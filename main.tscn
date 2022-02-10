@@ -1,0 +1,143 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://Objects/Helis/schweizer_300.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Objects/Buildings/hangar_2.tscn" type="PackedScene" id=2]
+[ext_resource path="res://main.gd" type="Script" id=3]
+[ext_resource path="res://Environments/WorldEnv.tres" type="Environment" id=4]
+[ext_resource path="res://SunLight.gd" type="Script" id=5]
+[ext_resource path="res://CameraInterpolation.gd" type="Script" id=6]
+[ext_resource path="res://HUD/LoadingScreen.gd" type="Script" id=7]
+[ext_resource path="res://ReflectionManager.gd" type="Script" id=8]
+
+[sub_resource type="SpatialMaterial" id=1]
+albedo_color = Color( 0, 0, 0, 1 )
+
+[sub_resource type="StyleBoxFlat" id=2]
+bg_color = Color( 0.129412, 0.129412, 0.129412, 1 )
+
+[node name="Spatial" type="Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00890732, -0.0263128, 0.0315943 )
+script = ExtResource( 3 )
+
+[node name="Schweizer_300" parent="." groups=["player"] instance=ExtResource( 1 )]
+pause_mode = 1
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155 )
+mode = 1
+
+[node name="CameraIterpolation" type="Spatial" parent="Schweizer_300"]
+pause_mode = 1
+transform = Transform( 1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, 0, 5.669, 7.354 )
+script = ExtResource( 6 )
+remote_path = NodePath("../../Camera")
+speed = 0.3
+
+[node name="World" type="Spatial" parent="."]
+
+[node name="Terrain" type="MeshInstance" parent="World"]
+skeleton = NodePath("")
+
+[node name="Environment" type="WorldEnvironment" parent="World"]
+environment = ExtResource( 4 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="World/Environment"]
+transform = Transform( -1, 5.01436e-08, -7.16125e-08, 0, 0.819152, 0.573576, 8.74228e-08, 0.573576, -0.819152, 0, 68.2458, 0 )
+light_energy = 1.03
+shadow_enabled = true
+directional_shadow_mode = 1
+directional_shadow_split_1 = 0.3
+directional_shadow_split_2 = 0.0
+directional_shadow_split_3 = 0.0
+directional_shadow_blend_splits = true
+directional_shadow_normal_bias = 2.6
+directional_shadow_max_distance = 300.0
+script = ExtResource( 5 )
+
+[node name="Networks" type="Node" parent="World"]
+
+[node name="Powerlines" type="Node" parent="World/Networks"]
+
+[node name="Road" type="Node" parent="World/Networks"]
+
+[node name="Reflections" type="Node" parent="World"]
+script = ExtResource( 8 )
+
+[node name="ReflectionProbe1" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe2" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe3" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe4" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe5" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe6" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe7" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe8" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe9" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe10" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe11" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe12" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe13" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe14" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe15" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="ReflectionProbe16" type="ReflectionProbe" parent="World/Reflections"]
+
+[node name="Buildings" type="Node" parent="World"]
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, -45.4393, 5.66891, 25.269 )
+near = 3.0
+far = 2000.0
+
+[node name="Start" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -50.5, 0, 0 )
+visible = false
+
+[node name="CSGPolygon" type="CSGPolygon" parent="Start"]
+transform = Transform( 50, 0, 0, 0, -2.18557e-06, 1, 0, -50, -4.37114e-08, -24.9718, -0.122162, 25.0614 )
+depth = 0.001
+smooth_faces = true
+material = SubResource( 1 )
+
+[node name="hangar" parent="Start" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.68345, 0, -4.04857 )
+
+[node name="LoadingScreen" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="LoadingScreen"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_styles/panel = SubResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ProgressBar" type="ProgressBar" parent="LoadingScreen"]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = 20.0
+margin_top = -7.0
+margin_right = -20.0
+margin_bottom = 23.0
+step = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}

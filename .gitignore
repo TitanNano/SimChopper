@@ -1,0 +1,8 @@
+# Import cache
+.import/
+
+# Binaries
+build/
+
+# Maps
+*.sc2

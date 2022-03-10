@@ -285,15 +285,12 @@ func _generate_terain_with_native_builder(city: Dictionary):
 func _generate_terain_async(city: Dictionary):
 	var grass_generator := SurfaceTool.new()
 	var dirt_generator := SurfaceTool.new()
-	var neon_generator := SurfaceTool.new()
 	var water_generator = SurfaceTool.new()
 
 	grass_generator.begin(Mesh.PRIMITIVE_TRIANGLES)
 	grass_generator.set_material(grass_material)
 	dirt_generator.begin(Mesh.PRIMITIVE_TRIANGLES)
 	dirt_generator.set_material(dirt_material)
-	neon_generator.begin(Mesh.PRIMITIVE_TRIANGLES)
-	neon_generator.set_material(neon_material)
 
 	water_generator.begin(Mesh.PRIMITIVE_TRIANGLES)
 	water_generator.set_material(ocean_material)
@@ -340,7 +337,6 @@ func _generate_terain_async(city: Dictionary):
 		if tile_type == 3:
 			water = tile.duplicate(true)
 
-			generator = neon_generator
 			tile[rotation.nw()].y -= tile_height
 			tile[rotation.ne()].y -= tile_height
 			tile[rotation.sw()].y -= tile_height
@@ -462,7 +458,7 @@ func _generate_terain_async(city: Dictionary):
 
 	prints("done generating surfaces", OS.get_system_time_msecs())
 
-	for generator in [dirt_generator, grass_generator, neon_generator, water_generator]:
+	for generator in [dirt_generator, grass_generator, water_generator]:
 		prints("got generator", budget.elapsed())
 		generator.index()
 		generator.generate_normals()

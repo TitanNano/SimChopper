@@ -33,7 +33,7 @@ void vertex() {
 
 void fragment() {
 	ALBEDO = color.rgb;
-	ALPHA = min(falloff * 2.0, 1.0);
+	ALPHA = min(1.0 - abs(falloff * 2.0 - 1.0), 1.0);
 }"
 
 [resource]

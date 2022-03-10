@@ -1,0 +1,20 @@
+[gd_resource type="ParticlesMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://Particles/Rotor/point_texture_schweizer.tex" type="Texture" id=1]
+
+[resource]
+emission_shape = 3
+emission_point_texture = ExtResource( 1 )
+emission_point_count = 512
+direction = Vector3( 0, 1, 0 )
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 15.0
+angle = -45.0
+scale = 4.0
+scale_random = 0.18
+color = Color( 0.698039, 0.25098, 0.25098, 1 )
+hue_variation = 1.0
+hue_variation_random = 1.0
+anim_speed = 1.0
+anim_offset = 1.0
+anim_offset_random = 1.0

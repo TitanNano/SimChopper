@@ -2,19 +2,6 @@ extends Spatial
 
 const grass_material = preload("res://Terrain/grass_material.tres")
 const dirt_material = preload("res://Terrain/dirt_material.tres")
-const blue_material = preload("res://Terrain/blue_material.tres")
-const black_material = preload("res://Terrain/black_material.tres")
-const orange_material = preload("res://Terrain/orange_material.tres")
-const red_material = preload("res://Terrain/red_material.tres")
-const white_material = preload("res://Terrain/white_material.tres")
-const yellow_material = preload("res://Terrain/yellow_material.tres")
-const pink_material = preload("res://Terrain/pink_material.tres")
-const aqua_material = preload("res://Terrain/aqua_material.tres")
-const purple_material = preload("res://Terrain/purple_material.tres")
-const darkblue_material = preload("res://Terrain/darkblue_material.tres")
-const gray_material = preload("res://Terrain/gray_material.tres")
-const neon_material = preload("res://Terrain/neon_material.tres")
-const blush_material = preload("res://Terrain/blush_material.tres")
 const ocean_material = preload("res://Materials/ocean.tres")
 
 const networks = {

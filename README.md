@@ -7,13 +7,13 @@ An open source mission driven helicopter pilot sandbox game.
 | Action                 | Keyboard      |
 |------------------------|---------------|
 | Lift Up                | Space         |
-| Lift Down              | Shift + Space |
+| Lift Down              | Shift + Space |
 | Forward                | W             |
 | Backwards              | S             |
-| Turn Clockwise         | D             |
+| Turn Clockwise         | D             |
 | Turn Counter Clockwise | A             |
 | Diagonally Left        | (W / S) + A   |
-| Diagonally Right       | (W / S) + D   |
+| Diagonally Right       | (W / S) + D   |
 
 ## Current Features
 

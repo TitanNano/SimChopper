@@ -1,7 +1,7 @@
 extends Spatial
 
-const grass_material = preload("res://Terrain/grass_material.tres")
-const dirt_material = preload("res://Terrain/dirt_material.tres")
+const grass_material = preload("res://Materials/grass_material.tres")
+const dirt_material = preload("res://Materials/dirt_material.tres")
 const ocean_material = preload("res://Materials/ocean.tres")
 
 const networks = {
@@ -162,10 +162,8 @@ const buildings = {
 }
 
 const TimeBudget := preload("util/TimeBudget.gd")
-const TerrainRotation := preload("Terrain/TerrainRotation.gd")
-const NTerrainRotation := preload("Terrain/TerrainRotation.gdns")
+const TerrainRotation := preload("Terrain/TerrainRotation.gdns")
 const TerrainBuilderFactory := preload("Terrain/TerrainBuilderFactory.gdns")
-const TerrainBuilder := preload("Terrain/TerrainBuilder.gd")
 const MsgPack := preload("res://godot-msgpack/msgpack.gd")
 const tile_size := 16
 const tile_height := 8
@@ -184,7 +182,11 @@ var sea_level := 0
 
 func _ready():
 	var file := File.new()
-	file.open("res://Maps/career/city0.sc2.mpz", File.READ)
+	var result = file.open("res://Maps/career/city0.sc2.mpz", File.READ)
+
+	if result != OK:
+		printerr("failed to open file")
+
 	var city_bytes := file.get_buffer(file.get_len()).decompress_dynamic(-1, File.COMPRESSION_GZIP)
 	var city: Dictionary = MsgPack.decode(city_bytes).result
 
@@ -198,8 +200,6 @@ func _ready():
 
 func _load_map_async(city: Dictionary):
 	self.world.visible = false
-	# yield(self._generate_terain_async(city), "completed")
-	# yield(self._generate_terain_with_builder(city), "completed")
 	self._generate_terain_with_native_builder(city)
 	yield(self._insert_networks_async(city.networks, city.tilelist), "completed")
 	yield(self._insert_buildings_async(city.buildings, city.tilelist), "completed")
@@ -209,12 +209,6 @@ func _load_map_async(city: Dictionary):
 
 #	self._create_snapshot()
 	self.world.visible = true
-
-
-func _on_terain_builder_progress(status) -> void:
-	var completed: int = self.loading_screen.completed_jobs
-	var progress := (float(status["complete"]) / float(status["total"])) * 100 * 3
-	self._on_progress(int(round(progress - completed)))
 
 
 func _on_progress(count: int) -> void:
@@ -240,32 +234,15 @@ func _spawn_player() -> void:
 	player.force_update_transform()
 	player.mode = RigidBody.MODE_RIGID
 
-func _generate_terain_with_builder(city: Dictionary):
-	self.loading_screen.progress += 100 * 3;
-
-	var rotation := TerrainRotation.new(city.simulator_settings['Compass'])
-	var builder := TerrainBuilder.new(city.tilelist, rotation, self.get_tree())
-
-	builder.connect("progress", self, "_on_terain_builder_progress") # warning-ignore:return_value_discarded
-	builder.city_size = city.city_size
-	builder.tile_size = self.tile_size
-	builder.tile_height = self.tile_height
-	builder.sea_level = self.sea_level
-
-	var mesh: ArrayMesh = yield(builder.build_terain_async(), "completed")
-
-	terrain.mesh = mesh
-	terrain.create_trimesh_collision()
-
 
 func _generate_terain_with_native_builder(city: Dictionary):
-	var rotation := NTerrainRotation.new()
+	var rotation := TerrainRotation.new()
 	rotation.set_rotation(city.simulator_settings['Compass'])
 
 	var materials := {
-		"Ground": preload("res://Terrain/dirt_material.tres"),
-		"Grass": preload("res://Terrain/grass_material.tres"),
-		"Water": preload("res://Materials/ocean.tres")
+		"Ground": dirt_material,
+		"Grass": grass_material,
+		"Water": ocean_material
 	}
 
 	var builder_factory := TerrainBuilderFactory.new()
@@ -280,230 +257,6 @@ func _generate_terain_with_native_builder(city: Dictionary):
 
 	terrain.mesh = mesh
 	terrain.create_trimesh_collision()
-
-
-func _generate_terain_async(city: Dictionary):
-	var grass_generator := SurfaceTool.new()
-	var dirt_generator := SurfaceTool.new()
-	var water_generator = SurfaceTool.new()
-
-	grass_generator.begin(Mesh.PRIMITIVE_TRIANGLES)
-	grass_generator.set_material(grass_material)
-	dirt_generator.begin(Mesh.PRIMITIVE_TRIANGLES)
-	dirt_generator.set_material(dirt_material)
-
-	water_generator.begin(Mesh.PRIMITIVE_TRIANGLES)
-	water_generator.set_material(ocean_material)
-
-	ocean_material.set_shader_param("Noise_Scale", city.city_size * 10)
-
-	var mesh := ArrayMesh.new()
-	var rotation := TerrainRotation.new(city.simulator_settings['Compass'])
-	var budget := TimeBudget.new(100)
-
-	for tile_key in city.tilelist:
-		var tileData: Dictionary = city.tilelist[tile_key]
-		var generator: SurfaceTool = dirt_generator
-
-		var tile_type: int = (tileData.terrain & 0xF0) >> 4
-		var tile_slope: int = tileData.terrain & 0x0F
-
-#		assert((tile_type > 0 && tileData.is_water) || (tile_type == 0 && not tileData.is_water))
-
-		var tile_x: int = tileData.coordinates[0] * tile_size
-		var tile_y: int = tileData.coordinates[1] * tile_size
-		var tile_z: int = tileData.altitude * tile_height
-
-		var tile := [
-#			0											1
-			Vector3(tile_x, tile_z, tile_y), 				Vector3(tile_x + tile_size, tile_z, tile_y),
-#			2											3
-			Vector3(tile_x, tile_z, tile_y + tile_size),	Vector3(tile_x + tile_size, tile_z, tile_y + tile_size),
-		]
-
-		var water := []
-
-		# tile is covered by water
-		if tile_type > 0 && self.sea_level >= tileData.altitude:
-			var water_altitude: float = tile_height * self.sea_level
-			water = tile.duplicate(true)
-
-			water[0].y = water_altitude
-			water[1].y = water_altitude
-			water[2].y = water_altitude
-			water[3].y = water_altitude
-
-		# tile is surface water
-		if tile_type == 3:
-			water = tile.duplicate(true)
-
-			tile[rotation.nw()].y -= tile_height
-			tile[rotation.ne()].y -= tile_height
-			tile[rotation.sw()].y -= tile_height
-			tile[rotation.se()].y -= tile_height
-
-		match tile_slope:
-			0x00:
-				generator = grass_generator
-
-			0x01:
-				tile[rotation.nw()].y += tile_height
-				tile[rotation.ne()].y += tile_height
-
-			0x02:
-				tile[rotation.ne()].y += tile_height
-				tile[rotation.se()].y += tile_height
-
-			0x03:
-				tile[rotation.sw()].y += tile_height
-				tile[rotation.se()].y += tile_height
-
-			0x04:
-				tile[rotation.nw()].y += tile_height
-				tile[rotation.sw()].y += tile_height
-
-			0x05:
-				tile[rotation.nw()].y += tile_height
-				tile[rotation.ne()].y += tile_height
-				tile[rotation.se()].y += tile_height
-
-			0x06:
-				tile[rotation.ne()].y += tile_height
-				tile[rotation.se()].y += tile_height
-				tile[rotation.sw()].y += tile_height
-
-			0x07:
-				tile[rotation.se()].y += tile_height
-				tile[rotation.sw()].y += tile_height
-				tile[rotation.nw()].y += tile_height
-
-			0x08:
-				tile[rotation.sw()].y += tile_height
-				tile[rotation.nw()].y += tile_height
-				tile[rotation.ne()].y += tile_height
-
-			0x09:
-				tile[rotation.ne()].y += tile_height
-
-			0x0A:
-				tile[rotation.se()].y += tile_height
-
-			0x0B:
-				tile[rotation.sw()].y += tile_height
-
-			0x0C:
-				tile[rotation.nw()].y += tile_height
-
-			0x0D:
-				tile[rotation.nw()].y += tile_height
-				tile[rotation.ne()].y += tile_height
-				tile[rotation.sw()].y += tile_height
-				tile[rotation.se()].y += tile_height
-
-			_:
-				generator = dirt_generator
-				print(tileData.coordinates, tile_slope)
-
-		var tile_center: Vector3 = (tile[0] + tile[1] + tile[2] + tile[3]) / tile.size()
-
-		var tile_faces := [
-			[tile[0], tile[1], tile_center],
-			[tile[1], tile[3], tile_center],
-			[tile[3], tile[2], tile_center],
-			[tile[2], tile[0], tile_center],
-		]
-
-		var water_faces := []
-
-		if water.size() > 0:
-			var resolution := 3
-
-			for ix in range(0, resolution):
-				var weight_x_start := 1.0 / resolution * ix
-				var weight_x_end := 1.0 / resolution * (ix+1)
-
-				for iy in range(0, resolution):
-					var weight_y_start := 1.0 / resolution * iy
-					var weight_y_end := 1.0 / resolution * (iy+1)
-
-					var x0 := lerp_xyz(water[0], water[3], weight_x_start, 0, weight_y_start)
-					var x1 := lerp_xyz(water[0], water[3], weight_x_end, 0, weight_y_start)
-					var y0 := lerp_xyz(water[0], water[3], weight_x_start, 0, weight_y_end)
-					var y1 := lerp_xyz(water[0], water[3], weight_x_end, 0, weight_y_end)
-					var c: Vector3 = x0 + ((y1 - x0) / 2)
-
-					water_faces.append_array([
-						[x0, x1, c],
-						[x1, y1, c],
-						[y1, y0, c],
-						[y0, x0, c],
-					])
-
-		for face in tile_faces:
-			for vertex in face:
-				generator.add_uv(self._tile_vertex_to_uv(vertex, tile_size, tileData.coordinates))
-				generator.add_vertex(vertex)
-
-		for face in water_faces:
-			for vertex in face:
-				water_generator.add_uv(self._tile_vertex_to_city_uv(vertex, tile_size, city.city_size))
-				water_generator.add_vertex(vertex)
-
-		self.emit_signal("loading_progress", 1)
-
-		if budget.is_exceded():
-			prints("exceded terain surface frame budget", budget.elapsed())
-			budget.restart()
-			yield(self.get_tree(), "idle_frame")
-
-	prints("done generating surfaces", OS.get_system_time_msecs())
-
-	for generator in [dirt_generator, grass_generator, water_generator]:
-		prints("got generator", budget.elapsed())
-		generator.index()
-		generator.generate_normals()
-		generator.generate_tangents()
-		prints("generated index, normals and tangents", budget.elapsed())
-
-		var surface_mesh: ArrayMesh = generator.commit()
-
-		prints("commited surface mesh", budget.elapsed())
-		if surface_mesh.get_surface_count() == 0:
-			continue
-
-		assert(surface_mesh.get_surface_count() == 1)
-		var new_index := mesh.get_surface_count()
-		var current_surface := surface_mesh.surface_get_arrays(0)
-		prints("got surface mesh", budget.elapsed())
-		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, current_surface)
-		mesh.surface_set_material(new_index, surface_mesh.surface_get_material(0))
-		prints("merged surface mesh and material", budget.elapsed())
-
-		if budget.is_exceded():
-			prints("exceeded mesh merge frame budget", budget.elapsed())
-			budget.restart()
-			yield(self.get_tree(), "idle_frame")
-
-	prints("done merging surfaces", OS.get_system_time_msecs())
-	terrain.mesh = mesh;
-	prints("surface mesh assigned", OS.get_system_time_msecs())
-	terrain.create_trimesh_collision()
-	prints("done generating terain collision", OS.get_system_time_msecs())
-	yield(self.get_tree(), "idle_frame")
-
-
-static func _tile_vertex_to_uv(vertex: Vector3, tile_size: float, tile_coordinate: Array) -> Vector2:
-	var uv_x: float = (vertex.x / tile_size) - tile_coordinate[0]
-	var uv_y: float = (vertex.z / tile_size) - tile_coordinate[1]
-
-	return Vector2(uv_x, uv_y)
-
-
-static func _tile_vertex_to_city_uv(vertex: Vector3, tile_size: float, city_size: float) -> Vector2:
-	var uv_x: float = vertex.x / (city_size * tile_size)
-	var uv_y: float = vertex.z / (city_size * tile_size)
-
-	return Vector2(uv_x, uv_y)
 
 
 func _insert_buildings_async(buildings: Dictionary, tiles: Dictionary):
@@ -680,10 +433,3 @@ func _setup_probing(city_size: int) -> void:
 	self.reflections.city_size = city_size
 
 	self.reflections.build_probes()
-
-func lerp_xyz(from: Vector3, to: Vector3, x, y, z) -> Vector3:
-	var target_x: float = lerp(from.x, to.x, x)
-	var target_y: float = lerp(from.y, to.y, y)
-	var target_z: float = lerp(from.z, to.z, z)
-
-	return Vector3(target_x, target_y, target_z)

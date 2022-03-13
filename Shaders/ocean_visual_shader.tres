@@ -1,9 +1,9 @@
 [gd_resource type="VisualShader" load_steps=52 format=2]
 
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_3d.gd" type="Script" id=1]
-[ext_resource path="res://addons/shaderV/tools/TimeScaled.gd" type="Script" id=2]
-[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/3d/screenspace_refraction.gd" type="Script" id=3]
-[ext_resource path="res://addons/shaderV/tools/relay.gd" type="Script" id=4]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/3d/screenspace_refraction.gd" type="Script" id=1]
+[ext_resource path="res://addons/visual_shader_node_library/shader_nodes/common/noise/simplex_3d.gd" type="Script" id=2]
+[ext_resource path="res://addons/shaderV/tools/relay.gd" type="Script" id=3]
+[ext_resource path="res://addons/shaderV/tools/TimeScaled.gd" type="Script" id=4]
 
 [sub_resource type="VisualShaderNodeInput" id=1]
 output_port_for_preview = 0
@@ -20,7 +20,7 @@ uniform_name = "Normal_Resolution"
 [sub_resource type="VisualShaderNodeCustom" id=5]
 default_input_values = [ 0, 0.1 ]
 initialized = true
-script = ExtResource( 2 )
+script = ExtResource( 4 )
 
 [sub_resource type="VisualShaderNodeVectorCompose" id=6]
 
@@ -36,7 +36,7 @@ uniform_name = "Albedo"
 [sub_resource type="VisualShaderNodeCustom" id=10]
 default_input_values = [ 1, 1.0, 2, 0.0, 4, 0.0 ]
 initialized = true
-script = ExtResource( 3 )
+script = ExtResource( 1 )
 
 [sub_resource type="VisualShaderNodeScalarUniform" id=11]
 uniform_name = "IOR"
@@ -110,7 +110,7 @@ constant = 1.0
 
 [sub_resource type="VisualShaderNodeCustom" id=31]
 initialized = true
-script = ExtResource( 4 )
+script = ExtResource( 3 )
 
 [sub_resource type="VisualShaderNodeTextureUniform" id=32]
 uniform_name = "TextureUniform"
@@ -133,12 +133,12 @@ input_name = "uv"
 [sub_resource type="VisualShaderNodeCustom" id=37]
 default_input_values = [ 1, Vector3( 1, 1, 1 ) ]
 initialized = true
-script = ExtResource( 1 )
+script = ExtResource( 2 )
 
 [sub_resource type="VisualShaderNodeCustom" id=38]
 default_input_values = [ 0, 0.01 ]
 initialized = true
-script = ExtResource( 2 )
+script = ExtResource( 4 )
 
 [sub_resource type="VisualShaderNodeVectorOp" id=39]
 default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 2, 3, 3 ) ]

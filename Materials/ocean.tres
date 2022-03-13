@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" load_steps=3 format=2]
 
-[ext_resource path="res://Materials/ocean_visual_shader.tres" type="Shader" id=1]
+[ext_resource path="res://Shaders/ocean_visual_shader.tres" type="Shader" id=1]
 [ext_resource path="res://Materials/procedural_ocean_noise.tres" type="Texture" id=2]
 
 [resource]

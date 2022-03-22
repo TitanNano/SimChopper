@@ -17,7 +17,6 @@ bg_color = Color( 0.129412, 0.129412, 0.129412, 1 )
 
 [node name="Spatial" type="Spatial"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00890732, -0.0263128, 0.0315943 )
-script = ExtResource( 3 )
 
 [node name="Schweizer_300" parent="." groups=["player"] instance=ExtResource( 1 )]
 pause_mode = 1
@@ -32,6 +31,7 @@ remote_path = NodePath("../../Camera")
 speed = 0.3
 
 [node name="World" type="Spatial" parent="."]
+script = ExtResource( 3 )
 
 [node name="Terrain" type="MeshInstance" parent="World"]
 skeleton = NodePath("")

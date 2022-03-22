@@ -170,17 +170,20 @@ const tile_height := 8
 
 signal loading_progress(count)
 
-onready var world := $World
-onready var terrain: MeshInstance = $World/Terrain
-onready var powerline_network := $World/Networks/Powerlines
-onready var road_network := $World/Networks/Road
-onready var loading_screen := $LoadingScreen
-onready var reflections := $World/Reflections
-onready var buildings_node := $World/Buildings
+onready var terrain: MeshInstance = $Terrain
+onready var powerline_network := $Networks/Powerlines
+onready var road_network := $Networks/Road
+onready var loading_screen := get_node("../LoadingScreen")
+onready var reflections := $Reflections
+onready var buildings_node := $Buildings
 
 var sea_level := 0
 
 func _ready():
+	call_deferred("_ready_deferred")
+
+
+func _ready_deferred():
 	var file := File.new()
 	var result = file.open("res://Maps/career/city0.sc2.mpz", File.READ)
 
@@ -199,7 +202,7 @@ func _ready():
 
 
 func _load_map_async(city: Dictionary):
-	self.world.visible = false
+	self.visible = false
 	self._generate_terain_with_native_builder(city)
 	yield(self._insert_networks_async(city.networks, city.tilelist), "completed")
 	yield(self._insert_buildings_async(city.buildings, city.tilelist), "completed")
@@ -208,7 +211,7 @@ func _load_map_async(city: Dictionary):
 	self._spawn_player()
 
 #	self._create_snapshot()
-	self.world.visible = true
+	self.visible = true
 
 
 func _on_progress(count: int) -> void:

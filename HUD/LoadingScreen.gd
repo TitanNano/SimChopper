@@ -2,8 +2,6 @@ extends Control
 
 onready var progress = $ProgressBar
 
-var _total_jobs := 0
-
 var total_jobs: int setget _set_total_jobs, _get_total_jobs
 var completed_jobs: int setget _set_completed_jobs, _get_completed_jobs
 

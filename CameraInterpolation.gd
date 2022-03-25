@@ -32,17 +32,7 @@ func _physics_process(_delta: float):
 
 		self.global_transform = parent.global_transform * counter_transform * self.local_transform
 
-
-#	var current_rotation := target.rotation
 	var current_transform := target.global_transform
 	var destination_transform := self.global_transform
-#	var is_moving := !self.last_destination.is_equal_approx(destination_transform)
-#	var acceleration = self.acceleration * delta
-#
-#	self.speed += acceleration if is_moving else -acceleration
-#	self.speed = min(1.0, max(self.speed, 0.1))
 
 	target.transform = current_transform.interpolate_with(destination_transform, self.speed)
-
-	# if not full_transform:
-	#	target.rotation = Vector3(current_rotation.x, target.rotation.y, current_rotation.z)

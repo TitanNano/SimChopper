@@ -169,13 +169,14 @@ const tile_size := 16
 const tile_height := 8
 
 signal loading_progress(count)
+signal loading_scale(count)
 
 onready var terrain: MeshInstance = $Terrain
 onready var powerline_network := $Networks/Powerlines
 onready var road_network := $Networks/Road
-onready var loading_screen := get_node("../LoadingScreen")
 onready var reflections := $Reflections
 onready var buildings_node := $Buildings
+onready var baked_lights := $"../BakedLightmap"
 
 var sea_level := 0
 
@@ -193,11 +194,9 @@ func _ready_deferred():
 	var city_bytes := file.get_buffer(file.get_len()).decompress_dynamic(-1, File.COMPRESSION_GZIP)
 	var city: Dictionary = MsgPack.decode(city_bytes).result
 
-	self.loading_screen.total_jobs = city.buildings.size() + city.networks.size()
+	self.emit_signal("loading_scale", city.buildings.size() + city.networks.size())
 	self.sea_level = city.simulator_settings["GlobalSeaLevel"]
 
-	# warning-ignore:return_value_discarded
-	self.connect("loading_progress", self, "_on_progress")
 	self._load_map_async(city)
 
 
@@ -212,10 +211,6 @@ func _load_map_async(city: Dictionary):
 
 #	self._create_snapshot()
 	self.visible = true
-
-
-func _on_progress(count: int) -> void:
-	self.loading_screen.completed_jobs += count
 
 
 func _create_snapshot() -> void:

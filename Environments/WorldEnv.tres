@@ -4,14 +4,18 @@
 ground_bottom_color = Color( 0.501961, 0.6, 0.701961, 1 )
 ground_horizon_color = Color( 0.501961, 0.6, 0.701961, 1 )
 ground_energy = 0.0
+sun_color = Color( 1, 0.913725, 0.713726, 1 )
 
 [resource]
 background_mode = 2
 background_sky = SubResource( 1 )
-fog_color = Color( 0.501961, 0.6, 0.701961, 1 )
+fog_enabled = true
+fog_color = Color( 0.647059, 0.839216, 0.945098, 1 )
+fog_sun_color = Color( 1, 0.913725, 0.713726, 1 )
 fog_sun_amount = 1.0
 fog_depth_begin = 0.0
-fog_depth_end = 600.0
+fog_depth_end = 900.0
+fog_transmit_enabled = true
 tonemap_mode = 3
 tonemap_exposure = 0.7
 ss_reflections_fade_in = 0.5

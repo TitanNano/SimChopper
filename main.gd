@@ -176,7 +176,7 @@ onready var powerline_network := $Networks/Powerlines
 onready var road_network := $Networks/Road
 onready var reflections := $Reflections
 onready var buildings_node := $Buildings
-onready var baked_lights := $"../BakedLightmap"
+onready var backdrop := $Backdrop
 
 var sea_level := 0
 
@@ -194,7 +194,7 @@ func _ready_deferred():
 	var city_bytes := file.get_buffer(file.get_len()).decompress_dynamic(-1, File.COMPRESSION_GZIP)
 	var city: Dictionary = MsgPack.decode(city_bytes).result
 
-	self.emit_signal("loading_scale", city.buildings.size() + city.networks.size())
+	self.emit_signal("loading_scale", city.buildings.size() + city.networks.size() + 1)
 	self.sea_level = city.simulator_settings["GlobalSeaLevel"]
 
 	self._load_map_async(city)
@@ -207,10 +207,13 @@ func _load_map_async(city: Dictionary):
 	yield(self._insert_buildings_async(city.buildings, city.tilelist), "completed")
 
 	self._setup_probing(city.city_size)
+	self.backdrop.build(city.city_size, self.tile_size, self.sea_level * tile_height)
 	self._spawn_player()
 
 #	self._create_snapshot()
+	yield(get_tree(), "idle_frame")
 	self.visible = true
+	self.emit_signal("loading_progress", 1)
 
 
 func _create_snapshot() -> void:

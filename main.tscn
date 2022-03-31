@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Objects/Helis/schweizer_300.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Objects/Buildings/hangar_2.tscn" type="PackedScene" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://HUD/LoadingScreen.gd" type="Script" id=7]
 [ext_resource path="res://ReflectionManager.gd" type="Script" id=8]
 [ext_resource path="res://HUDController.gd" type="Script" id=9]
+[ext_resource path="res://Backdrop.gd" type="Script" id=10]
 
 [sub_resource type="StyleBoxFlat" id=2]
 bg_color = Color( 0.129412, 0.129412, 0.129412, 1 )
@@ -140,10 +141,13 @@ script = ExtResource( 8 )
 
 [node name="Buildings" type="Node" parent="ViewportContainer/Viewport/World"]
 
+[node name="Backdrop" type="Node" parent="ViewportContainer/Viewport/World"]
+script = ExtResource( 10 )
+
 [node name="Camera" type="Camera" parent="ViewportContainer/Viewport"]
 transform = Transform( 1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, -45.4393, 5.66891, 25.269 )
 near = 3.0
-far = 2000.0
+far = 200000.0
 
 [node name="Start" type="Spatial" parent="ViewportContainer/Viewport"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -50.5, 0, 0 )

@@ -4,6 +4,7 @@ export var remote_path: NodePath
 export var local_transform: Transform
 export var full_transform := false
 export(float, 0, 1) var speed: float = 0.5
+export var snap := false
 
 func _ready():
 	var target = get_node(self.remote_path) as Spatial
@@ -35,4 +36,5 @@ func _physics_process(_delta: float):
 	var current_transform := target.global_transform
 	var destination_transform := self.global_transform
 
-	target.transform = current_transform.interpolate_with(destination_transform, self.speed)
+	target.transform = current_transform.interpolate_with(destination_transform, self.speed if not snap else 1.0)
+	self.snap = false

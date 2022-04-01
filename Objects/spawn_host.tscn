@@ -1,0 +1,6 @@
+[gd_scene format=2]
+
+[node name="SpawnHost" type="Spatial"]
+
+[node name="Spawn" type="Position3D" parent="." groups=["spawn"]]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.896, 0.01, 23.412 )

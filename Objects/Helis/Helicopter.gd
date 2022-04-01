@@ -18,6 +18,7 @@ var engine_speed := 0.0
 onready var audio_fx := $AudioFx
 onready var dust_particles := $Dust
 onready var rotor = $rotor
+onready var camera = $CameraInterpolation
 
 
 # Called when the node enters the scene tree for the first time.
@@ -130,3 +131,6 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 
 	state.apply_torque_impulse(torque_impulse)
 
+
+func snap_camera():
+	self.camera.snap = true

@@ -201,7 +201,6 @@ func _ready_deferred():
 
 
 func _load_map_async(city: Dictionary):
-	self.visible = false
 	self._generate_terain_with_native_builder(city)
 	yield(self._insert_networks_async(city.networks, city.tilelist), "completed")
 	yield(self._insert_buildings_async(city.buildings, city.tilelist), "completed")
@@ -211,8 +210,7 @@ func _load_map_async(city: Dictionary):
 	self._spawn_player()
 
 #	self._create_snapshot()
-	yield(get_tree(), "idle_frame")
-	self.visible = true
+	yield(self.get_tree(), "idle_frame")
 	self.emit_signal("loading_progress", 1)
 
 
@@ -233,6 +231,7 @@ func _spawn_player() -> void:
 
 	player.global_transform.origin = spawn.global_transform.origin
 	player.force_update_transform()
+	player.snap_camera()
 	player.mode = RigidBody.MODE_RIGID
 
 
@@ -326,8 +325,8 @@ func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 		return
 
 	if building.building_id == 0xE6 and self._is_spawn_point(building, tiles):
-		print("SPAWN POINT AT {point}".format({ "point": building.tile_coords }))
-		self._insert_building({ "building_id": 0xF6, "tile_coords": building.tile_coords, "name": "Hangar", "size": 1 }, tiles)
+		self._insert_building({ "building_id": 0xF6, "tile_coords": building.tile_coords, "name": "Hangar", "size": 2 }, tiles)
+		self._insert_spawn_point(building.tile_coords, 2, tile.altitude)
 
 	budget.restart()
 	var instance: Spatial = object.instance()
@@ -360,6 +359,16 @@ func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 
 	if insert_time > 100:
 		printerr("\"%s\" is very slow to insert" % building.name)
+
+
+func _insert_spawn_point(building_coords: Array, building_size: int, altitude: int) -> void:
+	print("SPAWN POINT AT {point}".format({ "point": building_coords }))
+	var spawn_host_scene := preload("res://Objects/spawn_host.tscn")
+	var spawn_host := spawn_host_scene.instance()
+	var location := self._get_building_world_cords(building_coords[0], building_coords[1], altitude, building_size)
+
+	spawn_host.translate(location)
+	self.add_child(spawn_host)
 
 
 func _get_building_world_cords(x: int, y: int, z: int, size: int) -> Vector3:

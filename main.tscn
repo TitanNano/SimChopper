@@ -64,11 +64,10 @@ shadow_atlas_size = 4096
 shadow_atlas_quad_0 = 1
 
 [node name="Schweizer_300" parent="ViewportContainer/Viewport" groups=["player"] instance=ExtResource( 1 )]
-pause_mode = 1
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155 )
 mode = 1
 
-[node name="CameraIterpolation" type="Position3D" parent="ViewportContainer/Viewport/Schweizer_300"]
+[node name="CameraInterpolation" type="Position3D" parent="ViewportContainer/Viewport/Schweizer_300"]
 pause_mode = 1
 transform = Transform( 1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, 0, 5.669, 7.354 )
 script = ExtResource( 6 )

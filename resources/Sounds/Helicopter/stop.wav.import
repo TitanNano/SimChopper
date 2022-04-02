@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/stop.wav-1729156457e3e9bff766d4d0ca71f3d4.sample"
+
+[deps]
+
+source_file="res://resources/Sounds/Helicopter/stop.wav"
+dest_files=[ "res://.import/stop.wav-1729156457e3e9bff766d4d0ca71f3d4.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

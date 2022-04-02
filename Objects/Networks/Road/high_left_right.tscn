@@ -1,5 +1,0 @@
-[gd_scene load_steps=2 format=2]
-
-[ext_resource path="res://Meshes/Networks/Road/high_left_right.glb" type="PackedScene" id=1]
-
-[node name="HighLeftRight" instance=ExtResource( 1 )]

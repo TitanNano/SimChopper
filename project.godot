@@ -807,7 +807,7 @@ _global_script_class_icons={
 [application]
 
 config/name="SimChopper"
-run/main_scene="res://main.tscn"
+run/main_scene="res://resources/main.tscn"
 
 [display]
 
@@ -894,4 +894,4 @@ common/enable_pause_aware_picking=true
 
 [rendering]
 
-environment/default_environment="res://Environments/default_env.tres"
+environment/default_environment="res://resources/Environments/default_env.tres"

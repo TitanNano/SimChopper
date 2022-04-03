@@ -63,6 +63,7 @@ process_material = ExtResource( 6 )
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.00369608 )
 
 [node name="Maxis-3d2-mesh-106" parent="main" index="0"]
+use_in_baked_light = true
 material/0 = SubResource( 6 )
 material/1 = SubResource( 7 )
 material/2 = SubResource( 8 )
@@ -105,3 +106,4 @@ material/0 = null
 
 [editable path="main"]
 [editable path="rotor"]
+[editable path="tail_rotor"]

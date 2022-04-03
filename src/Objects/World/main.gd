@@ -167,6 +167,7 @@ const TerrainBuilderFactory := preload("../Terrain/TerrainBuilderFactory.gdns")
 const MsgPack := preload("../../godot-msgpack/msgpack.gd")
 const tile_size := 16
 const tile_height := 8
+const gi_probe_columns := 1
 
 signal loading_progress(count)
 signal loading_scale(count)
@@ -195,7 +196,7 @@ func _ready_deferred():
 	var city_bytes := file.get_buffer(file.get_len()).decompress_dynamic(-1, File.COMPRESSION_GZIP)
 	var city: Dictionary = MsgPack.decode(city_bytes).result
 
-	self.emit_signal("loading_scale", city.buildings.size() + city.networks.size() + 1)
+	self.emit_signal("loading_scale", city.buildings.size() + city.networks.size() + (gi_probe_columns * gi_probe_columns) + 1)
 	self.sea_level = city.simulator_settings["GlobalSeaLevel"]
 
 	self._load_map_async(city)
@@ -207,6 +208,7 @@ func _load_map_async(city: Dictionary):
 	yield(self._insert_buildings_async(city.buildings, city.tilelist), "completed")
 
 	self._setup_probing(city.city_size)
+	yield(self._async_bake_lighting(city.city_size), "completed")
 	self.backdrop.build(city.city_size, self.tile_size, self.sea_level * tile_height)
 	self._spawn_player()
 
@@ -444,3 +446,37 @@ func _setup_probing(city_size: int) -> void:
 	self.reflections.city_size = city_size
 
 	self.reflections.build_probes()
+
+
+func _async_bake_lighting(city_size: int):
+	var budget := TimeBudget.new(0)
+	var probe_size: float = (city_size * tile_size) / gi_probe_columns
+
+	for x in range(0, gi_probe_columns):
+		for y in range(0, gi_probe_columns):
+			var probe := GIProbe.new()
+			var probe_height := self.tile_height * 10
+			prints("creating gi_probe", "%dx%d..." % [x,y])
+
+			var translation = Vector3(
+				probe_size * x + (probe_size / 2.0),
+				self.sea_level + probe_height,
+				probe_size * y + (probe_size / 2.0)
+			)
+
+			var extents = Vector3(probe_size / 2.0, probe_height, probe_size / 2.0)
+
+			probe.extents = extents
+			probe.translation = translation
+			probe.energy = 0.5
+			probe.propagation = 0.3
+			probe.subdiv = GIProbe.SUBDIV_MAX
+
+			$GIProbes.add_child(probe)
+			probe.owner = get_tree().get_current_scene()
+			probe.call_deferred('bake', self)
+			self.emit_signal("loading_progress", 1)
+			yield(get_tree(), "idle_frame")
+			prints("gi probe has been baked!")
+
+	prints("gi_probes bake time:", budget.elapsed())

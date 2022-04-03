@@ -4,7 +4,7 @@
 ground_bottom_color = Color( 0.501961, 0.6, 0.701961, 1 )
 ground_horizon_color = Color( 0.501961, 0.6, 0.701961, 1 )
 ground_energy = 0.0
-sun_color = Color( 1, 0.913725, 0.713726, 1 )
+sun_color = Color( 1, 0.960784, 0.866667, 1 )
 
 [resource]
 background_mode = 2

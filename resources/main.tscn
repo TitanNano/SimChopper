@@ -78,6 +78,7 @@ speed = 0.3
 script = ExtResource( 3 )
 
 [node name="Terrain" type="MeshInstance" parent="ViewportContainer/Viewport/World"]
+use_in_baked_light = true
 skeleton = NodePath("")
 
 [node name="Environment" type="WorldEnvironment" parent="ViewportContainer/Viewport/World"]
@@ -87,6 +88,7 @@ environment = ExtResource( 8 )
 transform = Transform( -1, 5.01436e-08, -7.16125e-08, 0, 0.819152, 0.573576, 8.74228e-08, 0.573576, -0.819152, 10, 30, 10 )
 light_color = Color( 1, 0.960784, 0.866667, 1 )
 light_energy = 1.03
+light_indirect_energy = 2.0
 shadow_enabled = true
 directional_shadow_mode = 1
 directional_shadow_split_1 = 0.3
@@ -104,7 +106,7 @@ script = ExtResource( 9 )
 
 [node name="Road" type="Node" parent="ViewportContainer/Viewport/World/Networks"]
 
-[node name="Reflections" type="Node" parent="ViewportContainer/Viewport/World"]
+[node name="Reflections" type="Spatial" parent="ViewportContainer/Viewport/World"]
 script = ExtResource( 5 )
 
 [node name="ReflectionProbe1" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
@@ -138,6 +140,8 @@ script = ExtResource( 5 )
 [node name="ReflectionProbe15" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
 
 [node name="ReflectionProbe16" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
+
+[node name="GIProbes" type="Spatial" parent="ViewportContainer/Viewport/World"]
 
 [node name="Buildings" type="Node" parent="ViewportContainer/Viewport/World"]
 

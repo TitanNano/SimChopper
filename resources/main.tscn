@@ -104,40 +104,8 @@ script = ExtResource( 9 )
 
 [node name="Road" type="Node" parent="ViewportContainer/Viewport/World/Networks"]
 
-[node name="Reflections" type="Node" parent="ViewportContainer/Viewport/World"]
+[node name="Reflections" type="Spatial" parent="ViewportContainer/Viewport/World"]
 script = ExtResource( 5 )
-
-[node name="ReflectionProbe1" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe2" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe3" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe4" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe5" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe6" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe7" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe8" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe9" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe10" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe11" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe12" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe13" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe14" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe15" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
-
-[node name="ReflectionProbe16" type="ReflectionProbe" parent="ViewportContainer/Viewport/World/Reflections"]
 
 [node name="Buildings" type="Node" parent="ViewportContainer/Viewport/World"]
 

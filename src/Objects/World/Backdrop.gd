@@ -36,7 +36,7 @@ func create_quadrant(size_city: int, size_depth: int, sea_level: int, offset_x: 
 	# warning-ignore:integer_division
 	# warning-ignore:integer_division
 	instance.translation.x = (size_city / 2 * offset_x) + (size_x / 2 * (offset_x - 1))
-	instance.translation.y = sea_level - 1
+	instance.translation.y = sea_level - 3
 
 	if offset_z == 0 and offset_x == 1:
 		instance.translation.z += merge_margin

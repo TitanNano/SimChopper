@@ -1,0 +1,15 @@
+[gd_resource type="SpatialMaterial" load_steps=3 format=2]
+
+[ext_resource path="res://resources/Textures/tex40-23_normal.png" type="Texture" id=1]
+[ext_resource path="res://resources/Textures/tex40-23.png" type="Texture" id=2]
+
+[resource]
+resource_name = "mat40-23"
+vertex_color_use_as_albedo = true
+params_cull_mode = 2
+albedo_texture = ExtResource( 2 )
+metallic = 1.0
+roughness = 0.74
+normal_enabled = true
+normal_scale = 0.5
+normal_texture = ExtResource( 1 )

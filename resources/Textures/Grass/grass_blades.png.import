@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/smoke_06.png-5878b3a82675329de8cc9bffd90213f6.s3tc.stex"
-path.etc2="res://.import/smoke_06.png-5878b3a82675329de8cc9bffd90213f6.etc2.stex"
+path.s3tc="res://.import/grass_blades.png-4b9c37ca02523d9a13d941e0be6c8cd1.s3tc.stex"
+path.etc2="res://.import/grass_blades.png-4b9c37ca02523d9a13d941e0be6c8cd1.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://resources/Materials/smoke_06.png"
-dest_files=[ "res://.import/smoke_06.png-5878b3a82675329de8cc9bffd90213f6.s3tc.stex", "res://.import/smoke_06.png-5878b3a82675329de8cc9bffd90213f6.etc2.stex" ]
+source_file="res://resources/Textures/Grass/grass_blades.png"
+dest_files=[ "res://.import/grass_blades.png-4b9c37ca02523d9a13d941e0be6c8cd1.s3tc.stex", "res://.import/grass_blades.png-4b9c37ca02523d9a13d941e0be6c8cd1.etc2.stex" ]
 
 [params]
 

@@ -1,7 +1,7 @@
 extends Spatial
 
 const terrain_material = preload("res://resources/Materials/terrain_material.tres")
-const ocean_material = preload("res://resources/Materials/ocean.tres")
+const ocean_material = preload("res://resources/Materials/ocean_material.tres")
 
 const networks = {
 	# Powerlines

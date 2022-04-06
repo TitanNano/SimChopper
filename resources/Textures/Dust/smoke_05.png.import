@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/ocean.png-58dcff0e10faa5969e22cebfb720ed1b.s3tc.stex"
-path.etc2="res://.import/ocean.png-58dcff0e10faa5969e22cebfb720ed1b.etc2.stex"
+path.s3tc="res://.import/smoke_05.png-91cacaa1684ce14a4f3bd6065d358d57.s3tc.stex"
+path.etc2="res://.import/smoke_05.png-91cacaa1684ce14a4f3bd6065d358d57.etc2.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc2" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://resources/Materials/ocean.png"
-dest_files=[ "res://.import/ocean.png-58dcff0e10faa5969e22cebfb720ed1b.s3tc.stex", "res://.import/ocean.png-58dcff0e10faa5969e22cebfb720ed1b.etc2.stex" ]
+source_file="res://resources/Textures/Dust/smoke_05.png"
+dest_files=[ "res://.import/smoke_05.png-91cacaa1684ce14a4f3bd6065d358d57.s3tc.stex", "res://.import/smoke_05.png-91cacaa1684ce14a4f3bd6065d358d57.etc2.stex" ]
 
 [params]
 
@@ -20,12 +20,12 @@ compress/mode=2
 compress/lossy_quality=0.7
 compress/hdr_mode=0
 compress/bptc_ldr=0
-compress/normal_map=1
+compress/normal_map=0
 flags/repeat=true
 flags/filter=true
 flags/mipmaps=true
 flags/anisotropic=false
-flags/srgb=2
+flags/srgb=1
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/HDR_as_SRGB=false

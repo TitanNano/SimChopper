@@ -1,8 +1,8 @@
 [gd_scene load_steps=140 format=2]
 
-[ext_resource path="res://resources/Materials/tree_leaves.tres" type="Material" id=1]
+[ext_resource path="res://resources/Materials/tree_leaves_material.tres" type="Material" id=1]
 [ext_resource path="res://resources/Meshes/Buildings/Tree/single.gltf" type="PackedScene" id=2]
-[ext_resource path="res://resources/Materials/tree_trunk.tres" type="Material" id=3]
+[ext_resource path="res://resources/Materials/tree_trunk_material.tres" type="Material" id=3]
 
 [sub_resource type="ConvexPolygonShape" id=1]
 points = PoolVector3Array( 0.154582, 4.71662, 0.351875, 0.219396, 5.33246, 0.643551, 0.186995, 5.33246, 0.643551, 0.251821, 4.61931, 0.416689, 0.219396, 5.1703, 0.481502, 0.122169, 4.9111, 0.481502, 0.251821, 4.68416, 0.319453, 0.122169, 4.97588, 0.416689 )

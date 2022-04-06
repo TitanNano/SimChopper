@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://resources/Materials/terrain_material.tres" type="Material" id=1]
-[ext_resource path="res://resources/Materials/grass_blade.tres" type="Material" id=2]
-[ext_resource path="res://resources/Materials/grass_particle_material.tres" type="Material" id=3]
+[ext_resource path="res://resources/Materials/grass_blade_material.tres" type="Material" id=2]
+[ext_resource path="res://resources/Particles/Grass/grass_particle_material.tres" type="Material" id=3]
 
 [sub_resource type="PlaneMesh" id=8]
 size = Vector2( 16, 16 )

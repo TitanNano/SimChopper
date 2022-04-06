@@ -1,7 +1,6 @@
 extends Spatial
 
-const grass_material = preload("res://resources/Materials/grass_material.tres")
-const dirt_material = preload("res://resources/Materials/dirt_material.tres")
+const terrain_material = preload("res://resources/Materials/terrain_material.tres")
 const ocean_material = preload("res://resources/Materials/ocean.tres")
 
 const networks = {
@@ -241,8 +240,7 @@ func _generate_terain_with_native_builder(city: Dictionary):
 	rotation.set_rotation(city.simulator_settings['Compass'])
 
 	var materials := {
-		"Ground": dirt_material,
-		"Grass": grass_material,
+		"Ground": terrain_material,
 		"Water": ocean_material
 	}
 

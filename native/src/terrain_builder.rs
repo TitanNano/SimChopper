@@ -70,7 +70,6 @@ impl TileData {
 #[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
 enum TileSurfaceType {
     Ground,
-    Grass,
     Water,
 }
 
@@ -78,7 +77,6 @@ impl fmt::Display for TileSurfaceType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let value = match self {
             Self::Ground => "Ground",
-            Self::Grass => "Grass",
             Self::Water => "Water",
         };
 
@@ -441,7 +439,7 @@ impl TerrainBuilder {
         let height: f32 = self.tile_height.into();
 
         match slope {
-            0x00 => tile.kind = TileSurfaceType::Grass,
+            0x00 => (),
 
             0x01 => {
                 tile.corners[rotation.nw()].y += height;

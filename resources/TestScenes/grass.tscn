@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://resources/Materials/grass_material.tres" type="Material" id=1]
+[ext_resource path="res://resources/Materials/terrain_material.tres" type="Material" id=1]
 [ext_resource path="res://resources/Materials/grass_blade.tres" type="Material" id=2]
 [ext_resource path="res://resources/Materials/grass_particle_material.tres" type="Material" id=3]
 

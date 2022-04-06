@@ -1,7 +1,4 @@
-[gd_resource type="Shader" format=2]
-
-[resource]
-code = "shader_type spatial;
+shader_type spatial;
 render_mode blend_mix;
 
 uniform sampler2D lifetime_fade: hint_white;
@@ -54,4 +51,4 @@ void fragment() {
 	
 	ALBEDO = options[index].rgb;
 	ALPHA = options[index].a * alpha_multiply.x * fade_strength;
-}"
+}

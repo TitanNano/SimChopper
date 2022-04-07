@@ -1,8 +1,5 @@
 extends Spatial
 
-const terrain_material = preload("res://resources/Materials/terrain_material.tres")
-const ocean_material = preload("res://resources/Materials/ocean_material.tres")
-
 const networks = {
 	# Powerlines
 	0x0E: preload("res://resources/Objects/Networks/Powerline/left_right.tscn"),
@@ -161,11 +158,7 @@ const buildings = {
 }
 
 const TimeBudget := preload("../../util/TimeBudget.gd")
-const TerrainRotation := preload("../Terrain/TerrainRotation.gdns")
-const TerrainBuilderFactory := preload("../Terrain/TerrainBuilderFactory.gdns")
 const MsgPack := preload("../../godot-msgpack/msgpack.gd")
-const tile_size := 16
-const tile_height := 8
 
 signal loading_progress(count)
 signal loading_scale(count)
@@ -176,8 +169,6 @@ onready var road_network := $Networks/Road
 onready var reflections := $Reflections
 onready var buildings_node := $Buildings
 onready var backdrop := $Backdrop
-
-var sea_level := 0
 
 func _ready():
 	call_deferred("_ready_deferred")
@@ -195,18 +186,20 @@ func _ready_deferred():
 	var city: Dictionary = MsgPack.decode(city_bytes).result
 
 	self.emit_signal("loading_scale", city.buildings.size() + city.networks.size() + 1)
-	self.sea_level = city.simulator_settings["GlobalSeaLevel"]
-
 	self._load_map_async(city)
 
 
 func _load_map_async(city: Dictionary):
-	self._generate_terain_with_native_builder(city)
+	yield(self.terrain.build_async(city), "completed")
 	yield(self._insert_networks_async(city.networks, city.tilelist), "completed")
 	yield(self._insert_buildings_async(city.buildings, city.tilelist), "completed")
 
 	self._setup_probing(city.city_size)
-	self.backdrop.build(city.city_size, self.tile_size, self.sea_level * tile_height)
+	self.backdrop.build(
+		city.city_size,
+		self.terrain.tile_size,
+		self.terrain.sea_level * self.terrain.tile_height
+	)
 	self._spawn_player()
 
 #	self._create_snapshot()
@@ -233,29 +226,6 @@ func _spawn_player() -> void:
 	player.force_update_transform()
 	player.snap_camera()
 	player.mode = RigidBody.MODE_RIGID
-
-
-func _generate_terain_with_native_builder(city: Dictionary):
-	var rotation := TerrainRotation.new()
-	rotation.set_rotation(city.simulator_settings['Compass'])
-
-	var materials := {
-		"Ground": terrain_material,
-		"Water": ocean_material
-	}
-
-	var builder_factory := TerrainBuilderFactory.new()
-	var builder = builder_factory.create(city.tilelist, rotation, materials)
-
-	builder.set_city_size(city.city_size)
-	builder.set_tile_size (self.tile_size)
-	builder.set_tile_height(self.tile_height)
-	builder.set_sea_level(self.sea_level)
-
-	var mesh: ArrayMesh = builder.build_terain_async()
-
-	terrain.mesh = mesh
-	terrain.create_trimesh_collision()
 
 
 func _insert_buildings_async(buildings: Dictionary, tiles: Dictionary):
@@ -371,15 +341,15 @@ func _insert_spawn_point(building_coords: Array, building_size: int, altitude: i
 
 
 func _get_building_world_cords(x: int, y: int, z: int, size: int) -> Vector3:
-	var offset := (size * tile_size / 2.0)
+	var offset: float = (size * self.terrain.tile_size / 2.0)
 
 	# OpenCity2k gets the bottom left corner, we have to correct that.
 	y -= (size - 1)
 
 	return Vector3(
-		(x * self.tile_size) + offset,
-		max(z, self.sea_level - 1) * self.tile_height,
-		(y * self.tile_size) + offset
+		(x * self.terrain.tile_size) + offset,
+		max(z, self.terrain.sea_level - 1) * self.terrain.tile_height,
+		(y * self.terrain.tile_size) + offset
 	)
 
 func _insert_networks_async(networks: Dictionary, tiles: Dictionary):
@@ -401,11 +371,11 @@ func _insert_networks_async(networks: Dictionary, tiles: Dictionary):
 
 		# is a suspension / pylon bridge part or raised powerline
 		if network_section.building_id in range(0x51, 0x5E):
-			location.y += tile_height
+			location.y += self.terrain.tile_height
 
 		# buildings disapear under fully raised terrain
 		if (tile.terrain & 0x0D) == 0x0D:
-			location.y += tile_height
+			location.y += self.terrain.tile_height
 
 		if instance.has_method("set_orientation"):
 			instance.set_orientation(
@@ -436,9 +406,9 @@ func _insert_networks_async(networks: Dictionary, tiles: Dictionary):
 
 
 func _setup_probing(city_size: int) -> void:
-	self.reflections.sea_level = self.sea_level * tile_height
-	self.reflections.tile_size = self.tile_size
-	self.reflections.tile_height = self.tile_height
+	self.reflections.sea_level = self.terrain.sea_level * self.terrain.tile_height
+	self.reflections.tile_size = self.terrain.tile_size
+	self.reflections.tile_height = self.terrain.tile_height
 	self.reflections.city_size = city_size
 
 	self.reflections.build_probes()

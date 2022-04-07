@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://src/HUD/HUDController.gd" type="Script" id=1]
 [ext_resource path="res://resources/Objects/Helis/schweizer_300.tscn" type="PackedScene" id=2]
@@ -10,6 +10,9 @@
 [ext_resource path="res://resources/Environments/WorldEnv.tres" type="Environment" id=8]
 [ext_resource path="res://src/Objects/Environment/SunLight.gd" type="Script" id=9]
 [ext_resource path="res://src/Objects/Camera/CameraInterpolation.gd" type="Script" id=10]
+[ext_resource path="res://src/Objects/Terrain/Terrain.gd" type="Script" id=11]
+[ext_resource path="res://resources/Materials/terrain_material.tres" type="Material" id=12]
+[ext_resource path="res://resources/Materials/ocean_material.tres" type="Material" id=13]
 
 [sub_resource type="StyleBoxFlat" id=2]
 bg_color = Color( 0.129412, 0.129412, 0.129412, 1 )
@@ -79,6 +82,9 @@ script = ExtResource( 3 )
 
 [node name="Terrain" type="MeshInstance" parent="ViewportContainer/Viewport/World"]
 skeleton = NodePath("")
+script = ExtResource( 11 )
+terrain_material = ExtResource( 12 )
+ocean_material = ExtResource( 13 )
 
 [node name="Environment" type="WorldEnvironment" parent="ViewportContainer/Viewport/World"]
 environment = ExtResource( 8 )

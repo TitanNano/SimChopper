@@ -2,7 +2,7 @@
 
 [ext_resource path="res://src/HUD/HUDController.gd" type="Script" id=1]
 [ext_resource path="res://resources/Objects/Helis/schweizer_300.tscn" type="PackedScene" id=2]
-[ext_resource path="res://src/Objects/World/main.gd" type="Script" id=3]
+[ext_resource path="res://src/Objects/World/World.gd" type="Script" id=3]
 [ext_resource path="res://src/HUD/LoadingScreen.gd" type="Script" id=4]
 [ext_resource path="res://src/Objects/World/ReflectionManager.gd" type="Script" id=5]
 [ext_resource path="res://src/Objects/World/Backdrop.gd" type="Script" id=6]
@@ -85,7 +85,7 @@ environment = ExtResource( 8 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="ViewportContainer/Viewport/World/Environment"]
 transform = Transform( -1, 5.01436e-08, -7.16125e-08, 0, 0.819152, 0.573576, 8.74228e-08, 0.573576, -0.819152, 10, 30, 10 )
-light_color = Color( 1, 0.960784, 0.866667, 1 )
+light_color = Color( 1, 0.913725, 0.713726, 1 )
 light_energy = 1.03
 shadow_enabled = true
 directional_shadow_mode = 1

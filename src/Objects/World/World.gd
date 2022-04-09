@@ -1,164 +1,8 @@
 extends Spatial
 
-const networks = {
-	# Powerlines
-	0x0E: preload("res://resources/Objects/Networks/Powerline/left_right.tscn"),
-	0x0F: preload("res://resources/Objects/Networks/Powerline/top_bottom.tscn"),
-	0x10: preload("res://resources/Objects/Networks/Powerline/high_top_bottom.tscn"),
-	0x11: preload("res://resources/Objects/Networks/Powerline/left_high_right.tscn"),
-	0x12: preload("res://resources/Objects/Networks/Powerline/top_high_bottom.tscn"),
-	0x13: preload("res://resources/Objects/Networks/Powerline/high_left_right.tscn"),
-	0x14: preload("res://resources/Objects/Networks/Powerline/bottom_right.tscn"),
-	0x15: preload("res://resources/Objects/Networks/Powerline/bottom_left.tscn"),
-	0x16: preload("res://resources/Objects/Networks/Powerline/top_left.tscn"),
-	0x17: preload("res://resources/Objects/Networks/Powerline/top_right.tscn"),
-	0x18: preload("res://resources/Objects/Networks/Powerline/right_top_bottom.tscn"),
-	0x19: preload("res://resources/Objects/Networks/Powerline/left_bottom_right.tscn"),
-	0x1A: preload("res://resources/Objects/Networks/Powerline/top_left_bottom.tscn"),
-	0x1B: preload("res://resources/Objects/Networks/Powerline/left_top_right.tscn"),
-	0x1C: preload("res://resources/Objects/Networks/Powerline/left_top_bottom_right.tscn"),
-	0x5C: preload("res://resources/Objects/Networks/Powerline/bridge_top_bottom.tscn"),
-
-	# Road
-	0x1D: preload("res://resources/Objects/Networks/Road/left_right.tscn"),
-	0x1E: preload("res://resources/Objects/Networks/Road/top_bottom.tscn"),
-	0x1F: preload("res://resources/Objects/Networks/Road/high_top_bottom.tscn"),
-	0x20: preload("res://resources/Objects/Networks/Road/left_high_right.tscn"),
-	0x21: preload("res://resources/Objects/Networks/Road/top_high_bottom.tscn"),
-	0x22: preload("res://resources/Objects/Networks/Road/high_left_right.tscn"),
-	0x23: preload("res://resources/Objects/Networks/Road/bottom_right.tscn"),
-	0x24: preload("res://resources/Objects/Networks/Road/bottom_left.tscn"),
-	0x25: preload("res://resources/Objects/Networks/Road/top_left.tscn"),
-	0x26: preload("res://resources/Objects/Networks/Road/top_right.tscn"),
-	0x27: preload("res://resources/Objects/Networks/Road/right_top_bottom.tscn"),
-	0x28: preload("res://resources/Objects/Networks/Road/left_bottom_right.tscn"),
-	0x29: preload("res://resources/Objects/Networks/Road/top_left_bottom.tscn"),
-	0x2A: preload("res://resources/Objects/Networks/Road/left_top_right.tscn"),
-	0x2B: preload("res://resources/Objects/Networks/Road/left_top_bottom_right.tscn"),
-	0x43: preload("res://resources/Objects/Networks/Road/left_right_power_top_bottom.tscn"),
-	0x44: preload("res://resources/Objects/Networks/Road/top_bottom_power_left_right.tscn"),
-
-	# Suspension Bridge
-	0x51: preload("res://resources/Objects/Networks/Bridge/bridge_suspension_start_bottom.tscn"),
-	0x52: preload("res://resources/Objects/Networks/Bridge/bridge_suspension_middle_bottom.tscn"),
-	0x53: preload("res://resources/Objects/Networks/Bridge/bridge_suspension_center.tscn"),
-	0x54: preload("res://resources/Objects/Networks/Bridge/bridge_suspension_middle_top.tscn"),
-	0x55: preload("res://resources/Objects/Networks/Bridge/bridge_suspension_end_top.tscn"),
-
-	# Pylon Bridge
-	0x56: preload("res://resources/Objects/Networks/Bridge/bridge_raising_tower_top_bottom.tscn"),
-	0x57: preload("res://resources/Objects/Networks/Bridge/bridge_top.tscn"),
-	0x58: preload("res://resources/Objects/Networks/Bridge/bridge_top.tscn"),
-}
-
-const buildings = {
-	0x0D: preload("res://resources/Objects/Buildings/park_small.tscn"),
-	0x06: preload("res://resources/Objects/Buildings/tree_single.tscn"),
-	0x73: preload("res://resources/Objects/Buildings/home_middle_class_1.tscn"),
-	0x74: preload("res://resources/Objects/Buildings/home_middle_class_2.tscn"),
-	0x75: preload("res://resources/Objects/Buildings/home_middle_class_3.tscn"),
-	0x76: preload("res://resources/Objects/Buildings/home_middle_class_4.tscn"),
-	0x77: preload("res://resources/Objects/Buildings/home_middle_class_5.tscn"),
-	0xF7: preload("res://resources/Objects/Buildings/church.tscn"),
-	0x96: preload("res://resources/Objects/Buildings/office_building_medium_1.tscn"),
-	0x98: preload("res://resources/Objects/Buildings/office_building_medium_2.tscn"),
-	0x9A: preload("res://resources/Objects/Buildings/office_building_medium_3.tscn"),
-	0x9B: preload("res://resources/Objects/Buildings/office_building_medium_4.tscn"),
-	0x9C: preload("res://resources/Objects/Buildings/office_building_medium_5.tscn"),
-	0x9D: preload("res://resources/Objects/Buildings/office_building_medium_6.tscn"),
-	0x8A: preload("res://resources/Objects/Buildings/abandoned_building_1.tscn"),
-	0x8B: preload("res://resources/Objects/Buildings/abandoned_building_2.tscn"),
-	0xAA: preload("res://resources/Objects/Buildings/abandoned_building_3.tscn"),
-	0xAB: preload("res://resources/Objects/Buildings/abandoned_building_4.tscn"),
-	0xAC: preload("res://resources/Objects/Buildings/abandoned_building_5.tscn"),
-	0xAD: preload("res://resources/Objects/Buildings/abandoned_building_6.tscn"),
-	0x78: preload("res://resources/Objects/Buildings/home_upper_class_1.tscn"),
-	0x79: preload("res://resources/Objects/Buildings/home_upper_class_2.tscn"),
-	0x7A: preload("res://resources/Objects/Buildings/home_upper_class_3.tscn"),
-	0x7B: preload("res://resources/Objects/Buildings/home_upper_class_4.tscn"),
-	0xE6: preload("res://resources/Objects/Ground/tarmac.tscn"),
-	0xEA: preload("res://resources/Objects/Buildings/tarmac_radar.tscn"),
-	0xC2: preload("res://resources/Objects/Buildings/construction_1-2.tscn"),
-	0xC3: preload("res://resources/Objects/Buildings/construction_1-2.tscn"),
-	0xA6: preload("res://resources/Objects/Buildings/construction_3.tscn"),
-	0xA7: preload("res://resources/Objects/Buildings/construction_4.tscn"),
-	0xA8: preload("res://resources/Objects/Buildings/construction_5.tscn"),
-	0xA9: preload("res://resources/Objects/Buildings/construction_6.tscn"),
-	0x88: preload("res://resources/Objects/Buildings/construction_7.tscn"),
-	0x89: preload("res://resources/Objects/Buildings/construction_8.tscn"),
-	0xE3: preload("res://resources/Objects/Buildings/airport_warehouse.tscn"),
-	0xE4: preload("res://resources/Objects/Buildings/airport_building_1.tscn"),
-	0xE5: preload("res://resources/Objects/Buildings/airport_building_2.tscn"),
-	0xE8: preload("res://resources/Objects/Buildings/airport_hangar_1.tscn"),
-	0xDD: preload("res://resources/Objects/Buildings/airport_runway.tscn"),
-	0xDF: preload("res://resources/Objects/Buildings/airport_runway_intersection.tscn"),
-	0xF6: preload("res://resources/Objects/Buildings/hangar_2.tscn"),
-	0x91: preload("res://resources/Objects/Buildings/condominiums_medium_1.tscn"),
-	0x92: preload("res://resources/Objects/Buildings/condominiums_medium_2.tscn"),
-	0x93: preload("res://resources/Objects/Buildings/condominiums_medium_3.tscn"),
-	0xB0: preload("res://resources/Objects/Buildings/condominiums_large_1.tscn"),
-	0xB1: preload("res://resources/Objects/Buildings/condominiums_large_2.tscn"),
-	0xA0: preload("res://resources/Objects/Buildings/factory_small_1.tscn"),
-	0xA1: preload("res://resources/Objects/Buildings/factory_small_2.tscn"),
-	0xA2: preload("res://resources/Objects/Buildings/factory_small_3.tscn"),
-	0xA3: preload("res://resources/Objects/Buildings/factory_small_4.tscn"),
-	0xA4: preload("res://resources/Objects/Buildings/factory_small_5.tscn"),
-	0xA5: preload("res://resources/Objects/Buildings/factory_small_6.tscn"),
-	0xD2: preload("res://resources/Objects/Buildings/station_police.tscn"),
-	0x8F: preload("res://resources/Objects/Buildings/apartments_medium_1.tscn"),
-	0x90: preload("res://resources/Objects/Buildings/apartments_medium_2.tscn"),
-	0x83: preload("res://resources/Objects/Buildings/toy_store.tscn"),
-	0x87: preload("res://resources/Objects/Buildings/industrial_substation.tscn"),
-	0x80: preload("res://resources/Objects/Buildings/offices_small_1.tscn"),
-	0x81: preload("res://resources/Objects/Buildings/offices_small_2.tscn"),
-	0xBA: preload("res://resources/Objects/Buildings/offices_historic.tscn"),
-	0xDC: preload("res://resources/Objects/Buildings/water_pump.tscn"),
-	0xD1: preload("res://resources/Objects/Buildings/station_hospital.tscn"),
-	0x7E: preload("res://resources/Objects/Buildings/convenience_store.tscn"),
-	0x7C: preload("res://resources/Objects/Buildings/station_gas_1.tscn"),
-	0x7F: preload("res://resources/Objects/Buildings/station_gas_2.tscn"),
-	0x70: preload("res://resources/Objects/Buildings/home_lower_class_1.tscn"),
-	0x71: preload("res://resources/Objects/Buildings/home_lower_class_2.tscn"),
-	0x72: preload("res://resources/Objects/Buildings/home_lower_class_3.tscn"),
-	0x82: preload("res://resources/Objects/Buildings/warehouse.tscn"),
-	0xE1: preload("res://resources/Objects/Buildings/airport_civilian_control_tower.tscn"),
-	0xD3: preload("res://resources/Objects/Buildings/station_fire.tscn"),
-	0xCD: preload("res://resources/Objects/Buildings/powerplant_microwave.tscn"),
-	0x97: preload("res://resources/Objects/Buildings/resort_hotel.tscn"),
-	0xAE: preload("res://resources/Objects/Buildings/apartments_large_1.tscn"),
-	0xAF: preload("res://resources/Objects/Buildings/apartments_large_2.tscn"),
-	0x8C: preload("res://resources/Objects/Buildings/apartments_small_1.tscn"),
-	0x8D: preload("res://resources/Objects/Buildings/apartments_small_2.tscn"),
-	0x8E: preload("res://resources/Objects/Buildings/apartments_small_3.tscn"),
-	0x07: preload("res://resources/Objects/Buildings/tree_couple.tscn"),
-	0x85: preload("res://resources/Objects/Buildings/chemical_storage.tscn"),
-	0xBC: preload("res://resources/Objects/Buildings/chemical_processing_1.tscn"),
-	0x9F: preload("res://resources/Objects/Buildings/chemical_processing_2.tscn"),
-	0xD6: preload("res://resources/Objects/Buildings/school.tscn"),
-	0xF5: preload("res://resources/Objects/Buildings/library.tscn"),
-	0xF8: preload("res://resources/Objects/Buildings/marina.tscn"),
-	0xC0: preload("res://resources/Objects/Buildings/warehouse_large_1.tscn"),
-	0xC1: preload("res://resources/Objects/Buildings/warehouse_large_2.tscn"),
-	0x84: preload("res://resources/Objects/Buildings/warehouse_small_1.tscn"),
-	0x86: preload("res://resources/Objects/Buildings/warehouse_small_2.tscn"),
-	0x9E: preload("res://resources/Objects/Buildings/warehouse_medium.tscn"),
-	0x7D: preload("res://resources/Objects/Buildings/bb_inn.tscn"),
-	0xD9: preload("res://resources/Objects/Buildings/college.tscn"),
-	0xFB: preload("res://resources/Objects/Buildings/arcology_plymouth.tscn"),
-	0xFC: preload("res://resources/Objects/Buildings/arcology_forest.tscn"),
-	0xFD: preload("res://resources/Objects/Buildings/arcology_darco.tscn"),
-	0xFE: preload("res://resources/Objects/Buildings/arcology_launch.tscn"),
-	0xF3: preload("res://resources/Objects/Buildings/mayors_house.tscn"),
-	0xD4: preload("res://resources/Objects/Buildings/museum.tscn"),
-	0x99: preload("res://resources/Objects/Buildings/office_retail.tscn"),
-	0xB9: preload("res://resources/Objects/Buildings/parking_lot.tscn"),
-	0x94: preload("res://resources/Objects/Buildings/shopping_centre.tscn"),
-	0xB5: preload("res://resources/Objects/Buildings/theatre.tscn"),
-	0xF4: preload("res://resources/Objects/Buildings/water_treatment.tscn"),
-}
-
 const TimeBudget := preload("../../util/TimeBudget.gd")
 const MsgPack := preload("../../godot-msgpack/msgpack.gd")
+const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
 
 signal loading_progress(count)
 signal loading_scale(count)
@@ -287,7 +131,7 @@ func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 	var tile: Dictionary = tiles[Array(building.tile_coords)]
 	var building_size: int = building.size
 	var name: String =  building.name
-	var object: PackedScene = self.buildings.get(building.building_id)
+	var object := SceneObjectRegistry.load_building(building.building_id)
 
 	if not object:
 		print("unknown building \"%s\"" % name)
@@ -357,7 +201,7 @@ func _insert_networks_async(networks: Dictionary, tiles: Dictionary):
 
 	for key in networks:
 		var network_section: Dictionary = networks[key]
-		var object: PackedScene = self.networks.get(network_section.building_id)
+		var object := SceneObjectRegistry.load_network(network_section.building_id)
 		var name: String = network_section.name
 
 		if not object:

@@ -668,6 +668,11 @@ _global_script_classes=[ {
 "class": "VisualShaderToolsvec2Compose",
 "language": "GDScript",
 "path": "res://addons/shaderV/tools/vec2Compose.gd"
+}, {
+"base": "Resource",
+"class": "WorldConstants",
+"language": "GDScript",
+"path": "res://src/Objects/Data/WorldConstants.gd"
 } ]
 _global_script_class_icons={
 "VisualShaderNodeCellularNoise2D": "",
@@ -801,7 +806,8 @@ _global_script_class_icons={
 "VisualShaderToolsSinTIME": "",
 "VisualShaderToolsSphericalToCartesian": "",
 "VisualShaderToolsTIMEscaled": "",
-"VisualShaderToolsvec2Compose": ""
+"VisualShaderToolsvec2Compose": "",
+"WorldConstants": ""
 }
 
 [application]

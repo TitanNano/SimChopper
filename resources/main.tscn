@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://src/HUD/HUDController.gd" type="Script" id=1]
 [ext_resource path="res://resources/Objects/Helis/schweizer_300.tscn" type="PackedScene" id=2]
@@ -13,6 +13,8 @@
 [ext_resource path="res://src/Objects/Terrain/Terrain.gd" type="Script" id=11]
 [ext_resource path="res://resources/Materials/terrain_material.tres" type="Material" id=12]
 [ext_resource path="res://resources/Materials/ocean_material.tres" type="Material" id=13]
+[ext_resource path="res://src/Objects/World/Networks.gd" type="Script" id=14]
+[ext_resource path="res://resources/Data/world_constants.tres" type="Resource" id=15]
 
 [sub_resource type="StyleBoxFlat" id=2]
 bg_color = Color( 0.129412, 0.129412, 0.129412, 1 )
@@ -79,12 +81,14 @@ speed = 0.3
 
 [node name="World" type="Spatial" parent="ViewportContainer/Viewport"]
 script = ExtResource( 3 )
+world_constants = ExtResource( 15 )
 
 [node name="Terrain" type="MeshInstance" parent="ViewportContainer/Viewport/World"]
 skeleton = NodePath("")
 script = ExtResource( 11 )
 terrain_material = ExtResource( 12 )
 ocean_material = ExtResource( 13 )
+world_constants = ExtResource( 15 )
 
 [node name="Environment" type="WorldEnvironment" parent="ViewportContainer/Viewport/World"]
 environment = ExtResource( 8 )
@@ -105,6 +109,8 @@ directional_shadow_max_distance = 300.0
 script = ExtResource( 9 )
 
 [node name="Networks" type="Node" parent="ViewportContainer/Viewport/World"]
+script = ExtResource( 14 )
+world_constants = ExtResource( 15 )
 
 [node name="Powerlines" type="Node" parent="ViewportContainer/Viewport/World/Networks"]
 

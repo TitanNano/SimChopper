@@ -3,19 +3,32 @@ extends Spatial
 const TimeBudget := preload("../../util/TimeBudget.gd")
 const MsgPack := preload("../../godot-msgpack/msgpack.gd")
 const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
+const Networks := preload("res://src/Objects/World/Networks.gd")
+const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 
 signal loading_progress(count)
 signal loading_scale(count)
 
+export var world_constants: Resource
+
 onready var terrain: MeshInstance = $Terrain
-onready var powerline_network := $Networks/Powerlines
-onready var road_network := $Networks/Road
+onready var networks: Networks = $Networks
 onready var reflections := $Reflections
 onready var buildings_node := $Buildings
 onready var backdrop := $Backdrop
 
+var sea_level: int
+
 func _ready():
+	assert(world_constants is WorldConstants, "world_constants is not of type WorldConstants")
+
+	self.networks.connect("loading_progress", self, "_on_child_progress")
+
 	call_deferred("_ready_deferred")
+
+
+func _on_child_progress(progress: int) -> void:
+	self.emit_signal("loading_progress", progress)
 
 
 func _ready_deferred():
@@ -29,20 +42,21 @@ func _ready_deferred():
 	var city_bytes := file.get_buffer(file.get_len()).decompress_dynamic(-1, File.COMPRESSION_GZIP)
 	var city: Dictionary = MsgPack.decode(city_bytes).result
 
+	self.sea_level = city.simulator_settings["GlobalSeaLevel"]
 	self.emit_signal("loading_scale", city.buildings.size() + city.networks.size() + 1)
 	self._load_map_async(city)
 
 
 func _load_map_async(city: Dictionary):
 	yield(self.terrain.build_async(city), "completed")
-	yield(self._insert_networks_async(city.networks, city.tilelist), "completed")
+	yield(self.networks.build_async(city), "completed")
 	yield(self._insert_buildings_async(city.buildings, city.tilelist), "completed")
 
 	self._setup_probing(city.city_size)
 	self.backdrop.build(
 		city.city_size,
-		self.terrain.tile_size,
-		self.terrain.sea_level * self.terrain.tile_height
+		self.world_constants.tile_size,
+		self.sea_level * self.world_constants.tile_height
 	)
 	self._spawn_player()
 
@@ -185,74 +199,22 @@ func _insert_spawn_point(building_coords: Array, building_size: int, altitude: i
 
 
 func _get_building_world_cords(x: int, y: int, z: int, size: int) -> Vector3:
-	var offset: float = (size * self.terrain.tile_size / 2.0)
+	var offset: float = (size * self.world_constants.tile_size / 2.0)
 
 	# OpenCity2k gets the bottom left corner, we have to correct that.
 	y -= (size - 1)
 
 	return Vector3(
-		(x * self.terrain.tile_size) + offset,
-		max(z, self.terrain.sea_level - 1) * self.terrain.tile_height,
-		(y * self.terrain.tile_size) + offset
+		(x * self.world_constants.tile_size) + offset,
+		max(z, self.sea_level - 1) * self.world_constants.tile_height,
+		(y * self.world_constants.tile_size) + offset
 	)
-
-func _insert_networks_async(networks: Dictionary, tiles: Dictionary):
-	var budget := TimeBudget.new(100)
-
-	for key in networks:
-		var network_section: Dictionary = networks[key]
-		var object := SceneObjectRegistry.load_network(network_section.building_id)
-		var name: String = network_section.name
-
-		if not object:
-			print("unknown network_section \"%s\"" % name)
-			self.emit_signal("loading_progress", 1)
-			continue
-
-		var instance: Spatial = object.instance()
-		var tile: Dictionary = tiles[key]
-		var location := self._get_building_world_cords(network_section.tile_coords[0], network_section.tile_coords[1], tile.altitude, 1)
-
-		# is a suspension / pylon bridge part or raised powerline
-		if network_section.building_id in range(0x51, 0x5E):
-			location.y += self.terrain.tile_height
-
-		# buildings disapear under fully raised terrain
-		if (tile.terrain & 0x0D) == 0x0D:
-			location.y += self.terrain.tile_height
-
-		if instance.has_method("set_orientation"):
-			instance.set_orientation(
-				tiles[[key[0], key[1] - 1]],
-				tiles[[key[0] + 1, key[1]]],
-				tiles[[key[0], key[1] + 1]],
-				tiles[[key[0] - 1, key[1]]]
-			)
-
-		instance.transform.origin = location
-
-		if network_section.building_id in range(0x0E, 0x1D) + range(0x5C, 0x5D):
-			powerline_network.add_child(instance, true)
-		elif network_section.building_id in (range(0x1D, 0x2C) + range(0x51, 0x5E) + range(0x43, 0x45)):
-			road_network.add_child(instance, true)
-		else:
-			print("network secction doesn't belong to any network, ", network_section)
-
-		self.emit_signal("loading_progress", 1)
-
-		if budget.is_exceded():
-			print("yielding after ", budget.elapsed(), "ms of work")
-			budget.restart()
-			yield(self.get_tree(), "idle_frame")
-
-	# yield at least once at the end, to let the engine catch up
-	yield(self.get_tree(), "idle_frame")
 
 
 func _setup_probing(city_size: int) -> void:
-	self.reflections.sea_level = self.terrain.sea_level * self.terrain.tile_height
-	self.reflections.tile_size = self.terrain.tile_size
-	self.reflections.tile_height = self.terrain.tile_height
+	self.reflections.sea_level = self.sea_level * self.world_constants.tile_height
+	self.reflections.tile_size = self.world_constants.tile_size
+	self.reflections.tile_height = self.world_constants.tile_height
 	self.reflections.city_size = city_size
 
 	self.reflections.build_probes()

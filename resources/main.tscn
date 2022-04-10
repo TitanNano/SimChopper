@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://src/HUD/HUDController.gd" type="Script" id=1]
 [ext_resource path="res://resources/Objects/Helis/schweizer_300.tscn" type="PackedScene" id=2]
@@ -15,6 +15,7 @@
 [ext_resource path="res://resources/Materials/ocean_material.tres" type="Material" id=13]
 [ext_resource path="res://src/Objects/World/Networks.gd" type="Script" id=14]
 [ext_resource path="res://resources/Data/world_constants.tres" type="Resource" id=15]
+[ext_resource path="res://src/Objects/World/Buildings.gd" type="Script" id=16]
 
 [sub_resource type="StyleBoxFlat" id=2]
 bg_color = Color( 0.129412, 0.129412, 0.129412, 1 )
@@ -120,6 +121,8 @@ world_constants = ExtResource( 15 )
 script = ExtResource( 5 )
 
 [node name="Buildings" type="Node" parent="ViewportContainer/Viewport/World"]
+script = ExtResource( 16 )
+world_constants = ExtResource( 15 )
 
 [node name="Backdrop" type="Node" parent="ViewportContainer/Viewport/World"]
 script = ExtResource( 6 )

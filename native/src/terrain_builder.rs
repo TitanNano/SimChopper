@@ -123,6 +123,22 @@ trait DimensionZ {
     fn z(&self) -> f32;
 }
 
+trait DimensionY {
+    fn y(&self) -> f32;
+}
+
+trait SetDimensionY {
+    fn set_y(self, value: f32);
+}
+
+trait FixedPoint {
+    fn is_fixed(&self) -> bool;
+}
+
+trait GetMut<T> {
+    fn get_mut(&self) -> &mut T;
+}
+
 impl DimensionX for Vertex {
     fn x(&self) -> f32 {
         self.x
@@ -159,18 +175,120 @@ impl<V: DimensionZ> DimensionZ for RefCell<V> {
     }
 }
 
+impl DimensionY for Vertex {
+    fn y(&self) -> f32 {
+        self.y
+    }
+}
+
+impl<V: DimensionY> DimensionY for Rc<V> {
+    fn y(&self) -> f32 {
+        (**self).y()
+    }
+}
+
+impl<V: DimensionY> DimensionY for RefCell<V> {
+    fn y(&self) -> f32 {
+        self.borrow().y()
+    }
+}
+
+impl SetDimensionY for &mut Vertex {
+    fn set_y(self, value: f32) {
+        self.y = value;
+    }
+}
+
+impl SetDimensionY for Vertex {
+    fn set_y(mut self, value: f32) {
+        self.y = value;
+    }
+}
+
+impl<V> SetDimensionY for Rc<V>
+where
+    for<'a> &'a V: SetDimensionY,
+{
+    fn set_y(self, value: f32) {
+        (*self).set_y(value)
+    }
+}
+
+impl<V> SetDimensionY for &RefCell<V>
+where
+    for<'a> &'a mut V: SetDimensionY,
+{
+    fn set_y(self, value: f32) {
+        self.borrow_mut().set_y(value);
+    }
+}
+
+impl<V> SetDimensionY for RefCell<V>
+where
+    for<'a> &'a mut V: SetDimensionY,
+{
+    fn set_y(self, value: f32) {
+        self.borrow_mut().set_y(value);
+    }
+}
+
+impl FixedPoint for Vertex {
+    fn is_fixed(&self) -> bool {
+        self.fixed
+    }
+}
+
+impl<V: FixedPoint> FixedPoint for Rc<V> {
+    fn is_fixed(&self) -> bool {
+        (**self).is_fixed()
+    }
+}
+
+impl<V: FixedPoint> FixedPoint for RefCell<V> {
+    fn is_fixed(&self) -> bool {
+        self.borrow().is_fixed()
+    }
+}
+
 type TileCorners = [Vector3; 4];
 type Face = [Vertex; 3];
 type SurfaceMap = HashMap<TileSurfaceType, Vec<Rc<RefCell<Vertex>>>>;
 type TileFaces = (Vec<Face>, Vec<Face>);
 type HashMapYBuffer<Value> = HashMap<(usize, usize), Vec<Value>>;
 
-trait YBuffer<Value: DimensionX + DimensionZ> {
+trait YBuffer<Value: DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensionY>: Sized {
     fn add(&mut self, value: Value);
-    fn new_ybuffer() -> Self;
+    fn new() -> Self;
+    fn into_iter_groups(self) -> Box<dyn Iterator<Item = Vec<Value>>>;
+
+    fn reduce(self) {
+        for vertex_group in self.into_iter_groups() {
+            let count: usize = vertex_group.len();
+            let peak_y = vertex_group
+                .iter()
+                .filter(|v| v.is_fixed())
+                .map(|v| v.y())
+                .reduce(f32::max)
+                .unwrap_or(0.0);
+
+            let average_y = if peak_y > 0.0 {
+                peak_y
+            } else {
+                let total_y: f32 = vertex_group.iter().map(|v| v.y()).sum();
+
+                total_y / (count as f32)
+            };
+
+            for vertex in vertex_group {
+                vertex.set_y(average_y);
+            }
+        }
+    }
 }
 
-impl<'v, V: DimensionX + DimensionZ> YBuffer<V> for HashMapYBuffer<V> {
+impl<'v, V: 'static + DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensionY> YBuffer<V>
+    for HashMapYBuffer<V>
+{
     fn add(&mut self, value: V) {
         let xz = (value.x().round() as usize, value.z().round() as usize);
 
@@ -183,8 +301,12 @@ impl<'v, V: DimensionX + DimensionZ> YBuffer<V> for HashMapYBuffer<V> {
             .push(value)
     }
 
-    fn new_ybuffer() -> Self {
+    fn new() -> Self {
         Self::new()
+    }
+
+    fn into_iter_groups(self) -> Box<dyn Iterator<Item = Vec<V>>> {
+        Box::new(self.into_iter().map(|(_, value)| value))
     }
 }
 
@@ -607,7 +729,7 @@ impl TerrainBuilder {
 
     #[export]
     pub fn build_terain_async(&self, _base: &Reference) -> Ref<ArrayMesh> {
-        let mut ybuffer: HashMapYBuffer<Rc<RefCell<Vertex>>> = YBuffer::new_ybuffer();
+        let mut ybuffer: HashMapYBuffer<Rc<RefCell<Vertex>>> = YBuffer::new();
         let mut surfaces = SurfaceMap::new();
 
         let terrain_faces: Vec<TileFaces> = self
@@ -636,33 +758,7 @@ impl TerrainBuilder {
         }
 
         godot_print!("ybuffer size: {}", ybuffer.len());
-
-        for (_, vertex_group) in ybuffer {
-            let count: usize = vertex_group.len();
-            let peak_y = vertex_group
-                .iter()
-                .filter(|v| {
-                    let vb = v.borrow();
-                    vb.fixed
-                })
-                .map(|v| v.borrow().y)
-                .reduce(f32::max)
-                .unwrap_or(0.0);
-
-            let average_y = if peak_y > 0.0 {
-                peak_y
-            } else {
-                let total_y: f32 = vertex_group.iter().map(|v| v.borrow().y).sum();
-
-                total_y / (count as f32)
-            };
-
-            for vertex in vertex_group {
-                let mut vertex = vertex.borrow_mut();
-
-                vertex.y = average_y;
-            }
-        }
+        ybuffer.reduce();
 
         let generator = SurfaceTool::new();
         let mesh = ArrayMesh::new();

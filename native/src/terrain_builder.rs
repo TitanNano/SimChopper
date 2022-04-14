@@ -1,3 +1,5 @@
+mod point;
+
 use gdnative::api::{visual_server::ArrayFormat, ArrayMesh, Material, Mesh, SurfaceTool};
 use gdnative::prelude::*;
 use lerp::Lerp;
@@ -7,6 +9,8 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
+
+use point::{DimensionX, DimensionY, DimensionZ, FixedPoint, SetDimensionY};
 
 const ERROR_CLASS_INSTANCE_ACCESS: &str = "unable to access NativeClass instance!";
 const ERROR_INVALID_VARIANT_TYPE_INT: &str = "Variant is expected to be i64 but is not!";
@@ -115,45 +119,9 @@ impl Into<Vector3> for Vertex {
     }
 }
 
-trait DimensionX {
-    fn x(&self) -> f32;
-}
-
-trait DimensionZ {
-    fn z(&self) -> f32;
-}
-
-trait DimensionY {
-    fn y(&self) -> f32;
-}
-
-trait SetDimensionY {
-    fn set_y(self, value: f32);
-}
-
-trait FixedPoint {
-    fn is_fixed(&self) -> bool;
-}
-
-trait GetMut<T> {
-    fn get_mut(&self) -> &mut T;
-}
-
 impl DimensionX for Vertex {
     fn x(&self) -> f32 {
         self.x
-    }
-}
-
-impl<V: DimensionX> DimensionX for Rc<V> {
-    fn x(&self) -> f32 {
-        (**self).x()
-    }
-}
-
-impl<V: DimensionX> DimensionX for RefCell<V> {
-    fn x(&self) -> f32 {
-        self.borrow().x()
     }
 }
 
@@ -163,33 +131,9 @@ impl DimensionZ for Vertex {
     }
 }
 
-impl<V: DimensionZ> DimensionZ for Rc<V> {
-    fn z(&self) -> f32 {
-        (**self).z()
-    }
-}
-
-impl<V: DimensionZ> DimensionZ for RefCell<V> {
-    fn z(&self) -> f32 {
-        self.borrow().z()
-    }
-}
-
 impl DimensionY for Vertex {
     fn y(&self) -> f32 {
         self.y
-    }
-}
-
-impl<V: DimensionY> DimensionY for Rc<V> {
-    fn y(&self) -> f32 {
-        (**self).y()
-    }
-}
-
-impl<V: DimensionY> DimensionY for RefCell<V> {
-    fn y(&self) -> f32 {
-        self.borrow().y()
     }
 }
 
@@ -202,33 +146,6 @@ impl SetDimensionY for &mut Vertex {
 impl SetDimensionY for Vertex {
     fn set_y(mut self, value: f32) {
         self.y = value;
-    }
-}
-
-impl<V> SetDimensionY for Rc<V>
-where
-    for<'a> &'a V: SetDimensionY,
-{
-    fn set_y(self, value: f32) {
-        (*self).set_y(value)
-    }
-}
-
-impl<V> SetDimensionY for &RefCell<V>
-where
-    for<'a> &'a mut V: SetDimensionY,
-{
-    fn set_y(self, value: f32) {
-        self.borrow_mut().set_y(value);
-    }
-}
-
-impl<V> SetDimensionY for RefCell<V>
-where
-    for<'a> &'a mut V: SetDimensionY,
-{
-    fn set_y(self, value: f32) {
-        self.borrow_mut().set_y(value);
     }
 }
 

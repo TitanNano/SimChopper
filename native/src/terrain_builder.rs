@@ -1,16 +1,16 @@
 mod point;
+mod tile_surface;
+mod lerp;
 
 use gdnative::api::{visual_server::ArrayFormat, ArrayMesh, Material, Mesh, SurfaceTool};
 use gdnative::prelude::*;
-use lerp::Lerp;
 
-use core::hash::Hash;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fmt;
 use std::rc::Rc;
 
 use point::{DimensionX, DimensionY, DimensionZ, FixedPoint, SetDimensionY};
+use tile_surface::{ Vertex, TileSurface, TileSurfaceType, SurfaceAssociated, TileFaces };
 
 const ERROR_CLASS_INSTANCE_ACCESS: &str = "unable to access NativeClass instance!";
 const ERROR_INVALID_VARIANT_TYPE_INT: &str = "Variant is expected to be i64 but is not!";
@@ -71,90 +71,6 @@ impl TileData {
     }
 }
 
-#[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
-enum TileSurfaceType {
-    Ground,
-    Water,
-}
-
-impl fmt::Display for TileSurfaceType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let value = match self {
-            Self::Ground => "Ground",
-            Self::Water => "Water",
-        };
-
-        write!(f, "{}", value)
-    }
-}
-
-#[derive(Debug)]
-struct Vertex {
-    x: f32,
-    y: f32,
-    z: f32,
-    surface: TileSurfaceType,
-    fixed: bool,
-}
-
-impl Vertex {
-    fn new(surface: TileSurfaceType, x: f32, y: f32, z: f32, fixed: bool) -> Self {
-        Self {
-            surface,
-            x,
-            y,
-            z,
-            fixed,
-        }
-    }
-
-    fn from_vector(surface: TileSurfaceType, vector: Vector3, fixed: bool) -> Self {
-        Self::new(surface, vector.x, vector.y, vector.z, fixed)
-    }
-}
-
-impl Into<Vector3> for Vertex {
-    fn into(self) -> Vector3 {
-        Vector3::new(self.x, self.y, self.z)
-    }
-}
-
-impl DimensionX for Vertex {
-    fn x(&self) -> f32 {
-        self.x
-    }
-}
-
-impl DimensionZ for Vertex {
-    fn z(&self) -> f32 {
-        self.z
-    }
-}
-
-impl DimensionY for Vertex {
-    fn y(&self) -> f32 {
-        self.y
-    }
-}
-
-impl SetDimensionY for &mut Vertex {
-    fn set_y(self, value: f32) {
-        self.y = value;
-    }
-}
-
-impl SetDimensionY for Vertex {
-    fn set_y(mut self, value: f32) {
-        self.y = value;
-    }
-}
-
-impl FixedPoint for Vertex {
-    fn is_fixed(&self) -> bool {
-        self.fixed
-    }
-}
-
 impl<V: FixedPoint> FixedPoint for Rc<V> {
     fn is_fixed(&self) -> bool {
         (**self).is_fixed()
@@ -167,10 +83,7 @@ impl<V: FixedPoint> FixedPoint for RefCell<V> {
     }
 }
 
-type TileCorners = [Vector3; 4];
-type Face = [Vertex; 3];
 type SurfaceMap = HashMap<TileSurfaceType, Vec<Rc<RefCell<Vertex>>>>;
-type TileFaces = (Vec<Face>, Vec<Face>);
 type HashMapYBuffer<Value> = HashMap<(usize, usize), Vec<Value>>;
 
 trait YBuffer<Value: DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensionY>: Sized {
@@ -224,101 +137,6 @@ impl<'v, V: 'static + DimensionX + DimensionZ + DimensionY + FixedPoint + SetDim
 
     fn into_iter_groups(self) -> Box<dyn Iterator<Item = Vec<V>>> {
         Box::new(self.into_iter().map(|(_, value)| value))
-    }
-}
-
-fn bilerp<T: Lerp<F> + Copy, F: Copy>(points: [T; 4], weight_x: F, weight_y: F) -> T {
-    let x = points[0].lerp(points[1], weight_x);
-    let y = points[2].lerp(points[3], weight_x);
-
-    x.lerp(y, weight_y)
-}
-
-fn bilerp_xyz(points: &[Vector3; 4], x: f32, y: f32) -> Vector3 {
-    let target_x = bilerp(points.map(|v| v.x), x, y);
-    let target_y = bilerp(points.map(|v| v.y), x, y);
-    let target_z = bilerp(points.map(|v| v.z), x, y);
-
-    Vector3::new(target_x, target_y, target_z)
-}
-
-#[derive(Clone)]
-struct TileSurface {
-    kind: TileSurfaceType,
-    corners: TileCorners,
-    resolution: u8,
-    fixed: bool,
-}
-
-impl TileSurface {
-    fn new(kind: TileSurfaceType) -> Self {
-        Self {
-            kind,
-            corners: [Vector3::ZERO, Vector3::ZERO, Vector3::ZERO, Vector3::ZERO],
-            resolution: 2,
-            fixed: false,
-        }
-    }
-
-    fn resolution(&self) -> u8 {
-        self.resolution
-    }
-
-    fn set_resolution(&mut self, value: u8) {
-        self.resolution = value
-    }
-
-    fn corners(&self) -> &TileCorners {
-        &self.corners
-    }
-
-    fn set_corners(&mut self, value: TileCorners) {
-        self.corners = value
-    }
-
-    fn kind(&self) -> TileSurfaceType {
-        self.kind
-    }
-
-    fn set_fixed(&mut self, fixed: bool) {
-        self.fixed = fixed;
-    }
-
-    fn generate_faces(&self) -> Vec<Face> {
-        let mut faces: Vec<Face> = Vec::new();
-        let kind = self.kind();
-        let resolution = self.resolution();
-
-        for ix in 0..resolution {
-            let weight_x_start = 1.0 / (resolution as f32) * (ix as f32);
-            let weight_x_end = 1.0 / (resolution as f32) * ((ix as f32) + 1.0);
-
-            for iy in 0..resolution {
-                let corners = self.corners();
-                let weight_y_start = 1.0 / (resolution as f32) * (iy as f32);
-                let weight_y_end = 1.0 / (resolution as f32) * ((iy as f32) + 1.0);
-
-                let x0 = bilerp_xyz(corners, weight_x_start, weight_y_start);
-                let x1 = bilerp_xyz(corners, weight_x_end, weight_y_start);
-                let y0 = bilerp_xyz(corners, weight_x_start, weight_y_end);
-                let y1 = bilerp_xyz(corners, weight_x_end, weight_y_end);
-
-                faces.append(&mut vec![
-                    [
-                        Vertex::from_vector(kind, x0, self.fixed),
-                        Vertex::from_vector(kind, x1, self.fixed),
-                        Vertex::from_vector(kind, y1, self.fixed),
-                    ],
-                    [
-                        Vertex::from_vector(kind, x0, self.fixed),
-                        Vertex::from_vector(kind, y1, self.fixed),
-                        Vertex::from_vector(kind, y0, self.fixed),
-                    ],
-                ])
-            }
-        }
-
-        return faces;
     }
 }
 
@@ -552,7 +370,7 @@ impl TerrainBuilder {
     }
 
     fn add_to_surface<'m, 'v>(surfaces: &'m mut SurfaceMap, vertex: Vertex) -> Rc<RefCell<Vertex>> {
-        let surface = vertex.surface;
+        let surface = vertex.surface();
         let cell = Rc::new(RefCell::new(vertex));
 
         if !surfaces.contains_key(&surface) {
@@ -568,8 +386,8 @@ impl TerrainBuilder {
     }
 
     fn tile_vertex_to_city_uv(&self, vertex: &Vertex, tile_size: u8) -> Vector2 {
-        let uv_x = vertex.x / f32::from(self.city_size * tile_size as u16);
-        let uv_y = vertex.z / f32::from(self.city_size * tile_size as u16);
+        let uv_x = vertex.x() / f32::from(self.city_size * tile_size as u16);
+        let uv_y = vertex.z() / f32::from(self.city_size * tile_size as u16);
 
         return Vector2::new(uv_x, uv_y);
     }
@@ -608,7 +426,7 @@ impl TerrainBuilder {
             let water_altitude = tile_height as usize * self.sea_level as usize;
 
             let mut water_tile = tile.clone();
-            water_tile.kind = TileSurfaceType::Water;
+            water_tile.set_kind(TileSurfaceType::Water);
             water_tile.set_resolution(3);
 
             water_tile.corners[0].y = water_altitude as f32;
@@ -622,7 +440,7 @@ impl TerrainBuilder {
         // tile is surface water
         if tile_type == 3 {
             let mut water_tile = tile.clone();
-            water_tile.kind = TileSurfaceType::Water;
+            water_tile.set_kind(TileSurfaceType::Water);
             water_tile.set_resolution(3);
 
             water = Some(water_tile);
@@ -668,7 +486,7 @@ impl TerrainBuilder {
         for vertex in vertecies {
             let vertex = Self::add_to_surface(&mut surfaces, vertex);
 
-            if vertex.borrow().surface != TileSurfaceType::Water {
+            if vertex.borrow().surface() != TileSurfaceType::Water {
                 ybuffer.add(vertex);
                 continue;
             }

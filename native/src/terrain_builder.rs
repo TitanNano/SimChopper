@@ -71,18 +71,6 @@ impl TileData {
     }
 }
 
-impl<V: FixedPoint> FixedPoint for Rc<V> {
-    fn is_fixed(&self) -> bool {
-        (**self).is_fixed()
-    }
-}
-
-impl<V: FixedPoint> FixedPoint for RefCell<V> {
-    fn is_fixed(&self) -> bool {
-        self.borrow().is_fixed()
-    }
-}
-
 type SurfaceMap = HashMap<TileSurfaceType, Vec<Rc<RefCell<Vertex>>>>;
 type HashMapYBuffer<Value> = HashMap<(usize, usize), Vec<Value>>;
 

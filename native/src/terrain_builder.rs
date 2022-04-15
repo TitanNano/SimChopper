@@ -1,6 +1,7 @@
+mod lerp;
 mod point;
 mod tile_surface;
-mod lerp;
+mod ybuffer;
 
 use gdnative::api::{visual_server::ArrayFormat, ArrayMesh, Material, Mesh, SurfaceTool};
 use gdnative::prelude::*;
@@ -9,8 +10,9 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use point::{DimensionX, DimensionY, DimensionZ, FixedPoint, SetDimensionY};
-use tile_surface::{ Vertex, TileSurface, TileSurfaceType, SurfaceAssociated, TileFaces };
+use point::{DimensionX, DimensionZ};
+use tile_surface::{SurfaceAssociated, TileFaces, TileSurface, TileSurfaceType, Vertex};
+use ybuffer::{YBuffer, HashMapYBuffer};
 
 const ERROR_CLASS_INSTANCE_ACCESS: &str = "unable to access NativeClass instance!";
 const ERROR_INVALID_VARIANT_TYPE_INT: &str = "Variant is expected to be i64 but is not!";
@@ -72,61 +74,6 @@ impl TileData {
 }
 
 type SurfaceMap = HashMap<TileSurfaceType, Vec<Rc<RefCell<Vertex>>>>;
-type HashMapYBuffer<Value> = HashMap<(usize, usize), Vec<Value>>;
-
-trait YBuffer<Value: DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensionY>: Sized {
-    fn add(&mut self, value: Value);
-    fn new() -> Self;
-    fn into_iter_groups(self) -> Box<dyn Iterator<Item = Vec<Value>>>;
-
-    fn reduce(self) {
-        for vertex_group in self.into_iter_groups() {
-            let count: usize = vertex_group.len();
-            let peak_y = vertex_group
-                .iter()
-                .filter(|v| v.is_fixed())
-                .map(|v| v.y())
-                .reduce(f32::max)
-                .unwrap_or(0.0);
-
-            let average_y = if peak_y > 0.0 {
-                peak_y
-            } else {
-                let total_y: f32 = vertex_group.iter().map(|v| v.y()).sum();
-
-                total_y / (count as f32)
-            };
-
-            for vertex in vertex_group {
-                vertex.set_y(average_y);
-            }
-        }
-    }
-}
-
-impl<'v, V: 'static + DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensionY> YBuffer<V>
-    for HashMapYBuffer<V>
-{
-    fn add(&mut self, value: V) {
-        let xz = (value.x().round() as usize, value.z().round() as usize);
-
-        if !self.contains_key(&xz) {
-            self.insert(xz, vec![]);
-        }
-
-        self.get_mut(&xz)
-            .expect("we just made sure that the key is set!")
-            .push(value)
-    }
-
-    fn new() -> Self {
-        Self::new()
-    }
-
-    fn into_iter_groups(self) -> Box<dyn Iterator<Item = Vec<V>>> {
-        Box::new(self.into_iter().map(|(_, value)| value))
-    }
-}
 
 const TERAIN_ROTATION_CORNERS: [u8; 4] = [0, 1, 3, 2];
 

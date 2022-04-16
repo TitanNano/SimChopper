@@ -129,88 +129,6 @@ impl TerrainBuilder {
         self.sea_level = value;
     }
 
-    fn apply_tile_slope(
-        &self,
-        tile: &mut TileSurface,
-        slope: u8,
-        rotation: &Instance<TerrainRotation, Shared>,
-    ) {
-        let height: f32 = self.tile_height.into();
-
-        match slope {
-            0x00 => (),
-
-            0x01 => {
-                tile.corners[rotation.nw()].y += height;
-                tile.corners[rotation.ne()].y += height;
-            }
-
-            0x02 => {
-                tile.corners[rotation.ne()].y += height;
-                tile.corners[rotation.se()].y += height;
-            }
-
-            0x03 => {
-                tile.corners[rotation.sw()].y += height;
-                tile.corners[rotation.se()].y += height;
-            }
-
-            0x04 => {
-                tile.corners[rotation.nw()].y += height;
-                tile.corners[rotation.sw()].y += height;
-            }
-
-            0x05 => {
-                tile.corners[rotation.nw()].y += height;
-                tile.corners[rotation.ne()].y += height;
-                tile.corners[rotation.se()].y += height;
-            }
-
-            0x06 => {
-                tile.corners[rotation.ne()].y += height;
-                tile.corners[rotation.se()].y += height;
-                tile.corners[rotation.sw()].y += height;
-            }
-
-            0x07 => {
-                tile.corners[rotation.se()].y += height;
-                tile.corners[rotation.sw()].y += height;
-                tile.corners[rotation.nw()].y += height;
-            }
-
-            0x08 => {
-                tile.corners[rotation.sw()].y += height;
-                tile.corners[rotation.nw()].y += height;
-                tile.corners[rotation.ne()].y += height;
-            }
-
-            0x09 => {
-                tile.corners[rotation.ne()].y += height;
-            }
-
-            0x0A => {
-                tile.corners[rotation.se()].y += height;
-            }
-
-            0x0B => {
-                tile.corners[rotation.sw()].y += height;
-            }
-
-            0x0C => {
-                tile.corners[rotation.nw()].y += height;
-            }
-
-            0x0D => {
-                tile.corners[rotation.nw()].y += height;
-                tile.corners[rotation.ne()].y += height;
-                tile.corners[rotation.sw()].y += height;
-                tile.corners[rotation.se()].y += height;
-            }
-
-            _ => {}
-        };
-    }
-
     fn add_to_surface<'m, 'v>(surfaces: &'m mut SurfaceMap, vertex: Vertex) -> Rc<RefCell<Vertex>> {
         let surface = vertex.surface();
         let cell = Rc::new(RefCell::new(vertex));
@@ -293,7 +211,7 @@ impl TerrainBuilder {
             tile.corners[rotation.se()].y -= tile_height as f32;
         }
 
-        self.apply_tile_slope(&mut tile, tile_slope, &rotation);
+        tile.apply_slope(tile_slope, &rotation, self.tile_height.into());
 
         let tile_faces = tile.generate_faces();
         let water_faces = match water {

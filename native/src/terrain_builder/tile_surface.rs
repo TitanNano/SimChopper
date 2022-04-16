@@ -1,9 +1,10 @@
 use std::fmt;
 
-use gdnative::prelude::Vector3;
+use gdnative::prelude::{Vector3, Instance, Shared};
 
 use super::lerp::bilerp_xyz;
 use super::point::{DimensionX, DimensionY, DimensionZ, FixedPoint, SetDimensionY};
+use super::terrain_rotation::{TerrainRotation, TerrainRotationBehaviour};
 
 /// the type of terrain surface.
 #[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
@@ -116,6 +117,86 @@ impl TileSurface {
         }
 
         return faces;
+    }
+
+    pub fn apply_slope(
+        &mut self,
+        slope: u8,
+        rotation: &Instance<TerrainRotation, Shared>,
+        height: f32
+    ) {
+        match slope {
+            0x00 => (),
+
+            0x01 => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.ne()].y += height;
+            }
+
+            0x02 => {
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.se()].y += height;
+            }
+
+            0x03 => {
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.se()].y += height;
+            }
+
+            0x04 => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.sw()].y += height;
+            }
+
+            0x05 => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.se()].y += height;
+            }
+
+            0x06 => {
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.se()].y += height;
+                self.corners[rotation.sw()].y += height;
+            }
+
+            0x07 => {
+                self.corners[rotation.se()].y += height;
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.nw()].y += height;
+            }
+
+            0x08 => {
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.ne()].y += height;
+            }
+
+            0x09 => {
+                self.corners[rotation.ne()].y += height;
+            }
+
+            0x0A => {
+                self.corners[rotation.se()].y += height;
+            }
+
+            0x0B => {
+                self.corners[rotation.sw()].y += height;
+            }
+
+            0x0C => {
+                self.corners[rotation.nw()].y += height;
+            }
+
+            0x0D => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.se()].y += height;
+            }
+
+            _ => {}
+        };
     }
 }
 

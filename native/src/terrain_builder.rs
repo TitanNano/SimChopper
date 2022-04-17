@@ -1,8 +1,8 @@
 mod lerp;
 mod point;
+mod terrain_rotation;
 mod tile_surface;
 mod ybuffer;
-mod terrain_rotation;
 
 use gdnative::api::{visual_server::ArrayFormat, ArrayMesh, Material, Mesh, SurfaceTool};
 use gdnative::prelude::*;
@@ -12,9 +12,9 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use point::{DimensionX, DimensionZ};
-use tile_surface::{SurfaceAssociated, TileFaces, TileSurface, TileSurfaceType, Vertex};
-use ybuffer::{YBuffer, HashMapYBuffer};
 use terrain_rotation::TerrainRotationBehaviour;
+use tile_surface::{SurfaceAssociated, TileFaces, TileSurface, TileSurfaceType, Vertex};
+use ybuffer::{HashMapYBuffer, YBuffer};
 
 pub use terrain_rotation::TerrainRotation;
 
@@ -213,9 +213,9 @@ impl TerrainBuilder {
 
         tile.apply_slope(tile_slope, &rotation, self.tile_height.into());
 
-        let tile_faces = tile.generate_faces();
+        let tile_faces = tile.into();
         let water_faces = match water {
-            Some(water) => water.generate_faces(),
+            Some(water) => water.into(),
             None => vec![],
         };
 

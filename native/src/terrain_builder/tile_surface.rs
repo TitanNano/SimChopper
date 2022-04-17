@@ -82,43 +82,6 @@ impl TileSurface {
         self.fixed = fixed;
     }
 
-    pub fn generate_faces(&self) -> Vec<Face> {
-        let mut faces: Vec<Face> = Vec::new();
-        let kind = self.kind();
-        let resolution = self.resolution();
-
-        for ix in 0..resolution {
-            let weight_x_start = 1.0 / (resolution as f32) * (ix as f32);
-            let weight_x_end = 1.0 / (resolution as f32) * ((ix as f32) + 1.0);
-
-            for iy in 0..resolution {
-                let corners = self.corners();
-                let weight_y_start = 1.0 / (resolution as f32) * (iy as f32);
-                let weight_y_end = 1.0 / (resolution as f32) * ((iy as f32) + 1.0);
-
-                let x0 = bilerp_xyz(corners, weight_x_start, weight_y_start);
-                let x1 = bilerp_xyz(corners, weight_x_end, weight_y_start);
-                let y0 = bilerp_xyz(corners, weight_x_start, weight_y_end);
-                let y1 = bilerp_xyz(corners, weight_x_end, weight_y_end);
-
-                faces.append(&mut vec![
-                    [
-                        Vertex::from_vector(kind, x0, self.fixed),
-                        Vertex::from_vector(kind, x1, self.fixed),
-                        Vertex::from_vector(kind, y1, self.fixed),
-                    ],
-                    [
-                        Vertex::from_vector(kind, x0, self.fixed),
-                        Vertex::from_vector(kind, y1, self.fixed),
-                        Vertex::from_vector(kind, y0, self.fixed),
-                    ],
-                ])
-            }
-        }
-
-        return faces;
-    }
-
     pub fn apply_slope(
         &mut self,
         slope: u8,
@@ -197,6 +160,45 @@ impl TileSurface {
 
             _ => {}
         };
+    }
+}
+
+impl From<TileSurface> for Vec<Face> {
+    fn from(tile: TileSurface) -> Vec<Face> {
+        let mut faces: Vec<Face> = Vec::new();
+        let kind = tile.kind();
+        let resolution = tile.resolution();
+
+        for ix in 0..resolution {
+            let weight_x_start = 1.0 / (resolution as f32) * (ix as f32);
+            let weight_x_end = 1.0 / (resolution as f32) * ((ix as f32) + 1.0);
+
+            for iy in 0..resolution {
+                let corners = tile.corners();
+                let weight_y_start = 1.0 / (resolution as f32) * (iy as f32);
+                let weight_y_end = 1.0 / (resolution as f32) * ((iy as f32) + 1.0);
+
+                let x0 = bilerp_xyz(corners, weight_x_start, weight_y_start);
+                let x1 = bilerp_xyz(corners, weight_x_end, weight_y_start);
+                let y0 = bilerp_xyz(corners, weight_x_start, weight_y_end);
+                let y1 = bilerp_xyz(corners, weight_x_end, weight_y_end);
+
+                faces.append(&mut vec![
+                    [
+                        Vertex::from_vector(kind, x0, tile.fixed),
+                        Vertex::from_vector(kind, x1, tile.fixed),
+                        Vertex::from_vector(kind, y1, tile.fixed),
+                    ],
+                    [
+                        Vertex::from_vector(kind, x0, tile.fixed),
+                        Vertex::from_vector(kind, y1, tile.fixed),
+                        Vertex::from_vector(kind, y0, tile.fixed),
+                    ],
+                ])
+            }
+        }
+
+        return faces;
     }
 }
 

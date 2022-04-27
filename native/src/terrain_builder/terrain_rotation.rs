@@ -1,10 +1,12 @@
-use gdnative::prelude::{NativeClass, Reference, methods, Instance, Shared};
+use gdnative::prelude::{methods, Instance, NativeClass, Reference, Shared};
+use gdnative::export::user_data;
 
 const TERAIN_ROTATION_CORNERS: [u8; 4] = [0, 1, 3, 2];
 const ERROR_CLASS_INSTANCE_ACCESS: &str = "unable to access NativeClass instance!";
 
 #[derive(NativeClass)]
 #[inherit(Reference)]
+#[user_data(user_data::MutexData<TerrainRotation>)]
 pub struct TerrainRotation {
     offset: u8,
 }

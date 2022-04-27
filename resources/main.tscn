@@ -84,8 +84,7 @@ speed = 0.3
 script = ExtResource( 3 )
 world_constants = ExtResource( 15 )
 
-[node name="Terrain" type="MeshInstance" parent="ViewportContainer/Viewport/World"]
-skeleton = NodePath("")
+[node name="Terrain" type="Spatial" parent="ViewportContainer/Viewport/World"]
 script = ExtResource( 11 )
 terrain_material = ExtResource( 12 )
 ocean_material = ExtResource( 13 )

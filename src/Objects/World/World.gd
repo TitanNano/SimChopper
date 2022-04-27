@@ -11,7 +11,7 @@ signal loading_scale(count)
 
 export var world_constants: Resource
 
-onready var terrain: MeshInstance = $Terrain
+onready var terrain := $Terrain
 onready var networks: Networks = $Networks
 onready var reflections := $Reflections
 onready var buildings := $Buildings

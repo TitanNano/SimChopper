@@ -1,4 +1,4 @@
-extends MeshInstance
+extends Node
 
 const TerrainRotation := preload("TerrainRotation.gdns")
 const TerrainBuilderFactory := preload("TerrainBuilderFactory.gdns")
@@ -38,7 +38,13 @@ func build_async(city: Dictionary):
 	builder.set_tile_height(self.world_constants.tile_height)
 	builder.set_sea_level(sea_level)
 
-	var mesh: ArrayMesh = builder.build_terain_async()
+	for mesh in builder.build_terain_async():
+		var mesh_instance := MeshInstance.new()
 
-	self.mesh = mesh
-	self.create_trimesh_collision()
+		mesh_instance.mesh = mesh
+		mesh_instance.generate_lightmap = true
+		mesh_instance.cast_shadow = MeshInstance.SHADOW_CASTING_SETTING_OFF
+		mesh_instance.create_trimesh_collision()
+
+		self.add_child(mesh_instance, true)
+		mesh_instance.owner = get_tree().current_scene

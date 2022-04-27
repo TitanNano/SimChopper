@@ -50,9 +50,9 @@ func build_probes():
 			probe.extents = extents
 			probe.translation = translation
 			probe.enable_shadows = true
-			probe.owner = get_tree().current_scene
 
 			self.add_child(probe)
+			probe.owner = get_tree().current_scene
 
 	yield(get_tree(), "idle_frame")
 	yield(get_tree(), "idle_frame")

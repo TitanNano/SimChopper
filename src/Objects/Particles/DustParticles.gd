@@ -8,21 +8,24 @@ func _ready() -> void:
 func _get_strength() -> float:
 	if not self.process_material is ParticlesMaterial:
 		return 0.0
-	
+
 	var material: ParticlesMaterial = self.process_material
-	
+
 	return material.initial_velocity / 15.0
-	
+
 func _set_strength(value: float):
 	var emitting := value > 0
-	
+
 	if self.emitting != emitting:
 		self.emitting = emitting
 
+	if not self.emitting:
+		return
+
 	if not self.process_material is ParticlesMaterial:
 		return
-	
+
 	var material: ParticlesMaterial = self.process_material
-	
+
 	material.initial_velocity = value * 15
 	material.scale = value * 4

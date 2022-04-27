@@ -68,11 +68,15 @@ func _get_tilt(velocity: Vector3) -> Vector3:
 func _physics_process(_delta: float) -> void:
 	var ray_cast: RayCast = $RayCast;
 	var ground := ray_cast.get_collision_point()
+	var colliding := ray_cast.is_colliding()
 
 	ray_cast.cast_to = ray_cast.global_transform.basis.xform_inv(Vector3.DOWN * 7)
-	dust_particles.global_transform.origin = ground
+
 	self.rotor.power = self.engine_speed
-	self.dust_particles.strength = self.engine_speed
+	self.dust_particles.strength = self.engine_speed if colliding else 0
+
+	if colliding:
+		self.dust_particles.global_transform.origin = ground
 
 
 func _integrate_forces(state: PhysicsDirectBodyState) -> void:

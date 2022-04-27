@@ -27,3 +27,14 @@ jobs:
       run: |
         cd native/
         cargo build --verbose
+
+  clippy:
+    runs-on: 'ubuntu-18.04'
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Check
+        run: |
+          cd native/
+          cargo clippy -- -D warnings

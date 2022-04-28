@@ -2,7 +2,8 @@
 .import/
 
 # Binaries
-build/
+build/**
+!build/.gitkeep
 
 # Maps
 *.sc2

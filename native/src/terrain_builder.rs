@@ -36,7 +36,7 @@ impl TileData {
     }
 
     fn property(&self, name: &str) -> Variant {
-        self.0.get(name).unwrap_or(Variant::nil())
+        self.0.get(name).unwrap_or_else(Variant::nil)
     }
 
     pub fn terrain(&self) -> i64 {
@@ -74,7 +74,7 @@ impl TileData {
 
         let building_id: i64 = building
             .get("building_id")
-            .unwrap_or(Variant::nil())
+            .unwrap_or_else(Variant::nil)
             .to()
             .expect(ERROR_INVALID_VARIANT_TYPE_INT);
 
@@ -128,24 +128,15 @@ fn calculate_normals<'a, I: Iterator<Item = &'a VertexRef>>(
             let plane = Plane::from_points(v0.as_vector(), v1.as_vector(), v2.as_vector())
                 .expect("points a not all members of the same plane");
 
-            let v0_normal = normal_map
-                .get(&v0.to_string())
-                .unwrap_or(&Vector3::ZERO)
-                .clone();
+            let v0_normal = *normal_map.get(&v0.to_string()).unwrap_or(&Vector3::ZERO);
 
             normal_map.insert(v0.to_string(), v0_normal + plane.normal);
 
-            let v1_normal = normal_map
-                .get(&v1.to_string())
-                .unwrap_or(&Vector3::ZERO)
-                .clone();
+            let v1_normal = *normal_map.get(&v1.to_string()).unwrap_or(&Vector3::ZERO);
 
             normal_map.insert(v1.to_string(), v1_normal + plane.normal);
 
-            let v2_normal = normal_map
-                .get(&v2.to_string())
-                .unwrap_or(&Vector3::ZERO)
-                .clone();
+            let v2_normal = *normal_map.get(&v2.to_string()).unwrap_or(&Vector3::ZERO);
 
             normal_map.insert(v2.to_string(), v2_normal + plane.normal);
 
@@ -213,17 +204,13 @@ impl TerrainBuilder {
         self.sea_level = value;
     }
 
-    fn add_to_surface<'m, 'v>(surfaces: &'m mut SurfaceMap, vertex: Vertex) -> VertexRef {
+    fn add_to_surface(surfaces: &mut SurfaceMap, vertex: Vertex) -> VertexRef {
         let surface = vertex.surface();
         let cell = VertexRef::from(vertex);
 
-        if !surfaces.contains_key(&surface) {
-            surfaces.insert(surface, vec![]);
-        }
-
         surfaces
-            .get_mut(&surface)
-            .expect("we just made sure that the key is set!")
+            .entry(surface)
+            .or_insert_with(Vec::new)
             .push(Arc::clone(&cell));
 
         cell
@@ -233,7 +220,7 @@ impl TerrainBuilder {
         let uv_x = vertex.x() / f32::from(self.city_size * tile_size as u16);
         let uv_y = vertex.z() / f32::from(self.city_size * tile_size as u16);
 
-        return Vector2::new(uv_x, uv_y);
+        Vector2::new(uv_x, uv_y)
     }
 
     fn process_tile(&self, tile_data_dic: Dictionary, edge: TileEdgeType) -> TileFaces {
@@ -295,7 +282,7 @@ impl TerrainBuilder {
             tile.corners[rotation.se()].y -= tile_height as f32;
         }
 
-        tile.apply_slope(tile_slope, &rotation, self.tile_height.into());
+        tile.apply_slope(tile_slope, rotation, self.tile_height.into());
 
         let mut tile_faces: Vec<_> = tile.into();
         let mut water_faces = match water {
@@ -363,7 +350,7 @@ impl TerrainBuilder {
 
                 let normal = normal_map
                     .get(&vertex.to_string())
-                    .expect(&format!("no normal for {:?}", vertex))
+                    .unwrap_or_else(|| panic!("no normal for {:?}", vertex))
                     .normalized();
 
                 vertex.set_normal(normal);
@@ -433,7 +420,7 @@ impl TerrainBuilder {
 
         godot_print!("generated {} vertices for terain", vertex_count);
         godot_print!("done generating surfaces {}ms", 0.0);
-        return mesh.into_shared();
+        mesh.into_shared()
     }
 
     #[export]

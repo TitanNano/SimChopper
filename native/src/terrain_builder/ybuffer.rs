@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
-use super::point::{ DimensionX, DimensionY, DimensionZ, FixedPoint, SetDimensionY };
+use super::point::{DimensionX, DimensionY, DimensionZ, FixedPoint, SetDimensionY};
 
-pub trait YBuffer<Value: DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensionY>: Sized {
+pub trait YBuffer<Value: DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensionY>:
+    Sized
+{
     fn add(&mut self, value: Value);
     fn new() -> Self;
     fn into_iter_groups(self) -> Box<dyn Iterator<Item = Vec<Value>>>;
@@ -40,13 +42,9 @@ impl<'v, V: 'static + DimensionX + DimensionZ + DimensionY + FixedPoint + SetDim
     fn add(&mut self, value: V) {
         let xz = (value.x().round() as usize, value.z().round() as usize);
 
-        if !self.contains_key(&xz) {
-            self.insert(xz, vec![]);
-        }
-
-        self.get_mut(&xz)
-            .expect("we just made sure that the key is set!")
-            .push(value)
+        self.entry(xz)
+            .or_insert_with(Vec::new)
+            .push(value);
     }
 
     fn new() -> Self {

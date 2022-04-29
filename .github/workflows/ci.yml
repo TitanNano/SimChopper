@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: ['linux', 'windows', 'darwin']
+        arch: ['x86_64']
+        include:
+          - platform: linux
+            os: ubuntu-18.04
+            vendor: unknown
+            env: -gnu
+          - platform: windows
+            os: windows-2019
+            vendor: pc
+            env: '-gnu'
+          - platform: darwin
+            os: macos-11
+            vendor: apple
+          - platform: darwin
+            arch: aarch64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: Set up clang64
+      if: ${{ contains(matrix.os, 'windows') }}
+      run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
+    - name: Add Build target
+      run: rustup target add ${{ matrix.arch }}-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}
+    - name: Build
+      run: |
+        cd native/
+        cargo build --target ${{ matrix.arch }}-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}
+
+  clippy:
+    runs-on: 'ubuntu-18.04'
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Check
+        run: |
+          cd native/
+          cargo clippy -- -D warnings

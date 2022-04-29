@@ -7,14 +7,14 @@ reloadable=true
 
 [entry]
 
-OSX.64="res://native/target/x86_64-apple-darwin/release/libnative.dylib"
-OSX.aarch64="res://native/target/aarch64-apple-darwin/release/libnative.dylib"
+OSX.x86_64="res://native/target/x86_64-apple-darwin/release/libnative.dylib"
+OSX.arm64="res://native/target/aarch64-apple-darwin/release/libnative.dylib"
 Windows.64="res://native/target/x86_64-pc-windows-gnu/release/native.dll"
 X11.64="res://native/target/x86_64-unknown-linux-gnu/release/libnative.so"
 
 [dependencies]
 
-OSX.64=[  ]
-OSX.aarch64=[  ]
+OSX.x86_64=[  ]
+OSX.arm64=[  ]
 Windows.64=[  ]
 X11.64=[  ]

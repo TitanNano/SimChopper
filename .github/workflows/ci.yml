@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         platform: ['linux', 'windows', 'darwin']
-        arch: ['x86_64']
+        arch: ['x86_64', 'aarch64']
         include:
           - platform: linux
             os: ubuntu-18.04
@@ -23,11 +23,12 @@ jobs:
           - platform: windows
             os: windows-2019
             vendor: pc
-            env: '-gnu'
+            env: '-msvc'
           - platform: darwin
             os: macos-11
             vendor: apple
-          - platform: darwin
+        exclude:
+          - platform: linux
             arch: aarch64
 
     runs-on: ${{ matrix.os }}

@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  rust-build:
     strategy:
       matrix:
         platform: ['linux', 'windows', 'darwin']
@@ -20,13 +20,16 @@ jobs:
             os: ubuntu-18.04
             vendor: unknown
             env: -gnu
+            lib: libnative.so
           - platform: windows
             os: windows-2019
             vendor: pc
             env: '-msvc'
+            lib: native.dll
           - platform: darwin
             os: macos-11
             vendor: apple
+            lib: libnative.dylib
         exclude:
           - platform: linux
             arch: aarch64
@@ -45,8 +48,12 @@ jobs:
       run: |
         cd native/
         cargo build --target ${{ matrix.arch }}-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}
-
-  clippy:
+    - name: Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+          name: libnative-${{ matrix.platform }}-${{ matrix.arch }}
+          path: native/target/${{ matrix.arch }}-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/debug/${{ matrix.lib }}
+  rust-clippy:
     runs-on: 'ubuntu-18.04'
 
     steps:

@@ -1,5 +1,5 @@
-use gdnative::prelude::{methods, Instance, NativeClass, Reference, Shared};
 use gdnative::export::user_data;
+use gdnative::prelude::{methods, Instance, NativeClass, Reference, Shared};
 
 const TERAIN_ROTATION_CORNERS: [u8; 4] = [0, 1, 3, 2];
 const ERROR_CLASS_INSTANCE_ACCESS: &str = "unable to access NativeClass instance!";
@@ -37,7 +37,7 @@ impl TerrainRotationBehaviour for TerrainRotation {
         let shifted_index = ((index + self.offset) % 4) as usize;
         let target_value = TERAIN_ROTATION_CORNERS.get(shifted_index).unwrap_or(&0);
 
-        return target_value.to_owned();
+        target_value.to_owned()
     }
 
     fn nw(&self) -> usize {
@@ -45,15 +45,15 @@ impl TerrainRotationBehaviour for TerrainRotation {
     }
 
     fn ne(&self) -> usize {
-        return self.get_corner(1).into();
+        self.get_corner(1).into()
     }
 
     fn se(&self) -> usize {
-        return self.get_corner(2).into();
+        self.get_corner(2).into()
     }
 
     fn sw(&self) -> usize {
-        return self.get_corner(3).into();
+        self.get_corner(3).into()
     }
 }
 

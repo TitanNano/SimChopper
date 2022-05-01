@@ -125,7 +125,7 @@ impl TileSurface {
         &mut self,
         slope: u8,
         rotation: &Instance<TerrainRotation, Shared>,
-        height: f32
+        height: f32,
     ) {
         match slope {
             0x00 => (),
@@ -249,7 +249,7 @@ impl From<TileSurface> for Vec<Face> {
             }
         }
 
-        return faces;
+        faces
     }
 }
 
@@ -300,9 +300,9 @@ impl Vertex {
     }
 }
 
-impl Into<Vector3> for Vertex {
-    fn into(self) -> Vector3 {
-        Vector3::new(self.x, self.y, self.z)
+impl From<Vertex> for Vector3 {
+    fn from(value: Vertex) -> Self {
+        Self::new(value.x, value.y, value.z)
     }
 }
 

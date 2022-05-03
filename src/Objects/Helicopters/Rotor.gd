@@ -19,7 +19,7 @@ func _physics_process(delta: float) -> void:
 func _process(_delta: float) -> void:
 	#rotor velocity
 	var rotation_offset: float = abs(self.rotation.y - self.previous_rotation.y)
-	var previous_transform := Transform.IDENTITY.rotated(Vector3.FORWARD, min(rotation_offset, 0.610865) * -1)
+	var previous_transform := Transform.IDENTITY.rotated(Vector3.FORWARD, min(max(0.01, rotation_offset), 0.610865) * -1)
 
 	self.previous_rotation = Vector3(self.rotation)
 	self.material.set_shader_param("previous_transform", previous_transform)

@@ -14,6 +14,18 @@ An open source mission driven helicopter pilot sandbox game.
 | Turn Counter Clockwise | A             |
 | Diagonally Left        | (W / S) + A   |
 | Diagonally Right       | (W / S) + D   |
+| Quit Game (Windows)    | Alt + F4      |
+| Quit Game (macOS)      | Cmd + Q       |
+| Quit Game (Linux)      | Ctrl + Q      |
+
+## Screenshots
+<img src="./screenshots/screenshot_1.png" width="50%"><img src="./screenshots/screenshot_2.png" width="50%">
+
+<img src="./screenshots/screenshot_3.png" width="50%"><img src="./screenshots/screenshot_4.png" width="50%">
+
+## Maps
+
+The game uses SimCity 2000 city files to generate its maps. The original city files, created by SC2 have to be converted into a slightly more standardized file format via the sc2mpz tool. Ultimately, it should be possible to load a game with any city built in SimCity 2000.
 
 ## Current Features
 
@@ -66,7 +78,7 @@ An open source mission driven helicopter pilot sandbox game.
   - Military Missions
 
 ## Building From Source
-The game is built with the [Godot Game Engine 3.x](https://github.com/godotengine/godot/tree/3.x) and new builds can be exported with the engines own editor. The game relies on a GDNative module written in Rust. The native module has to be built from source before it can be used by the engine. See the [`/native` directory](./tree/master/native) for detailed instructions.
+The game is built with the [Godot Game Engine 3.4.4](https://github.com/godotengine/godot/tree/3.4.4) and new builds can be exported with the engines own editor. The game relies on a GDNative module written in Rust. The native module has to be built from source before it can be used by the engine. See the [`/native` directory](./native) for detailed instructions.
 
 ## Contributing
 Pull Requests should always reference existing issues. Please do not submit PRs which have no related issue. To suggest new features, not listed above, or discuss current features / implementations, please use the discussions Section of the repository.

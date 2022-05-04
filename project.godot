@@ -824,9 +824,13 @@ window/size/fullscreen.release=true
 window/size/width.release=1920
 window/size/height.release=1080
 
+[editor]
+
+required_version="3.4.4"
+
 [editor_plugins]
 
-enabled=PoolStringArray(  )
+enabled=PoolStringArray( "res://addons/customization/plugin.cfg" )
 
 [gdnative]
 

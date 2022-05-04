@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/customization/force_quit_control/ForceQuitDialog.gd" type="Script" id=1]
+[ext_resource path="res://addons/customization/force_quit_control/ForceQuitControl.gd" type="Script" id=2]
+
+[node name="Control" type="ColorRect"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 0.5 )
+script = ExtResource( 2 )
+
+[node name="AcceptDialog" type="AcceptDialog" parent="."]
+visible = true
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+popup_exclusive = true
+window_title = "Invalid Engine Version"
+dialog_text = "You are using Godot %s.%s.%s while this project is expecting %s.%s.%s!"
+script = ExtResource( 1 )

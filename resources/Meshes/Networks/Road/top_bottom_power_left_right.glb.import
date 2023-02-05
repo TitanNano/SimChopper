@@ -11,7 +11,7 @@ dest_files=[ "res://.import/top_bottom_power_left_right.glb-8465b2092e9d201fb9b9
 
 [params]
 
-nodes/root_type="Spatial"
+nodes/root_type="StaticBody"
 nodes/root_name="Scene Root"
 nodes/root_scale=1.0
 nodes/custom_script=""

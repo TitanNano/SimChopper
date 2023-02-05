@@ -826,7 +826,7 @@ window/size/height.release=1080
 
 [editor]
 
-required_version="3.4.4"
+required_version="3.5.1"
 
 [editor_plugins]
 
@@ -901,6 +901,7 @@ limits/debugger_stdout/max_chars_per_second=1000000
 common/physics_fps=120
 common/enable_pause_aware_picking=true
 3d/default_gravity=9.81
+common/physics_interpolation=true
 
 [rendering]
 

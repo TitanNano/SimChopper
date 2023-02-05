@@ -6,11 +6,12 @@
 *.cpp text
 *.c text
 *.h text
-*.gd text
+*.gd text eol=lf
 *.cs text
 
 # Declare files that will always have CRLF line endings on checkout.
 *.sln text eol=crlf
+*.sh text eol=lf
 
 # Denote all files that are truly binary and should not be modified.
 *.png binary

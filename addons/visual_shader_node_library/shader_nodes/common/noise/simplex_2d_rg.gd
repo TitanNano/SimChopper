@@ -7,7 +7,7 @@ enum Inputs {
 	PERIOD,
 	SCALE,
 	GRADIENT_ROTATION,
-	
+
 	I_COUNT
 }
 
@@ -22,7 +22,7 @@ const INPUT_TYPES = [
 enum Outputs {
 	NOISE,
 	GRADIENT,
-	
+
 	O_COUNT
 }
 
@@ -70,16 +70,16 @@ func _get_global_code(mode):
 
 func _get_code(input_vars, output_vars, mode, type):
 	var offset = input_vars[Inputs.OFFSET];
-	
+
 	if not offset:
 		offset = "vec2(0.0, 0.0)"
 	else:
 		offset = "(%s).xy" % [offset]
 
 	offset = "(%s).xy * (%s).xy" % [offset, input_vars[Inputs.SCALE]]
-	
+
 	var gradient_rotation = input_vars[Inputs.GRADIENT_ROTATION]
-	
+
 	var result_assignment = ""
 
 	if input_vars[Inputs.PERIOD]:
@@ -94,9 +94,9 @@ func _get_code(input_vars, output_vars, mode, type):
 			offset,
 			gradient_rotation
 		]
-	
+
 	var noise_assignment = "%s = result.x;" % [output_vars[Outputs.NOISE]];
-	
+
 	var gradient_assignment = "%s = vec3(result.xy, 0.0);" % [output_vars[Outputs.GRADIENT]]
 
 	return """

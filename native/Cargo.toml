@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-gdnative ="0.10.0"
+gdnative = "0.10.1"
 lerp = "0.4.0"
 backtrace = "0.3.64"
 num = "0.4.0"

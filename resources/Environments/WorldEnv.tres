@@ -24,3 +24,4 @@ ss_reflections_depth_tolerance = 1.0
 dof_blur_far_enabled = true
 dof_blur_far_distance = 180.0
 dof_blur_far_transition = 20.0
+glow_enabled = true

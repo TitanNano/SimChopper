@@ -5,6 +5,7 @@ const MsgPack := preload("../../godot-msgpack/msgpack.gd")
 const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
 const Networks := preload("res://src/Objects/World/Networks.gd")
 const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
+const Logger := preload("res://src/util/Logger.gd")
 
 signal loading_progress(count)
 signal loading_scale(count)
@@ -35,11 +36,12 @@ func _ready_deferred():
 	var result = file.open("res://resources/Maps/career/city0.sc2.mpz", File.READ)
 
 	if result != OK:
-		printerr("failed to open file")
+		Logger.error("failed to open file")
 		return
 
-	var city_bytes := file.get_buffer(file.get_len()).decompress_dynamic(-1, File.COMPRESSION_GZIP)
-	var city: Dictionary = MsgPack.decode(city_bytes).result
+	var city_bytes := file.get_buffer(file.get_len()).decompress_dynamic(-1, File.COMPRESSION_DEFLATE)
+	var city_result: Dictionary = MsgPack.decode(city_bytes)
+	var city: Dictionary = city_result.result
 
 	self.sea_level = city.simulator_settings["GlobalSeaLevel"]
 	self.city_coords_feature = CityCoordsFeature.new(self.world_constants, self.sea_level)

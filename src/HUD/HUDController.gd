@@ -7,11 +7,11 @@ onready var viewport := $ViewportContainer
 onready var world := $ViewportContainer/Viewport/World
 
 func _ready():
-	world.connect("loading_scale", self, "_on_loading_scale")
-	world.connect("loading_progress", self, "_on_loading_progress")
+	assert(world.connect("loading_scale", self, "_on_loading_scale") == OK)
+	assert(world.connect("loading_progress", self, "_on_loading_progress") == OK)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	loading_screen.visible = !game_ready
 	viewport.visible = game_ready
 

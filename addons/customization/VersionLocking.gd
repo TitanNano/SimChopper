@@ -1,10 +1,11 @@
 tool
 extends Reference
 
+const CustomProjectSettings := preload("res://src/CustomProjectSettings.gd")
 
 static func verify(editor: EditorInterface) -> void:
 	var engine_version := Engine.get_version_info()
-	var desired_version: String = ProjectSettings.get_setting("editor/required_version")
+	var desired_version: String = ProjectSettings.get_setting(CustomProjectSettings.EDITOR_REQUIRED_VERSION)
 
 	if engine_version.status != "stable":
 		var dialog_scene: PackedScene = load("res://addons/customization/unstable_warning_control/unstable_warning_control.tscn")

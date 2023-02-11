@@ -4,6 +4,8 @@ const TimeBudget := preload("res://src/util/TimeBudget.gd")
 const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 const WorldConstants := preload("res://src/Objects/Data/WorldConstants.gd")
 const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
+const CarSpawner := preload("res://src/Objects/Spawner/CarSpawner.gd")
+const Building := preload("res://src/Objects/Map/Building.gd")
 
 signal loading_progress(value)
 
@@ -28,9 +30,9 @@ func build_async(city: Dictionary) -> void:
 	self.city_coords_feature = CityCoordsFeature.new(world_constants, sea_level)
 
 	for key in networks:
-		var network_section: Dictionary = networks[key]
-		var object := SceneObjectRegistry.load_network(network_section.building_id)
-		var name: String = network_section.name
+		var network_section: Building = Building.new(networks[key])
+		var object := SceneObjectRegistry.load_network(network_section.building_id())
+		var name: String = network_section.name()
 
 		if not object:
 			print("unknown network_section \"%s\"" % name)
@@ -39,10 +41,10 @@ func build_async(city: Dictionary) -> void:
 
 		var instance: Spatial = object.instance()
 		var tile: Dictionary = tiles[key]
-		var location := self.city_coords_feature.get_building_coords(network_section.tile_coords[0], network_section.tile_coords[1], tile.altitude, 1)
+		var location := self.city_coords_feature.get_building_coords(network_section.tile_coords()[0], network_section.tile_coords()[1], tile.altitude, 1)
 
 		# is a suspension / pylon bridge part or raised powerline
-		if network_section.building_id in range(0x51, 0x5E):
+		if network_section.building_id() in range(0x51, 0x5E):
 			location.y += self.world_constants.tile_height
 
 		# buildings disapear under fully raised terrain
@@ -59,10 +61,12 @@ func build_async(city: Dictionary) -> void:
 
 		instance.transform.origin = location
 
-		if network_section.building_id in range(0x0E, 0x1D) + range(0x5C, 0x5D):
+		if network_section.building_id() in range(0x0E, 0x1D) + range(0x5C, 0x5D):
 			powerline_network.add_child(instance, true)
-		elif network_section.building_id in (range(0x1D, 0x2C) + range(0x51, 0x5E) + range(0x43, 0x45)):
+		elif network_section.building_id() in (range(0x1D, 0x2C) + range(0x51, 0x5E) + range(0x43, 0x45)):
 			road_network.add_child(instance, true)
+			road_network.insert_node(network_section)
+			road_network.associate_object(network_section, instance)
 		else:
 			print("network secction doesn't belong to any network, ", network_section)
 
@@ -73,7 +77,17 @@ func build_async(city: Dictionary) -> void:
 			budget.restart()
 			yield(self.get_tree(), "idle_frame")
 
+	road_network.update_debug()
+
+	for _i in range(3):
+		var car_spawner: CarSpawner = load("res://resources/Objects/Spawner/CarSpawner.tscn").instance()
+		car_spawner.road_network_path = road_network.get_path()
+		car_spawner.translate(road_network.get_child(randi() % road_network.get_child_count()).global_transform.origin)
+		car_spawner.translate(Vector3.UP * 2)
+		self.get_parent().add_child(car_spawner)
+		car_spawner.start_auto_spawn()
+
+
 	# yield at least once at the end, to let the engine catch up
 	yield(self.get_tree(), "idle_frame")
-
 	self.is_built = true

@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAcreateRegularPolygon
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, Vector3(0.5, 0.5, 0))
 	set_input_port_default_value(2, 3)
 	set_input_port_default_value(3, Vector3(1.0, 1.0, 0.0))
@@ -23,8 +23,8 @@ func _get_subcategory():
 func _get_description() -> String:
 	return "Regular N-gon with 3+ sides"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 8
@@ -51,19 +51,19 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		3:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		4:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		5:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		6:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		7:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -80,11 +80,11 @@ func _get_output_port_name(port: int):
 func _get_output_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 float p0lyg0nFunc(vec2 _uv_p0lyg0n, vec2 _pos_p0lyg0n, vec2 _size_p0lyg0n, float _sides_p0lyg0n, float _angle_p0lyg0n, float _smooth_p0lyg0n){
 	_uv_p0lyg0n = (_uv_p0lyg0n - _pos_p0lyg0n) / (_size_p0lyg0n * 2.0);
@@ -97,7 +97,7 @@ float p0lyg0nFunc(vec2 _uv_p0lyg0n, vec2 _pos_p0lyg0n, vec2 _size_p0lyg0n, float
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var uv = "UV"
 	
 	if input_vars[0]:

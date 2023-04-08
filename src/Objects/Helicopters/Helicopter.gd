@@ -1,9 +1,12 @@
-extends RigidBody
+extends RigidBody3D
+
+const DustParticles := preload("res://src/Objects/Particles/DustParticles.gd")
+const AudioSource := preload("res://src/Objects/Audio/AudioSource.gd")
 
 # pseudo constants
-export var CRUISE_SPEED := 159.0 # km/h
-export var RATE_OF_CLIMB := 3.8 # m/s
-export var RATE_OF_ROTATION := 90 # degrees / s
+@export var CRUISE_SPEED := 159.0 # km/h
+@export var RATE_OF_CLIMB := 3.8 # m/s
+@export var RATE_OF_ROTATION := 90 # degrees / s
 const MAX_TILT := 45.0 # degrees
 const ACCELERATION_TIME := 0.4 # amount of seconds to accelerate to top speed
 var CRUISE_SPEED_MS := (CRUISE_SPEED * 1000) / 3600
@@ -15,10 +18,10 @@ var rotational_velocity := 0.0
 var engine_speed := 0.0
 
 
-onready var audio_fx := $AudioFx
-onready var dust_particles := $Dust
-onready var rotor = $rotor
-onready var camera = $CameraInterpolation
+@onready var audio_fx: AudioSource = $AudioFx
+@onready var dust_particles: DustParticles = $Dust
+@onready var rotor = $rotor
+@onready var camera = $CameraInterpolation
 
 
 # Called when the node enters the scene tree for the first time.
@@ -30,10 +33,10 @@ func _get_top_speed(delta: float) -> float:
 
 
 func _get_top_rotation(delta: float) -> float:
-	return deg2rad(RATE_OF_ROTATION) * delta
+	return deg_to_rad(RATE_OF_ROTATION) * delta
 
 
-func _update_directional_velocity(direction: Vector3, state: PhysicsDirectBodyState) -> Vector3:
+func _update_directional_velocity(direction: Vector3, state: PhysicsDirectBodyState3D) -> Vector3:
 	var acceleration := DIRECTIONAL_ACCELERATION #* delta
 	var y_velocity := Vector3.UP * state.linear_velocity
 
@@ -43,7 +46,7 @@ func _update_directional_velocity(direction: Vector3, state: PhysicsDirectBodySt
 
 
 func _update_rotational_velocity(direction: float, delta: float) -> float:
-	var acceleration := deg2rad(ROTATIONAL_ACCELERATION) * delta
+	var acceleration := deg_to_rad(ROTATIONAL_ACCELERATION) * delta
 
 	if direction == 0:
 		self.rotational_velocity = move_toward(self.rotational_velocity, 0, acceleration)
@@ -60,26 +63,26 @@ func _get_tilt(velocity: Vector3) -> Vector3:
 	var direction := velocity.rotated(Vector3.UP, -self.rotation.y) # revert rotation
 	var tilt_z = MAX_TILT * (-direction.x / top_speed)
 	var tilt_x = MAX_TILT * (direction.z / top_speed)
-	var tilt := Vector3(deg2rad(tilt_x), 0, deg2rad(tilt_z))
+	var tilt := Vector3(deg_to_rad(tilt_x), 0, deg_to_rad(tilt_z))
 
 	return tilt
 
 
 func _physics_process(_delta: float) -> void:
-	var ray_cast: RayCast = $RayCast;
+	var ray_cast: RayCast3D = $RayCast3D;
 	var ground := ray_cast.get_collision_point()
 	var colliding := ray_cast.is_colliding()
 
-	ray_cast.cast_to = ray_cast.global_transform.basis.xform_inv(Vector3.DOWN * 7)
+	ray_cast.target_position = Vector3.DOWN * 7 * ray_cast.global_transform.basis
 
 	self.rotor.power = self.engine_speed
-	self.dust_particles.strength = self.engine_speed if colliding else 0
+	self.dust_particles.strength = self.engine_speed if colliding else 0.0
 
 	if colliding:
 		self.dust_particles.global_transform.origin = ground
 
 
-func _integrate_forces(state: PhysicsDirectBodyState) -> void:
+func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var delta := state.step
 	var land_strength := Input.get_action_strength("land")
 	var climb_strength := Input.get_axis("land", "rise")
@@ -97,9 +100,9 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 		return
 
 	if audio_fx.track_name.ends_with("start.wav"):
-		var sfx = preload("res://resources/Sounds/Helicopter/loop0.wav")
+		var sfx: AudioStreamWAV = preload("res://resources/Sounds/Helicopter/loop0.wav")
 
-		sfx.loop_mode = AudioStreamSample.LOOP_FORWARD
+		sfx.loop_mode = AudioStreamWAV.LOOP_FORWARD
 		sfx.loop_end = sfx.data.size()
 
 		audio_fx.play_track(sfx)
@@ -112,15 +115,16 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 
 	direction = direction.rotated(Vector3.UP, self.rotation.y)
 
-	# warning-ignore:shadowed_variable
+	@warning_ignore("shadowed_variable")
 	var directional_velocity := self._update_directional_velocity(direction, state)
 
 	# we calculate the velocity difference between what we target and what we actually got
 	var required_force := ((directional_velocity + target_climb_velocity) - state.linear_velocity) * self.mass
 
-	state.add_central_force(required_force)
+	state.apply_central_force(required_force)
 
 	# apply rotational velocity
+	@warning_ignore("incompatible_ternary")
 	var target_rotation_velocity: float = (self._update_rotational_velocity(turn_strength, delta) if direction == Vector3.ZERO else 0)
 	var rotation_velocity := self.global_transform.basis.y * target_rotation_velocity
 
@@ -131,7 +135,7 @@ func _integrate_forces(state: PhysicsDirectBodyState) -> void:
 	var tilt_velocity_z := (tilt_offset.z * self.global_transform.basis.z)
 
 	var torque_offset := tilt_velocity_x + tilt_velocity_z * 10 + rotation_velocity - state.angular_velocity
-	var torque_impulse := self.get_inverse_inertia_tensor().inverse().xform(torque_offset)
+	var torque_impulse := self.get_inverse_inertia_tensor().inverse() * torque_offset
 
 	state.apply_torque_impulse(torque_impulse)
 

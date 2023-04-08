@@ -1,24 +1,17 @@
-use gdnative::export::user_data;
-use gdnative::prelude::{methods, Instance, NativeClass, Reference, Shared};
+use godot::prelude::*;
 
 const TERAIN_ROTATION_CORNERS: [u8; 4] = [0, 1, 3, 2];
-const ERROR_CLASS_INSTANCE_ACCESS: &str = "unable to access NativeClass instance!";
 
-#[derive(NativeClass)]
-#[inherit(Reference)]
-#[user_data(user_data::MutexData<TerrainRotation>)]
+#[derive(GodotClass)]
+#[class(base=RefCounted, init)]
 pub struct TerrainRotation {
     offset: u8,
 }
 
-#[methods]
+#[godot_api]
 impl TerrainRotation {
-    fn new(_base: &Reference) -> Self {
-        Self { offset: 0 }
-    }
-
-    #[export]
-    fn set_rotation(&mut self, _base: &Reference, rotation: i64) {
+    #[func]
+    fn set_rotation(&mut self, rotation: i64) {
         self.offset = u8::try_from(rotation).unwrap_or(u8::MAX);
     }
 }
@@ -54,47 +47,5 @@ impl TerrainRotationBehaviour for TerrainRotation {
 
     fn sw(&self) -> usize {
         self.get_corner(3).into()
-    }
-}
-
-impl TerrainRotationBehaviour for Instance<TerrainRotation, Shared> {
-    fn get_corner(&self, index: u8) -> u8 {
-        let inst_ref = unsafe { self.assume_safe() };
-
-        inst_ref
-            .map(|object, _base| object.get_corner(index))
-            .expect(ERROR_CLASS_INSTANCE_ACCESS)
-    }
-
-    fn nw(&self) -> usize {
-        let inst_ref = unsafe { self.assume_safe() };
-
-        inst_ref
-            .map(|object, _base| object.nw())
-            .expect(ERROR_CLASS_INSTANCE_ACCESS)
-    }
-
-    fn ne(&self) -> usize {
-        let inst_ref = unsafe { self.assume_safe() };
-
-        inst_ref
-            .map(|object, _base| object.ne())
-            .expect(ERROR_CLASS_INSTANCE_ACCESS)
-    }
-
-    fn se(&self) -> usize {
-        let inst_ref = unsafe { self.assume_safe() };
-
-        inst_ref
-            .map(|object, _base| object.se())
-            .expect(ERROR_CLASS_INSTANCE_ACCESS)
-    }
-
-    fn sw(&self) -> usize {
-        let inst_ref = unsafe { self.assume_safe() };
-
-        inst_ref
-            .map(|object, _base| object.sw())
-            .expect(ERROR_CLASS_INSTANCE_ACCESS)
     }
 }

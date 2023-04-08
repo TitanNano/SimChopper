@@ -30,15 +30,15 @@
 #   static Dictionary encode(Variant value)
 #     Convert a value (number, string, array and dictionary) into their
 #     counterparts in messagepack. Returns dictionary with three fields:
-#     `result` which is the packed data (a PoolByteArray); `error` which is the
+#     `result` which is the packed data (a PackedByteArray); `error` which is the
 #     error code; and `error_string` which is a human readable error message
 #
-#   static Dictionary decode(PoolByteArray bytes)
-#     Convert a packed data (a PoolByteArray) into a value, the reverse of the
+#   static Dictionary decode(PackedByteArray bytes)
+#     Convert a packed data (a PackedByteArray) into a value, the reverse of the
 #     encode function. The return value is similar to the one in the encode
 #     method
 
-static func encode(value):
+static func encode(value: Variant) -> Dictionary:
 	var ctx = {error = OK, error_string = ""}
 	var buffer = StreamPeerBuffer.new()
 	buffer.big_endian = true
@@ -52,17 +52,17 @@ static func encode(value):
 		}
 	else:
 		return {
-			result = PoolByteArray(),
+			result = PackedByteArray(),
 			error = ctx.error,
 			error_string = ctx.error_string,
 		}
 
-static func decode(bytes: PoolByteArray) -> Dictionary:
-	var buffer = StreamPeerBuffer.new()
+static func decode(bytes: PackedByteArray) -> Dictionary:
+	var buffer := StreamPeerBuffer.new()
 	buffer.big_endian = true
 	buffer.data_array = bytes
 
-	var ctx = {error = OK, error_string = ""}
+	var ctx := {error = OK, error_string = ""}
 	var value = _decode(buffer, ctx)
 	if ctx.error == OK:
 		if buffer.get_position() == buffer.get_size():
@@ -73,7 +73,7 @@ static func decode(bytes: PoolByteArray) -> Dictionary:
 	else:
 		return {result = null, error = ctx.error, error_string = ctx.error_string}
 
-static func _encode(buf, value, ctx):
+static func _encode(buf: StreamPeerBuffer, value: Variant, ctx: Dictionary):
 	match typeof(value):
 		TYPE_NIL:
 			buf.put_u8(0xc0)
@@ -101,12 +101,12 @@ static func _encode(buf, value, ctx):
 				buf.put_u8(0xd3)
 				buf.put_64(value)
 
-		TYPE_REAL:
+		TYPE_FLOAT:
 			buf.put_u8(0xca)
 			buf.put_float(value)
 
 		TYPE_STRING:
-			var bytes = value.to_utf8()
+			var bytes = (value as String).to_utf8_buffer()
 
 			var size = bytes.size()
 			if size <= (1 << 5) - 1:
@@ -125,12 +125,13 @@ static func _encode(buf, value, ctx):
 				buf.put_u8(0xdb)
 				buf.put_u32(size)
 			else:
+				@warning_ignore("assert_always_false")
 				assert(false)
 
 			buf.put_data(bytes)
 
-		TYPE_RAW_ARRAY:
-			var size = value.size()
+		TYPE_PACKED_BYTE_ARRAY:
+			var size = (value as PackedByteArray).size()
 			if size <= (1 << 8) - 1:
 				buf.put_u8(0xc4)
 				buf.put_u8(size)
@@ -141,12 +142,13 @@ static func _encode(buf, value, ctx):
 				buf.put_u8(0xc6)
 				buf.put_u32(size)
 			else:
+				@warning_ignore("assert_always_false")
 				assert(false)
 
 			buf.put_data(value)
 
 		TYPE_ARRAY:
-			var size = value.size()
+			var size = (value as Array).size()
 			if size <= 15:
 				# type fixarray [1001XXXX]
 				buf.put_u8(0x90 | size)
@@ -159,6 +161,7 @@ static func _encode(buf, value, ctx):
 				buf.put_u8(0xdd)
 				buf.put_u32(size)
 			else:
+				@warning_ignore("assert_always_false")
 				assert(false)
 
 			for obj in value:
@@ -167,7 +170,7 @@ static func _encode(buf, value, ctx):
 					return
 
 		TYPE_DICTIONARY:
-			var size = value.size()
+			var size = (value as Dictionary).size()
 			if size <= 15:
 				# type fixmap [1000XXXX]
 				buf.put_u8(0x80 | size)
@@ -180,6 +183,7 @@ static func _encode(buf, value, ctx):
 				buf.put_u8(0xdf)
 				buf.put_u32(size)
 			else:
+				@warning_ignore("assert_always_false")
 				assert(false)
 
 			for key in value:
@@ -194,7 +198,7 @@ static func _encode(buf, value, ctx):
 			ctx.error = FAILED
 			ctx.error_string = "unsupported data type %s" % [typeof(value)]
 
-static func _decode(buffer, ctx):
+static func _decode(buffer: StreamPeerBuffer, ctx: Dictionary) -> Variant:
 	if buffer.get_position() == buffer.get_size():
 		ctx.error = FAILED
 		ctx.error_string = "unexpected end of input"

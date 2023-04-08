@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 
 
 enum Fields {
@@ -10,8 +10,8 @@ enum Fields {
 
 const fields = [Fields.BYTE, Fields.BYTE_4, Fields.BYTE_4, Fields.BYTE_4]
 
-static func new() -> PoolByteArray:
-	var instance := PoolByteArray()
+static func new() -> PackedByteArray:
+	var instance := PackedByteArray()
 	
 	for field in fields:
 		for _i in range(0, field):
@@ -29,8 +29,8 @@ static func _offset(field: int) -> int:
 	return offset
 
 
-static func _field_buffer(field: int) -> PoolByteArray:
-	var buffer := PoolByteArray()
+static func _field_buffer(field: int) -> PackedByteArray:
+	var buffer := PackedByteArray()
 	var field_size: int = fields[field]
 	
 	buffer.resize(field_size)
@@ -38,32 +38,32 @@ static func _field_buffer(field: int) -> PoolByteArray:
 	return buffer
 
 
-static func _set_field(instance: PoolByteArray, field: int, value: PoolByteArray) -> void:
+static func _set_field(instance: PackedByteArray, field: int, value: PackedByteArray) -> void:
 	var offset := _offset(field)
 	
 	for i in range(offset, offset + value.size()):
 		instance[i] = value[i - offset]
 
 
-static func x(instance: PoolByteArray, value: float):
+static func x(instance: PackedByteArray, value: float):
 	var field := 1
-	var buffer := var2bytes(value)
+	var buffer := var_to_bytes(value)
 	
 	assert(buffer.size() == fields[field])
 	
 	_set_field(instance, field, buffer)
 
 
-static func surface(instance: PoolByteArray, value: int):
+static func surface(instance: PackedByteArray, value: int):
 	var field := 0
-	var buffer := var2bytes(value)
+	var buffer := var_to_bytes(value)
 	
 	assert(buffer.size() == fields[field])
 	
 	_set_field(instance, field, buffer)
 
 
-static func from_vector(surface: int, vector: Vector3) -> PoolByteArray:
+static func from_vector(surface: int, vector: Vector3) -> PackedByteArray:
 	var inst = new()
 	
 	surface(inst, surface)
@@ -72,5 +72,5 @@ static func from_vector(surface: int, vector: Vector3) -> PoolByteArray:
 	return inst
 
 
-func as_vector(id: int) -> Vector3:
-	return Vector3(self.x[id], self.y[id], self.z[id])
+# func as_vector(id: int) -> Vector3:
+#	return Vector3(self.x[id], self.y[id], self.z[id])

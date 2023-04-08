@@ -1,35 +1,25 @@
-[gd_resource type="VisualShader" load_steps=2 format=2]
+[gd_resource type="VisualShader" load_steps=2 format=3 uid="uid://dm4ci1hjq4gbu"]
 
-[sub_resource type="VisualShaderNodeInput" id=1]
+[sub_resource type="VisualShaderNodeInput" id="1"]
 input_name = "uv"
 
 [resource]
 code = "shader_type spatial;
-render_mode specular_schlick_ggx;
 
 
-
-
-void vertex() {
-// Output:0
-
-}
 
 void fragment() {
 // Input:2
-	vec3 n_out2p0 = vec3(UV, 0.0);
+	vec2 n_out2p0 = UV;
+
 
 // Output:0
-	ALBEDO = n_out2p0;
+	ALBEDO = vec3(n_out2p0, 0.0);
 
-}
-
-void light() {
-// Output:0
 
 }
 "
-graph_offset = Vector2( -573.21, 24.75 )
-nodes/fragment/2/node = SubResource( 1 )
-nodes/fragment/2/position = Vector2( -94.1173, 243.546 )
-nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0 )
+graph_offset = Vector2(-281.544, -89.9851)
+nodes/fragment/2/node = SubResource("1")
+nodes/fragment/2/position = Vector2(-360, 260)
+nodes/fragment/connections = PackedInt32Array(2, 0, 0, 0)

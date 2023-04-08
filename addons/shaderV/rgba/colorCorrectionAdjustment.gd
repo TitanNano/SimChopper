@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAcolorCorrectionAdjustment
 
@@ -14,8 +14,8 @@ func _get_category() -> String:
 func _get_description() -> String:
 	return "Full analog of color correction adjustment of environment in Godot"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 2
@@ -30,7 +30,7 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SAMPLER
 
@@ -40,10 +40,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "col"
 
-func _get_output_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec3 applyC0l0rC0rrecti0nFunc(vec3 _c0l_c0rr, sampler2D _tex_c0rr) {
 	_c0l_c0rr.r = texture(_tex_c0rr, vec2(_c0l_c0rr.r, 0.0)).r;
@@ -53,6 +53,6 @@ vec3 applyC0l0rC0rrecti0nFunc(vec3 _c0l_c0rr, sampler2D _tex_c0rr) {
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	return "%s = applyC0l0rC0rrecti0nFunc(%s, %s);" % [
 output_vars[0], input_vars[0], input_vars[1]]

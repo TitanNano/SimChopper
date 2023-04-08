@@ -1,6 +1,6 @@
-extends Spatial
+extends Node3D
 
-export var connected_ranges := PoolIntArray([0x1D, 0x2C, 0x51, 0x57])
+@export var connected_ranges := PackedInt32Array([0x1D, 0x2C, 0x51, 0x57])
 
 func _ready() -> void:
 	pass
@@ -26,4 +26,4 @@ func set_orientation(north: Dictionary, east: Dictionary, south: Dictionary, wes
 
 	var rotation := 90 if east_west > north_south else 0
 
-	self.rotation.y = deg2rad(rotation)
+	self.rotation.y = deg_to_rad(rotation)

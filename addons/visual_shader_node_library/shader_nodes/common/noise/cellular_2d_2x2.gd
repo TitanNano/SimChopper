@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeCellularNoise2D_2X2
 
@@ -12,8 +12,8 @@ enum Inputs {
 
 const INPUT_NAMES = ["offset", "scale", "jitter"];
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
 	VisualShaderNode.PORT_TYPE_SCALAR
 ]
 
@@ -27,7 +27,7 @@ enum Outputs {
 
 const OUTPUT_NAMES = ["composite", "f1", "f2"];
 const OUTPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
 	VisualShaderNode.PORT_TYPE_SCALAR,
 	VisualShaderNode.PORT_TYPE_SCALAR
 ]
@@ -66,7 +66,7 @@ func _get_output_port_type(port):
 	return OUTPUT_TYPES[port]
 
 func _get_global_code(mode):
-	var code = preload("cellular_2d_2x2.shader").code
+	var code = preload("cellular_2d_2x2.gdshader").code
 	code = code.replace("shader_type spatial;", "")
 	code = code.replace("HELPER_", "HELPER_%s_" % [self._get_name()])
 	return code

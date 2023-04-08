@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAemboss
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(2, -1.0)
 	set_input_port_default_value(3, 0.005)
 	set_input_port_default_value(4, 1.0)
@@ -20,8 +20,8 @@ func _get_description() -> String:
 	return """Emboss filter.
 Note: negative lod => detect lod automatically"""
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 5
@@ -44,7 +44,7 @@ func _get_input_port_type(port: int):
 		0:
 			return VisualShaderNode.PORT_TYPE_SAMPLER
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		3:
@@ -65,11 +65,11 @@ func _get_output_port_name(port: int):
 func _get_output_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec4 emb0ssFunc(sampler2D _tex_emb0ss, vec2 _uv_emb0ss, float _lod_emb0ss, vec2 _ofst_emb0ss, float _ctst_emb0ss){
 	vec4 col_emb0ss = vec4(0.5, 0.5, 0.5, 0.5);
@@ -85,7 +85,7 @@ vec4 emb0ssFunc(sampler2D _tex_emb0ss, vec2 _uv_emb0ss, float _lod_emb0ss, vec2 
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var texture = "TEXTURE"
 	var uv = "UV"
 	

@@ -6,22 +6,23 @@ const WorldConstants := preload("res://src/Objects/Data/WorldConstants.gd")
 const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
 const CarSpawner := preload("res://src/Objects/Spawner/CarSpawner.gd")
 const Building := preload("res://src/Objects/Map/Building.gd")
+const RoadNavigation := preload("res://src/Objects/Networks/RoadNavigation.gd")
 
 signal loading_progress(value)
 
-export var is_built := false
-export var world_constants: Resource
+@export var is_built := false
+@export var world_constants: WorldConstants
 
 var city_coords_feature: CityCoordsFeature
 
-onready var powerline_network := $Powerlines
-onready var road_network := $Road
+@onready var powerline_network := $Powerlines
+@onready var road_network: RoadNavigation = $Road
 
 func _ready() -> void:
 	assert(world_constants is WorldConstants, "Networks.world_constants is not of type WorldConstants")
 
 
-func build_async(city: Dictionary) -> void:
+func build_async(city: Dictionary):
 	var budget := TimeBudget.new(100)
 	var networks: Dictionary = city.networks
 	var tiles: Dictionary = city.tilelist
@@ -32,6 +33,7 @@ func build_async(city: Dictionary) -> void:
 	for key in networks:
 		var network_section: Building = Building.new(networks[key])
 		var object := SceneObjectRegistry.load_network(network_section.building_id())
+		@warning_ignore("shadowed_variable_base_class")
 		var name: String = network_section.name()
 
 		if not object:
@@ -39,7 +41,7 @@ func build_async(city: Dictionary) -> void:
 			self.emit_signal("loading_progress", 1)
 			continue
 
-		var instance: Spatial = object.instance()
+		var instance: Node3D = object.instantiate()
 		var tile: Dictionary = tiles[key]
 		var location := self.city_coords_feature.get_building_coords(network_section.tile_coords()[0], network_section.tile_coords()[1], tile.altitude, 1)
 
@@ -52,7 +54,7 @@ func build_async(city: Dictionary) -> void:
 			location.y += self.world_constants.tile_height
 
 		if instance.has_method("set_orientation"):
-			instance.set_orientation(
+			instance.call("set_orientation",
 				tiles[[key[0], key[1] - 1]],
 				tiles[[key[0] + 1, key[1]]],
 				tiles[[key[0], key[1] + 1]],
@@ -75,19 +77,21 @@ func build_async(city: Dictionary) -> void:
 		if budget.is_exceded():
 			print("yielding after ", budget.elapsed(), "ms of work")
 			budget.restart()
-			yield(self.get_tree(), "idle_frame")
+			await self.get_tree().process_frame
 
 	road_network.update_debug()
 
 	for _i in range(3):
-		var car_spawner: CarSpawner = load("res://resources/Objects/Spawner/CarSpawner.tscn").instance()
+		var car_spawner: CarSpawner = (load("res://resources/Objects/Spawner/CarSpawner.tscn") as PackedScene).instantiate()
+		var random_child: Node3D = road_network.get_child(randi() % road_network.get_child_count()) 
+		var transform := random_child.global_transform.origin
 		car_spawner.road_network_path = road_network.get_path()
-		car_spawner.translate(road_network.get_child(randi() % road_network.get_child_count()).global_transform.origin)
+		car_spawner.translate(transform)
 		car_spawner.translate(Vector3.UP * 2)
 		self.get_parent().add_child(car_spawner)
 		car_spawner.start_auto_spawn()
 
 
 	# yield at least once at the end, to let the engine catch up
-	yield(self.get_tree(), "idle_frame")
+	await self.get_tree().process_frame
 	self.is_built = true

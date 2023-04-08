@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeNoiseGeneric2dFractal
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, 6)
 	set_input_port_default_value(2, Vector3(2, 2, 0))
 	set_input_port_default_value(3, 2)
@@ -23,7 +23,7 @@ func _get_subcategory() -> String:
 func _get_description() -> String:
 	return "Fractal GenericNoise using hash random function"
 
-func _get_return_icon_type() -> int:
+func _get_return_icon_type() -> VisualShaderNode.PortType:
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
 func _get_input_port_count() -> int:
@@ -51,11 +51,11 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		2:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		3:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		4:
@@ -65,7 +65,7 @@ func _get_input_port_type(port: int):
 		6:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		7:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_output_port_count() -> int:
 	return 1
@@ -73,10 +73,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "result"
 
-func _get_output_port_type(port: int) -> int:
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 float hash2_gener1c2DFractal(vec2 _p_hash2_gener1c) {
 	return (fract(1e4 * sin(17.0 * _p_hash2_gener1c.x + _p_hash2_gener1c.y * 0.1) *
@@ -109,7 +109,7 @@ float genericNoise2DFBM(vec2 _uv_gnfbm, int _oct_gnfbm, vec2 _per_gnfbm, float _
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var uv = "UV"
 	
 	if input_vars[0]:

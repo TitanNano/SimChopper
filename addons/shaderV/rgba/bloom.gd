@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAbloom
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(2, 1.0)
 
 func _get_name() -> String:
@@ -17,8 +17,8 @@ func _get_category() -> String:
 #func _get_description() -> String:
 #	return ""
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 3
@@ -35,7 +35,7 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		2:
@@ -54,11 +54,11 @@ func _get_output_port_name(port: int):
 func _get_output_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec4 bl00mFunc(vec4 _c0l_bl00m, float _strength_bl00m){
 	float _gamma_bl00m = 1.0 - pow(_c0l_bl00m.r, _strength_bl00m);
@@ -67,7 +67,7 @@ vec4 bl00mFunc(vec4 _c0l_bl00m, float _strength_bl00m){
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	return """vec4 %s%s = bl00mFunc(vec4(%s, %s), %s);
 %s = %s%s.rgb;
 %s = %s%s.a""" % [

@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeUVdoodle
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, 0.5)
 	set_input_port_default_value(2, 4.0)
 	set_input_port_default_value(3, 0.7)
@@ -21,8 +21,8 @@ func _get_subcategory() -> String:
 func _get_description() -> String:
 	return "Doodle UV effect"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 6
@@ -45,7 +45,7 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		2:
@@ -63,10 +63,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "uv"
 
-func _get_output_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 float hash2D00dle(vec2 _p_hash_d00dle) {
 	return fract(1e4 * sin(17.0 * _p_hash_d00dle.x + _p_hash_d00dle.y * 0.1) * (0.1 + abs(sin(_p_hash_d00dle.y * 13.0 + _p_hash_d00dle.x))));
@@ -89,7 +89,7 @@ vec2 d00dleUVFunc(vec2 _uv_d00dle, float _max_offset_d00dle, float _time_d00dle,
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var uv = "UV"
 	
 	if input_vars[0]:

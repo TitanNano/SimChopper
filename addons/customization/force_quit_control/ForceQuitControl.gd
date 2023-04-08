@@ -1,7 +1,7 @@
-tool
+@tool
 extends ColorRect
 
-onready var dialog := $AcceptDialog
+@onready var dialog := $AcceptDialog
 
 var params: Array
 

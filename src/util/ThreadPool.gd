@@ -1,12 +1,11 @@
-extends Reference
+extends RefCounted
 
-const Callable := preload("Callable.gd")
 const ThreadWorker := preload("ThreadWorker.gd")
 
 signal completed(results)
-signal progress(status)
+signal progress(status: Dictionary)
 
-var pool := []
+var pool: Array[ThreadWorker]= []
 var _completed_workers := 0
 var _completed_jobs := 0
 var _total_job_count := 0
@@ -24,20 +23,20 @@ func _collect_thread(thread_results):
 	var results = self._results
 	self._results = []
 	# find out why the results are so huge. 1.2 GB is not reasonable
-	self.emit_signal("completed", results)
+	self.completed.emit(results)
 	self._mutex.unlock()
 
 
 func _report_porgress():
 	self._completed_jobs += 1
-	self.emit_signal("progress", { "complete": self._completed_jobs, "total": self._total_job_count })
+	self.progress.emit({ "complete": self._completed_jobs, "total": self._total_job_count })
 
 
-func _init(runner: SceneTree, executor: Callable) -> void:
+func _init(runner: SceneTree,executor: Callable):
 	for _i in range(0, OS.get_processor_count()):
-		var worker = ThreadWorker.new(runner, executor)
-		worker.connect("completed", self, "_collect_thread")
-		worker.connect("progress", self, "_report_porgress")
+		var worker := ThreadWorker.new(runner, executor)
+		worker.completed.connect(self._collect_thread)
+		worker.progress.connect(self._report_porgress)
 
 		self.pool.append(worker)
 

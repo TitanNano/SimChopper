@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderToolsCartesianToSpherical
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(0, Vector3(1.0, 1.0, 1.0))
 
 func _get_name() -> String:
@@ -17,8 +17,8 @@ func _get_subcategory():
 func _get_description() -> String:
 	return "Cartesian (x, y, z) -> Spherical (r, theta, phi). By default (x, y, z) is UV."
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 1
@@ -26,8 +26,8 @@ func _get_input_port_count() -> int:
 func _get_input_port_name(port: int) -> String:
 	return "cartesian"
 
-func _get_input_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_input_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 	
 
 func _get_output_port_count() -> int:
@@ -36,10 +36,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port ) -> String:
 	return "spherical"
 
-func _get_output_port_type(port) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec3 cartesianToSphericalFunc(vec3 _cartesian_vec3){
 //	(x, y, z) -> (r, theta, phi)
@@ -49,7 +49,7 @@ vec3 cartesianToSphericalFunc(vec3 _cartesian_vec3){
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var uv = "UV"
 	
 	if input_vars[0]:

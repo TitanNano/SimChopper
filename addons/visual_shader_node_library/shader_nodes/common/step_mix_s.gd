@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeStepMixS
 
@@ -15,7 +15,7 @@ func _get_description():
 	return "Equivalent of MixS with output of Step or Smoothstep as coefficient"
 
 func _get_return_icon_type():
-	return VisualShaderNode.PORT_TYPE_VECTOR
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 enum Inputs {
 	A,
@@ -28,8 +28,8 @@ enum Inputs {
 };
 const INPUT_NAMES = ["a", "b", "k", "threshold", "smoothness"];
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
 	VisualShaderNode.PORT_TYPE_SCALAR,
 	VisualShaderNode.PORT_TYPE_SCALAR,
 	VisualShaderNode.PORT_TYPE_SCALAR
@@ -51,7 +51,7 @@ func _get_output_port_name(port):
 	return "result"
 
 func _get_output_port_type(port):
-	return VisualShaderNode.PORT_TYPE_VECTOR
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_global_code(mode):
 	return ""
@@ -59,7 +59,7 @@ func _get_global_code(mode):
 func _get_code(input_vars, output_vars, mode, type):
 	var threshold = input_vars[Inputs.THRESHOLD];
 	
-	if not threshold:
+	if threshold == null:
 		threshold = "0.0"
 	
 	var step;
@@ -85,9 +85,9 @@ func _get_code(input_vars, output_vars, mode, type):
 
 
 func _init():
-	if not get_input_port_default_value(Inputs.A):
+	if get_input_port_default_value(Inputs.A) == null:
 		set_input_port_default_value(Inputs.A, Vector3(1.0,1.0,1.0))
-	if not get_input_port_default_value(Inputs.B):
+	if get_input_port_default_value(Inputs.B) == null:
 		set_input_port_default_value(Inputs.B, Vector3(0.0,0.0,0.0))
-	if not get_input_port_default_value(Inputs.THRESHOLD):
+	if get_input_port_default_value(Inputs.THRESHOLD) == null:
 		set_input_port_default_value(Inputs.THRESHOLD, 0.0)

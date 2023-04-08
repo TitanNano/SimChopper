@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAshiftHSV
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, 1.0)
 	set_input_port_default_value(2, 1.0)
 	set_input_port_default_value(3, 1.0)
@@ -24,8 +24,8 @@ Input values recommendations:
 [value]: min=0.0;
 """
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 4
@@ -44,7 +44,7 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		2:
@@ -58,10 +58,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "col"
 
-func _get_output_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec3 hsv2rgbHSVChan9eFunc(vec3 _hsv_c0l0r_HSVChan9e){
 	vec4 _K_hsv2rgbHSVChan9e = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -73,7 +73,7 @@ vec3 hsv2rgbHSVChan9eFunc(vec3 _hsv_c0l0r_HSVChan9e){
 
 vec3 rgb2hvsHSVChan9eFunc(vec3 _rgb_c0l0r_HSVChan9e){
 	vec4 _K_rgb2hvsHSVChan9e = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-	vec4 _p_rgb2hvsHSVChan9e = mix( vec4(_rgb_c0l0r_HSVChan9e.bg, _K_rgb2hvsHSVChan9e.wz),
+	vec4 _p_rgb2hvsHSVChan9e = mix( vec4(_rgb_c0l0r_HSVChan9e.panel, _K_rgb2hvsHSVChan9e.wz),
 									vec4(_rgb_c0l0r_HSVChan9e.gb, _K_rgb2hvsHSVChan9e.xy),
 									step(_rgb_c0l0r_HSVChan9e.b, _rgb_c0l0r_HSVChan9e.g));
 	vec4 _q_rgb2hvsHSVChan9e = mix( vec4(_p_rgb2hvsHSVChan9e.xyw, _rgb_c0l0r_HSVChan9e.r), 
@@ -94,6 +94,6 @@ vec3 hsvChangeHSVChan9eFunc(vec3 _c0l0r_HSVChan9e, float _h_HSVChan9e, float _s_
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	return "%s = hsvChangeHSVChan9eFunc(%s, %s, %s, %s);" % [
 output_vars[0], input_vars[0], input_vars[1], input_vars[2], input_vars[3]]

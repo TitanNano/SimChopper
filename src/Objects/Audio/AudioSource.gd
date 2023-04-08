@@ -1,7 +1,7 @@
 extends Node
 
-onready var slot0: AudioStreamPlayer = $Slot0
-onready var slot1: AudioStreamPlayer = $Slot1
+@onready var slot0: AudioStreamPlayer = $Slot0
+@onready var slot1: AudioStreamPlayer = $Slot1
 
 var active_slot: AudioStreamPlayer = null
 var target_slot: AudioStreamPlayer = null
@@ -9,8 +9,8 @@ var elapsed := 0.0
 
 const DURATION = 0.5 #seconds
 
-var playing setget ,_get_playing
-var track_name setget ,_get_track_name
+var playing: bool : get = _get_playing
+var track_name: String : get = _get_track_name
 
 func _process(delta):
 	if not active_slot or not target_slot:

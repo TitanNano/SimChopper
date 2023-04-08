@@ -1,5 +1,5 @@
-tool
-extends Position3D
+@tool
+extends Marker3D
 
 
 # Declare member variables here. Examples:
@@ -8,11 +8,11 @@ extends Position3D
 
 var _vector := Vector3.UP
 
-export(Color) var color setget _set_color, _get_color
-export(Vector3) var vector setget _set_vector, _get_vector
+@export var color: Color : get = _get_color, set = _set_color
+@export var vector: Vector3 : get = _get_vector, set = _set_vector
 
-onready var length = get_node("Length")
-onready var head = get_node("Head")
+@onready var length: CSGCylinder3D = get_node("Length")
+@onready var head: CSGMesh3D = get_node("Head")
 
 var is_ready := false
 
@@ -25,24 +25,24 @@ func _ready() -> void:
 
 func _set_color(value: Color) -> void:
 	if not self.is_ready:
-		yield(self, "ready")
+		await self.ready
 
-	self.head.material.albedo_color = value
-	self.length.material.albedo_color = value
+	(self.head.material as StandardMaterial3D).albedo_color = value
+	(self.length.material as StandardMaterial3D).albedo_color = value
 
 
 func _get_color() -> Color:
-	return self.length.material.albedo_color
+	return (self.length.material as StandardMaterial3D).albedo_color
 
 
 func _set_vector(v: Vector3) -> void:
 	if not self.is_ready:
-		yield(self, "ready")
+		await self.ready
 
 	self._vector = v
 	self.length.height = v.length()
-	self.length.translation.y = v.length() / 2
-	self.head.translation.y = v.length() + 0.4
+	self.length.position.y = v.length() / 2
+	self.head.position.y = v.length() + 0.4
 	self.global_transform.basis = Basis.IDENTITY
 
 	var counter_axis := self._vector.x if abs(self._vector.x) > abs(self.vector.z) else self._vector.z

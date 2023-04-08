@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeUVclampAlpha
 
@@ -14,7 +14,7 @@ func _get_category() -> String:
 func _get_description() -> String:
 	return "Clamp alpha to border vec4(0, 0, 1, 1)"
 
-func _get_return_icon_type() -> int:
+func _get_return_icon_type() -> VisualShaderNode.PortType:
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
 func _get_input_port_count() -> int:
@@ -32,7 +32,7 @@ func _get_input_port_type(port: int):
 		0:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_output_port_count() -> int:
 	return 1
@@ -40,10 +40,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "alpha"
 
-func _get_output_port_type(port: int) -> int:
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 float clampAlphaBorderFunc(float _color_alpha_clamp, vec2 _uv_clamp){
 	_color_alpha_clamp = mix(0.0, _color_alpha_clamp, max(sign(_uv_clamp.x), 0.0));
@@ -54,7 +54,7 @@ float clampAlphaBorderFunc(float _color_alpha_clamp, vec2 _uv_clamp){
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var texture = "TEXTURE"
 	var uv = "UV"
 	

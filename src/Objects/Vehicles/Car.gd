@@ -1,4 +1,4 @@
-extends RigidBody
+extends RigidBody3D
 
 const V3Util := preload("res://src/util/V3Util.gd")
 const RoadNavigation := preload("res://src/Objects/Networks/RoadNavigation.gd")
@@ -6,7 +6,7 @@ const Building := preload("res://src/Objects/Map/Building.gd")
 const Logger := preload("res://src/util/Logger.gd")
 const CustomProjectSettings := preload("res://src/CustomProjectSettings.gd")
 
-export var road_network_path: NodePath
+@export var road_network_path: NodePath
 
 var velocity := 30
 var safe_velocity := Vector3.ZERO
@@ -17,15 +17,15 @@ var ground_normal := Vector3.DOWN
 
 var stuck := 0
 var new := true
-var last_transform := Transform.IDENTITY
+var last_transform := Transform3D.IDENTITY
 
 var target_nav_node: Building
 var current_nav_node: Building
 
-onready var navigation: NavigationAgent = $NavigationAgent
-onready var debug_target: MeshInstance = $DebugTarget
-onready var ground_detector: RayCast = $GroundDetector
-onready var road_network: RoadNavigation = get_node(road_network_path)
+@onready var navigation: NavigationAgent3D = $NavigationAgent3D
+@onready var debug_target: MeshInstance3D = $DebugTarget
+@onready var ground_detector: RayCast3D = $GroundDetector
+@onready var road_network: RoadNavigation = get_node(road_network_path)
 
 func _ready() -> void:
 	self.rng = RandomNumberGenerator.new()
@@ -70,28 +70,29 @@ func _physics_process(_delta: float) -> void:
 	var target := self.get_next_location()
 
 	# directional velocity
+	@warning_ignore("shadowed_variable_base_class")
 	var basis := V3Util.basis_from_normal(self.ground_normal)
 	var direction := self.global_transform.origin.direction_to(target)
 	direction.y = 0
 
-	direction = basis.xform(direction)
+	direction = basis * direction
 
 	var current_velocity := direction * self.velocity
 
 	# rotation
 	var angle_dir = (self.global_transform.origin * V3Util.XZ_PLANE).direction_to(target * V3Util.XZ_PLANE)
-	# warning-ignore:shadowed_variable
+	@warning_ignore("shadowed_variable")
 	var target_angle = Vector3.FORWARD.signed_angle_to(angle_dir, Vector3.UP)
 	var angle_offset := self.angular_offset(self.rotation.y, target_angle)
 
 	# ban 180 deg turns
-	if not self.new and abs(angle_offset) > deg2rad(100):
-		Logger.debug(["attempted", rad2deg(angle_offset), "deg turn, blocked"])
+	if not self.new and abs(angle_offset) > deg_to_rad(100):
+		Logger.debug(["attempted", rad_to_deg(angle_offset), "deg turn, blocked"])
 		self.safe_velocity = Vector3.ZERO
 		self._on_choose_target()
 		return
 
-	if abs(angle_offset) > deg2rad(5):
+	if abs(angle_offset) > deg_to_rad(5):
 		current_velocity *= 1
 
 	self.target_angle = target_angle
@@ -106,38 +107,38 @@ func _on_velocity_computed(new_velocity: Vector3) -> void:
 	self.safe_velocity = new_velocity
 
 
-func _integrate_forces(state: PhysicsDirectBodyState) -> void:
+func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	if not self.target_nav_node:
 		return
 
 	# add gravity
 	if not self.ground_detector.is_colliding():
 		Logger.debug("applying gravity")
-		self.add_central_force(state.total_gravity * 300 * state.step * self.mass)
+		self.apply_central_force(state.total_gravity * 300 * state.step * self.mass)
 
 	var applied_velocity := (self.safe_velocity - state.linear_velocity)
 
 	applied_velocity *= min(applied_velocity.length_squared(),  self.safe_velocity.length_squared()) / max(applied_velocity.length_squared(), 1)
 
-	self.add_central_force(applied_velocity * self.mass)
+	self.apply_central_force(applied_velocity * self.mass)
 
 	# add x rotation for ground alignemnt
 	var x_rot := Vector3.UP.signed_angle_to(self.ground_normal, Vector3.RIGHT.rotated(Vector3.UP, self.rotation.y))
 	var x_offset := x_rot - self.rotation.x
-	var x_angular_vector := self.global_transform.basis.xform(Vector3.RIGHT)
+	var x_angular_vector := self.global_transform.basis * Vector3.RIGHT
 	var x_angular := x_angular_vector * x_offset * 6
 
 	# add y rotation for orientation
-	# warning-ignore:shadowed_variable
+	@warning_ignore("shadowed_variable")
 	var target_angle := self.target_angle
 	var offset := self.angular_offset(self.rotation.y, target_angle)
 
 	Logger.debug(["angular offset", offset])
 
-	var angular_vector := self.global_transform.basis.xform(Vector3.UP)
+	var angular_vector := self.global_transform.basis * Vector3.UP
 	var angular := angular_vector * offset * 12
 
-	var torque_impulse := self.get_inverse_inertia_tensor().inverse().xform((angular + x_angular) - state.angular_velocity)
+	var torque_impulse := self.get_inverse_inertia_tensor().inverse() * ((angular + x_angular) - state.angular_velocity)
 
 	self.apply_torque_impulse(torque_impulse)
 
@@ -173,6 +174,7 @@ func get_random_street_location() -> Vector3:
 
 
 func is_target_reached() -> bool:
+	@warning_ignore("shadowed_variable_base_class")
 	var rotation := self.global_rotation
 	var orientation := Vector3.FORWARD.rotated(Vector3.UP, rotation.y)
 	return self.road_network.has_arrived(self.global_transform.origin, orientation, self.target_nav_node)
@@ -204,7 +206,7 @@ func angular_offset(from: float, to: float) -> float:
 
 	# if offset is larger than 180 degrees we should rather rotate
 	# in the other direction
-	if abs(offset) > deg2rad(180):
-		offset = (deg2rad(360) - abs(offset)) * sign(offset) * -1
+	if abs(offset) > deg_to_rad(180):
+		offset = (deg_to_rad(360) - abs(offset)) * sign(offset) * -1
 
 	return offset

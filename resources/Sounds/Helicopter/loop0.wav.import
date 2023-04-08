@@ -1,13 +1,14 @@
 [remap]
 
 importer="wav"
-type="AudioStreamSample"
-path="res://.import/loop0.wav-4467608b9b5a74fac8e6ae7b7ea4e89d.sample"
+type="AudioStreamWAV"
+uid="uid://dhv3rlovpbqai"
+path="res://.godot/imported/loop0.wav-4467608b9b5a74fac8e6ae7b7ea4e89d.sample"
 
 [deps]
 
 source_file="res://resources/Sounds/Helicopter/loop0.wav"
-dest_files=[ "res://.import/loop0.wav-4467608b9b5a74fac8e6ae7b7ea4e89d.sample" ]
+dest_files=["res://.godot/imported/loop0.wav-4467608b9b5a74fac8e6ae7b7ea4e89d.sample"]
 
 [params]
 
@@ -17,5 +18,7 @@ force/max_rate=false
 force/max_rate_hz=44100
 edit/trim=false
 edit/normalize=false
-edit/loop=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
 compress/mode=0

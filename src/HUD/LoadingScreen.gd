@@ -1,9 +1,9 @@
 extends Control
 
-onready var progress = $ProgressBar
+@onready var progress = $ProgressBar
 
-var total_jobs: int setget _set_total_jobs, _get_total_jobs
-var completed_jobs: int setget _set_completed_jobs, _get_completed_jobs
+var total_jobs: int : get = _get_total_jobs, set = _set_total_jobs
+var completed_jobs: int : get = _get_completed_jobs, set = _set_completed_jobs
 
 func _set_total_jobs(value: int):
 	self.progress.step = 1

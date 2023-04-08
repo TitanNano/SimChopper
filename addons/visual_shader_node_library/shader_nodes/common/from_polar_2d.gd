@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeFromPolar2D
 
@@ -15,7 +15,7 @@ func _get_description():
 	return "Converts 2D polar coordinates to cartesian coordinates"
 
 func _get_return_icon_type():
-	return VisualShaderNode.PORT_TYPE_VECTOR
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 enum Inputs {
 	A,
@@ -28,7 +28,7 @@ const INPUT_NAMES = ["a", "d", "origin"];
 const INPUT_TYPES = [
 	VisualShaderNode.PORT_TYPE_SCALAR,
 	VisualShaderNode.PORT_TYPE_SCALAR,
-	VisualShaderNode.PORT_TYPE_VECTOR
+	VisualShaderNode.PORT_TYPE_VECTOR_3D
 ];
 
 func _get_input_port_count():
@@ -47,7 +47,7 @@ func _get_output_port_name(port):
 	return "xy"
 
 func _get_output_port_type(port):
-	return VisualShaderNode.PORT_TYPE_VECTOR
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_global_code(mode):
 	return ""

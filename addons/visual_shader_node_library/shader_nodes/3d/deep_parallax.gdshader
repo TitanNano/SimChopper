@@ -1,5 +1,5 @@
 shader_type spatial;
-uniform sampler2D texture_parallax_default : hint_black;
+uniform sampler2D texture_parallax_default : hint_default_black;
 
 void deep_parallax(in vec3 uv_in, in sampler2D depth_texture, in float depth_scale, in float min_layers, in float max_layers, in vec3 vertex, in vec3 normal, in vec3 tangent, in vec3 binormal, in vec3 depth_flip, out vec3 uv_out) {
 	vec3 view_dir = normalize(normalize(-vertex) * mat3( tangent * depth_flip.x, -binormal * depth_flip.y, normal));

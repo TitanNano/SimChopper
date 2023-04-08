@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRotation2D
 
@@ -15,7 +15,7 @@ func _get_description():
 	return "Rotates the input around a pivot. Default pivot is zero."
 
 func _get_return_icon_type():
-	return VisualShaderNode.PORT_TYPE_VECTOR
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count():
 	return 3
@@ -34,9 +34,9 @@ func _get_input_port_type(port):
 		0:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_output_port_count():
 	return 1
@@ -49,10 +49,10 @@ func _get_output_port_name(port):
 func _get_output_port_type(port):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_global_code(mode):
-	var code = preload("rotation_2d.shader").code
+	var code = preload("rotation_2d.gdshader").code
 	code = code.replace("shader_type spatial;\n", "")
 	return code
 

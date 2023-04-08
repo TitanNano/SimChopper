@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeDither
 
@@ -47,7 +47,7 @@ func _get_global_code(mode):
 	if mode != Shader.MODE_SPATIAL:
 		return ""
 		
-	var code = preload("dither.shader").code
+	var code = preload("dither.gdshader").code
 	code = code.replace("shader_type spatial;\n", "")
 	return code
 

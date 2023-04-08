@@ -1,12 +1,12 @@
-[gd_resource type="NoiseTexture" load_steps=2 format=2]
+[gd_resource type="NoiseTexture2D" load_steps=2 format=3 uid="uid://ckj5pmqjto75o"]
 
-[sub_resource type="OpenSimplexNoise" id=1]
-octaves = 4
+[sub_resource type="FastNoiseLite" id="1"]
+fractal_octaves = 4
 
 [resource]
 width = 1536
 height = 1536
 seamless = true
-as_normalmap = true
+as_normal_map = true
 bump_strength = 50.0
-noise = SubResource( 1 )
+noise = SubResource("1")

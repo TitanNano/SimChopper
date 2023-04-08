@@ -2,36 +2,36 @@
 
 [ext_resource path="res://resources/Materials/terrain.tres" type="Material" id=1]
 
-[node name="Spatial" type="CSGCombiner"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000691056, -0.00109231, 0.00030762 )
+[node name="Node3D" type="CSGCombiner3D"]
+transform = Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000691056, -0.00109231, 0.00030762 )
 material_override = ExtResource( 1 )
 
-[node name="CSGMesh" type="CSGBox" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.83251, -0.00448173, -0.000960946 )
+[node name="CSGMesh3D" type="CSGBox3D" parent="."]
+transform = Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.83251, -0.00448173, -0.000960946 )
 width = 13.4325
 height = 1.27916
 depth = 12.5112
 
-[node name="CSGMesh3" type="CSGBox" parent="."]
-transform = Transform( 0.912356, 0.409398, 0, -0.409398, 0.912356, 0, 0, 0, 1, 2.5711, 0.735011, 0 )
+[node name="CSGMesh3" type="CSGBox3D" parent="."]
+transform = Transform3D( 0.912356, 0.409398, 0, -0.409398, 0.912356, 0, 0, 0, 1, 2.5711, 0.735011, 0 )
 operation = 2
 width = 8.44367
 depth = 14.9281
 
-[node name="CSGMesh4" type="CSGBox" parent="."]
-transform = Transform( 0.882562, -0.470196, 0, 0.470196, 0.882562, 0, 0, 0, 1, -5.51888, 1.62208, 0 )
+[node name="CSGMesh4" type="CSGBox3D" parent="."]
+transform = Transform3D( 0.882562, -0.470196, 0, 0.470196, 0.882562, 0, 0, 0, 1, -5.51888, 1.62208, 0 )
 operation = 2
 width = 3.62258
 depth = 14.2474
 
-[node name="CSGMesh5" type="CSGBox" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -8.666, 0.909223, 0 )
+[node name="CSGMesh5" type="CSGBox3D" parent="."]
+transform = Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, -8.666, 0.909223, 0 )
 operation = 2
 width = 4.10775
 depth = 18.8211
 
-[node name="CSGMesh6" type="CSGBox" parent="."]
-transform = Transform( -0.0439506, 0, -0.999034, 0.797087, 0.602846, -0.0350663, 0.602264, -0.797858, -0.0264955, -4.68527, 0.948625, -5.98851 )
+[node name="CSGMesh6" type="CSGBox3D" parent="."]
+transform = Transform3D( -0.0439506, 0, -0.999034, 0.797087, 0.602846, -0.0350663, 0.602264, -0.797858, -0.0264955, -4.68527, 0.948625, -5.98851 )
 operation = 2
 width = 3.46321
 depth = 18.8211

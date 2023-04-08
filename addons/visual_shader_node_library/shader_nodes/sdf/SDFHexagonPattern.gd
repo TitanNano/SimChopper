@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeSDFPatternHexTiles
 
@@ -18,7 +18,7 @@ Also returns three numbers uniquely identifying a tile the pixel belongs to.
 """
 
 func _get_return_icon_type():
-	return VisualShaderNode.PORT_TYPE_VECTOR
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 enum Inputs {
 	UV,
@@ -28,8 +28,8 @@ enum Inputs {
 };
 const INPUT_NAMES = ["uv", "border size"]
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D
 ]
 
 func _get_input_port_count():
@@ -53,11 +53,11 @@ enum Outputs {
 
 const OUTPUT_NAMES = ["distances", "distance a", "distance b", "distance c", "tile id"]
 const OUTPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
 	VisualShaderNode.PORT_TYPE_SCALAR,
 	VisualShaderNode.PORT_TYPE_SCALAR,
 	VisualShaderNode.PORT_TYPE_SCALAR,
-	VisualShaderNode.PORT_TYPE_VECTOR
+	VisualShaderNode.PORT_TYPE_VECTOR_3D
 ]
 
 func _get_output_port_count():
@@ -70,7 +70,7 @@ func _get_output_port_type(port):
 	return OUTPUT_TYPES[port]
 
 func _get_global_code(mode):
-	var code = preload("SDFHexagonPattern.shader").code
+	var code = preload("SDFHexagonPattern.gdshader").code
 	code = code.replace("shader_type spatial;", "")
 	return code
 

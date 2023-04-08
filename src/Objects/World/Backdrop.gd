@@ -2,50 +2,51 @@ extends Node
 
 const horizon_depth := 40000
 const merge_margin := 4 # this is related to the wave height of the main ocean material
-export(ShaderMaterial) var material := preload("res://resources/Materials/ocean_backdrop.tres")
+
+@export var material: ShaderMaterial = preload("res://resources/Materials/ocean_backdrop.tres")
 
 func _ready() -> void:
 	pass
 
-func create_mesh_instance(size_x: int, size_z: int, size_city: int) -> MeshInstance:
-	# warning-ignore:integer_division
-	# warning-ignore:integer_division
+func create_mesh_instance(size_x: int, size_z: int, size_city: int) -> MeshInstance3D:
+	@warning_ignore("integer_division")
 	var uv_aspect_ratio := Vector3((size_x / size_city), (size_z / size_city), 1)
-	var instance: MeshInstance = MeshInstance.new()
+	var instance: MeshInstance3D = MeshInstance3D.new()
 
-	var inst_material := self.material.duplicate()
-	inst_material.set_shader_param('uv_aspectratio', uv_aspect_ratio)
+	var inst_material: ShaderMaterial = self.material.duplicate()
+	inst_material.set_shader_parameter('uv_aspectratio', uv_aspect_ratio)
 
 	instance.name = "backdrop"
-	instance.mesh = PlaneMesh.new()
-	instance.mesh.size = Vector2(size_x, size_z)
-	instance.mesh.surface_set_material(0, inst_material)
+	
+	var mesh := PlaneMesh.new()
+	mesh.size = Vector2(size_x, size_z)
+	mesh.surface_set_material(0, inst_material)
+
+	instance.mesh = mesh
 
 	return instance
 
 
-func create_quadrant(size_city: int, size_depth: int, sea_level: int, offset_x: int, offset_z: int) -> MeshInstance:
+func create_quadrant(size_city: int, size_depth: int, sea_level: int, offset_x: int, offset_z: int) -> MeshInstance3D:
 	var size_x := size_city if offset_x == 1 else size_depth
 	var size_z := size_city if offset_z == 1 else size_depth
 	var instance := self.create_mesh_instance(size_x, size_z, size_city)
 
-	# warning-ignore:integer_division
-	# warning-ignore:integer_division
-	instance.translation.z = (size_city / 2 * offset_z) + (size_z / 2 * (offset_z - 1))
+	@warning_ignore("integer_division")
+	instance.position.z = (size_city / 2 * offset_z) + (size_z / 2 * (offset_z - 1))
 
-	# warning-ignore:integer_division
-	# warning-ignore:integer_division
-	instance.translation.x = (size_city / 2 * offset_x) + (size_x / 2 * (offset_x - 1))
-	instance.translation.y = sea_level - 3
+	@warning_ignore("integer_division")
+	instance.position.x = (size_city / 2 * offset_x) + (size_x / 2 * (offset_x - 1))
+	instance.position.y = sea_level - 3
 
 	if offset_z == 0 and offset_x == 1:
-		instance.translation.z += merge_margin
+		instance.position.z += merge_margin
 	elif offset_z == 1 and offset_x == 0:
-		instance.translation.x += merge_margin
+		instance.position.x += merge_margin
 	elif offset_z == 1 and offset_x == 2:
-		instance.translation.x -= merge_margin
+		instance.position.x -= merge_margin
 	elif offset_z == 2 and offset_x == 1:
-		instance.translation.z -= merge_margin
+		instance.position.z -= merge_margin
 
 	return instance
 

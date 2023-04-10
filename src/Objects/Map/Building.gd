@@ -1,6 +1,6 @@
 var data: Dictionary
 
-func _init(data: Dictionary) -> void:
+func _init(data: Dictionary):
 	self.data = data
 
 
@@ -16,5 +16,5 @@ func name() -> String:
 	return self.data.get("name")
 
 
-func tile_coords() -> PoolIntArray:
+func tile_coords() -> PackedInt32Array:
 	return self.data.get("tile_coords")

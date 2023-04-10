@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-gdnative = "0.10.1"
+godot = { git = "https://github.com/godot-rust/gdext", rev = "e0d45a36fb18e2ee9041277a61b096f762baa0ce" }
 lerp = "0.4.0"
 backtrace = "0.3.64"
 num = "0.4.0"

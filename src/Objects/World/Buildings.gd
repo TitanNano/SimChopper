@@ -7,7 +7,7 @@ const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 signal loading_progress(value)
 signal spawn_point_encountered(tile_coords, size, altitude)
 
-export var world_constants: Resource
+@export var world_constants: Resource
 
 var city_coords_feature: CityCoordsFeature
 
@@ -38,10 +38,10 @@ func build_async(city) -> void:
 		if budget.is_exceded():
 			print("yielding after ", budget.elapsed(), "ms of work")
 			budget.restart()
-			yield(self.get_tree(), "idle_frame")
+			await self.get_tree().process_frame
 
 	print("finished buildings after ", budget.elapsed(), "ms of work")
-	yield(self.get_tree(), "idle_frame")
+	await self.get_tree().process_frame
 
 func _is_spawn_point(building: Dictionary, tiles: Dictionary) -> bool:
 	var x = building.tile_coords[0]
@@ -50,7 +50,7 @@ func _is_spawn_point(building: Dictionary, tiles: Dictionary) -> bool:
 	for index in range(x - 1, x + 3):
 		var tile: Dictionary = tiles[[index, y]]
 
-		if not tile.building:
+		if tile.building == null:
 			return false
 
 		if tile.building.building_id == 0xE6:
@@ -61,7 +61,7 @@ func _is_spawn_point(building: Dictionary, tiles: Dictionary) -> bool:
 	for index in range(y - 1, y + 3):
 		var tile: Dictionary = tiles[[x, index]]
 
-		if not tile.building:
+		if tile.building == null:
 			return false
 
 		if tile.building.building_id == 0xE6:
@@ -76,6 +76,7 @@ func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 	var budget := TimeBudget.new(0)
 	var tile: Dictionary = tiles[Array(building.tile_coords)]
 	var building_size: int = building.size
+	@warning_ignore("shadowed_variable_base_class")
 	var name: String =  building.name
 	var object := SceneObjectRegistry.load_building(building.building_id)
 
@@ -88,7 +89,7 @@ func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 		self.emit_signal("spawn_point_encountered", building.tile_coords, 2, tile.altitude)
 
 	budget.restart()
-	var instance: Spatial = object.instance()
+	var instance: Node3D = object.instantiate()
 	var instance_time := budget.elapsed()
 
 	var location := self.city_coords_feature.get_building_coords(building.tile_coords[0], building.tile_coords[1], tile.altitude, building_size)
@@ -96,8 +97,8 @@ func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 	location.y += 0.1
 
 	var sector_name := "{x}_{y}".format({
-		"x": stepify(building.tile_coords[0], 10),
-		"y": stepify(building.tile_coords[1], 10)
+		"x": snapped(building.tile_coords[0], 10),
+		"y": snapped(building.tile_coords[1], 10)
 	})
 
 	budget.restart()

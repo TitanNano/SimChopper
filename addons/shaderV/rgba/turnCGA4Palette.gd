@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAturnCGA4Palette
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, 1.5)
 
 func _get_name() -> String:
@@ -17,8 +17,8 @@ func _get_category() -> String:
 func _get_description() -> String:
 	return "Swaps color to CGA 4-color palette"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 2
@@ -33,7 +33,7 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		0:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -43,10 +43,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "col"
 
-func _get_output_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec3 cg4Pa1etteFunc(vec3 _c0l_cga, float _g4mm4_cga){
 	_c0l_cga = pow(_c0l_cga, vec3(_g4mm4_cga));
@@ -66,5 +66,5 @@ vec3 cg4Pa1etteFunc(vec3 _c0l_cga, float _g4mm4_cga){
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	return "%s = cg4Pa1etteFunc(%s, %s);" % [output_vars[0], input_vars[0], input_vars[1]]

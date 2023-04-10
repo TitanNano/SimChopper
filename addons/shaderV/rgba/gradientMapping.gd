@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAgradientMapping
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, 1.0)
 	set_input_port_default_value(2, 0.0)
 	set_input_port_default_value(3, false)
@@ -17,11 +17,11 @@ func _get_category() -> String:
 #	return ""
 
 func _get_description() -> String:
-	return """Remaps colors based on average color value using [gradient].
+	return """Remaps colors based checked average color value using [gradient].
 [gradientOffset] allows to do color cycling if set TIME to [gradientOffset] and 'true' to [cycleColor]"""
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 5
@@ -42,7 +42,7 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		2:
@@ -65,11 +65,11 @@ func _get_output_port_name(port: int):
 func _get_output_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec4 gradientMappingFunc(vec3 _c0l_base_gm, float _grad_offset, sampler2D _palette_gm, bool _use_c0l_cycle){
 	float avg_c0l = 0.2126 * _c0l_base_gm.r + 0.7152 * _c0l_base_gm.g + 0.0722 * _c0l_base_gm.b;
@@ -81,7 +81,7 @@ vec4 gradientMappingFunc(vec3 _c0l_base_gm, float _grad_offset, sampler2D _palet
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	return """vec4 %s%s = gradientMappingFunc(%s, %s, %s, %s);
 %s = %s%s.rgb;
 %s = %s%s.a * %s;""" % [

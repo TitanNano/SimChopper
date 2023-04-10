@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeScreenSpaceRefraction
 
@@ -15,27 +15,31 @@ func _get_description():
 	return "Ray traces the screen depth for more accurate refractions (GLES 3 Only)"
 
 func _get_return_icon_type():
-	return VisualShaderNode.PORT_TYPE_VECTOR
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count():
-	return 7
+	return 9
 
 func _get_input_port_name(port):
 	match port:
 		0:
-			return "ior"
+			return "Ior"
 		1:
-			return "thickness"
+			return "Thickness"
 		2:
-			return "roughness"
+			return "Roughness"
 		3:
-			return "albedo"
+			return "Albedo"
 		4:
-			return "alpha"
+			return "Alpha"
 		5:
-			return "emission"
+			return "Emission"
 		6:
-			return "normal"
+			return "Normal"
+		7:
+			return "Screen Texture"
+		8:
+			return "Depth Texture"
 
 func _get_input_port_type(port):
 	match port:
@@ -46,13 +50,17 @@ func _get_input_port_type(port):
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		3:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		4:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		5:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		6:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
+		7:
+			return VisualShaderNode.PORT_TYPE_SAMPLER
+		8: 
+			return VisualShaderNode.PORT_TYPE_SAMPLER
 
 func _get_output_port_count():
 	return 2
@@ -67,24 +75,20 @@ func _get_output_port_name(port):
 func _get_output_port_type(port):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_global_code(mode):
-	if OS.get_current_video_driver() == OS.VIDEO_DRIVER_GLES2:
-		push_warning("Screenspace refraction is not supported in GLES 2!")
-		return ""
-	
 	if mode != Shader.MODE_SPATIAL:
 		return ""
 	
-	var code = preload("screenspace_refraction.shader").code
+	var code = preload("screenspace_refraction.gdshader").code
 	code = code.replace("shader_type spatial;\n", "")
 	return code
 
 func _get_code(input_vars, output_vars, mode, type):
-	if mode != Shader.MODE_SPATIAL or type != VisualShader.TYPE_FRAGMENT or OS.get_current_video_driver() == OS.VIDEO_DRIVER_GLES2:
+	if mode != Shader.MODE_SPATIAL or type != VisualShader.TYPE_FRAGMENT:
 		return ""
 	
 	# Default values
@@ -95,7 +99,9 @@ func _get_code(input_vars, output_vars, mode, type):
 	var alpha = "0.0"
 	var emission = "vec3(0.0)"
 	var normal = "NORMAL"
-	
+	var screen_texture = "sampler2D()"
+	var depth_texture = "sampler2D()"
+
 	if input_vars[0]:
 		ior = input_vars[0]
 	if input_vars[1]:
@@ -110,10 +116,14 @@ func _get_code(input_vars, output_vars, mode, type):
 		emission = input_vars[5]
 	if input_vars[6]:
 		normal = input_vars[6]
+	if input_vars[7]:
+		screen_texture = input_vars[7]
+	if input_vars[8]:
+		depth_texture = input_vars[8]
 	
-	var params =  [ior, roughness, thickness, albedo, alpha, emission, normal, output_vars[0], output_vars[1]]
+	var params =  [ior, roughness, thickness, albedo, alpha, emission, screen_texture, depth_texture, normal, output_vars[0], output_vars[1]]
 	
-	return "screenspace_refraction(%s, %s, %s, %s, %s, %s, SCREEN_UV, SCREEN_TEXTURE, DEPTH_TEXTURE, VIEW, %s, VERTEX, INV_CAMERA_MATRIX, CAMERA_MATRIX, PROJECTION_MATRIX, %s, %s);" % params
+	return "screenspace_refraction(%s, %s, %s, %s, %s, %s, SCREEN_UV, %s, %s, VIEW, %s, VERTEX, VIEW_MATRIX, INV_VIEW_MATRIX, PROJECTION_MATRIX, %s, %s);" % params
 
 func _init():
 	# Default values for Editor

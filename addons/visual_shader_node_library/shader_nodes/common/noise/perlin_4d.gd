@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodePerlinNoise4D
 
@@ -15,9 +15,9 @@ enum Inputs {
 
 const INPUT_NAMES = ["offset", "offset_w", "period", "period_w", "scale", "scale_w"];
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR, VisualShaderNode.PORT_TYPE_SCALAR,
-	VisualShaderNode.PORT_TYPE_VECTOR, VisualShaderNode.PORT_TYPE_SCALAR,
-	VisualShaderNode.PORT_TYPE_VECTOR, VisualShaderNode.PORT_TYPE_SCALAR
+	VisualShaderNode.PORT_TYPE_VECTOR_3D, VisualShaderNode.PORT_TYPE_SCALAR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D, VisualShaderNode.PORT_TYPE_SCALAR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D, VisualShaderNode.PORT_TYPE_SCALAR
 ]
 
 func _get_name():
@@ -54,7 +54,7 @@ func _get_output_port_type(port):
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
 func _get_global_code(mode):
-	var code = preload("perlin_4d.shader").code
+	var code = preload("perlin_4d.gdshader").code
 	code = code.replace("shader_type spatial;", "")
 	code = code.replace("HELPER_", "HELPER_%s_" % [self._get_name()])
 	return code

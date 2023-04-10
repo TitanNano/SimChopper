@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeDepth
 
@@ -42,21 +42,21 @@ func _get_input_port_name(port):
 func _get_input_port_type(port):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		3:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		4:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		5:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		6:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		7:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_output_port_count():
 	return 1
@@ -69,13 +69,13 @@ func _get_output_port_name(port):
 func _get_output_port_type(port):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_global_code(mode):
 	if mode != Shader.MODE_SPATIAL:
 		return ""
 		
-	var code = preload("depth.shader").code
+	var code = preload("depth.gdshader").code
 	code = code.replace("shader_type spatial;\n", "")
 	return code
 
@@ -116,8 +116,8 @@ func _get_code(input_vars, output_vars, mode, type):
 func _init():
 	# Default values for the editor
 	# depth_scale
-	if not get_input_port_default_value(2):
+	if get_input_port_default_value(2) == null:
 		set_input_port_default_value(2, 0.05)
 	# depth_flip
-	if not get_input_port_default_value(9):
+	if get_input_port_default_value(9) == null:
 		set_input_port_default_value(9, Vector2(1.0, 1.0))

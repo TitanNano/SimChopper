@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeUVswirl
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, Vector3(0.5, 0.5, 0.0))
 	set_input_port_default_value(2, 0.0)
 	set_input_port_default_value(3, 0.0)
@@ -19,8 +19,8 @@ func _get_subcategory() -> String:
 func _get_description() -> String:
 	return "Swirl UV effect"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 4
@@ -39,9 +39,9 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		3:
@@ -53,10 +53,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "uv"
 
-func _get_output_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec2 swirlUVFunc(vec2 _uv_sw1rl, float _t1me_sw1rl, vec2 _p1vot_sw1rl, float _amount_sw1rl){
 	float _rotation_index_sw1rl = _amount_sw1rl * length(_uv_sw1rl - _p1vot_sw1rl) * _t1me_sw1rl;
@@ -68,7 +68,7 @@ vec2 swirlUVFunc(vec2 _uv_sw1rl, float _t1me_sw1rl, vec2 _p1vot_sw1rl, float _am
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var uv = "UV"
 	
 	if input_vars[0]:

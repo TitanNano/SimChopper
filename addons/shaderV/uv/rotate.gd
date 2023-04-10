@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeUVrotate
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, 0.0)
 	set_input_port_default_value(2, Vector3(0.5, 0.5, 0))
 
@@ -18,8 +18,8 @@ func _get_category() -> String:
 func _get_description() -> String:
 	return "Rotate UV by angle in radians relative to pivot vector"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 3
@@ -36,11 +36,11 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		2:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_output_port_count() -> int:
 	return 1
@@ -48,10 +48,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "uv"
 
-func _get_output_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec3 r0tateUVFunc(vec3 _uv_r0tate, vec2 _pivot_r0tate, float _r0tation_r0tate){
 	//_r0tation_r0tate = radians(_r0tationDeg_r0tate);
@@ -63,7 +63,7 @@ vec3 r0tateUVFunc(vec3 _uv_r0tate, vec2 _pivot_r0tate, float _r0tation_r0tate){
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var uv = "UV"
 	
 	if input_vars[0]:

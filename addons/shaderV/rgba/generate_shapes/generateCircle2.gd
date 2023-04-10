@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAcreateCircle2
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, Vector3(0.5, 0.5, 0))
 	set_input_port_default_value(2, Vector3(1.0, 1.0, 0.0))
 	set_input_port_default_value(3, 0.0)
@@ -23,8 +23,8 @@ func _get_subcategory():
 func _get_description() -> String:
 	return "Circle creation with adjusted position, scale, radius inner/outer width, and color"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 8
@@ -51,11 +51,11 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		3:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		4:
@@ -63,7 +63,7 @@ func _get_input_port_type(port: int):
 		5:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		6:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		7:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -80,11 +80,11 @@ func _get_output_port_name(port: int):
 func _get_output_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec4 generateCircle2Func(vec2 _uv_gc2, vec2 _p0s_gc2, vec2 _sca1e_gc2, float _rad_gc2,
 						 float _b0rdIn_gc2, float _b0rdOut_gc2, vec4 _c0l_gc2){
@@ -95,7 +95,7 @@ vec4 generateCircle2Func(vec2 _uv_gc2, vec2 _p0s_gc2, vec2 _sca1e_gc2, float _ra
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var uv = "UV"
 	
 	if input_vars[0]:

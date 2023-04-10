@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRandomNoise
 
@@ -11,7 +11,7 @@ enum Inputs {
 
 const INPUT_NAMES = ["input", "w"];
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
 	VisualShaderNode.PORT_TYPE_SCALAR
 ]
 

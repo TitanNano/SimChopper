@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeSimplexNoise2DWithRotatingGradient
 
@@ -13,9 +13,9 @@ enum Inputs {
 
 const INPUT_NAMES = ["offset", "period", "scale", "gradient_rotation"];
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
 	VisualShaderNode.PORT_TYPE_SCALAR
 ]
 
@@ -27,7 +27,7 @@ enum Outputs {
 }
 
 const OUTPUT_NAMES = ["noise", "gradient"]
-const OUTPUT_TYPES = [VisualShaderNode.PORT_TYPE_SCALAR, VisualShaderNode.PORT_TYPE_VECTOR]
+const OUTPUT_TYPES = [VisualShaderNode.PORT_TYPE_SCALAR, VisualShaderNode.PORT_TYPE_VECTOR_3D]
 
 func _get_name():
 	return "SimplexNoise2DRG"
@@ -63,7 +63,7 @@ func _get_output_port_type(port):
 	return OUTPUT_TYPES[port]
 
 func _get_global_code(mode):
-	var code = preload("simplex_2d_rg.shader").code
+	var code = preload("simplex_2d_rg.gdshader").code
 	code = code.replace("shader_type spatial;", "")
 	code = code.replace("HELPER_", "HELPER_%s_" % [self._get_name()])
 	return code

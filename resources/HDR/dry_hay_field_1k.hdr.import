@@ -1,35 +1,36 @@
 [remap]
 
 importer="texture"
-type="StreamTexture"
-path="res://.import/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.stex"
+type="CompressedTexture2D"
+uid="uid://b2hjdtr47u4b7"
+path.bptc="res://.godot/imported/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.bptc.ctex"
+path.astc="res://.godot/imported/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.astc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://resources/HDR/dry_hay_field_1k.hdr"
-dest_files=[ "res://.import/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.stex" ]
+dest_files=["res://.godot/imported/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.bptc.ctex", "res://.godot/imported/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.astc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
+compress/high_quality=true
 compress/lossy_quality=0.7
-compress/hdr_mode=0
-compress/bptc_ldr=0
-compress/normal_map=0
-flags/repeat=0
-flags/filter=true
-flags/mipmaps=false
-flags/anisotropic=false
-flags/srgb=2
-process/fix_alpha_border=true
+compress/hdr_compression=1
+compress/normal_map=2
+compress/channel_pack=1
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=1
+roughness/src_normal=""
+process/fix_alpha_border=false
 process/premult_alpha=false
-process/HDR_as_SRGB=false
-process/invert_color=false
 process/normal_map_invert_y=false
-stream=false
-size_limit=0
-detect_3d=true
-svg/scale=1.0
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=0

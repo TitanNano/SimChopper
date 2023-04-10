@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAouterGlowEmpty
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(2, -1.0)
 	set_input_port_default_value(3, 1.0)
 	set_input_port_default_value(4, 1.0)
@@ -21,8 +21,8 @@ func _get_subcategory():
 func _get_description() -> String:
 	return "Same as OuterGlow but without original texture (only contours)"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 7
@@ -49,7 +49,7 @@ func _get_input_port_type(port: int):
 		0:
 			return VisualShaderNode.PORT_TYPE_SAMPLER
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		3:
@@ -57,7 +57,7 @@ func _get_input_port_type(port: int):
 		4:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		5:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		6:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -74,11 +74,11 @@ func _get_output_port_name(port: int):
 func _get_output_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec4 outerGl0wEmptyFunc(sampler2D _samp_1ngl0wEmpt, vec2 _uv_1ngl0wEmpt, float _l0d_1ngl0wEmpt, float _rad_1ngl0wEmpt, float _1ntns_1ngl0wEmpt, vec4 _c0l_1ngl0wEmpt){
 	_rad_1ngl0wEmpt = abs(_rad_1ngl0wEmpt);
@@ -113,7 +113,7 @@ vec4 outerGl0wEmptyFunc(sampler2D _samp_1ngl0wEmpt, vec2 _uv_1ngl0wEmpt, float _
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var texture = "TEXTURE"
 	var uv = "UV"
 	

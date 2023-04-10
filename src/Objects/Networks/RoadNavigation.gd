@@ -4,7 +4,7 @@ const Building := preload("res://src/Objects/Map/Building.gd")
 const Logger := preload("res://src/util/Logger.gd")
 const CustomProjectSettings := preload("res://src/CustomProjectSettings.gd")
 
-export var world_constants: Resource
+@export var world_constants: WorldConstants
 
 var network := {}
 var object_map := {}
@@ -50,18 +50,18 @@ func insert_node(node: Building) -> void:
 	self.neighbor_cache.clear()
 
 
-func get_neighbors(node: Building):
-	var tile_coords = node.tile_coords()
+func get_neighbors(node: Building) -> Array[Building]:
+	var tile_coords := node.tile_coords()
 	assert(tile_coords.size() == 2)
 
 	if self.neighbor_cache.has(tile_coords):
 		return self.neighbor_cache[tile_coords]
 
-	var neighbors: Array = []
-	var x: int = tile_coords[0]
-	var y: int = tile_coords[1]
+	var neighbors: Array[Building] = []
+	var x := tile_coords[0]
+	var y := tile_coords[1]
 
-	for nc in [[x, y-1], [x-1, y], [x+1, y], [x, y+1]]:
+	for nc in [PackedInt32Array([x, y-1]), PackedInt32Array([x-1, y]), PackedInt32Array([x+1, y]), PackedInt32Array([x, y+1])]:
 		if not self.network.has(nc):
 			continue
 
@@ -72,16 +72,16 @@ func get_neighbors(node: Building):
 	return neighbors
 
 
-func associate_object(node: Building, object: Spatial) -> void:
+func associate_object(node: Building, object: Node3D) -> void:
 	self.object_map[object] = node
 	self.node_map[node] = object
 
 
-func lookup_node(object: Spatial) -> Building:
+func lookup_node(object: Node3D) -> Building:
 	return self.object_map[object]
 
 
-func lookup_object(node: Building) -> Spatial:
+func lookup_object(node: Building) -> Node3D:
 	return self.node_map[node]
 
 
@@ -89,16 +89,17 @@ static func diagonal_offset(width: float) -> float:
 	return sqrt(pow(width, 2) + pow(width, 2)) / 8
 
 
-func get_global_transform(node: Building, direction := Vector3.ZERO) -> Transform:
+func get_global_transform(node: Building, direction := Vector3.ZERO) -> Transform3D:
 	var obj := self.lookup_object(node)
 	var trans := obj.global_transform
 	var node_building_id := node.building_id()
 
 	var width: int = self.world_constants.tile_size
-	# warning-ignore:unused_variable
+	
+	@warning_ignore("unused_variable", "shadowed_variable")
 	var diagonal_offset := self.diagonal_offset(width)
 	var raw_angle := Vector3.FORWARD.signed_angle_to(direction, Vector3.UP)
-	var angle := int(stepify(rad2deg(raw_angle), 90))
+	var angle := int(snapped(rad_to_deg(raw_angle), 90))
 	var offset := (width / 4.0) * Vector3.RIGHT.rotated(Vector3.UP, angle)
 
 	# set diagonal offset for road courbes
@@ -141,7 +142,7 @@ func get_global_transform(node: Building, direction := Vector3.ZERO) -> Transfor
 
 func get_nearest_node(global_translation: Vector3) -> Building:
 	var distance := -1.0
-	var nearest: Spatial = null
+	var nearest: Node3D = null
 
 	for object in self.node_map.values():
 		var new := global_translation.distance_squared_to(object.global_transform.origin)
@@ -219,7 +220,7 @@ func update_debug():
 
 	for tile_coords in self.network:
 		var node: Building = self.network[tile_coords]
-		var node_debug = CSGSphere.new()
+		var node_debug = CSGSphere3D.new()
 
 		node_debug.add_to_group("debug")
 		node_debug.global_transform = self.get_global_transform(node)
@@ -228,7 +229,7 @@ func update_debug():
 		self.add_child(node_debug)
 
 		for con in self.get_neighbors(node):
-			var con_debug := CSGCylinder.new()
+			var con_debug := CSGCylinder3D.new()
 			var node_pos := 	self.get_global_transform(node).origin + Vector3(0, 4, 0)
 			var con_pos := 	self.get_global_transform(con).origin + Vector3(0, 4, 0)
 			var dis := node_pos.distance_to(con_pos)

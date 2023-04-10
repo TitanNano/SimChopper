@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeSDFRectangle
 
@@ -27,9 +27,9 @@ enum Inputs {
 };
 const INPUT_NAMES = ["uv", "half-size", "center", "corner radius"]
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
 	VisualShaderNode.PORT_TYPE_SCALAR
 ]
 

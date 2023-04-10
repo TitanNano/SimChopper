@@ -1,0 +1,9 @@
+[configuration]
+entry_symbol = "gdext_rust_init"
+
+[libraries]
+macos.arm64="res://native/target/aarch64-apple-darwin/release/libnative.dylib"
+macos.x86_64="res://native/target/x86_64-apple-darwin/release/libnative.dylib"
+macos.universal="res://native/target/universal-apple-darwin/release/libnative.dylib"
+windows.x86_64="res://native/target/x86_64-pc-windows-msvc/release/native.dll"
+linux.x86_64="res://native/target/x86_64-unknown-linux-gnu/release/libnative.so"

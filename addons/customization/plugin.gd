@@ -1,4 +1,4 @@
-tool
+@tool
 extends EditorPlugin
 
 const VersionLocking := preload("VersionLocking.gd")

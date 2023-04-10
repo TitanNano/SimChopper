@@ -1,22 +1,18 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=2 format=3 uid="uid://mueq6q7gg5gf"]
 
-[ext_resource path="res://addons/customization/unstable_warning_control/UnstableWarningDialog.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://addons/customization/unstable_warning_control/UnstableWarningDialog.gd" id="1"]
 
 [node name="Control" type="ColorRect"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color( 0, 0, 0, 0.5 )
+color = Color(0, 0, 0, 0.5)
 
 [node name="AcceptDialog" type="AcceptDialog" parent="."]
+initial_position = 2
+title = "Unstable Engine Version"
+size = Vector2i(982, 100)
 visible = true
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-rect_min_size = Vector2( 500, 0 )
-popup_exclusive = true
-window_title = "Unstable Engine Version"
+popup_window = true
 dialog_text = "You are using an unstable engine version to edit this project. Make sure to not commit any changes created with this version!"
-script = ExtResource( 1 )
+script = ExtResource("1")

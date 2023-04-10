@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAnormalFromHeightmap
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(2, Vector3(64, 64, 0))
 	set_input_port_default_value(3, 10)
 	set_input_port_default_value(4, false)
@@ -21,11 +21,11 @@ func _get_category() -> String:
 func _get_description() -> String:
 	return """Create normal map from heightmap texture. You should provide actual size of heightmap (in pixels).
 It always uses 0 lod of heightmap texture to create normalmap.
-It's possible to invert X and Y of normalmap if needed.
+It's possible to reverse X and Y of normalmap if needed.
 If you provide texture with different colors (not actual heightmap) to 'heightmapSampler', you can set 'preconvertToGray' to 'true'."""
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 7
@@ -52,9 +52,9 @@ func _get_input_port_type(port: int):
 		0:
 			return VisualShaderNode.PORT_TYPE_SAMPLER
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		3:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		4:
@@ -70,10 +70,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "normal"
 
-func _get_output_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec3 normalFromHeightmapFunc(vec2 _hm_uv, sampler2D _hm_tex, vec2 _hm_size, float _norm_hm_strgth, bool _conv_hm_gray, bool _inv_x_norm, bool _inv_y_norm){
 	vec3 _hm_down = textureLod(_hm_tex, _hm_uv + vec2(0.0, 1.0 / _hm_size.y), 0.0).rgb;
@@ -97,7 +97,7 @@ vec3 normalFromHeightmapFunc(vec2 _hm_uv, sampler2D _hm_tex, vec2 _hm_size, floa
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var texture = "TEXTURE"
 	var uv = "UV"
 	

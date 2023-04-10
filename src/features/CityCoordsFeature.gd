@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 
 const WorldConstants := preload("res://src/Objects/Data/WorldConstants.gd")
 
@@ -6,7 +6,7 @@ var world_constants: WorldConstants
 var sea_level: int
 
 
-func _init(world_constants: WorldConstants, sea_level: int) -> void:
+func _init(world_constants: WorldConstants, sea_level: int):
 	self.world_constants = world_constants
 	self.sea_level = sea_level
 

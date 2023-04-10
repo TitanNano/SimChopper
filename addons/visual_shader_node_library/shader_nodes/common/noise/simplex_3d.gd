@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeSimplexNoise3D
 
@@ -11,8 +11,8 @@ enum Inputs {
 
 const INPUT_NAMES = ["offset", "scale"];
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D
 ]
 
 enum Outputs {
@@ -23,7 +23,7 @@ enum Outputs {
 }
 
 const OUTPUT_NAMES = ["noise", "gradient"]
-const OUTPUT_TYPES = [VisualShaderNode.PORT_TYPE_SCALAR, VisualShaderNode.PORT_TYPE_VECTOR]
+const OUTPUT_TYPES = [VisualShaderNode.PORT_TYPE_SCALAR, VisualShaderNode.PORT_TYPE_VECTOR_3D]
 
 func _get_name():
 	return "SimplexNoise3D"
@@ -59,7 +59,7 @@ func _get_output_port_type(port):
 	return OUTPUT_TYPES[port]
 
 func _get_global_code(mode):
-	var code = preload("simplex_3d.shader").code
+	var code = preload("simplex_3d.gdshader").code
 	code = code.replace("shader_type spatial;", "")
 	code = code.replace("HELPER_", "HELPER_%s_" % [self._get_name()])
 	return code
@@ -67,7 +67,7 @@ func _get_global_code(mode):
 func _get_code(input_vars, output_vars, mode, type):
 	var offset = input_vars[Inputs.OFFSET];
 	
-	if not offset:
+	if offset == null:
 		offset = "vec3(0.0)"
 	else:
 		offset = "%s" % [offset]
@@ -79,5 +79,5 @@ func _get_code(input_vars, output_vars, mode, type):
 	""" % [output_vars[Outputs.NOISE], offset, output_vars[Outputs.GRADIENT]]
 
 func _init():
-	if not get_input_port_default_value(Inputs.SCALE):
+	if get_input_port_default_value(Inputs.SCALE) == null:
 		set_input_port_default_value(Inputs.SCALE, Vector3(1.0, 1.0, 1.0))

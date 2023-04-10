@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeFlowMap
 
@@ -15,7 +15,7 @@ func _get_description():
 	return "Animates a uv with a flowmap"
 
 func _get_return_icon_type():
-	return VisualShaderNode.PORT_TYPE_VECTOR
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count():
 	return 6
@@ -38,15 +38,15 @@ func _get_input_port_name(port):
 func _get_input_port_type(port):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		3:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		4:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		5:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -69,14 +69,14 @@ func _get_output_port_type(port):
 		0:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		3:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
 func _get_global_code(mode):
-	var code = preload("flow_map.shader").code
+	var code = preload("flow_map.gdshader").code
 	code = code.replace("shader_type spatial;\n", "")
 	return code
 

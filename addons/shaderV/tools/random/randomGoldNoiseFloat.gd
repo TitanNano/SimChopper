@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderToolsRandomFloatGoldenRation
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(0, Vector3(0, 0, 0))
 	set_input_port_default_value(1, Vector3(0, 0, 0))
 	set_input_port_default_value(2, 0.0)
@@ -17,9 +17,9 @@ func _get_subcategory() -> String:
 	return "Random"
 
 func _get_description() -> String:
-	return "Random float based on golden ratio"
+	return "Random float based checked golden ratio"
 
-func _get_return_icon_type() -> int:
+func _get_return_icon_type() -> VisualShaderNode.PortType:
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
 func _get_input_port_count() -> int:
@@ -37,9 +37,9 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -49,10 +49,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port) -> String:
 	return "rand"
 
-func _get_output_port_type(port) -> int:
+func _get_output_port_type(port) -> VisualShaderNode.PortType:
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 float randomGoldRatioFunc(vec2 _coord_gn, vec2 _scale_gn, float _seed_gn){
 	float PHI = 1.6180339887; 

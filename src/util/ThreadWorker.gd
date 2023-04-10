@@ -1,6 +1,4 @@
-extends Reference
-
-const Callable := preload("Callable.gd")
+extends RefCounted
 
 signal completed(results)
 signal progress()
@@ -13,14 +11,13 @@ var runner: SceneTree
 var executor: Callable
 var _results := []
 
-# warning-ignore:shadowed_variable
-# warning-ignore:shadowed_variable
-func _init(runner: SceneTree, executor: Callable) -> void:
+@warning_ignore("shadowed_variable")
+func _init(runner: SceneTree, executor: Callable):
 	self.runner = runner
 	self.executor = executor
 
 	# warning-ignore:return_value_discarded
-	self._thread.start(self, "_thread_root")
+	self._thread.start(self._thread_root)
 	
 
 func _thread_root(): 
@@ -42,7 +39,7 @@ func _thread_root():
 			hasJobs = self._jobs.size() > 0
 			self._mutex.unlock()
 			
-			var result = self.executor.invoke([job])
+			var result = self.executor.call(job)
 			
 			self._results.append(result)
 			self.call_deferred('emit_signal', "progress")
@@ -64,13 +61,13 @@ func push(job_list):
 func drain():
 	# warning-ignore:return_value_discarded
 	self._semaphore.post()
-	yield(self.runner, "idle_frame") 	# make sure the method runs async
+	await self.runner.process_frame 	# make sure the method runs async
 	
 	while self._thread.is_alive():
-		yield(self.runner, "idle_frame")
+		await self.runner.process_frame
 	
 	self._thread.wait_to_finish()
 	
 	var results := self._results
-	self.emit_signal("completed", results)
+	self.completed.emit(results)
 	self._results = []

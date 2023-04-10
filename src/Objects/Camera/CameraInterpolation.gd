@@ -1,13 +1,13 @@
-extends Spatial
+extends Node3D
 
-export var remote_path: NodePath
-export var local_transform: Transform
-export var full_transform := false
-export(float, 0, 1) var speed: float = 0.5
-export var snap := false
+@export var remote_path: NodePath
+@export var local_transform: Transform3D
+@export var full_transform := false
+@export_range(0, 1) var speed: float = 0.5
+@export var snap := false
 
 func _ready():
-	var target = get_node(self.remote_path) as Spatial
+	var target = get_node(self.remote_path) as Node3D
 
 	self.local_transform = self.transform
 
@@ -18,16 +18,16 @@ func _ready():
 
 
 func _physics_process(_delta: float):
-	if not self.remote_path:
+	if self.remote_path == null:
 		push_warning("CameraInterpolation has no remote target!")
 		return
 
-	var target := get_node(self.remote_path) as Camera
+	var target := get_node(self.remote_path) as Camera3D
 
 	if not self.full_transform:
-		var parent := self.get_parent() as Spatial
+		var parent := self.get_parent() as Node3D
 
-		var counter_transform = Transform() \
+		var counter_transform = Transform3D() \
 			.rotated(Vector3.RIGHT, -parent.rotation.x) \
 			.rotated(Vector3.BACK, -parent.rotation.z)
 

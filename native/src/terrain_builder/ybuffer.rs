@@ -36,15 +36,13 @@ pub trait YBuffer<Value: DimensionX + DimensionZ + DimensionY + FixedPoint + Set
 
 pub type HashMapYBuffer<Value> = HashMap<(usize, usize), Vec<Value>>;
 
-impl<'v, V: 'static + DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensionY> YBuffer<V>
+impl<V: 'static + DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensionY> YBuffer<V>
     for HashMapYBuffer<V>
 {
     fn add(&mut self, value: V) {
         let xz = (value.x().round() as usize, value.z().round() as usize);
 
-        self.entry(xz)
-            .or_insert_with(Vec::new)
-            .push(value);
+        self.entry(xz).or_insert_with(Vec::new).push(value);
     }
 
     fn new() -> Self {
@@ -52,6 +50,6 @@ impl<'v, V: 'static + DimensionX + DimensionZ + DimensionY + FixedPoint + SetDim
     }
 
     fn into_iter_groups(self) -> Box<dyn Iterator<Item = Vec<V>>> {
-        Box::new(self.into_iter().map(|(_, value)| value))
+        Box::new(self.into_values())
     }
 }

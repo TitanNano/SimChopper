@@ -48,33 +48,42 @@ static func _log(message, level: int, skip_stack := 0) -> void:
 	for i in range(skip_stack + 1):
 		stack.pop_front()
 
-	var stack_frame: Dictionary = stack.pop_front()
-	var file: String = stack_frame.get("source")
-	var fun: String = stack_frame.get("function")
-	var time := Time.get_ticks_msec()
-	var minutes := time / 1000 / 60
-	var seconds := time / 1000 % 60
-	var milliseconds := time % 1000
+	var target := "unknown"
+	var maybe_stack_frame = stack.pop_front()
+	
+	if maybe_stack_frame != null:
+		var stack_frame: Dictionary = maybe_stack_frame
+		var file: String = stack_frame.get("source")
+		var fun: String = stack_frame.get("function")
 
-	var path := file.split("/")
-	var file_name := path[path.size() - 1].rsplit(".", false, 1)[0]
-	var target := "{file}::{fun}".format({
-		"file": file_name,
-		"fun": fun,
-	})
+		var path := file.split("/")
+		var file_name := path[path.size() - 1].rsplit(".", false, 1)[0]
+		
+		target = "{file}::{fun}".format({
+			"file": file_name,
+			"fun": fun,
+		})
+
 	var max_level := (LEVEL_FILTER_MAP[target] as int) if target in LEVEL_FILTER_MAP else LEVEL_FILTER
 
 	if level > max_level:
 		return
+		
+	var time := Time.get_ticks_msec()
+	@warning_ignore("integer_division")
+	var minutes := time / 1000 / 60
+	@warning_ignore("integer_division")
+	var seconds := time / 1000 % 60
+	var milliseconds := time % 1000
 
 	if typeof(message) == TYPE_ARRAY:
-		message = PoolStringArray(message).join(" ")
+		message = " ".join(PackedStringArray(message))
 
 	var logline = "[{min}:{sec}:{msec}] [{level}] [{target}] {msg}".format({
 		"target": target,
-		"min": String(minutes).pad_zeros(3),
-		"sec": String(seconds).pad_zeros(2),
-		"msec": String(milliseconds).pad_zeros(3),
+		"min": String.num_int64(minutes).pad_zeros(3),
+		"sec": String.num_int64(seconds).pad_zeros(2),
+		"msec": String.num_int64(milliseconds).pad_zeros(3),
 		"msg": message,
 		"level": level_to_string(level),
 	})

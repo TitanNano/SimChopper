@@ -2,7 +2,7 @@ use std::fmt;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use gdnative::prelude::{Instance, Shared, Vector3};
+use godot::prelude::*;
 
 use super::lerp::bilerp_xyz;
 use super::point::{DimensionX, DimensionY, DimensionZ, FixedPoint, SetDimensionY};
@@ -121,12 +121,7 @@ impl TileSurface {
         self.fixed = fixed;
     }
 
-    pub fn apply_slope(
-        &mut self,
-        slope: u8,
-        rotation: &Instance<TerrainRotation, Shared>,
-        height: f32,
-    ) {
+    pub fn apply_slope(&mut self, slope: u8, rotation: &TerrainRotation, height: f32) {
         match slope {
             0x00 => (),
 

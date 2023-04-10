@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeEmissionMultiply
 
@@ -32,9 +32,9 @@ func _get_input_port_name(port):
 func _get_input_port_type(port):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -49,13 +49,13 @@ func _get_output_port_name(port):
 func _get_output_port_type(port):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_global_code(mode):
 	if mode != Shader.MODE_SPATIAL:
 		return ""
 		
-	var code = preload("emission_multiply.shader").code
+	var code = preload("emission_multiply.gdshader").code
 	code = code.replace("shader_type spatial;\n", "")
 	return code
 

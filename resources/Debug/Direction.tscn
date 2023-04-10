@@ -1,28 +1,28 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=5 format=3 uid="uid://3bo40rtnlh27"]
 
-[ext_resource path="res://src/Debug/Direction.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://src/Debug/Direction.gd" id="1"]
 
-[sub_resource type="SpatialMaterial" id=1]
-albedo_color = Color( 0.396078, 0.113725, 0.113725, 1 )
+[sub_resource type="StandardMaterial3D" id="1"]
+albedo_color = Color(0.396078, 0.113725, 0.113725, 1)
 
-[sub_resource type="PrismMesh" id=2]
-size = Vector3( 1.5, 1.5, 1 )
+[sub_resource type="PrismMesh" id="2"]
+size = Vector3(1.5, 1.5, 1)
 
-[sub_resource type="SpatialMaterial" id=3]
-albedo_color = Color( 0.396078, 0.113725, 0.113725, 1 )
+[sub_resource type="StandardMaterial3D" id="3"]
+albedo_color = Color(0.396078, 0.113725, 0.113725, 1)
 
-[node name="Direction" type="Position3D"]
-script = ExtResource( 1 )
-color = Color( 0.396078, 0.113725, 0.113725, 1 )
-vector = Vector3( 0, 1, 0 )
+[node name="Direction" type="Marker3D"]
+script = ExtResource("1")
+color = Color(0.396078, 0.113725, 0.113725, 1)
+vector = Vector3(0, 1, 0)
 
-[node name="Length" type="CSGCylinder" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0 )
+[node name="Length" type="CSGCylinder3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 radius = 0.4
 sides = 10
-material = SubResource( 1 )
+material = SubResource("1")
 
-[node name="Head" type="CSGMesh" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0 )
-mesh = SubResource( 2 )
-material = SubResource( 3 )
+[node name="Head" type="CSGMesh3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+mesh = SubResource("2")
+material = SubResource("3")

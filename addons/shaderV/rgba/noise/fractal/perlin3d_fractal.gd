@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeNoisePerlin3dFractal
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, 6)
 	set_input_port_default_value(2, Vector3(2, 2, 0))
 	set_input_port_default_value(3, 2)
@@ -24,7 +24,7 @@ func _get_subcategory() -> String:
 func _get_description() -> String:
 	return "Fractal 3D Perlin Noise"
 
-func _get_return_icon_type() -> int:
+func _get_return_icon_type() -> VisualShaderNode.PortType:
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
 func _get_input_port_count() -> int:
@@ -54,11 +54,11 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		2:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		3:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		4:
@@ -68,7 +68,7 @@ func _get_input_port_type(port: int):
 		6:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		7:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		8:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -78,10 +78,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "result"
 
-func _get_output_port_type(port: int) -> int:
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
 	return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 float perlin3dNoiseFractalFunc(vec3 P) {
 	vec3 Pi0 = floor(P);
@@ -167,7 +167,7 @@ float perlinNoise3DFBM(vec2 _uv_pn3fbm, int _oct_pn3fbm, vec2 _per_pn3fbm, float
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var uv = "UV"
 	
 	if input_vars[0]:

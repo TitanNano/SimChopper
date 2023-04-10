@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAcreateSpiral
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, Vector3(0.5, 0.5, 0))
 	set_input_port_default_value(2, 70.0)
 	set_input_port_default_value(3, 1.0)
@@ -24,8 +24,8 @@ func _get_subcategory():
 func _get_description() -> String:
 	return "Spiral creation with adjusted position, size, linesAmount, softness, speed and color"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 9
@@ -54,9 +54,9 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		3:
@@ -68,7 +68,7 @@ func _get_input_port_type(port: int):
 		6:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 		7:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		8:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -85,11 +85,11 @@ func _get_output_port_name(port: int):
 func _get_output_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec4 generateSp1ralFunc(vec2 _uv_genSp1r, vec2 _p1v0t_genSp1r, float _s1ze_genSp1r, float _l1neAmnt_genSp1r,
 						float _spd_genSp1r, float _s0ft_genSp1r, float _t1me_genSp1r, vec4 _c0l_genSp1r){
@@ -101,7 +101,7 @@ vec4 generateSp1ralFunc(vec2 _uv_genSp1r, vec2 _p1v0t_genSp1r, float _s1ze_genSp
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	var uv = "UV"
 	
 	if input_vars[0]:

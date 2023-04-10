@@ -4,11 +4,14 @@ mod terrain_rotation;
 mod tile_surface;
 mod ybuffer;
 
-use gdnative::api::{visual_server::ArrayFormat, ArrayMesh, Material, Mesh, SurfaceTool};
-use gdnative::prelude::*;
+use godot::engine::mesh::{ArrayFormat, PrimitiveType};
+use godot::engine::{ArrayMesh, Material, SurfaceTool};
+use godot::prelude::meta::VariantMetadata;
+use godot::prelude::*;
 
 use std::cmp::{max, min};
 use std::collections::HashMap;
+use std::ops::Deref;
 use std::sync::Arc;
 use std::time::Instant;
 
@@ -24,11 +27,26 @@ use ybuffer::{HashMapYBuffer, YBuffer};
 
 pub use terrain_rotation::TerrainRotation;
 
-const ERROR_INVALID_VARIANT_TYPE_INT: &str = "Variant is expected to be i64 but is not!";
-const ERROR_INVALID_VARIANT_TYPE_ARRAY: &str = "Variant is expected to be VariantArray but is not!";
-const ERROR_INVALID_VARIANT_TYPE_OBJECT: &str = "Variant is expected to be an Object but is not!";
+struct Shared<T: VariantMetadata>(T);
 
-struct TileData(Dictionary<Shared>);
+unsafe impl<T: VariantMetadata> Send for Shared<T> {}
+unsafe impl<T: VariantMetadata> Sync for Shared<T> {}
+
+impl<T: VariantMetadata> Deref for Shared<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T: VariantMetadata> Shared<T> {
+    fn inner(self) -> T {
+        self.0
+    }
+}
+
+struct TileData(Dictionary);
 
 impl TileData {
     pub fn new(object: Dictionary) -> Self {
@@ -40,26 +58,19 @@ impl TileData {
     }
 
     pub fn terrain(&self) -> i64 {
-        self.property("terrain")
-            .to()
-            .expect(ERROR_INVALID_VARIANT_TYPE_INT)
+        self.property("terrain").to()
     }
 
     pub fn altitude(&self) -> i64 {
-        self.property("altitude")
-            .to()
-            .expect(ERROR_INVALID_VARIANT_TYPE_INT)
+        self.property("altitude").to()
     }
 
     pub fn coordinates(&self) -> Vec<i64> {
-        let array: VariantArray = self
-            .property("coordinates")
-            .to()
-            .expect(ERROR_INVALID_VARIANT_TYPE_ARRAY);
+        let array: VariantArray = self.property("coordinates").to();
 
         array
-            .iter()
-            .map(|value: Variant| value.to().expect(ERROR_INVALID_VARIANT_TYPE_INT))
+            .iter_shared()
+            .map(|value: Variant| value.to())
             .collect()
     }
 
@@ -70,13 +81,12 @@ impl TileData {
             return false;
         }
 
-        let building: Dictionary = variant.to().expect(ERROR_INVALID_VARIANT_TYPE_OBJECT);
+        let building: Dictionary = variant.to();
 
         let building_id: i64 = building
             .get("building_id")
             .unwrap_or_else(Variant::nil)
-            .to()
-            .expect(ERROR_INVALID_VARIANT_TYPE_INT);
+            .to();
 
         building_id > 0
     }
@@ -125,8 +135,7 @@ fn calculate_normals<'a, I: Iterator<Item = &'a VertexRef>>(
             let v1 = v1.lock().unwrap();
             let v2 = v2.lock().unwrap();
 
-            let plane = Plane::from_points(v0.as_vector(), v1.as_vector(), v2.as_vector())
-                .expect("points a not all members of the same plane");
+            let plane = Plane::from_points(v0.as_vector(), v1.as_vector(), v2.as_vector());
 
             let v0_normal = *normal_map.get(&v0.to_string()).unwrap_or(&Vector3::ZERO);
 
@@ -145,63 +154,68 @@ fn calculate_normals<'a, I: Iterator<Item = &'a VertexRef>>(
 }
 
 fn create_tilelist_key(x: u16, y: u16) -> Variant {
-    let key = VariantArray::new();
+    let mut key = Array::new();
 
     key.push(x as i32);
     key.push(y as i32);
 
-    key.into_shared().to_variant()
+    key.to_variant()
 }
 
-#[derive(NativeClass)]
-#[no_constructor] // disallow default constructor
-#[inherit(Reference)]
+struct ThreadContext<'a> {
+    tile_size: u8,
+    city_size: u16,
+    tile_height: u8,
+    sea_level: u16,
+    rotation: &'a TerrainRotation,
+    tilelist: Shared<Dictionary>,
+    materials: Shared<Dictionary>,
+}
+
+#[derive(GodotClass)]
+#[class(base=RefCounted)]
 pub struct TerrainBuilder {
     tile_size: u8,
     city_size: u16,
     tile_height: u8,
     sea_level: u16,
-    rotation: Instance<TerrainRotation, Shared>,
+    rotation: Gd<TerrainRotation>,
     tilelist: Dictionary,
     materials: Dictionary,
 }
 
-#[methods]
+#[godot_api]
 impl TerrainBuilder {
-    fn new(
-        rotation: Instance<TerrainRotation, Shared>,
-        tilelist: Dictionary,
-        materials: Dictionary,
-    ) -> Self {
-        Self {
-            tile_size: 16,
-            city_size: 0,
-            tile_height: 8,
-            sea_level: 0,
-            rotation,
-            tilelist,
-            materials,
-        }
-    }
-
-    #[export]
-    fn set_city_size(&mut self, _base: &Reference, value: u16) {
+    #[func]
+    fn set_city_size(&mut self, value: u16) {
         self.city_size = value;
     }
 
-    #[export]
-    fn set_tile_size(&mut self, _base: &Reference, value: u8) {
+    #[func]
+    fn set_tile_size(&mut self, value: u8) {
         self.tile_size = value;
     }
 
-    #[export]
-    fn set_tile_height(&mut self, _base: &Reference, value: u8) {
+    #[func]
+    fn set_tile_height(&mut self, value: u8) {
         self.tile_height = value;
     }
 
-    #[export]
-    fn set_sea_level(&mut self, _base: &Reference, value: u16) {
+    #[func]
+    fn set_sea_level(&mut self, value: u16) {
         self.sea_level = value;
+    }
+
+    fn tilelist(&self) -> Shared<Dictionary> {
+        Shared(self.tilelist.share())
+    }
+
+    fn materials(&self) -> Shared<Dictionary> {
+        Shared(self.materials.share())
+    }
+
+    fn rotation(&self) -> &Gd<TerrainRotation> {
+        &self.rotation
     }
 
     fn add_to_surface(surfaces: &mut SurfaceMap, vertex: Vertex) -> VertexRef {
@@ -216,21 +230,24 @@ impl TerrainBuilder {
         cell
     }
 
-    fn tile_vertex_to_city_uv(&self, vertex: &Vertex, tile_size: u8) -> Vector2 {
-        let uv_x = vertex.x() / f32::from(self.city_size * tile_size as u16);
-        let uv_y = vertex.z() / f32::from(self.city_size * tile_size as u16);
+    fn tile_vertex_to_city_uv(context: &ThreadContext, vertex: &Vertex, tile_size: u8) -> Vector2 {
+        let uv_x = vertex.x() / f32::from(context.city_size * tile_size as u16);
+        let uv_y = vertex.z() / f32::from(context.city_size * tile_size as u16);
 
         Vector2::new(uv_x, uv_y)
     }
 
-    fn process_tile(&self, tile_data_dic: Dictionary, edge: TileEdgeType) -> TileFaces {
+    fn process_tile(
+        context: &ThreadContext,
+        tile_data_dic: Dictionary,
+        edge: TileEdgeType,
+    ) -> TileFaces {
         let tile_data: TileData = TileData::new(tile_data_dic);
         let tile_type = ((tile_data.terrain() & 0xF0) >> 4) as u8;
         let tile_slope = (tile_data.terrain() & 0x0F) as u8;
-        let tile_size = self.tile_size as f32;
-        let tile_height = self.tile_height;
-        let rotation = &self.rotation;
-
+        let tile_size = context.tile_size as f32;
+        let tile_height = context.tile_height;
+        let rotation = context.rotation;
         //		assert((tile_type > 0 && tileData.is_water) || (tile_type == 0 && not tileData.is_water))
 
         let tile_x = (tile_data.coordinates()[0] * tile_size as i64) as f32;
@@ -253,8 +270,8 @@ impl TerrainBuilder {
         let mut water: Option<TileSurface> = None;
 
         // tile is covered by water
-        if tile_type > 0 && (self.sea_level as i64) >= tile_data.altitude() {
-            let water_altitude = tile_height as usize * self.sea_level as usize;
+        if tile_type > 0 && (context.sea_level as i64) >= tile_data.altitude() {
+            let water_altitude = tile_height as usize * context.sea_level as usize;
 
             let mut water_tile = tile.clone();
             water_tile.set_kind(TileSurfaceType::Water);
@@ -282,7 +299,7 @@ impl TerrainBuilder {
             tile.corners[rotation.se()].y -= tile_height as f32;
         }
 
-        tile.apply_slope(tile_slope, rotation, self.tile_height.into());
+        tile.apply_slope(tile_slope, rotation, context.tile_height.into());
 
         let mut tile_faces: Vec<_> = tile.into();
         let mut water_faces = match water {
@@ -295,7 +312,10 @@ impl TerrainBuilder {
         tile_faces
     }
 
-    fn build_chunk_vertices(&self, chunk: (u16, u16, u16, u16)) -> (SurfaceMap, Vec<VertexRef>) {
+    fn build_chunk_vertices(
+        context: &ThreadContext,
+        chunk: (u16, u16, u16, u16),
+    ) -> (SurfaceMap, Vec<VertexRef>) {
         let mut ybuffer: HashMapYBuffer<VertexRef> = YBuffer::new();
         let mut surfaces = SurfaceMap::new();
         let mut vertices = vec![];
@@ -313,12 +333,12 @@ impl TerrainBuilder {
                     TileEdgeType::new(is_top_edge, is_bottom_edge, is_left_edge, is_right_edge);
 
                 let key = create_tilelist_key(x, y);
-                let tile = self
+                let tile = context
                     .tilelist
                     .get(key)
                     .expect("there is a hole in the tilelist!");
 
-                let tile_faces = self.process_tile(tile.to().unwrap(), edge);
+                let tile_faces = Self::process_tile(context, tile.to(), edge);
 
                 vertices.extend(tile_faces.into_iter().flatten());
             }
@@ -351,7 +371,9 @@ impl TerrainBuilder {
                 let normal = normal_map
                     .get(&vertex.to_string())
                     .unwrap_or_else(|| panic!("no normal for {:?}", vertex))
-                    .normalized();
+                    .to_owned();
+
+                let normal = Vector3::new(normal.x, normal.y, normal.z).normalized();
 
                 vertex.set_normal(normal);
             });
@@ -359,9 +381,9 @@ impl TerrainBuilder {
         (surfaces, edge_buffer)
     }
 
-    fn build_terain_chunk(&self, surfaces: SurfaceMap) -> Ref<ArrayMesh> {
-        let generator = SurfaceTool::new();
-        let mesh = ArrayMesh::new();
+    fn build_terain_chunk(context: &ThreadContext, surfaces: SurfaceMap) -> Shared<Gd<ArrayMesh>> {
+        let mut generator = SurfaceTool::new();
+        let mut mesh = ArrayMesh::new();
         let mut vertex_count = 0;
 
         // all vertices are added to the y buffer and their surfaces
@@ -369,8 +391,7 @@ impl TerrainBuilder {
         // and afterwards we can generate all the surfaces
         for (surface_type, surface) in surfaces {
             generator.clear();
-            generator.begin(Mesh::PRIMITIVE_TRIANGLES);
-            generator.add_smooth_group(true);
+            generator.begin(PrimitiveType::PRIMITIVE_TRIANGLES);
 
             for vertex_cell in surface {
                 let vertex = Arc::try_unwrap(vertex_cell)
@@ -378,13 +399,17 @@ impl TerrainBuilder {
                     .into_inner()
                     .expect("mutex got poisoned");
 
-                generator.add_uv(self.tile_vertex_to_city_uv(&vertex, self.tile_size));
-                generator.add_normal(*vertex.normal());
+                generator.set_uv(Self::tile_vertex_to_city_uv(
+                    context,
+                    &vertex,
+                    context.tile_size,
+                ));
+                generator.set_normal(*vertex.normal());
 
                 if vertex.is_chunk_edge() {
-                    generator.add_color(Color::from_rgb(1.0, 0.0, 0.0));
+                    generator.set_color(Color::from_rgb(1.0, 0.0, 0.0));
                 } else {
-                    generator.add_color(Color::from_rgb(1.0, 1.0, 1.0));
+                    generator.set_color(Color::from_rgb(1.0, 1.0, 1.0));
                 }
 
                 generator.add_vertex(vertex.into());
@@ -399,18 +424,17 @@ impl TerrainBuilder {
             let new_index = mesh.get_surface_count();
 
             mesh.add_surface_from_arrays(
-                Mesh::PRIMITIVE_TRIANGLES,
+                PrimitiveType::PRIMITIVE_TRIANGLES,
                 surface_arrays,
-                VariantArray::new_shared(),
-                ArrayFormat::COMPRESS_DEFAULT.into(),
+                Array::<VariantArray>::new(),
+                Dictionary::new(),
+                ArrayFormat::ARRAY_COMPRESS_FLAGS_BASE, //COMPRESS_DEFAULT.into(),
             );
 
-            let surface_material_variant = self.materials.get(surface_type.to_string());
+            let surface_material_variant = context.materials.get(surface_type.to_string());
 
-            let surface_material: Option<Ref<Material>> = match surface_material_variant {
-                Some(material) => material.to_object(),
-                None => None,
-            };
+            let surface_material: Option<Gd<Material>> =
+                surface_material_variant.map(|material| material.to());
 
             match surface_material {
                 Some(material) => mesh.surface_set_material(new_index, material),
@@ -420,17 +444,18 @@ impl TerrainBuilder {
 
         godot_print!("generated {} vertices for terain", vertex_count);
         godot_print!("done generating surfaces {}ms", 0.0);
-        mesh.into_shared()
+
+        Shared(mesh)
     }
 
-    #[export]
-    pub fn build_terain_async(&self, _base: &Reference) -> Vec<Ref<ArrayMesh>> {
+    #[func]
+    pub fn build_terain_async(&self) -> Array<Gd<ArrayMesh>> {
         let chunk_size = 16;
 
         // we need to be certain that we have a compatible city size
         assert!((self.city_size % chunk_size) == 0);
 
-        let chunk_count = self.city_size / (chunk_size as u16);
+        let chunk_count = self.city_size / chunk_size;
         let timer = Instant::now();
         let mut chunks: Vec<(u16, u16, u16, u16)> = Vec::with_capacity(chunk_count as usize);
 
@@ -445,44 +470,62 @@ impl TerrainBuilder {
             }
         }
 
+        let rotation = self.rotation().bind();
+        let context = self.thread_context(rotation.deref());
+
         let (surface_chunks, chunk_edge_vertices): (Vec<_>, Vec<_>) = chunks
             .into_par_iter()
-            .map(|chunk| self.build_chunk_vertices(chunk))
+            .map(|chunk| Self::build_chunk_vertices(&context, chunk))
             .unzip();
 
         stitch_chunk_seams(chunk_edge_vertices);
 
-        let result = surface_chunks
+        let result: Vec<Shared<Gd<ArrayMesh>>> = surface_chunks
             .into_par_iter()
-            .map(|chunk| self.build_terain_chunk(chunk))
+            .map(|chunk| Self::build_terain_chunk(&context, chunk))
             .collect();
 
         godot_print!("terrain build time: {}ms", timer.elapsed().as_millis());
 
-        result
+        result.into_iter().map(|mesh| mesh.inner()).collect()
     }
 }
 
-#[derive(NativeClass)]
-#[inherit(Reference)]
-pub struct TerrainBuilderFactory;
-
-#[methods]
-impl TerrainBuilderFactory {
-    fn new(_base: &Reference) -> Self {
-        Self
+impl TerrainBuilder {
+    fn thread_context<'a>(&self, rotation: &'a TerrainRotation) -> ThreadContext<'a> {
+        ThreadContext {
+            tile_size: self.tile_size,
+            city_size: self.city_size,
+            tile_height: self.tile_height,
+            sea_level: self.sea_level,
+            rotation,
+            tilelist: self.tilelist(),
+            materials: self.materials(),
+        }
     }
+}
 
-    #[export]
-    pub fn create(
+#[derive(GodotClass)]
+#[class(base = RefCounted, init)]
+struct TerrainBuilderFactory;
+
+#[godot_api]
+impl TerrainBuilderFactory {
+    #[func]
+    fn create(
         &self,
-        _base: &Reference,
         tilelist: Dictionary,
-        rotation: Instance<TerrainRotation, Shared>,
+        rotation: Gd<TerrainRotation>,
         materials: Dictionary,
-    ) -> Instance<TerrainBuilder, Unique> {
-        let builder = TerrainBuilder::new(rotation, tilelist, materials);
-
-        builder.emplace()
+    ) -> Gd<TerrainBuilder> {
+        Gd::new(TerrainBuilder {
+            tile_size: 16,
+            city_size: 0,
+            tile_height: 8,
+            sea_level: 0,
+            rotation,
+            tilelist,
+            materials,
+        })
     }
 }

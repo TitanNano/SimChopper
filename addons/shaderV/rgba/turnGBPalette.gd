@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAturnGameBoyPalette
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, 1.5)
 
 func _get_name() -> String:
@@ -17,8 +17,8 @@ func _get_category() -> String:
 func _get_description() -> String:
 	return "Swaps color to GameBoy palette"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 2
@@ -33,7 +33,7 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		0:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -43,10 +43,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "col"
 
-func _get_output_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec3 g4meb0yPa1etteFunc(vec3 _c0l_g4b0, float _g4mm4_g4b0){
 	_c0l_g4b0 = pow(_c0l_g4b0, vec3(_g4mm4_g4b0));
@@ -66,5 +66,5 @@ vec3 g4meb0yPa1etteFunc(vec3 _c0l_g4b0, float _g4mm4_g4b0){
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	return "%s = g4meb0yPa1etteFunc(%s, %s);" % [output_vars[0], input_vars[0], input_vars[1]]

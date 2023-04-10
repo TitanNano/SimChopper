@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode blend_mix;
 
-uniform sampler2D lifetime_fade: hint_white;
+uniform sampler2D lifetime_fade: hint_default_white;
 uniform sampler2D texture1;
 uniform sampler2D texture2;
 uniform sampler2D texture3;
@@ -11,24 +11,20 @@ uniform sampler2D texture6;
 uniform float distance_fade_start = 10.0;
 uniform float distance_fade_length = 10.0;
 
-varying float angle;
 varying float age;
-varying float frame;
 varying float fade_distance;
 
 void vertex() {
-	angle = INSTANCE_CUSTOM.x;
 	age = INSTANCE_CUSTOM.y;
-	frame = INSTANCE_CUSTOM.z;
 
 	// billboard mode
-	mat4 mat_world = mat4(normalize(CAMERA_MATRIX[0])*length(WORLD_MATRIX[0]),normalize(CAMERA_MATRIX[1])*length(WORLD_MATRIX[0]),normalize(CAMERA_MATRIX[2])*length(WORLD_MATRIX[2]),WORLD_MATRIX[3]);
+	mat4 mat_world = mat4(normalize(INV_VIEW_MATRIX[0])*length(MODEL_MATRIX[0]),normalize(INV_VIEW_MATRIX[1])*length(MODEL_MATRIX[0]),normalize(INV_VIEW_MATRIX[2])*length(MODEL_MATRIX[2]),MODEL_MATRIX[3]);
 	mat_world = mat_world * mat4( vec4(cos(INSTANCE_CUSTOM.x),-sin(INSTANCE_CUSTOM.x), 0.0, 0.0), vec4(sin(INSTANCE_CUSTOM.x), cos(INSTANCE_CUSTOM.x), 0.0, 0.0),vec4(0.0, 0.0, 1.0, 0.0),vec4(0.0, 0.0, 0.0, 1.0));
-	MODELVIEW_MATRIX = INV_CAMERA_MATRIX * mat_world;
+	MODELVIEW_MATRIX = VIEW_MATRIX * mat_world;
 	
 	// face distance
-	float world_y = (WORLD_MATRIX * vec4(VERTEX, 1.0)).y;
-	float camera_world_y = (CAMERA_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).y;
+	float world_y = (MODEL_MATRIX * vec4(VERTEX, 1.0)).y;
+	float camera_world_y = (INV_VIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).y;
 	
 	fade_distance = abs(camera_world_y - world_y);
 }

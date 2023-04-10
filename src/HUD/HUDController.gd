@@ -1,14 +1,23 @@
 extends Control
 
+const World := preload("res://src/Objects/World/World.gd")
+const LoadingScreen := preload("res://src/HUD/LoadingScreen.gd")
+
 var game_ready := false
 
-onready var loading_screen := $LoadingScreen
-onready var viewport := $ViewportContainer
-onready var world := $ViewportContainer/Viewport/World
+@onready var loading_screen: LoadingScreen = $LoadingScreen
+@onready var viewport: SubViewportContainer = $SubViewportContainer
+@onready var world: World = $SubViewportContainer/SubViewport/World
 
 func _ready():
-	assert(world.connect("loading_scale", self, "_on_loading_scale") == OK)
-	assert(world.connect("loading_progress", self, "_on_loading_progress") == OK)
+	world.loading_scale.connect(self._on_loading_scale)
+	world.loading_progress.connect(self._on_loading_progress)
+	
+	var scale := DisplayServer.screen_get_scale(DisplayServer.SCREEN_OF_MAIN_WINDOW)
+	var window := self.get_window()
+	
+	window.size *= scale
+	window.position -= Vector2i(self.get_window().size / scale / 2)
 
 
 func _process(_delta: float) -> void:

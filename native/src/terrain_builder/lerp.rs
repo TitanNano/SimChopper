@@ -1,4 +1,4 @@
-use gdnative::prelude::Vector3;
+use godot::prelude::*;
 use lerp::Lerp;
 
 fn bilerp<T: Lerp<F> + Copy, F: Copy>(points: [T; 4], weight_x: F, weight_y: F) -> T {

@@ -1,8 +1,8 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeRGBAgrayscale
 
-func _init() -> void:
+func _init():
 	set_input_port_default_value(1, 1.0)
 
 func _get_name() -> String:
@@ -17,8 +17,8 @@ func _get_category() -> String:
 func _get_description() -> String:
 	return "Improved grayscale with gray factor"
 
-func _get_return_icon_type() -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_return_icon_type() -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count() -> int:
 	return 2
@@ -33,7 +33,7 @@ func _get_input_port_name(port: int):
 func _get_input_port_type(port: int):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -43,10 +43,10 @@ func _get_output_port_count() -> int:
 func _get_output_port_name(port: int) -> String:
 	return "col"
 
-func _get_output_port_type(port: int) -> int:
-	return VisualShaderNode.PORT_TYPE_VECTOR
+func _get_output_port_type(port: int) -> VisualShaderNode.PortType:
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
-func _get_global_code(mode: int) -> String:
+func _get_global_code(mode: Shader.Mode) -> String:
 	return """
 vec3 grayscaleFunc(vec3 _c0l0r_grayscale, float _gray_fact0r){
 	_gray_fact0r = min(max(_gray_fact0r, 0.0), 1.0);
@@ -54,5 +54,5 @@ vec3 grayscaleFunc(vec3 _c0l0r_grayscale, float _gray_fact0r){
 }
 """
 
-func _get_code(input_vars: Array, output_vars: Array, mode: int, type: int) -> String:
+func _get_code(input_vars: Array[String], output_vars: Array[String], mode: Shader.Mode, type: VisualShader.Type) -> String:
 	return "%s = grayscaleFunc(%s, %s);" % [output_vars[0], input_vars[0], input_vars[1]]

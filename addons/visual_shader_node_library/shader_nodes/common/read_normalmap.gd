@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeReadNormalMap
 
@@ -12,10 +12,10 @@ func _get_subcategory():
 	return "Misc"
 
 func _get_description():
-	return "Returns the view space normal based on data from a specified normal map."
+	return "Returns the view space normal based checked data from a specified normal map."
 
 func _get_return_icon_type():
-	return VisualShaderNode.PORT_TYPE_VECTOR
+	return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_input_port_count():
 	return 5
@@ -36,13 +36,13 @@ func _get_input_port_name(port):
 func _get_input_port_type(port):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		1:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		2:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		3:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 		4:
 			return VisualShaderNode.PORT_TYPE_SCALAR
 
@@ -57,13 +57,13 @@ func _get_output_port_name(port):
 func _get_output_port_type(port):
 	match port:
 		0:
-			return VisualShaderNode.PORT_TYPE_VECTOR
+			return VisualShaderNode.PORT_TYPE_VECTOR_3D
 
 func _get_global_code(mode):
 	if mode != Shader.MODE_SPATIAL:
 		return ""
 	
-	var code = preload("read_normalmap.shader").code
+	var code = preload("read_normalmap.gdshader").code
 	code = code.replace("shader_type spatial;\n", "")
 	return code
 
@@ -76,7 +76,7 @@ func _get_code(input_vars, output_vars, mode, type):
 	var normal = "NORMAL"
 	var tangent = "TANGENT"
 	var binormal = "BINORMAL"
-	var normal_depth = "NORMALMAP_DEPTH"
+	var normal_depth = "NORMAL_MAP_DEPTH"
 	
 	if input_vars[0]:
 		normalmap_data = input_vars[0]

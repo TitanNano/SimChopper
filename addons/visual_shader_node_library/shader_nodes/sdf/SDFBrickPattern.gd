@@ -1,4 +1,4 @@
-tool
+@tool
 extends VisualShaderNodeCustom
 class_name VisualShaderNodeSDFPatternBrick
 
@@ -28,8 +28,8 @@ enum Inputs {
 };
 const INPUT_NAMES = ["uv", "border size"]
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
-	VisualShaderNode.PORT_TYPE_VECTOR
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D
 ]
 
 func _get_input_port_count():
@@ -52,10 +52,10 @@ enum Outputs {
 
 const OUTPUT_NAMES = ["distance xy", "distance x", "distance y", "brick id"]
 const OUTPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR,
+	VisualShaderNode.PORT_TYPE_VECTOR_3D,
 	VisualShaderNode.PORT_TYPE_SCALAR,
 	VisualShaderNode.PORT_TYPE_SCALAR,
-	VisualShaderNode.PORT_TYPE_VECTOR
+	VisualShaderNode.PORT_TYPE_VECTOR_3D
 ]
 
 func _get_output_port_count():

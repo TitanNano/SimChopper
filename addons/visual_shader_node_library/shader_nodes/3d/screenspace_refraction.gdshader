@@ -17,24 +17,6 @@ float line_unit_box_intersect_dist(vec3 lineorigin, vec3 linedirection) {
   return min(furthestplane.x, min(furthestplane.y, furthestplane.z));
 }
 
-vec3 get_specular_refraction_dominant_dir(vec3 N, vec3 V, float ssr_roughness, float ssr_ior) {
-	/* TODO: This a bad approximation. Better approximation should fit
-	* the refracted vector and ssr_roughness into the best prefiltered reflection
-	* lobe. */
-	/* Correct the ssr_ior for ssr_ior < 1.0 to not see the abrupt delimitation or the TIR */
-	ssr_ior = (ssr_ior < 1.0) ? mix(ssr_ior, 1.0, ssr_roughness) : ssr_ior;
-	float eta = 1.0 / ssr_ior;
-	
-	float NV = dot(N, -V);
-	
-	/* Custom Refraction. */
-	float k = 1.0 - eta * eta * (1.0 - NV * NV);
-	k = max(0.0, k); /* Only this changes. */
-	vec3 R = eta * -V - (eta * NV + sqrt(k)) * N;
-	
-	return R;
-}
-
 vec3 project_point(mat4 projection_matrix, vec3 point) {
 	vec4 ndc = projection_matrix * vec4(point, 1.0);
 	return ndc.xyz / ndc.w;
@@ -134,8 +116,8 @@ vec3 raycast(mat4 projection_matrix, sampler2D depth_texture, vec3 ray_origin, v
 	
 	float lod_fac = clamp(sqrt(ssr_roughness) * 2.0 - 0.4, 0.0, 1.0);
 	bool hit = false;
-	float iter;
-	for(iter = 1.0; !hit && (ray_time < max_time) && (iter < float(SSR_MAX_STEPS)); iter++) {
+
+	for(float iter = 1.0; !hit && (ray_time < max_time) && (iter < float(SSR_MAX_STEPS)); iter++) {
 		/* Minimum stride of 2 because we are using half res minmax zbuffer. */
 		float stride = max(1.0, iter * trace_quality) * 2.0;
 		float lod = log2(stride * 0.5 * trace_quality) * lod_fac;
@@ -188,12 +170,8 @@ float screen_border_mask(vec2 hit_co) {
 }
 
 vec4 ssr(vec3 position, mat4 projection_matrix, mat4 view_matrix, sampler2D screen_texture, sampler2D depth_texture, vec3 N, vec3 V, float ssr_ior, float ssr_roughnessSquared) {
-	float a2 = max(5e-6, ssr_roughnessSquared * ssr_roughnessSquared);
-	
 	vec3 H = N;
-	float pdf = 0.0;
 	
-	vec3 vV = V;
 	float eta = 1.0 / ssr_ior;
 	if (dot(H, V) < 0.0) {
 		H = -H;
@@ -233,7 +211,6 @@ void screenspace_refraction(in float ssr_ior, in float ssr_roughness, in float s
 	vec3 refr_pos = (ssr_thickness > 0.0) ?
 			line_plane_intersect(world_pos, refr_V, world_pos - N * ssr_thickness, N) :
 			world_pos;
-	vec3 refr_dir = get_specular_refraction_dominant_dir(N, refr_V, ssr_roughness, final_ior);
 	
 	/* ---------------------------- */
 	/*   Screen Space Refraction    */

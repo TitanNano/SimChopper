@@ -22,12 +22,8 @@ func _set_strength(value: float):
 
 	if not self.emitting:
 		return
+		
+	var mesh: PrimitiveMesh = self.draw_pass_1
+	var material: StandardMaterial3D = mesh.material
 
-	if not self.process_material is ParticleProcessMaterial:
-		return
-
-	var material: ParticleProcessMaterial = self.process_material
-
-	material.initial_velocity_min = value * 15
-	material.initial_velocity_max = value * 15
-	material.scale_max = value * 4.09
+	material.proximity_fade_distance = max(100 * (1 - value), 2)

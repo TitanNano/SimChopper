@@ -74,9 +74,12 @@ func _physics_process(_delta: float) -> void:
 	var colliding := ray_cast.is_colliding()
 
 	ray_cast.target_position = Vector3.DOWN * 7 * ray_cast.global_transform.basis
+	
+	var distance := ray_cast.global_transform.origin - ground
+	var dust_strength := 1 - (distance.length() / 7)
 
 	self.rotor.power = self.engine_speed
-	self.dust_particles.strength = self.engine_speed if colliding else 0.0
+	self.dust_particles.strength = self.engine_speed * dust_strength if colliding else 0.0
 
 	if colliding:
 		self.dust_particles.global_transform.origin = ground

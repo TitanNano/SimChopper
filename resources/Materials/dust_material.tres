@@ -1,29 +1,16 @@
-[gd_resource type="ShaderMaterial" load_steps=10 format=3 uid="uid://iolrb2gr68q4"]
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://cjoloelf8ku4k"]
 
-[ext_resource type="Shader" path="res://resources/Shaders/dust.gdshader" id="1"]
-[ext_resource type="Texture2D" uid="uid://dqc0e3q3b2nub" path="res://resources/Textures/Dust/smoke_02.png" id="2"]
-[ext_resource type="Texture2D" uid="uid://2knghoe00y36" path="res://resources/Textures/Dust/smoke_05.png" id="3"]
-[ext_resource type="Texture2D" uid="uid://cjfu6acettm8v" path="res://resources/Textures/Dust/smoke_03.png" id="4"]
-[ext_resource type="Texture2D" uid="uid://dmjepyugihr3e" path="res://resources/Textures/Dust/smoke_06.png" id="5"]
-[ext_resource type="Texture2D" uid="uid://c1tcxbg8wfmqa" path="res://resources/Textures/Dust/smoke_04.png" id="6"]
-[ext_resource type="Texture2D" uid="uid://md13sg5m5beq" path="res://resources/Textures/Dust/smoke_01.png" id="7"]
-
-[sub_resource type="Gradient" id="1"]
-offsets = PackedFloat32Array(0, 0.200658, 0.625, 1)
-colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="2"]
-gradient = SubResource("1")
+[ext_resource type="Texture2D" uid="uid://bjpn68ehwxofg" path="res://resources/Textures/Dust/dust.png" id="1_3b3ya"]
 
 [resource]
-render_priority = 0
-shader = ExtResource("1")
-shader_parameter/distance_fade_start = 5.0
-shader_parameter/distance_fade_length = 2.0
-shader_parameter/lifetime_fade = SubResource("2")
-shader_parameter/texture1 = ExtResource("7")
-shader_parameter/texture2 = ExtResource("2")
-shader_parameter/texture3 = ExtResource("4")
-shader_parameter/texture4 = ExtResource("6")
-shader_parameter/texture5 = ExtResource("3")
-shader_parameter/texture6 = ExtResource("5")
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_3b3ya")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+proximity_fade_enabled = true
+proximity_fade_distance = 2.0

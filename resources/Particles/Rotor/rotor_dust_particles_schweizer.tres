@@ -1,21 +1,27 @@
-[gd_resource type="ParticleProcessMaterial" load_steps=2 format=3 uid="uid://ckkpoyyglqm80"]
+[gd_resource type="ParticleProcessMaterial" load_steps=3 format=3 uid="uid://ckkpoyyglqm80"]
 
-[ext_resource type="Texture2D" path="res://resources/Particles/Rotor/point_texture_schweizer.tex" id="1_4oovx"]
+[sub_resource type="Gradient" id="Gradient_c1tqv"]
+colors = PackedColorArray(1, 1, 1, 0.588235, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_jtl1a"]
+gradient = SubResource("Gradient_c1tqv")
 
 [resource]
-emission_shape = 4
-emission_point_texture = ExtResource("1_4oovx")
-emission_point_count = 512
+emission_shape = 6
+emission_ring_axis = Vector3(2.08165e-12, 1, 2.08165e-12)
+emission_ring_height = 1.0
+emission_ring_radius = 6.0
+emission_ring_inner_radius = 5.0
 direction = Vector3(0, 1, 0)
 gravity = Vector3(0, 0, 0)
 initial_velocity_min = 15.0
 initial_velocity_max = 15.0
-angle_min = -45.0
-angle_max = -45.0
-scale_min = 3.91
-scale_max = 4.09
-color = Color(0.698039, 0.25098, 0.25098, 1)
-anim_speed_min = 1.0
-anim_speed_max = 1.0
-anim_offset_min = 1.0
-anim_offset_max = 1.0
+angular_velocity_min = 30.0
+angular_velocity_max = 50.0
+radial_accel_min = 15.0
+radial_accel_max = 15.0
+angle_min = -90.0
+angle_max = 360.0
+scale_min = 2.0
+scale_max = 6.0
+color_ramp = SubResource("GradientTexture1D_jtl1a")

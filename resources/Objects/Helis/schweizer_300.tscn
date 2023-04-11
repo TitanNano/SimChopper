@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://cmv7rt4gqew38"]
 
-[ext_resource type="PackedScene" path="res://resources/Objects/Helis/Helicopter.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://dl34exjsm3sq4" path="res://resources/Objects/Helis/Helicopter.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://b0ln8n5f4i7ks" path="res://resources/Meshes/Helis/schweizer_300/main.glb" id="2"]
 [ext_resource type="PackedScene" uid="uid://c0wggsy543kf2" path="res://resources/Meshes/Helis/schweizer_300/rotor.glb" id="3"]
 [ext_resource type="PackedScene" uid="uid://din03my4vl3s6" path="res://resources/Meshes/Helis/schweizer_300/tail_rotor.glb" id="4"]

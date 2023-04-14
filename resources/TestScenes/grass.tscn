@@ -1,35 +1,251 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=10 format=3 uid="uid://dew3sqhftdel1"]
 
-[ext_resource path="res://resources/Materials/terrain_material.tres" type="Material" id=1]
-[ext_resource path="res://resources/Materials/grass_blade_material.tres" type="Material" id=2]
-[ext_resource path="res://resources/GPUParticles3D/Grass/grass_particle_material.tres" type="Material" id=3]
+[ext_resource type="Material" uid="uid://cra7dybo4pfnt" path="res://resources/Particles/Grass/grass_particle_material_vs.tres" id="1_tpat7"]
 
-[sub_resource type="PlaneMesh" id=8]
-size = Vector2( 16, 16 )
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6mngs"]
+albedo_color = Color(0.215686, 0.415686, 0.137255, 1)
 
-[sub_resource type="ConvexPolygonShape3D" id=2]
-points = PackedVector3Array( -8, 0, -8, -8, 0, 8, 8, 0, -8, 8, 0, 8 )
+[sub_resource type="PlaneMesh" id="PlaneMesh_pfbub"]
+material = SubResource("StandardMaterial3D_6mngs")
+size = Vector2(12, 12)
 
-[sub_resource type="QuadMesh" id=15]
-material = ExtResource( 2 )
-size = Vector2( 0.5, 0.5 )
-center_offset = Vector3( 0, 0.25, 0 )
+[sub_resource type="ConvexPolygonShape3D" id="2"]
+points = PackedVector3Array(-8, 0, -8, -8, 0, 8, 8, 0, -8, 8, 0, 8)
+
+[sub_resource type="Shader" id="Shader_1i074"]
+code = "/** A grass shader by Toadile for Godot 3.x
+ * Copies, modififications, and redistrubitions are allowed and encouranged.
+ * For best effect, make sure that the quad/geometry is twice the width that is 
+ * normal. In most cases, a quad that is 2 by 1 will be sufficient for the grass
+ * -object interaction effect to be convincing. 
+ *
+ * Since the grass bending uses screen space, to use SSAO and other post 
+ * processing on it, the displacement portion would have to be commented out in 
+ * the fragment function to enable SSAO
+ */
+
+shader_type spatial;
+render_mode blend_mix, cull_disabled, depth_draw_always;
+
+// general parameters
+uniform float y_offset = 0.5;
+uniform vec4 base_color : source_color = vec4(1.0);
+uniform vec4 end_color : source_color = vec4(1.0);
+uniform float specular: hint_range(0,1) = 0.1;
+uniform float metallic: hint_range(0,1) = 0.0;
+uniform float roughness : hint_range(0,1) = 1.0;
+uniform float rim: hint_range(0,1) = 0.01;
+uniform float transmission: hint_range(0,1) = 0.5;
+uniform sampler2D texture_albedo;
+uniform sampler2D texture_normal : hint_normal;
+uniform sampler2D texture_wind_noise;
+uniform vec2 uv_scale = vec2(1.0,1.0);
+uniform vec2 uv_offset = vec2(0.0,0.0);
+
+// wind parameters
+uniform float wind_noise_scale = 2.0;
+uniform vec2 wind_direction = vec2(0.0, 1.0);
+uniform float wind_speed : hint_range(0,10) = 1.0;
+uniform float wind_strength : hint_range(0,10) = 1.0;
+
+// grass properties
+uniform float color_variatiion : hint_range(0, 2) = 0.5;
+uniform float height : hint_range(0, 10) = 1.0;
+uniform float height_variation : hint_range(0, 2) = 0.3;
+uniform float flatness : hint_range(0,2) = 0.2;
+
+// rendering settings
+uniform float fade_out_distance = 30.0;
+uniform float fade_out_transition = 20.0;
+uniform bool y_billboard = false;
+uniform float displace_intensity : hint_range(0, 2) = 1.0;
+uniform float proximity_distance : hint_range(0, 2) = 1.0;
+uniform bool displace = true;
+uniform float alpha_scissors : hint_range(0, 1) = 0.9;
+uniform bool use_normal_map_alpha = false;
+
+uniform sampler2D depth_texture : hint_depth_texture;
+
+// variables
+varying float bend_uv_direction;
+varying vec3 instance_offset;
+varying float fade;
+
+void vertex() {
+	// set up grass
+	VERTEX.y *= height;
+	VERTEX.y += y_offset*height;
+	float inverse_uv_y = 1.0-UV.y;
+	COLOR = base_color*vec4(UV.y) + end_color*vec4(inverse_uv_y);
+	
+	// \"h\" means height
+	float h_variation = float(INSTANCE_ID % 3)*height_variation*0.5;
+	float inv_h_stiff = (h_variation + height+1.0) * 2.0;
+	float h_stiff = 1.0/inv_h_stiff;
+	
+	// wind noise animation
+	vec2 world_xy = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xz*0.2*wind_noise_scale + normalize(wind_direction + INSTANCE_CUSTOM.xz)*TIME*wind_speed*0.51*h_stiff;
+	vec4 noise_tex = texture(texture_wind_noise, world_xy);
+	
+	// y billboard adjustment
+	if (y_billboard)
+	{
+		MODELVIEW_MATRIX = VIEW_MATRIX * mat4(
+			vec4(normalize(cross(vec3(0.0, 1.0, 0.0), INV_VIEW_MATRIX[2].xyz)),0.0),
+			vec4(0.0, 1.0, 0.0, 0.0),
+			vec4(normalize(cross(INV_VIEW_MATRIX[0].xyz, vec3(0.0, 1.0, 0.0))),0.0),
+			MODEL_MATRIX[3]);
+	}
+	
+	// animate the grass
+	vec4 local_wind_direction;
+	if (y_billboard)
+	{
+		local_wind_direction = vec4(wind_direction.x, 1.0, wind_direction.y, 0.0) * INV_VIEW_MATRIX;
+	} else
+	{
+		local_wind_direction = vec4(wind_direction.x, 1.0, wind_direction.y, 0.0) * MODEL_MATRIX;
+	}
+	float flat_x = sin(MODELVIEW_MATRIX[2].x)*flatness*h_stiff;
+	float flat_y = cos(MODELVIEW_MATRIX[2].z)*flatness*h_stiff;
+	float bend = pow(inverse_uv_y, 2);
+	float n = (noise_tex.r-0.5*2.0)*bend*(wind_strength + length(INSTANCE_CUSTOM.xyz));
+	VERTEX.x += n*flat_x + sin(TIME*0.01*h_stiff+float(INSTANCE_ID))*n*0.1*inv_h_stiff + local_wind_direction.x*wind_strength*bend*height;
+	VERTEX.z += n*flat_y + cos(TIME*0.01*h_stiff+float(INSTANCE_ID))*n*0.1*inv_h_stiff + local_wind_direction.z*wind_strength*bend*height;
+	VERTEX.y += h_variation*inverse_uv_y;
+	VERTEX.y -= inverse_uv_y * flatness * 0.15;
+	
+	// introduce variation per grass instance
+	if (INSTANCE_ID % 2 == 0) bend_uv_direction = 1.0; else bend_uv_direction = -1.0;
+	
+	if (INSTANCE_ID % 2 == 0) instance_offset = vec3(color_variatiion*0.1); 
+	else instance_offset = vec3(-color_variatiion*0.1);
+	
+	// fade out grass by shrinking it
+	float view_distance = length(VERTEX - vec3(MODELVIEW_MATRIX[3].x, MODELVIEW_MATRIX[3].y, MODELVIEW_MATRIX[3].z));
+	if (view_distance > fade_out_distance + fade_out_transition) fade = 1.0f; else fade = 0.0f;
+	if (view_distance > fade_out_distance)
+	{
+		float offset = (fade_out_distance + fade_out_transition - view_distance) / fade_out_transition;
+		VERTEX.y *= offset;
+	}
+}
+
+void fragment() {
+	if (fade >= 0.5f) discard;
+	vec2 base_uv = UV;
+	base_uv.x *= 2.0;
+	base_uv.x -= 0.5;
+	base_uv *= uv_scale;
+	base_uv += uv_offset;
+	float prox = 1.0;
+	
+	// comment out this if-block if not wanting to use displacement and wanting SSAO
+	if (displace)
+	{
+		float depth_tex = textureLod(depth_texture,SCREEN_UV,0.0).r;
+		vec4 world_pos = INV_PROJECTION_MATRIX * vec4(SCREEN_UV*2.0-1.0,depth_tex*2.0-1.0,1.0);
+		world_pos.xyz/=world_pos.w;
+		float stuff = clamp(1.0-smoothstep(world_pos.z+0.5,world_pos.z,VERTEX.z), 0.3, 1.1);
+		prox = clamp(1.0-smoothstep(world_pos.z+proximity_distance,world_pos.z,VERTEX.z) + UV.y*proximity_distance,0.0,1.0);
+		base_uv.x += (1.0-prox)*0.2*displace_intensity * bend_uv_direction;
+		base_uv.y -= (1.0-prox)*0.5*displace_intensity;
+	}
+	vec4 albedo_tex = texture(texture_albedo,vec2(base_uv.x, base_uv.y));
+	vec4 normal_tex = texture(texture_normal,vec2(base_uv.x, base_uv.y));
+	
+	// discard distant grass
+	if (!use_normal_map_alpha && albedo_tex.a < alpha_scissors)
+	{
+		discard;
+	} else if (use_normal_map_alpha && normal_tex.a < alpha_scissors)
+	{
+		discard;
+	}
+	
+	ALBEDO = COLOR.rgb * albedo_tex.rgb * (1.0 + instance_offset) * prox;
+	METALLIC = metallic;
+	ROUGHNESS = roughness;
+	SPECULAR = specular;
+	RIM = rim;
+	SSS_TRANSMITTANCE_DEPTH = transmission;
+	NORMAL_MAP = normal_tex.rgb;
+}"
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_2q536"]
+seed = -1
+fractal_octaves = 10
+fractal_lacunarity = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_jifde"]
+in_3d_space = true
+noise = SubResource("FastNoiseLite_2q536")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w2ciu"]
+render_priority = 0
+shader = SubResource("Shader_1i074")
+shader_parameter/y_offset = 0.1
+shader_parameter/base_color = Color(0.215686, 0.415686, 0.137255, 1)
+shader_parameter/end_color = Color(0.454902, 0.968627, 0.294118, 1)
+shader_parameter/specular = 0.1
+shader_parameter/metallic = 0.0
+shader_parameter/roughness = 1.0
+shader_parameter/rim = 0.01
+shader_parameter/transmission = 0.5
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/uv_offset = Vector2(0, 0)
+shader_parameter/wind_noise_scale = 1.0
+shader_parameter/wind_direction = Vector2(0.5, 0.5)
+shader_parameter/wind_speed = 0.4
+shader_parameter/wind_strength = 0.1
+shader_parameter/color_variatiion = 2.0
+shader_parameter/height = 1.0
+shader_parameter/height_variation = 0.3
+shader_parameter/flatness = 0.2
+shader_parameter/fade_out_distance = 30.0
+shader_parameter/fade_out_transition = 20.0
+shader_parameter/y_billboard = true
+shader_parameter/displace_intensity = 1.0
+shader_parameter/proximity_distance = 1.0
+shader_parameter/displace = false
+shader_parameter/alpha_scissors = 0.9
+shader_parameter/use_normal_map_alpha = false
+shader_parameter/texture_wind_noise = SubResource("NoiseTexture2D_jifde")
+
+[sub_resource type="QuadMesh" id="QuadMesh_qf3nk"]
+material = SubResource("ShaderMaterial_w2ciu")
+size = Vector2(0.03, 0.2)
+subdivide_depth = 4
 
 [node name="Node3D" type="Node3D"]
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
-mesh = SubResource( 8 )
-material/0 = ExtResource( 1 )
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.738752, 0)
+mesh = SubResource("PlaneMesh_pfbub")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
-shape = SubResource( 2 )
+shape = SubResource("2")
 
-[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
-transform = Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
-amount = 2000
+[node name="Particles" type="GPUParticles3D" parent="StaticBody3D"]
+amount = 40000
+lifetime = 1e+10
+preprocess = 100.0
 explosiveness = 1.0
-visibility_aabb = AABB( -8.03591, -0.835813, -8.00927, 16.0718, 1.67163, 16.0185 )
-process_material = ExtResource( 3 )
-draw_pass_1 = SubResource( 15 )
+collision_base_size = 0.0
+visibility_aabb = AABB(-5, -5, -5, 10, 10, 10)
+process_material = ExtResource("1_tpat7")
+draw_pass_1 = SubResource("QuadMesh_qf3nk")
+
+[node name="GPUParticlesCollisionHeightField3D" type="GPUParticlesCollisionHeightField3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.800956, 0)
+size = Vector3(12, 2, 12)
+
+[node name="GPUParticlesAttractorSphere3D" type="GPUParticlesAttractorSphere3D" parent="StaticBody3D"]
+transform = Transform3D(0.99994, 0.0109779, 0, -0.0109779, 0.99994, 0, 0, 0, 1, -1.95662, -0.609413, 4.75119)
+strength = -6.0
+directionality = 1.0
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-0.913298, 0.195277, -0.357427, 0, 0.877568, 0.479451, 0.407292, 0.437882, -0.801482, -4.2223, 5.66378, -9.46794)

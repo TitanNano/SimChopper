@@ -13,9 +13,9 @@ enum Inputs {
 
 const INPUT_NAMES = ["offset", "period", "scale", "gradient_rotation"];
 const INPUT_TYPES = [
-	VisualShaderNode.PORT_TYPE_VECTOR_3D,
-	VisualShaderNode.PORT_TYPE_VECTOR_3D,
-	VisualShaderNode.PORT_TYPE_VECTOR_3D,
+	VisualShaderNode.PORT_TYPE_VECTOR_2D,
+	VisualShaderNode.PORT_TYPE_VECTOR_2D,
+	VisualShaderNode.PORT_TYPE_VECTOR_2D,
 	VisualShaderNode.PORT_TYPE_SCALAR
 ]
 
@@ -27,7 +27,7 @@ enum Outputs {
 }
 
 const OUTPUT_NAMES = ["noise", "gradient"]
-const OUTPUT_TYPES = [VisualShaderNode.PORT_TYPE_SCALAR, VisualShaderNode.PORT_TYPE_VECTOR_3D]
+const OUTPUT_TYPES = [VisualShaderNode.PORT_TYPE_SCALAR, VisualShaderNode.PORT_TYPE_VECTOR_2D]
 
 func _get_name():
 	return "SimplexNoise2DRG"
@@ -71,12 +71,10 @@ func _get_global_code(mode):
 func _get_code(input_vars, output_vars, mode, type):
 	var offset = input_vars[Inputs.OFFSET];
 
-	if not offset:
+	if offset == null:
 		offset = "vec2(0.0, 0.0)"
-	else:
-		offset = "(%s).xy" % [offset]
 
-	offset = "(%s).xy * (%s).xy" % [offset, input_vars[Inputs.SCALE]]
+	offset = "%s * %s" % [offset, input_vars[Inputs.SCALE]]
 
 	var gradient_rotation = input_vars[Inputs.GRADIENT_ROTATION]
 
@@ -84,20 +82,20 @@ func _get_code(input_vars, output_vars, mode, type):
 
 	if input_vars[Inputs.PERIOD]:
 		# periodic noise
-		result_assignment = "vec3 result = simplex_noise_2d_rg_p(%s.xy, (%s).xy, %s);" % [
+		result_assignment = "vec3 result = simplex_noise_2d_rg_p(%s, %s, %s);" % [
 			offset,
 			input_vars[Inputs.PERIOD],
 			gradient_rotation
 		]
 	else:
-		result_assignment = " vec3 result = simplex_noise_2d_rg_np(%s.xy, %s);" % [
+		result_assignment = " vec3 result = simplex_noise_2d_rg_np(%s, %s);" % [
 			offset,
 			gradient_rotation
 		]
 
 	var noise_assignment = "%s = result.x;" % [output_vars[Outputs.NOISE]];
 
-	var gradient_assignment = "%s = vec3(result.xy, 0.0);" % [output_vars[Outputs.GRADIENT]]
+	var gradient_assignment = "%s = result.xy;" % [output_vars[Outputs.GRADIENT]]
 
 	return """
 	%s
@@ -107,6 +105,6 @@ func _get_code(input_vars, output_vars, mode, type):
 
 func _init():
 	if not get_input_port_default_value(Inputs.SCALE):
-		set_input_port_default_value(Inputs.SCALE, Vector3(1.0, 1.0, 1.0))
+		set_input_port_default_value(Inputs.SCALE, Vector2(1.0, 1.0))
 	if not get_input_port_default_value(Inputs.GRADIENT_ROTATION):
 		set_input_port_default_value(Inputs.GRADIENT_ROTATION, 0.0)

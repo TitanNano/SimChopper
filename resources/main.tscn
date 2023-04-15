@@ -66,12 +66,15 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
 handle_input_locally = false
+scaling_3d_mode = 1
+audio_listener_enable_3d = true
 size = Vector2i(1152, 648)
 size_2d_override_stretch = true
 render_target_update_mode = 4
 
-[node name="Schweizer_300" parent="SubViewportContainer/SubViewport" groups=["player"] instance=ExtResource("16_e6k8r")]
+[node name="Schweizer_300" parent="SubViewportContainer/SubViewport" node_paths=PackedStringArray("child_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)
+child_camera = NodePath("CameraInterpolation")
 
 [node name="CameraInterpolation" type="Marker3D" parent="SubViewportContainer/SubViewport/Schweizer_300"]
 process_mode = 3
@@ -127,6 +130,8 @@ script = ExtResource("6")
 
 [node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport"]
 transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, -45.4393, 5.66891, 25.269)
+doppler_tracking = 2
+current = true
 near = 3.0
 far = 200000.0
 

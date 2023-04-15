@@ -1,0 +1,118 @@
+[gd_resource type="AnimationLibrary" load_steps=12 format=3 uid="uid://uec74t4jqdxi"]
+
+[ext_resource type="AudioStream" uid="uid://dhv3rlovpbqai" path="res://resources/Sounds/Helicopter/loop0.wav" id="1_vcbvg"]
+[ext_resource type="AudioStream" uid="uid://cn3jhpp5xy4n8" path="res://resources/Sounds/Helicopter/loop2.wav" id="2_cuv6p"]
+[ext_resource type="AudioStream" uid="uid://cnd3wqumu5hkw" path="res://resources/Sounds/Helicopter/loop3.wav" id="3_odvpc"]
+[ext_resource type="AudioStream" uid="uid://c4en5mqwos5v6" path="res://resources/Sounds/Helicopter/stop.wav" id="4_fstcy"]
+[ext_resource type="AudioStream" uid="uid://ce4jpnr7uxq1o" path="res://resources/Sounds/Helicopter/start.wav" id="5_ibin8"]
+
+[sub_resource type="Animation" id="Animation_875du"]
+length = 1.58
+loop_mode = 1
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../RotorAudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("1_vcbvg")
+}],
+"times": PackedFloat32Array(0)
+}
+tracks/0/use_blend = true
+
+[sub_resource type="Animation" id="Animation_r0hda"]
+length = 1.3
+loop_mode = 1
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../RotorAudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("2_cuv6p")
+}],
+"times": PackedFloat32Array(0)
+}
+tracks/0/use_blend = true
+
+[sub_resource type="Animation" id="Animation_fxti5"]
+length = 1.2
+loop_mode = 1
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../RotorAudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("3_odvpc")
+}],
+"times": PackedFloat32Array(0)
+}
+tracks/0/use_blend = true
+
+[sub_resource type="Animation" id="Animation_wc54n"]
+length = 5.0
+loop_mode = 2
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../RotorAudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("4_fstcy")
+}],
+"times": PackedFloat32Array(0)
+}
+tracks/0/use_blend = true
+
+[sub_resource type="Animation" id="Animation_m74j3"]
+resource_name = "rotor"
+length = 5.0
+loop_mode = 1
+step = 1.0
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../RotorAudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("5_ibin8")
+}],
+"times": PackedFloat32Array(0)
+}
+tracks/0/use_blend = true
+
+[sub_resource type="Animation" id="Animation_0m301"]
+resource_name = "rotor_off"
+length = 0.001
+
+[resource]
+_data = {
+"rotor_0": SubResource("Animation_875du"),
+"rotor_1": SubResource("Animation_r0hda"),
+"rotor_2": SubResource("Animation_fxti5"),
+"rotor_end": SubResource("Animation_wc54n"),
+"rotor_off": SubResource("Animation_0m301"),
+"rotor_start": SubResource("Animation_m74j3")
+}

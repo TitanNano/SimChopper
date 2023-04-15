@@ -1,12 +1,22 @@
 extends RigidBody3D
 
 const DustParticles := preload("res://src/Objects/Particles/DustParticles.gd")
-const AudioSource := preload("res://src/Objects/Audio/AudioSource.gd")
+const CameraInterpolation := preload("res://src/Objects/Camera/CameraInterpolation.gd")
+const Rotor := preload("res://src/Objects/Helicopters/Rotor.gd")
+const Logger := preload("res://src/util/Logger.gd")
 
 # pseudo constants
 @export var CRUISE_SPEED := 159.0 # km/h
 @export var RATE_OF_CLIMB := 3.8 # m/s
 @export var RATE_OF_ROTATION := 90 # degrees / s
+
+@export_group("Slots", "child_")
+
+@export var child_engine_sound_tree: AnimationTree
+@export var child_camera: Node3D
+@export var child_dust_particles: GPUParticles3D
+@export var child_rotor: Node3D
+
 const MAX_TILT := 45.0 # degrees
 const ACCELERATION_TIME := 0.4 # amount of seconds to accelerate to top speed
 var CRUISE_SPEED_MS := (CRUISE_SPEED * 1000) / 3600
@@ -17,11 +27,9 @@ var directional_velocity := Vector3.ZERO
 var rotational_velocity := 0.0
 var engine_speed := 0.0
 
-
-@onready var audio_fx: AudioSource = $AudioFx
-@onready var dust_particles: DustParticles = $Dust
-@onready var rotor = $rotor
-@onready var camera = $CameraInterpolation
+@onready var camera: CameraInterpolation = self.child_camera
+@onready var dust_particles: DustParticles = self.child_dust_particles
+@onready var rotor: Rotor = self.child_rotor
 
 
 # Called when the node enters the scene tree for the first time.
@@ -94,21 +102,19 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var movement_strength := Input.get_axis("forward", "back")
 	var turn_strength := Input.get_axis("turn_right", "turn_left")
 	var direction := Vector3(-turn_strength, 0, movement_strength).normalized()
+	var sound_state_machine := anim_state_machine(self.child_engine_sound_tree)
 
 	if self.engine_speed < 1:
-		if self.engine_speed > 0 and not audio_fx.playing:
-			audio_fx.play_track(preload("res://resources/Sounds/Helicopter/start.wav"))
-
-		self.engine_speed = min(self.engine_speed + climb * 0.001, 1)
+		if climb > 0:
+			self.engine_speed = min(self.engine_speed + 0.36 * delta, 1)
+			Logger.info(["state: ", sound_state_machine.get_current_node(), "Engine: ", self.engine_speed])
+		elif self.engine_speed > 0:
+			self.engine_speed = max(self.engine_speed - 0.36 * delta, 0)
+		
+		self.bind_states(climb_strength)
 		return
 
-	if audio_fx.track_name.ends_with("start.wav"):
-		var sfx: AudioStreamWAV = preload("res://resources/Sounds/Helicopter/loop0.wav")
-
-		sfx.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		sfx.loop_end = sfx.data.size()
-
-		audio_fx.play_track(sfx)
+	self.bind_states(climb_strength)
 
 	# apply climb first
 	var target_climb_velocity := Vector3(0, climb, 0) + (state.total_gravity * -1)
@@ -145,3 +151,12 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 
 func snap_camera():
 	self.camera.snap = true
+
+func anim_state_machine(tree: AnimationTree) -> AnimationNodeStateMachinePlayback:
+	return tree.get("parameters/playback") as AnimationNodeStateMachinePlayback
+
+func bind_states(climb_strength: float):
+	self.child_engine_sound_tree.set("parameters/conditions/engine_off", self.engine_speed == 0 and climb_strength == 0)
+	self.child_engine_sound_tree.set("parameters/conditions/lift_off", self.engine_speed == 1)
+	self.child_engine_sound_tree.set("parameters/conditions/spin_down", self.engine_speed < 1 and climb_strength == 0)
+	self.child_engine_sound_tree.set("parameters/conditions/spin_up", self.engine_speed < 1 and climb_strength > 0)

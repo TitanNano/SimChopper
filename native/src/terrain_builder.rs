@@ -99,7 +99,7 @@ fn stitch_chunk_seams(vertices: Vec<Vec<VertexRef>>) {
     let vertices: Vec<_> = vertices.into_iter().flatten().collect();
 
     vertices.iter().for_each(|vertex| {
-        let vertex = vertex.lock().unwrap();
+        let vertex = vertex.read().unwrap();
         let vertex_key = vertex.to_string();
 
         let normal = {
@@ -112,7 +112,7 @@ fn stitch_chunk_seams(vertices: Vec<Vec<VertexRef>>) {
     });
 
     vertices.into_iter().for_each(|vertex| {
-        let mut vertex = vertex.lock().unwrap();
+        let mut vertex = vertex.write().unwrap();
         let normal = normal_map.get(&vertex.to_string()).unwrap();
 
         vertex.set_normal(normal.normalized());
@@ -131,9 +131,9 @@ fn calculate_normals<'a, I: Iterator<Item = &'a VertexRef>>(
             let [v0, v1, v2]: [&VertexRef; 3] =
                 face.collect::<Vec<_>>().as_slice().try_into().unwrap();
 
-            let v0 = v0.lock().unwrap();
-            let v1 = v1.lock().unwrap();
-            let v2 = v2.lock().unwrap();
+            let v0 = v0.read().unwrap();
+            let v1 = v1.read().unwrap();
+            let v2 = v2.read().unwrap();
 
             let plane = Plane::from_points(v0.as_vector(), v1.as_vector(), v2.as_vector());
 
@@ -347,11 +347,11 @@ impl TerrainBuilder {
         for vertex in vertices {
             let vertex = Self::add_to_surface(&mut surfaces, vertex);
 
-            if vertex.lock().unwrap().is_chunk_edge() {
+            if vertex.read().unwrap().is_chunk_edge() {
                 edge_buffer.push(vertex.clone());
             }
 
-            if vertex.lock().unwrap().surface() != TileSurfaceType::Water {
+            if vertex.read().unwrap().surface() != TileSurfaceType::Water {
                 ybuffer.add(vertex);
                 continue;
             }
@@ -366,7 +366,7 @@ impl TerrainBuilder {
             .iter()
             .flat_map(|(_, value)| value)
             .for_each(|vertex_ref| {
-                let mut vertex = vertex_ref.lock().unwrap();
+                let mut vertex = vertex_ref.write().unwrap();
 
                 let normal = normal_map
                     .get(&vertex.to_string())
@@ -386,9 +386,6 @@ impl TerrainBuilder {
         let mut mesh = ArrayMesh::new();
         let mut vertex_count = 0;
 
-        // all vertices are added to the y buffer and their surfaces
-        // we now have to merge the y positions in the y buffer
-        // and afterwards we can generate all the surfaces
         for (surface_type, surface) in surfaces {
             generator.clear();
             generator.begin(PrimitiveType::PRIMITIVE_TRIANGLES);

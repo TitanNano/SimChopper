@@ -1,6 +1,5 @@
 use std::fmt;
-use std::sync::Arc;
-use std::sync::Mutex;
+use std::sync::{Arc, RwLock};
 
 use godot::prelude::*;
 
@@ -353,10 +352,10 @@ impl SurfaceAssociated for Vertex {
     }
 }
 
-pub type VertexRef = Arc<Mutex<Vertex>>;
+pub type VertexRef = Arc<RwLock<Vertex>>;
 
 impl From<Vertex> for VertexRef {
     fn from(value: Vertex) -> Self {
-        Arc::new(Mutex::new(value))
+        Arc::new(RwLock::new(value))
     }
 }

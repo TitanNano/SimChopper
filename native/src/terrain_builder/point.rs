@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, RwLock};
 
 const MUTEX_LOCK_ERROR: &str = "mutex apears to be poisoned";
 
@@ -13,9 +13,9 @@ impl<V: DimensionX> DimensionX for Arc<V> {
     }
 }
 
-impl<V: DimensionX> DimensionX for Mutex<V> {
+impl<V: DimensionX> DimensionX for RwLock<V> {
     fn x(&self) -> f32 {
-        self.lock().expect(MUTEX_LOCK_ERROR).x()
+        self.read().expect(MUTEX_LOCK_ERROR).x()
     }
 }
 
@@ -30,9 +30,9 @@ impl<V: DimensionZ> DimensionZ for Arc<V> {
     }
 }
 
-impl<V: DimensionZ> DimensionZ for Mutex<V> {
+impl<V: DimensionZ> DimensionZ for RwLock<V> {
     fn z(&self) -> f32 {
-        self.lock().expect(MUTEX_LOCK_ERROR).z()
+        self.read().expect(MUTEX_LOCK_ERROR).z()
     }
 }
 
@@ -47,9 +47,9 @@ impl<V: DimensionY> DimensionY for Arc<V> {
     }
 }
 
-impl<V: DimensionY> DimensionY for Mutex<V> {
+impl<V: DimensionY> DimensionY for RwLock<V> {
     fn y(&self) -> f32 {
-        self.lock().expect(MUTEX_LOCK_ERROR).y()
+        self.read().expect(MUTEX_LOCK_ERROR).y()
     }
 }
 
@@ -67,21 +67,21 @@ where
     }
 }
 
-impl<V> SetDimensionY for &Mutex<V>
+impl<V> SetDimensionY for &RwLock<V>
 where
     for<'a> &'a mut V: SetDimensionY,
 {
     fn set_y(self, value: f32) {
-        self.lock().expect(MUTEX_LOCK_ERROR).set_y(value);
+        self.write().expect(MUTEX_LOCK_ERROR).set_y(value);
     }
 }
 
-impl<V> SetDimensionY for Mutex<V>
+impl<V> SetDimensionY for RwLock<V>
 where
     for<'a> &'a mut V: SetDimensionY,
 {
     fn set_y(self, value: f32) {
-        self.lock().expect(MUTEX_LOCK_ERROR).set_y(value);
+        self.write().expect(MUTEX_LOCK_ERROR).set_y(value);
     }
 }
 
@@ -97,8 +97,8 @@ impl<V: FixedPoint> FixedPoint for Arc<V> {
     }
 }
 
-impl<V: FixedPoint> FixedPoint for Mutex<V> {
+impl<V: FixedPoint> FixedPoint for RwLock<V> {
     fn is_fixed(&self) -> bool {
-        self.lock().expect(MUTEX_LOCK_ERROR).is_fixed()
+        self.read().expect(MUTEX_LOCK_ERROR).is_fixed()
     }
 }

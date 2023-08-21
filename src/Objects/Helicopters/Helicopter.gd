@@ -16,6 +16,8 @@ const Logger := preload("res://src/util/Logger.gd")
 @export var child_camera: Node3D
 @export var child_dust_particles: GPUParticles3D
 @export var child_rotor: Node3D
+@export var child_main_camera: Node3D
+@export var child_debug_camera: Node3D
 
 const MAX_TILT := 45.0 # degrees
 const ACCELERATION_TIME := 0.4 # amount of seconds to accelerate to top speed
@@ -30,6 +32,8 @@ var engine_speed := 0.0
 @onready var camera: CameraInterpolation = self.child_camera
 @onready var dust_particles: DustParticles = self.child_dust_particles
 @onready var rotor: Rotor = self.child_rotor
+@onready var main_camera: CameraInterpolation = self.child_main_camera
+@onready var debug_camera: CameraInterpolation = self.child_debug_camera
 
 
 # Called when the node enters the scene tree for the first time.
@@ -74,6 +78,10 @@ func _get_tilt(velocity: Vector3) -> Vector3:
 	var tilt := Vector3(deg_to_rad(tilt_x), 0, deg_to_rad(tilt_z))
 
 	return tilt
+
+func _process(delta):
+	if Input.is_action_just_pressed("debug_cam"):
+		self.switch_debug_camera()
 
 
 func _physics_process(_delta: float) -> void:
@@ -160,3 +168,10 @@ func bind_states(climb_strength: float):
 	self.child_engine_sound_tree.set("parameters/conditions/lift_off", self.engine_speed == 1)
 	self.child_engine_sound_tree.set("parameters/conditions/spin_down", self.engine_speed < 1 and climb_strength == 0)
 	self.child_engine_sound_tree.set("parameters/conditions/spin_up", self.engine_speed < 1 and climb_strength > 0)
+
+
+func switch_debug_camera():
+	if self.main_camera.active:
+		self.debug_camera.active = true
+	else:
+		self.main_camera.active = true

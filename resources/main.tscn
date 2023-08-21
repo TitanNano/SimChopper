@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://src/HUD/HUDController.gd" id="1"]
 [ext_resource type="Script" path="res://src/Objects/World/World.gd" id="3"]
+[ext_resource type="Script" path="res://src/ViewPort.gd" id="3_2c332"]
 [ext_resource type="Script" path="res://src/HUD/LoadingScreen.gd" id="4"]
 [ext_resource type="Script" path="res://src/Objects/World/ReflectionManager.gd" id="5"]
 [ext_resource type="Script" path="res://src/Objects/World/Backdrop.gd" id="6"]
@@ -71,16 +72,26 @@ audio_listener_enable_3d = true
 size = Vector2i(1152, 648)
 size_2d_override_stretch = true
 render_target_update_mode = 4
+script = ExtResource("3_2c332")
 
-[node name="Schweizer_300" parent="SubViewportContainer/SubViewport" node_paths=PackedStringArray("child_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
+[node name="Schweizer_300" parent="SubViewportContainer/SubViewport" node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)
-child_camera = NodePath("CameraInterpolation")
+child_camera = NodePath("MainCameraAnchor")
+child_main_camera = NodePath("MainCameraAnchor")
+child_debug_camera = NodePath("DebugCameraAnchor")
 
-[node name="CameraInterpolation" type="Marker3D" parent="SubViewportContainer/SubViewport/Schweizer_300"]
+[node name="MainCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/Schweizer_300"]
 process_mode = 3
 transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, 0, 5.669, 7.354)
 script = ExtResource("10")
-remote_path = NodePath("../../Camera")
+snap = true
+track_y_axis = true
+active = true
+
+[node name="DebugCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/Schweizer_300"]
+process_mode = 3
+transform = Transform3D(-0.0697565, 0.65051, -0.756287, 2.64427e-16, 0.758134, 0.652098, 0.997564, 0.0454881, -0.0528848, -34.7616, 32.649, -0.770037)
+script = ExtResource("10")
 
 [node name="World" type="Node3D" parent="SubViewportContainer/SubViewport"]
 script = ExtResource("3")

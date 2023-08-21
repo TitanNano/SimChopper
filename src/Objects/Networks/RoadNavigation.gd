@@ -1,4 +1,5 @@
 extends Node
+class_name RoadNavigation
 
 const Building := preload("res://src/Objects/Map/Building.gd")
 const Logger := preload("res://src/util/Logger.gd")
@@ -10,6 +11,7 @@ var network := {}
 var object_map := {}
 var node_map := {}
 var neighbor_cache := {}
+var type_query_cache := {}
 var rng: RandomNumberGenerator
 
 enum Corners {
@@ -47,6 +49,7 @@ func _ready() -> void:
 
 func insert_node(node: Building) -> void:
 	self.network[node.tile_coords()] = node
+	self.type_query_cache.clear()
 	self.neighbor_cache.clear()
 
 
@@ -85,10 +88,6 @@ func lookup_object(node: Building) -> Node3D:
 	return self.node_map[node]
 
 
-static func diagonal_offset(width: float) -> float:
-	return sqrt(pow(width, 2) + pow(width, 2)) / 8
-
-
 func get_global_transform(node: Building, direction := Vector3.ZERO) -> Transform3D:
 	var obj := self.lookup_object(node)
 	var trans := obj.global_transform
@@ -96,8 +95,6 @@ func get_global_transform(node: Building, direction := Vector3.ZERO) -> Transfor
 
 	var width: int = self.world_constants.tile_size
 	
-	@warning_ignore("unused_variable", "shadowed_variable")
-	var diagonal_offset := self.diagonal_offset(width)
 	var raw_angle := Vector3.FORWARD.signed_angle_to(direction, Vector3.UP)
 	var angle := int(snapped(rad_to_deg(raw_angle), 90))
 	var offset := (width / 4.0) * Vector3.RIGHT.rotated(Vector3.UP, angle)
@@ -156,6 +153,25 @@ func get_nearest_node(global_translation: Vector3) -> Building:
 		nearest = object
 
 	return self.lookup_node(nearest)
+
+
+func get_nodes_by_types(node_types: Array[int]) -> Array[Building]:
+	var result :Array[Building] = []
+	
+	if self.type_query_cache.has(node_types):
+		return self.type_query_cache[node_types]
+	
+	for any_node in self.network.values():
+		var node := any_node as Building
+	
+		if not node.building_id() in node_types:
+			continue
+		
+		result.push_back(node)
+		
+	self.type_query_cache[node_types] = result
+	
+	return result
 
 
 func has_arrived(location: Vector3, direction: Vector3, node: Building) -> bool:

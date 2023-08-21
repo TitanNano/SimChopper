@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cvh54xiw8586b"]
+[gd_scene load_steps=21 format=3 uid="uid://cvh54xiw8586b"]
 
 [ext_resource type="Script" path="res://src/HUD/HUDController.gd" id="1"]
 [ext_resource type="Script" path="res://src/Objects/World/World.gd" id="3"]
@@ -15,6 +15,7 @@
 [ext_resource type="Resource" path="res://resources/Data/world_constants.tres" id="15"]
 [ext_resource type="Script" path="res://src/Objects/World/Buildings.gd" id="16"]
 [ext_resource type="PackedScene" uid="uid://cmv7rt4gqew38" path="res://resources/Objects/Helis/schweizer_300.tscn" id="16_e6k8r"]
+[ext_resource type="Script" path="res://src/Objects/Vehicles/CarSpawnDirector.gd" id="16_icqnu"]
 [ext_resource type="Script" path="res://src/Objects/Networks/RoadNavigation.gd" id="17"]
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lhcij"]
@@ -128,6 +129,11 @@ world_constants = ExtResource("15")
 
 [node name="Backdrop" type="Node" parent="SubViewportContainer/SubViewport/World"]
 script = ExtResource("6")
+
+[node name="CarSpawnDirector" type="Node" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("node_camera", "node_road_network")]
+script = ExtResource("16_icqnu")
+node_camera = NodePath("../../Schweizer_300/MainCameraAnchor")
+node_road_network = NodePath("../Networks/Road")
 
 [node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport"]
 transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, -45.4393, 5.66891, 25.269)

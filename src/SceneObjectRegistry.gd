@@ -1,5 +1,10 @@
 extends Object
 
+enum BuildingIds {
+	ROAD_LEFT_RIGHT = 0x1D,
+	ROAD_TOP_BOTTOM = 0x1E,
+}
+
 const networks := {
 	# Powerlines
 	0x0E: "res://resources/Objects/Networks/Powerline/left_right.tscn",

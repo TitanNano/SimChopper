@@ -78,7 +78,7 @@ The game uses SimCity 2000 city files to generate its maps. The original city fi
   - Military Missions
 
 ## Building From Source
-The game is built with the [Godot Game Engine 3.4.4](https://github.com/godotengine/godot/tree/3.4.4-stable) and new builds can be exported with the engines own editor. The game relies on a GDNative module written in Rust. The native module has to be built from source before it can be used by the engine. See the [`/native` directory](./native) for detailed instructions.
+The game is built with the [Godot Game Engine 4.1.1](https://github.com/godotengine/godot/tree/4.1.1-stable) and new builds can be exported with the engines own editor. The game relies on a GDNative module written in Rust. The native module has to be built from source before it can be used by the engine. See the [`/native` directory](./native) for detailed instructions.
 
 ## Contributing
 Pull Requests should always reference existing issues. Please do not submit PRs which have no related issue. To suggest new features, not listed above, or discuss current features / implementations, please use the discussions Section of the repository.

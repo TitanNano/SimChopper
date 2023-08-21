@@ -1,5 +1,6 @@
 [configuration]
 entry_symbol = "gdext_rust_init"
+compatibility_minimum = 4.1
 
 [libraries]
 macos.arm64="res://native/target/aarch64-apple-darwin/release/libnative.dylib"

@@ -4,7 +4,7 @@ mod terrain_rotation;
 mod tile_surface;
 mod ybuffer;
 
-use godot::engine::mesh::{ArrayFormat, PrimitiveType};
+use godot::engine::mesh::PrimitiveType;
 use godot::engine::{ArrayMesh, Material, SurfaceTool};
 use godot::prelude::meta::VariantMetadata;
 use godot::prelude::*;
@@ -420,13 +420,7 @@ impl TerrainBuilder {
             let surface_arrays = generator.commit_to_arrays();
             let new_index = mesh.get_surface_count();
 
-            mesh.add_surface_from_arrays(
-                PrimitiveType::PRIMITIVE_TRIANGLES,
-                surface_arrays,
-                Array::<VariantArray>::new(),
-                Dictionary::new(),
-                ArrayFormat::ARRAY_COMPRESS_FLAGS_BASE, //COMPRESS_DEFAULT.into(),
-            );
+            mesh.add_surface_from_arrays(PrimitiveType::PRIMITIVE_TRIANGLES, surface_arrays);
 
             let surface_material_variant = context.materials.get(surface_type.to_string());
 

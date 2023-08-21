@@ -71,7 +71,7 @@ jobs:
     strategy:
       matrix:
         profile: ['macOS', 'Windows', 'Linux']
-        version: ['4.0.2']
+        version: ['4.1.1']
         include:
           - profile: 'macOS'
             platform: darwin

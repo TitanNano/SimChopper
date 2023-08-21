@@ -82,6 +82,10 @@ tracks/0/keys = {
 }
 tracks/0/use_blend = true
 
+[sub_resource type="Animation" id="Animation_0m301"]
+resource_name = "rotor_off"
+length = 0.001
+
 [sub_resource type="Animation" id="Animation_m74j3"]
 resource_name = "rotor"
 length = 5.0
@@ -102,10 +106,6 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0)
 }
 tracks/0/use_blend = true
-
-[sub_resource type="Animation" id="Animation_0m301"]
-resource_name = "rotor_off"
-length = 0.001
 
 [resource]
 _data = {

@@ -165,6 +165,8 @@ input_name = "vertex"
 
 [resource]
 code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx;
+
 uniform float Wave_Height;
 uniform vec4 Albedo : source_color;
 uniform float IOR;

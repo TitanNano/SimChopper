@@ -3,7 +3,6 @@ extends Node
 const TimeBudget := preload("res://src/util/TimeBudget.gd")
 const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
-const CarSpawner := preload("res://src/Objects/Spawner/CarSpawner.gd")
 const Building := preload("res://src/Objects/Map/Building.gd")
 const RoadNavigation := preload("res://src/Objects/Networks/RoadNavigation.gd")
 

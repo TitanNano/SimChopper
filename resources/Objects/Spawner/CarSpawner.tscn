@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://rup3fivpcq5r"]
+[gd_scene load_steps=4 format=3 uid="uid://blyermwgncstx"]
 
-[ext_resource type="Script" path="res://src/Objects/Spawner/CarSpawner.gd" id="1"]
+[ext_resource type="Script" path="res://native/scripts/src/spawner/car_spawner.rs" id="1_c5pws"]
 
 [sub_resource type="StandardMaterial3D" id="1"]
 albedo_color = Color(1, 0, 0, 1)
@@ -12,7 +12,8 @@ bottom_radius = 0.1
 height = 200.0
 
 [node name="CarSpawner" type="Marker3D"]
-script = ExtResource("1")
+script = ExtResource("1_c5pws")
+road_network_path = null
 
 [node name="CSGMesh3D" type="CSGMesh3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, 0)

@@ -23,7 +23,7 @@ jobs:
           - platform: windows
             os: windows-2019
             vendor: pc
-            env: '-msvc'
+            env: '-gnu'
             lib: native.dll
           - platform: darwin
             os: macos-11
@@ -62,7 +62,7 @@ jobs:
       if: inputs.release
       run: |
         cd native/
-        ${{ env.CARGO_BUILD}} ${{ env.TARGET_TRIPLET}} --release
+        ${{ env.CARGO_BUILD }} ${{ env.TARGET_TRIPLET}} --release
     - name: Artifacts
       uses: actions/upload-artifact@v3
       with:

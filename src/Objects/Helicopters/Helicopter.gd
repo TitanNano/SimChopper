@@ -1,6 +1,5 @@
 extends RigidBody3D
 
-const DustParticles := preload("res://src/Objects/Particles/DustParticles.gd")
 const Rotor := preload("res://src/Objects/Helicopters/Rotor.gd")
 const Logger := preload("res://src/util/Logger.gd")
 

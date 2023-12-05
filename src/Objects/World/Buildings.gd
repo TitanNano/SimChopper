@@ -7,7 +7,7 @@ const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 signal loading_progress(value)
 signal spawn_point_encountered(tile_coords, size, altitude)
 
-@export var world_constants: Resource
+@export var world_constants: WorldConstants
 
 var city_coords_feature: CityCoordsFeature
 
@@ -44,8 +44,8 @@ func build_async(city) -> void:
 	await self.get_tree().process_frame
 
 func _is_spawn_point(building: Dictionary, tiles: Dictionary) -> bool:
-	var x = building.tile_coords[0]
-	var y = building.tile_coords[1]
+	var x: int = building.tile_coords[0]
+	var y: int = building.tile_coords[1]
 
 	for index in range(x - 1, x + 3):
 		var tile: Dictionary = tiles[[index, y]]
@@ -74,11 +74,11 @@ func _is_spawn_point(building: Dictionary, tiles: Dictionary) -> bool:
 
 func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 	var budget := TimeBudget.new(0)
-	var tile: Dictionary = tiles[Array(building.tile_coords)]
+	var tile: Dictionary = tiles[building.get("tile_cords") as Array]
 	var building_size: int = building.size
 	@warning_ignore("shadowed_variable_base_class")
 	var name: String =  building.name
-	var object := SceneObjectRegistry.load_building(building.building_id)
+	var object := SceneObjectRegistry.load_building(building.get("building_id") as int)
 
 	if not object:
 		print("unknown building \"%s\"" % name)
@@ -91,8 +91,10 @@ func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 	budget.restart()
 	var instance: Node3D = object.instantiate()
 	var instance_time := budget.elapsed()
+	var tile_coords: Array[int] = building.get("tile_coords")
+	var altitude: int = tile.get("altitude")
 
-	var location := self.city_coords_feature.get_building_coords(building.tile_coords[0], building.tile_coords[1], tile.altitude, building_size)
+	var location := self.city_coords_feature.get_building_coords(tile_coords[0], tile_coords[1], altitude, building_size)
 
 	location.y += 0.1
 

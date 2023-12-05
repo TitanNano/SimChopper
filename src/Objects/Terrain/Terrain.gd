@@ -17,9 +17,13 @@ func _ready() -> void:
 func build_async(city: Dictionary):
 	var rotation := TerrainRotation.new()
 	var builder_factory := TerrainBuilderFactory.new()
-	var sea_level = city.simulator_settings["GlobalSeaLevel"]
+	var simulator_settings: Dictionary = city.get("simulator_settings")
+	var compass: int = simulator_settings.get("Compass")
+	var sea_level: int = simulator_settings.get("GlobalSeaLevel")
+	var tilelist: Dictionary = city.get("tilelist")
+	var city_size: int = city.get("city_size")
 
-	rotation.set_rotation(city.simulator_settings['Compass'])
+	rotation.set_rotation(compass)
 
 	# make function async
 	await get_tree().process_frame
@@ -29,9 +33,9 @@ func build_async(city: Dictionary):
 		"Water": ocean_material
 	}
 
-	var builder = builder_factory.create(city.tilelist, rotation, materials)
+	var builder = builder_factory.create(tilelist, rotation, materials)
 
-	builder.set_city_size(city.city_size)
+	builder.set_city_size(city_size)
 	builder.set_tile_size(self.world_constants.tile_size)
 	builder.set_tile_height(self.world_constants.tile_height)
 	builder.set_sea_level(sea_level)

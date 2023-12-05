@@ -10,7 +10,7 @@ enum Fields {
 
 const fields = [Fields.BYTE, Fields.BYTE_4, Fields.BYTE_4, Fields.BYTE_4]
 
-static func new() -> PackedByteArray:
+static func _new() -> PackedByteArray:
 	var instance := PackedByteArray()
 	
 	for field in fields:
@@ -64,7 +64,7 @@ static func surface(instance: PackedByteArray, value: int):
 
 
 static func from_vector(surface: int, vector: Vector3) -> PackedByteArray:
-	var inst = new()
+	var inst := _new()
 	
 	surface(inst, surface)
 	x(inst, vector.x)

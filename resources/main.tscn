@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cvh54xiw8586b"]
+[gd_scene load_steps=20 format=3 uid="uid://cvh54xiw8586b"]
 
 [ext_resource type="Script" path="res://src/HUD/HUDController.gd" id="1"]
 [ext_resource type="Script" path="res://src/Objects/World/World.gd" id="3"]
@@ -65,7 +65,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" node_paths=PackedStringArray("current_camera_controller")]
 handle_input_locally = false
 scaling_3d_mode = 1
 audio_listener_enable_3d = true
@@ -73,6 +73,7 @@ size = Vector2i(1152, 648)
 size_2d_override_stretch = true
 render_target_update_mode = 4
 script = ExtResource("3_2c332")
+current_camera_controller = NodePath("Schweizer_300/MainCameraAnchor")
 
 [node name="Schweizer_300" parent="SubViewportContainer/SubViewport" node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)

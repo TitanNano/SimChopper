@@ -39,8 +39,8 @@
 #     method
 
 static func encode(value: Variant) -> Dictionary:
-	var ctx = {error = OK, error_string = ""}
-	var buffer = StreamPeerBuffer.new()
+	var ctx := {error = OK, error_string = ""}
+	var buffer := StreamPeerBuffer.new()
 	buffer.big_endian = true
 
 	_encode(buffer, value, ctx)
@@ -85,30 +85,32 @@ static func _encode(buf: StreamPeerBuffer, value: Variant, ctx: Dictionary):
 				buf.put_u8(0xc2)
 
 		TYPE_INT:
-			if -(1 << 5) <= value and value <= (1 << 7) - 1:
+			var int_value: int = value
+			if -(1 << 5) <= int_value and int_value <= (1 << 7) - 1:
 				# fixnum (positive and negative)
-				buf.put_8(value)
+				buf.put_8(int_value)
 			elif -(1 << 7) <= value and value <= (1 << 7):
 				buf.put_u8(0xd0)
-				buf.put_8(value)
+				buf.put_8(int_value)
 			elif -(1 << 15) <= value and value <= (1 << 15):
 				buf.put_u8(0xd1)
-				buf.put_16(value)
+				buf.put_16(int_value)
 			elif -(1 << 31) <= value and value <= (1 << 31):
 				buf.put_u8(0xd2)
-				buf.put_32(value)
+				buf.put_32(int_value)
 			else:
 				buf.put_u8(0xd3)
-				buf.put_64(value)
+				buf.put_64(int_value)
 
 		TYPE_FLOAT:
+			var float_value: float = value
 			buf.put_u8(0xca)
-			buf.put_float(value)
+			buf.put_float(float_value)
 
 		TYPE_STRING:
-			var bytes = (value as String).to_utf8_buffer()
+			var bytes: PackedByteArray = (value as String).to_utf8_buffer()
+			var size := bytes.size()
 
-			var size = bytes.size()
 			if size <= (1 << 5) - 1:
 				# type fixstr [101XXXXX]
 				buf.put_u8(0xa0 | size)
@@ -131,7 +133,9 @@ static func _encode(buf: StreamPeerBuffer, value: Variant, ctx: Dictionary):
 			buf.put_data(bytes)
 
 		TYPE_PACKED_BYTE_ARRAY:
-			var size = (value as PackedByteArray).size()
+			var byte_array: PackedByteArray = value
+			var size := (byte_array).size()
+			
 			if size <= (1 << 8) - 1:
 				buf.put_u8(0xc4)
 				buf.put_u8(size)
@@ -145,10 +149,12 @@ static func _encode(buf: StreamPeerBuffer, value: Variant, ctx: Dictionary):
 				@warning_ignore("assert_always_false")
 				assert(false)
 
-			buf.put_data(value)
+			buf.put_data(byte_array)
 
 		TYPE_ARRAY:
-			var size = (value as Array).size()
+			var array_value: Array = value
+			var size := array_value.size()
+
 			if size <= 15:
 				# type fixarray [1001XXXX]
 				buf.put_u8(0x90 | size)
@@ -170,7 +176,9 @@ static func _encode(buf: StreamPeerBuffer, value: Variant, ctx: Dictionary):
 					return
 
 		TYPE_DICTIONARY:
-			var size = (value as Dictionary).size()
+			var dic_value: Dictionary = value
+			var size := dic_value.size()
+			
 			if size <= 15:
 				# type fixmap [1000XXXX]
 				buf.put_u8(0x80 | size)
@@ -204,7 +212,8 @@ static func _decode(buffer: StreamPeerBuffer, ctx: Dictionary) -> Variant:
 		ctx.error_string = "unexpected end of input"
 		return null
 
-	var head = buffer.get_u8()
+	var head := buffer.get_u8()
+
 	if head == 0xc0:
 		return null
 	elif head == 0xc2:
@@ -304,7 +313,8 @@ static func _decode(buffer: StreamPeerBuffer, ctx: Dictionary) -> Variant:
 
 	# String
 	elif (~head) & 0xa0 == 0:
-		var size = head & 0x1f
+		var size := head & 0x1f
+		
 		if buffer.get_size() - buffer.get_position() < size:
 			ctx.error = FAILED
 			ctx.error_string = "not enough buffer for fixstr required %s bytes" % [size]
@@ -317,7 +327,7 @@ static func _decode(buffer: StreamPeerBuffer, ctx: Dictionary) -> Variant:
 			ctx.error_string = "not enough buffer for str8 size"
 			return null
 
-		var size = buffer.get_u8()
+		var size := buffer.get_u8()
 		if buffer.get_size() - buffer.get_position() < size:
 			ctx.error = FAILED
 			ctx.error_string = "not enough buffer for str8 data required %s bytes" % [size]
@@ -330,7 +340,7 @@ static func _decode(buffer: StreamPeerBuffer, ctx: Dictionary) -> Variant:
 			ctx.error_string = "not enough buffer for str16 size"
 			return null
 
-		var size = buffer.get_u16()
+		var size := buffer.get_u16()
 		if buffer.get_size() - buffer.get_position() < size:
 			ctx.error = FAILED
 			ctx.error_string = "not enough buffer for str16 data required %s bytes" % [size]
@@ -343,7 +353,7 @@ static func _decode(buffer: StreamPeerBuffer, ctx: Dictionary) -> Variant:
 			ctx.error_string = "not enough buffer for str32 size"
 			return null
 
-		var size = buffer.get_u32()
+		var size := buffer.get_u32()
 		if buffer.get_size() - buffer.get_position() < size:
 			ctx.error = FAILED
 			ctx.error_string = "not enough buffer for str32 data required %s bytes" % [size]
@@ -358,7 +368,7 @@ static func _decode(buffer: StreamPeerBuffer, ctx: Dictionary) -> Variant:
 			ctx.error_string = "not enough buffer for bin8 size"
 			return null
 
-		var size = buffer.get_u8()
+		var size := buffer.get_u8()
 		if buffer.get_size() - buffer.get_position() < size:
 			ctx.error = FAILED
 			ctx.error_string = "not enough buffer for bin8 data required %s bytes" % [size]
@@ -373,7 +383,7 @@ static func _decode(buffer: StreamPeerBuffer, ctx: Dictionary) -> Variant:
 			ctx.error_string = "not enough buffer for bin16 size"
 			return null
 
-		var size = buffer.get_u16()
+		var size := buffer.get_u16()
 		if buffer.get_size() - buffer.get_position() < size:
 			ctx.error = FAILED
 			ctx.error_string = "not enough buffer for bin16 data required %s bytes" % [size]
@@ -388,7 +398,7 @@ static func _decode(buffer: StreamPeerBuffer, ctx: Dictionary) -> Variant:
 			ctx.error_string = "not enough buffer for bin32 size"
 			return null
 
-		var size = buffer.get_u32()
+		var size := buffer.get_u32()
 		if buffer.get_size() - buffer.get_position() < size:
 			ctx.error = FAILED
 			ctx.error_string = "not enough buffer for bin32 data required %s bytes" % [size]

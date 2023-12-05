@@ -99,7 +99,7 @@ func get_global_transform(node: Building, direction := Vector3.ZERO) -> Transfor
 	@warning_ignore("unused_variable", "shadowed_variable")
 	var diagonal_offset := self.diagonal_offset(width)
 	var raw_angle := Vector3.FORWARD.signed_angle_to(direction, Vector3.UP)
-	var angle := int(snapped(rad_to_deg(raw_angle), 90))
+	var angle := snappedi(rad_to_deg(raw_angle), 90)
 	var offset := (width / 4.0) * Vector3.RIGHT.rotated(Vector3.UP, angle)
 
 	# set diagonal offset for road courbes
@@ -144,7 +144,7 @@ func get_nearest_node(global_translation: Vector3) -> Building:
 	var distance := -1.0
 	var nearest: Node3D = null
 
-	for object in self.node_map.values():
+	for object in self.node_map.values() as Array[Node3D]:
 		var new := global_translation.distance_squared_to(object.global_transform.origin)
 
 		Logger.debug(["node distance to actor:", new])
@@ -220,7 +220,7 @@ func update_debug():
 
 	for tile_coords in self.network:
 		var node: Building = self.network[tile_coords]
-		var node_debug = CSGSphere3D.new()
+		var node_debug := CSGSphere3D.new()
 
 		node_debug.add_to_group("debug")
 		node_debug.global_transform = self.get_global_transform(node)
@@ -235,7 +235,7 @@ func update_debug():
 			var dis := node_pos.distance_to(con_pos)
 			var dir := node_pos.direction_to(con_pos)
 			var angle := Vector3.UP.angle_to(dir) * -1
-			var rotation_axis = dir.cross(Vector3.UP).normalized()
+			var rotation_axis := dir.cross(Vector3.UP).normalized()
 
 			con_debug.radius = 0.3
 			con_debug.height = dis / 2.0

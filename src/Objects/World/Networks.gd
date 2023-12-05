@@ -2,7 +2,6 @@ extends Node
 
 const TimeBudget := preload("res://src/util/TimeBudget.gd")
 const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
-const WorldConstants := preload("res://src/Objects/Data/WorldConstants.gd")
 const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
 const CarSpawner := preload("res://src/Objects/Spawner/CarSpawner.gd")
 const Building := preload("res://src/Objects/Map/Building.gd")
@@ -31,7 +30,7 @@ func build_async(city: Dictionary):
 	self.city_coords_feature = CityCoordsFeature.new(world_constants, sea_level)
 
 	for key in networks:
-		var network_section: Building = Building.new(networks[key])
+		var network_section: Building = Building.new(networks.get(key) as Dictionary)
 		var object := SceneObjectRegistry.load_network(network_section.building_id())
 		@warning_ignore("shadowed_variable_base_class")
 		var name: String = network_section.name()
@@ -43,7 +42,8 @@ func build_async(city: Dictionary):
 
 		var instance: Node3D = object.instantiate()
 		var tile: Dictionary = tiles[key]
-		var location := self.city_coords_feature.get_building_coords(network_section.tile_coords()[0], network_section.tile_coords()[1], tile.altitude, 1)
+		var altitude: int = tile.get("altitude")
+		var location := self.city_coords_feature.get_building_coords(network_section.tile_coords()[0], network_section.tile_coords()[1], altitude, 1)
 
 		# is a suspension / pylon bridge part or raised powerline
 		if network_section.building_id() in range(0x51, 0x5E):

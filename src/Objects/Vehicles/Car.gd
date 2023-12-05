@@ -80,25 +80,25 @@ func _physics_process(_delta: float) -> void:
 	var current_velocity := direction * self.velocity
 
 	# rotation
-	var angle_dir = (self.global_transform.origin * V3Util.XZ_PLANE).direction_to(target * V3Util.XZ_PLANE)
+	var angle_dir := (self.global_transform.origin * V3Util.XZ_PLANE).direction_to(target * V3Util.XZ_PLANE)
 	@warning_ignore("shadowed_variable")
-	var target_angle = Vector3.FORWARD.signed_angle_to(angle_dir, Vector3.UP)
+	var target_angle := Vector3.FORWARD.signed_angle_to(angle_dir, Vector3.UP)
 	var angle_offset := self.angular_offset(self.rotation.y, target_angle)
 
 	# ban 180 deg turns
-	if not self.new and abs(angle_offset) > deg_to_rad(100):
+	if not self.new and absf(angle_offset) > deg_to_rad(100):
 		Logger.debug(["attempted", rad_to_deg(angle_offset), "deg turn, blocked"])
 		self.safe_velocity = Vector3.ZERO
 		self._on_choose_target()
 		return
 
-	if abs(angle_offset) > deg_to_rad(5):
+	if absf(angle_offset) > deg_to_rad(5):
 		current_velocity *= 1
 
 	self.target_angle = target_angle
 	self.set_velocity(current_velocity)
 
-	if ProjectSettings.get_setting(CustomProjectSettings.DEBUG_SHAPES_ROAD_NAVIGATION_DISPLAY_VEHICLE_TARGET) \
+	if ProjectSettings.get_setting(CustomProjectSettings.DEBUG_SHAPES_ROAD_NAVIGATION_DISPLAY_VEHICLE_TARGET) as bool \
 		and debug_target.is_inside_tree():
 			debug_target.global_transform.origin = target
 

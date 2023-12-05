@@ -14,7 +14,7 @@ func _init(world_constants: WorldConstants, sea_level: int):
 func get_world_coords(x: int, y: int, z: int) -> Vector3:
 	return Vector3(
 		(x * self.world_constants.tile_size),
-		max(z, self.sea_level - 1) * self.world_constants.tile_height,
+		maxf(z, self.sea_level - 1) * self.world_constants.tile_height,
 		(y * self.world_constants.tile_size)
 	)
 

@@ -12,7 +12,7 @@ var _total_job_count := 0
 var _mutex = Mutex.new()
 var _results = []
 
-func _collect_thread(thread_results):
+func _collect_thread(thread_results: Array):
 	self._mutex.lock()
 	self._completed_workers += 1
 	self._results.append_array(thread_results)
@@ -42,7 +42,7 @@ func _init(runner: SceneTree,executor: Callable):
 
 func fill(jobs: Array):
 	var cursor := 0
-	var size := int(ceil(jobs.size() / float(self.pool.size())))
+	var size := int(ceilf(jobs.size() / float(self.pool.size())))
 	
 	self._total_job_count += jobs.size()
 	

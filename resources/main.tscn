@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://src/HUD/LoadingScreen.gd" id="4"]
 [ext_resource type="Script" path="res://src/Objects/World/ReflectionManager.gd" id="5"]
 [ext_resource type="Script" path="res://src/Objects/World/Backdrop.gd" id="6"]
-[ext_resource type="PackedScene" path="res://resources/Objects/Buildings/hangar_2.tscn" id="7"]
+[ext_resource type="PackedScene" uid="uid://csuvlu656dwm4" path="res://resources/Objects/Buildings/hangar_2.tscn" id="7"]
 [ext_resource type="Environment" uid="uid://bl607wqoa882d" path="res://resources/Environments/WorldEnv.tres" id="8"]
 [ext_resource type="Script" path="res://src/Objects/Camera/CameraInterpolation.gd" id="10"]
 [ext_resource type="Script" path="res://src/Objects/Terrain/Terrain.gd" id="11"]
@@ -87,7 +87,6 @@ transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, 
 script = ExtResource("10")
 snap = true
 track_y_axis = true
-active = true
 
 [node name="DebugCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/Schweizer_300"]
 process_mode = 3

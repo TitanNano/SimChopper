@@ -1,7 +1,5 @@
 extends Node
 
-const WorldConstants := preload("res://src/Objects/Data/WorldConstants.gd")
-
 const build_progress_steps := 0
 
 signal build_progress(steps)

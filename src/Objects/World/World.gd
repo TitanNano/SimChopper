@@ -55,7 +55,7 @@ func _on_child_progress(progress: int) -> void:
 	self.loading_progress.emit(progress)
 
 
-func _on_spawn_point_encountered(tile_coords: Array, size: int, altitude: int) -> void:
+func _on_spawn_point_encountered(tile_coords: Array[int], size: int, altitude: int) -> void:
 	self._insert_spawn_point(tile_coords, size, altitude)
 
 

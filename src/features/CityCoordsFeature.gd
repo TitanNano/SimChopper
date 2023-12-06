@@ -1,7 +1,5 @@
 extends RefCounted
 
-const WorldConstants := preload("res://src/Objects/Data/WorldConstants.gd")
-
 var world_constants: WorldConstants
 var sea_level: int
 

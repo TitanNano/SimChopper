@@ -26,23 +26,23 @@ static func level_to_string(level: int) -> String:
 		_: return "INVALID_LOG_LEVEL"
 
 
-static func error(message) -> void:
+static func error(message: Variant) -> void:
 	_log(message, Level.ERROR, 1)
 
 
-static func warning(message) -> void:
+static func warning(message: Variant) -> void:
 	_log(message, Level.WARNING, 1)
 
 
-static func info(message) -> void:
+static func info(message: Variant) -> void:
 	_log(message, Level.INFO, 1)
 
 
-static func debug(message) -> void:
+static func debug(message: Variant) -> void:
 	_log(message, Level.DEBUG, 1)
 
 
-static func _log(message, level: int, skip_stack := 0) -> void:
+static func _log(message: Variant, level: int, skip_stack := 0) -> void:
 	var stack := get_stack()
 
 	for i in range(skip_stack + 1):
@@ -64,7 +64,7 @@ static func _log(message, level: int, skip_stack := 0) -> void:
 			"fun": fun,
 		})
 
-	var max_level := (LEVEL_FILTER_MAP[target] as int) if target in LEVEL_FILTER_MAP else LEVEL_FILTER
+	var max_level := (LEVEL_FILTER_MAP.get(target) as int) if target in LEVEL_FILTER_MAP else LEVEL_FILTER
 
 	if level > max_level:
 		return
@@ -77,7 +77,7 @@ static func _log(message, level: int, skip_stack := 0) -> void:
 	var milliseconds := time % 1000
 
 	if typeof(message) == TYPE_ARRAY:
-		message = " ".join(PackedStringArray(message))
+		message = " ".join(PackedStringArray(message as Array))
 
 	var logline = "[{min}:{sec}:{msec}] [{level}] [{target}] {msg}".format({
 		"target": target,

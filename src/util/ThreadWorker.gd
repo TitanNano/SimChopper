@@ -49,7 +49,7 @@ func _thread_root():
 			return
 
 
-func push(job_list):
+func push(job_list: Array):
 	self._mutex.lock()
 	self._jobs.append_array(job_list)
 	self._mutex.unlock()

@@ -1564,10 +1564,10 @@ shape = SubResource("180")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.53889, 0, 3.25)
 shape = SubResource("181")
 
-[node name="tree001" parent="." index="182"]
+[node name="tree_001" parent="." index="182"]
 surface_material_override/0 = ExtResource("2")
 
-[node name="leaves001" parent="tree001" index="0"]
+[node name="leaves_001" parent="tree_001" index="0"]
 surface_material_override/0 = ExtResource("1")
 
 [node name="CollisionShape276" type="CollisionShape3D" parent="." index="183"]

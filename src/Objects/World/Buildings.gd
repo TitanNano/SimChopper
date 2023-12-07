@@ -7,7 +7,7 @@ const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 signal loading_progress(value)
 signal spawn_point_encountered(tile_coords, size, altitude)
 
-@export var world_constants: Resource
+@export var world_constants: WorldConstants
 
 var city_coords_feature: CityCoordsFeature
 
@@ -44,8 +44,8 @@ func build_async(city) -> void:
 	await self.get_tree().process_frame
 
 func _is_spawn_point(building: Dictionary, tiles: Dictionary) -> bool:
-	var x = building.tile_coords[0]
-	var y = building.tile_coords[1]
+	var x: int = building.tile_coords[0]
+	var y: int = building.tile_coords[1]
 
 	for index in range(x - 1, x + 3):
 		var tile: Dictionary = tiles[[index, y]]
@@ -74,11 +74,11 @@ func _is_spawn_point(building: Dictionary, tiles: Dictionary) -> bool:
 
 func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 	var budget := TimeBudget.new(0)
-	var tile: Dictionary = tiles[Array(building.tile_coords)]
+	var tile: Dictionary = tiles[building.get("tile_coords") as Array]
 	var building_size: int = building.size
 	@warning_ignore("shadowed_variable_base_class")
 	var name: String =  building.name
-	var object := SceneObjectRegistry.load_building(building.building_id)
+	var object := SceneObjectRegistry.load_building(building.get("building_id") as int)
 
 	if not object:
 		print("unknown building \"%s\"" % name)
@@ -86,13 +86,15 @@ func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 
 	if building.building_id == 0xE6 and self._is_spawn_point(building, tiles):
 		self._insert_building({ "building_id": 0xF6, "tile_coords": building.tile_coords, "name": "Hangar", "size": 2 }, tiles)
-		self.emit_signal("spawn_point_encountered", building.tile_coords, 2, tile.altitude)
+		self.spawn_point_encountered.emit(to_int_array(building.get("tile_coords") as Array), 2, tile.altitude)
 
 	budget.restart()
 	var instance: Node3D = object.instantiate()
 	var instance_time := budget.elapsed()
+	var tile_coords: Array[int] = to_int_array(building.get("tile_coords") as Array)
+	var altitude: int = tile.get("altitude")
 
-	var location := self.city_coords_feature.get_building_coords(building.tile_coords[0], building.tile_coords[1], tile.altitude, building_size)
+	var location := self.city_coords_feature.get_building_coords(tile_coords[0], tile_coords[1], altitude, building_size)
 
 	location.y += 0.1
 
@@ -119,3 +121,12 @@ func _insert_building(building: Dictionary, tiles: Dictionary) -> void:
 
 	if insert_time > 100:
 		printerr("\"%s\" is very slow to insert" % building.name)
+
+
+static func to_int_array(list: Array) -> Array[int]:
+	var result: Array[int] = []
+
+	for item in list:
+		result.push_back(item)
+		
+	return result

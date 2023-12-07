@@ -1,7 +1,6 @@
 extends RigidBody3D
 
 const DustParticles := preload("res://src/Objects/Particles/DustParticles.gd")
-const CameraInterpolation := preload("res://src/Objects/Camera/CameraInterpolation.gd")
 const Rotor := preload("res://src/Objects/Helicopters/Rotor.gd")
 const Logger := preload("res://src/util/Logger.gd")
 
@@ -49,10 +48,8 @@ func _get_top_rotation(delta: float) -> float:
 
 
 func _update_directional_velocity(direction: Vector3, state: PhysicsDirectBodyState3D) -> Vector3:
-	var acceleration := DIRECTIONAL_ACCELERATION #* delta
-	var y_velocity := Vector3.UP * state.linear_velocity
-
-	var target_velocity = (direction * CRUISE_SPEED_MS) #+ y_velocity
+	var acceleration := DIRECTIONAL_ACCELERATION
+	var target_velocity := (direction * CRUISE_SPEED_MS)
 
 	return state.linear_velocity.move_toward(target_velocity, acceleration)
 
@@ -73,13 +70,13 @@ func _update_rotational_velocity(direction: float, delta: float) -> float:
 func _get_tilt(velocity: Vector3) -> Vector3:
 	var top_speed := self._get_top_speed(1)
 	var direction := velocity.rotated(Vector3.UP, -self.rotation.y) # revert rotation
-	var tilt_z = MAX_TILT * (-direction.x / top_speed)
-	var tilt_x = MAX_TILT * (direction.z / top_speed)
+	var tilt_z := MAX_TILT * (-direction.x / top_speed)
+	var tilt_x := MAX_TILT * (direction.z / top_speed)
 	var tilt := Vector3(deg_to_rad(tilt_x), 0, deg_to_rad(tilt_z))
 
 	return tilt
 
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_just_pressed("debug_cam"):
 		self.switch_debug_camera()
 

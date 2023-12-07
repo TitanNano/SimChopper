@@ -55,7 +55,7 @@ func _on_child_progress(progress: int) -> void:
 	self.loading_progress.emit(progress)
 
 
-func _on_spawn_point_encountered(tile_coords: Array, size: int, altitude: int) -> void:
+func _on_spawn_point_encountered(tile_coords: Array[int], size: int, altitude: int) -> void:
 	self._insert_spawn_point(tile_coords, size, altitude)
 
 
@@ -63,10 +63,12 @@ func _load_map_async(city: Dictionary):
 	await self.terrain.build_async(city)
 	await self.networks.build_async(city)
 	await self.buildings.build_async(city)
+	
+	var city_size: int = city.get("city_size")
 
-	self._setup_probing(city.city_size)
+	self._setup_probing(city_size)
 	self.backdrop.build(
-		city.city_size,
+		city_size,
 		self.world_constants.tile_size,
 		self.sea_level * self.world_constants.tile_height
 	)
@@ -78,8 +80,8 @@ func _load_map_async(city: Dictionary):
 
 
 func _create_snapshot() -> void:
-	var packed_scene = PackedScene.new()
-	var file_name = "{year}-{month}-{day}-{hour}-{minute}-{second}.tscn".format(Time.get_datetime_dict_from_system())
+	var packed_scene := PackedScene.new()
+	var file_name := "{year}-{month}-{day}-{hour}-{minute}-{second}.tscn".format(Time.get_datetime_dict_from_system())
 	packed_scene.pack(get_tree().get_current_scene())
 	var result := ResourceSaver.save(packed_scene, "res://snapshots/%s" % file_name)
 
@@ -97,7 +99,7 @@ func _spawn_player() -> void:
 	player.snap_camera()
 
 
-func _insert_spawn_point(building_coords: Array, building_size: int, altitude: int) -> void:
+func _insert_spawn_point(building_coords: Array[int], building_size: int, altitude: int) -> void:
 	print("SPAWN POINT AT {point}".format({ "point": building_coords }))
 	var spawn_host_scene := preload("res://resources/Objects/spawn_host.tscn")
 	var spawn_host: Node3D = spawn_host_scene.instantiate()

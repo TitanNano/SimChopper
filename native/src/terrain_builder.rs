@@ -222,10 +222,7 @@ impl TerrainBuilder {
         let surface = vertex.surface();
         let cell = VertexRef::from(vertex);
 
-        surfaces
-            .entry(surface)
-            .or_insert_with(Vec::new)
-            .push(Arc::clone(&cell));
+        surfaces.entry(surface).or_default().push(Arc::clone(&cell));
 
         cell
     }

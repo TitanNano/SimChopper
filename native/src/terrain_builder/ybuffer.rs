@@ -42,7 +42,7 @@ impl<V: 'static + DimensionX + DimensionZ + DimensionY + FixedPoint + SetDimensi
     fn add(&mut self, value: V) {
         let xz = (value.x().round() as usize, value.z().round() as usize);
 
-        self.entry(xz).or_insert_with(Vec::new).push(value);
+        self.entry(xz).or_default().push(value);
     }
 
     fn new() -> Self {

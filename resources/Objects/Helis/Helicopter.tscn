@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dl34exjsm3sq4"]
+[gd_scene load_steps=8 format=3 uid="uid://dl34exjsm3sq4"]
 
 [ext_resource type="Material" uid="uid://cjoloelf8ku4k" path="res://resources/Materials/dust_material.tres" id="1"]
 [ext_resource type="Script" path="res://src/Objects/Helicopters/Helicopter.gd" id="3"]
@@ -13,14 +13,12 @@ bounce = 0.7
 [sub_resource type="QuadMesh" id="9"]
 material = ExtResource("1")
 
-[sub_resource type="AnimationNodeStateMachinePlayback" id="AnimationNodeStateMachinePlayback_l5cl2"]
-
 [node name="Helicopter" type="RigidBody3D" node_paths=PackedStringArray("child_engine_sound_tree", "child_dust_particles")]
 mass = 929.8
 physics_material_override = SubResource("20")
-continuous_cd = true
 sleeping = true
 can_sleep = false
+continuous_cd = true
 script = ExtResource("3")
 child_engine_sound_tree = NodePath("RotorAudioTree")
 child_dust_particles = NodePath("Dust")
@@ -41,11 +39,13 @@ draw_pass_1 = SubResource("9")
 script = ExtResource("12")
 
 [node name="RotorAudioTree" type="AnimationTree" parent="."]
+root_node = NodePath(".")
+libraries = {
+"": ExtResource("5_ayahk")
+}
 tree_root = ExtResource("4_8iee2")
-anim_player = NodePath("../RotorAudioPlayer")
 advance_expression_base_node = NodePath("")
-active = true
-parameters/playback = SubResource("AnimationNodeStateMachinePlayback_l5cl2")
+anim_player = NodePath("../RotorAudioPlayer")
 parameters/conditions/engine_off = false
 parameters/conditions/lift_off = false
 parameters/conditions/spin_down = false

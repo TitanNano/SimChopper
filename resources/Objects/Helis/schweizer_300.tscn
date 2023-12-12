@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cmv7rt4gqew38"]
+[gd_scene load_steps=17 format=3 uid="uid://cmv7rt4gqew38"]
 
 [ext_resource type="PackedScene" uid="uid://dl34exjsm3sq4" path="res://resources/Objects/Helis/Helicopter.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://b0ln8n5f4i7ks" path="res://resources/Meshes/Helis/schweizer_300/main.glb" id="2"]
@@ -7,8 +7,6 @@
 [ext_resource type="Material" uid="uid://ckkpoyyglqm80" path="res://resources/Particles/Rotor/rotor_dust_particles_schweizer.tres" id="6"]
 [ext_resource type="Material" uid="uid://ckwvw4rptthjv" path="res://resources/Materials/rotor_material.tres" id="6_y4h4o"]
 [ext_resource type="Script" path="res://src/Objects/Helicopters/Rotor.gd" id="7"]
-
-[sub_resource type="AnimationNodeStateMachinePlayback" id="AnimationNodeStateMachinePlayback_2hrxt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5whq0"]
 resource_name = "matcolour-80"
@@ -68,9 +66,6 @@ child_rotor = NodePath("rotor")
 
 [node name="Dust" parent="." index="1"]
 process_material = ExtResource("6")
-
-[node name="RotorAudioTree" parent="." index="2"]
-parameters/playback = SubResource("AnimationNodeStateMachinePlayback_2hrxt")
 
 [node name="main" parent="." index="3" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.00369608)

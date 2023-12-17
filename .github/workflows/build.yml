@@ -73,7 +73,7 @@ jobs:
     strategy:
       matrix:
         profile: ['macOS', 'Windows', 'Linux']
-        version: ['4.2']
+        version: ['4.2.1']
         include:
           - profile: 'macOS'
             platform: darwin
@@ -107,6 +107,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     env:
+      EXPORT_DIR: build/${{ matrix.profile }}
       EXPORT_ARGS: ${{ matrix.profile }} build/${{ matrix.profile }}/SimChopper${{ matrix.extension }}
 
     steps:
@@ -115,7 +116,7 @@ jobs:
       - name: setup Godot
         uses: lihop/setup-godot@4aad9daa7dd81c11329c4b54fdc26dbd39eea7d6
         with:
-          version: ${{ matrix.version }}-stable
+          version: ${{ matrix.version }}
           export-templates: false
       - name: download Godot export template
         run: |
@@ -123,6 +124,12 @@ jobs:
           cd ${{ matrix.template_dir }}/${{ matrix.version }}.stable
           curl -LO https://github.com/godotengine/godot/releases/download/${{ matrix.version }}-stable/Godot_v${{ matrix.version }}-stable_export_templates.tpz
           unzip -j Godot_v${{ matrix.version }}-stable_export_templates.tpz
+      - name: download host libs
+        if: ${{ matrix.platform != 'linux' && startsWith(matrix.os, 'ubuntu') }}
+        uses: actions/download-artifact@v3
+        with:
+          name: libnative-linux-x86_64
+          path: native/target/x86_64-unknown-linux-gnu/release/
       - name: download x86_64 libs
         if: matrix.x86_64
         uses: actions/download-artifact@v3
@@ -146,17 +153,19 @@ jobs:
       - name: export-debug
         if: ${{ !inputs.release }}
         run: |
-          mkdir -p "build/${{ matrix.profile}}"
+          mkdir -p "${{ env.EXPORT_DIR }}"
           godot --headless --export-debug ${{ env.EXPORT_ARGS }}
+          test $(ls -al "${{ env.EXPORT_DIR }}" | wc -l) -gt 1
       - name: export-release
         if: inputs.release
         run: |
-          mkdir -p "build/${{ matrix.profile}}"
+          mkdir -p "${{ env.EXPORT_DIR }}"
           godot --headless --export-release ${{ env.EXPORT_ARGS }}
+          test $(ls -al "${{ env.EXPORT_DIR }}" | wc -l) -gt 1
       - name: describe revision
         id: describe
-        run: echo "::set-output name=ref::$(git describe --tags --always)"
+        run: echo "ref=$(git describe --tags --always)" >> $GITHUB_OUTPUT
       - uses: actions/upload-artifact@v2
         with:
           name: SimChopper_${{ matrix.profile }}_${{ steps.describe.outputs.ref }}
-          path: build/${{ matrix.profile }}
+          path: ${{ env.EXPORT_DIR }}

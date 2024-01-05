@@ -1,17 +1,17 @@
 [gd_scene load_steps=8 format=3 uid="uid://dl34exjsm3sq4"]
 
-[ext_resource type="Material" uid="uid://cjoloelf8ku4k" path="res://resources/Materials/dust_material.tres" id="1"]
+[ext_resource type="Material" uid="uid://cjoloelf8ku4k" path="res://resources/Materials/dust_material.tres" id="2_8yiqd"]
+[ext_resource type="Script" path="res://native/src/scripts/particles/dust_particles.rs" id="2_ocmjg"]
 [ext_resource type="Script" path="res://src/Objects/Helicopters/Helicopter.gd" id="3"]
 [ext_resource type="AnimationNodeStateMachine" uid="uid://xbcrg5mghpup" path="res://resources/Animations/HelicopterRotorSoundStates.tres" id="4_8iee2"]
 [ext_resource type="AnimationLibrary" uid="uid://uec74t4jqdxi" path="res://resources/Animations/Helicopter.tres" id="5_ayahk"]
-[ext_resource type="Script" path="res://src/Objects/Particles/DustParticles.gd" id="12"]
 
 [sub_resource type="PhysicsMaterial" id="20"]
 friction = 0.5
 bounce = 0.7
 
-[sub_resource type="QuadMesh" id="9"]
-material = ExtResource("1")
+[sub_resource type="QuadMesh" id="QuadMesh_e0n42"]
+material = ExtResource("2_8yiqd")
 
 [node name="Helicopter" type="RigidBody3D" node_paths=PackedStringArray("child_engine_sound_tree", "child_dust_particles")]
 mass = 929.8
@@ -35,14 +35,12 @@ amount = 100
 lifetime = 0.4
 visibility_aabb = AABB(-8.76025, -1.34854, -8.13392, 17.451, 2.29104, 17.5903)
 draw_order = 2
-draw_pass_1 = SubResource("9")
-script = ExtResource("12")
+draw_pass_1 = SubResource("QuadMesh_e0n42")
+script = ExtResource("2_ocmjg")
+strength = null
 
 [node name="RotorAudioTree" type="AnimationTree" parent="."]
 root_node = NodePath(".")
-libraries = {
-"": ExtResource("5_ayahk")
-}
 tree_root = ExtResource("4_8iee2")
 advance_expression_base_node = NodePath("")
 anim_player = NodePath("../RotorAudioPlayer")

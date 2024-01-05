@@ -115,6 +115,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "const-str"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aca749d3d3f5b87a0d6100509879f9cf486ab510803a4a4e1001da1ff61c2bd6"
+
+[[package]]
 name = "const_panic"
 version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -243,6 +249,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "gensym"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "913dce4c5f06c2ea40fc178c06f777ac89fc6b1383e90c254fafb1abe4ba3c82"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
+ "uuid",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -268,7 +286,7 @@ checksum = "8e4afd9ad95555081e109fe1d21f2a30c691b5f0919c67dfa690a2e1eb6bd51c"
 [[package]]
 name = "godot"
 version = "0.1.0"
-source = "git+https://github.com/titannano/gdext?rev=a5d17342b7b47e8af652a6a733f497c468bbd59a#a5d17342b7b47e8af652a6a733f497c468bbd59a"
+source = "git+https://github.com/titannano/gdext?rev=4ce4714#4ce4714b8871bf75e95d03401e44e3f1ccbdd7df"
 dependencies = [
  "godot-core",
  "godot-macros",
@@ -277,7 +295,7 @@ dependencies = [
 [[package]]
 name = "godot-bindings"
 version = "0.1.0"
-source = "git+https://github.com/titannano/gdext?rev=a5d17342b7b47e8af652a6a733f497c468bbd59a#a5d17342b7b47e8af652a6a733f497c468bbd59a"
+source = "git+https://github.com/titannano/gdext?rev=4ce4714#4ce4714b8871bf75e95d03401e44e3f1ccbdd7df"
 dependencies = [
  "godot4-prebuilt",
 ]
@@ -285,7 +303,7 @@ dependencies = [
 [[package]]
 name = "godot-codegen"
 version = "0.1.0"
-source = "git+https://github.com/titannano/gdext?rev=a5d17342b7b47e8af652a6a733f497c468bbd59a#a5d17342b7b47e8af652a6a733f497c468bbd59a"
+source = "git+https://github.com/titannano/gdext?rev=4ce4714#4ce4714b8871bf75e95d03401e44e3f1ccbdd7df"
 dependencies = [
  "godot-bindings",
  "godot-fmt",
@@ -299,7 +317,7 @@ dependencies = [
 [[package]]
 name = "godot-core"
 version = "0.1.0"
-source = "git+https://github.com/titannano/gdext?rev=a5d17342b7b47e8af652a6a733f497c468bbd59a#a5d17342b7b47e8af652a6a733f497c468bbd59a"
+source = "git+https://github.com/titannano/gdext?rev=4ce4714#4ce4714b8871bf75e95d03401e44e3f1ccbdd7df"
 dependencies = [
  "glam",
  "godot-bindings",
@@ -310,8 +328,9 @@ dependencies = [
 [[package]]
 name = "godot-ffi"
 version = "0.1.0"
-source = "git+https://github.com/titannano/gdext?rev=a5d17342b7b47e8af652a6a733f497c468bbd59a#a5d17342b7b47e8af652a6a733f497c468bbd59a"
+source = "git+https://github.com/titannano/gdext?rev=4ce4714#4ce4714b8871bf75e95d03401e44e3f1ccbdd7df"
 dependencies = [
+ "gensym",
  "godot-bindings",
  "godot-codegen",
  "paste",
@@ -320,7 +339,7 @@ dependencies = [
 [[package]]
 name = "godot-fmt"
 version = "0.1.0"
-source = "git+https://github.com/titannano/gdext?rev=a5d17342b7b47e8af652a6a733f497c468bbd59a#a5d17342b7b47e8af652a6a733f497c468bbd59a"
+source = "git+https://github.com/titannano/gdext?rev=4ce4714#4ce4714b8871bf75e95d03401e44e3f1ccbdd7df"
 dependencies = [
  "proc-macro2",
 ]
@@ -328,7 +347,7 @@ dependencies = [
 [[package]]
 name = "godot-macros"
 version = "0.1.0"
-source = "git+https://github.com/titannano/gdext?rev=a5d17342b7b47e8af652a6a733f497c468bbd59a#a5d17342b7b47e8af652a6a733f497c468bbd59a"
+source = "git+https://github.com/titannano/gdext?rev=4ce4714#4ce4714b8871bf75e95d03401e44e3f1ccbdd7df"
 dependencies = [
  "godot-bindings",
  "proc-macro2",
@@ -339,20 +358,21 @@ dependencies = [
 [[package]]
 name = "godot-rust-script"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=928159e6f6a73a249d5504ca6c136809b5ed07c0#928159e6f6a73a249d5504ca6c136809b5ed07c0"
+source = "git+https://github.com/titannano/godot-rust-script?rev=a2a5c018fcf0247f1d242ec2bf8a994cc975c1ee#a2a5c018fcf0247f1d242ec2bf8a994cc975c1ee"
 dependencies = [
  "abi_stable",
- "cfg-if",
+ "const-str",
  "godot",
  "godot-rust-script-derive",
  "itertools",
+ "once_cell",
  "rand",
 ]
 
 [[package]]
 name = "godot-rust-script-derive"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=928159e6f6a73a249d5504ca6c136809b5ed07c0#928159e6f6a73a249d5504ca6c136809b5ed07c0"
+source = "git+https://github.com/titannano/godot-rust-script?rev=a2a5c018fcf0247f1d242ec2bf8a994cc975c1ee#a2a5c018fcf0247f1d242ec2bf8a994cc975c1ee"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -363,7 +383,7 @@ dependencies = [
 [[package]]
 name = "godot4-prebuilt"
 version = "0.0.0"
-source = "git+https://github.com/godot-rust/godot4-prebuilt?branch=4.1.1#fca6897dbfb1a2d9387f81491acd77f6f091b8c4"
+source = "git+https://github.com/godot-rust/godot4-prebuilt?branch=4.2#9e60296be502e294dde3f245971f2868ce553677"
 
 [[package]]
 name = "hashbrown"
@@ -479,18 +499,18 @@ dependencies = [
 
 [[package]]
 name = "nanoserde"
-version = "0.1.32"
+version = "0.1.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "755e7965536bc54d7c9fba2df5ada5bf835b0443fd613f0a53fa199a301839d3"
+checksum = "4a983d0b19ed0fcd803c4f04f9b20d5e6dd17e06d44d98742a0985ac45dab1bc"
 dependencies = [
  "nanoserde-derive",
 ]
 
 [[package]]
 name = "nanoserde-derive"
-version = "0.1.19"
+version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed7a94da6c6181c35d043fc61c43ac96d3a5d739e7b8027f77650ba41504d6ab"
+checksum = "d4dc96541767a4279572fdcf9f95af9cc1c9b2a2254e7a079203c81e206a9059"
 
 [[package]]
 name = "native"
@@ -502,8 +522,8 @@ dependencies = [
  "itertools",
  "lerp",
  "num",
+ "num_enum",
  "rayon",
- "scripts",
 ]
 
 [[package]]
@@ -621,6 +641,12 @@ checksum = "67ac1d3f9a1d3616fd9a60c8d74296f22406a238b6a72f5cc1e6f314df4ffbf9"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "once_cell"
+version = "1.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
 
 [[package]]
 name = "parking_lot"
@@ -793,15 +819,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
-name = "scripts"
-version = "0.1.0"
-dependencies = [
- "backtrace",
- "godot-rust-script",
- "num_enum",
-]
-
-[[package]]
 name = "semver"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -904,6 +921,15 @@ name = "unicode-ident"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84a22b9f218b40614adcb3f4ff08b703773ad44fa9423e4e0d346d5db86e4ebc"
+
+[[package]]
+name = "uuid"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e395fcf16a7a3d8127ec99782007af141946b4795001f876d54fb0d55978560"
+dependencies = [
+ "getrandom",
+]
 
 [[package]]
 name = "venial"

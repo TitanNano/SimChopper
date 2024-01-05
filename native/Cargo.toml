@@ -1,13 +1,3 @@
-[workspace]
-resolver = "2"
-
-members = [
-  "scripts",
-]
-
-[workspace.dependencies]
-godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "928159e6f6a73a249d5504ca6c136809b5ed07c0", default-features = false }
-
 [package]
 name = "native"
 version = "0.4.0"
@@ -17,11 +7,12 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = { git = "https://github.com/titannano/gdext", rev = "a5d17342b7b47e8af652a6a733f497c468bbd59a" }
+godot = { git = "https://github.com/titannano/gdext", rev = "4ce4714" }
 lerp = "0.4.0"
 backtrace = "0.3.64"
 num = "0.4.0"
 rayon = "1.5.1"
 itertools = "0.10.3"
-godot-rust-script = { workspace = true, features = ["runtime"] }
-scripts = { path = "./scripts" }
+num_enum = "0.7.1"
+
+godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "a2a5c018fcf0247f1d242ec2bf8a994cc975c1ee" }

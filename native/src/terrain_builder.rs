@@ -173,7 +173,7 @@ struct ThreadContext<'a> {
 }
 
 #[derive(GodotClass)]
-#[class(base=RefCounted)]
+#[class(base=RefCounted, init)]
 pub struct TerrainBuilder {
     tile_size: u8,
     city_size: u16,
@@ -186,6 +186,23 @@ pub struct TerrainBuilder {
 
 #[godot_api]
 impl TerrainBuilder {
+    #[func]
+    fn new(
+        tilelist: Dictionary,
+        rotation: Gd<TerrainRotation>,
+        materials: Dictionary,
+    ) -> Gd<TerrainBuilder> {
+        Gd::from_object(TerrainBuilder {
+            tile_size: 16,
+            city_size: 0,
+            tile_height: 8,
+            sea_level: 0,
+            rotation,
+            tilelist,
+            materials,
+        })
+    }
+
     #[func]
     fn set_city_size(&mut self, value: u16) {
         self.city_size = value;

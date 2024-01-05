@@ -12,7 +12,6 @@ use godot_rust_script::{
 #[script(base = Node3D)]
 struct CarSpawner {
 	default_car: Option<Gd<PackedScene>>,
-	car: Option<Gd<PackedScene>>,
 
 	#[export]
 	pub road_network_path: NodePath,
@@ -30,10 +29,6 @@ impl CarSpawner {
 			.load(GString::from(
 				"res://resources/Objects/Vehicles/car_station_wagon.tscn",
 			))
-			.map(|res| res.cast());
-
-		self.car = loader
-			.load(GString::from("res://src/Objects/Vehicles/Car.gd"))
 			.map(|res| res.cast());
 	}
 
@@ -88,7 +83,7 @@ impl CarSpawner {
 
 				timer.connect(
 					StringName::from("timeout"),
-					Callable::from_object_method(self.base.clone(), "start_auto_spawn"),
+					Callable::from_object_method(&self.base, "start_auto_spawn"),
 				);
 
 				self.timer.as_mut().unwrap()

@@ -75,9 +75,10 @@ render_target_update_mode = 4
 script = ExtResource("3_2c332")
 current_camera_controller = NodePath("Schweizer_300/MainCameraAnchor")
 
-[node name="Schweizer_300" parent="SubViewportContainer/SubViewport" node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
+[node name="Schweizer_300" parent="SubViewportContainer/SubViewport" node_paths=PackedStringArray("child_camera", "child_rotor", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)
 child_camera = NodePath("MainCameraAnchor")
+child_rotor = NodePath("rotor")
 child_main_camera = NodePath("MainCameraAnchor")
 child_debug_camera = NodePath("DebugCameraAnchor")
 

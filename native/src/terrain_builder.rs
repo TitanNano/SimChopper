@@ -396,8 +396,8 @@ impl TerrainBuilder {
     }
 
     fn build_terain_chunk(context: &ThreadContext, surfaces: SurfaceMap) -> Shared<Gd<ArrayMesh>> {
-        let mut generator = SurfaceTool::new();
-        let mut mesh = ArrayMesh::new();
+        let mut generator = SurfaceTool::new_gd();
+        let mut mesh = ArrayMesh::new_gd();
         let mut vertex_count = 0;
 
         for (surface_type, surface) in surfaces {

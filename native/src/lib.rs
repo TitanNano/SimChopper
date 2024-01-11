@@ -2,7 +2,6 @@ mod scripts;
 mod terrain_builder;
 
 use godot::prelude::{gdextension, ExtensionLibrary, InitLevel};
-use godot_rust_script;
 
 struct NativeLib;
 

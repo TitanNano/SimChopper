@@ -27,6 +27,7 @@ var ROTATIONAL_ACCELERATION := RATE_OF_ROTATION / ACCELERATION_TIME
 var directional_velocity := Vector3.ZERO
 var rotational_velocity := 0.0
 var engine_speed := 0.0
+var is_on_ground := true
 
 @onready var camera: CameraInterpolation = self.child_camera
 @onready var dust_particles: DustParticles = self.child_dust_particles
@@ -91,6 +92,7 @@ func _physics_process(_delta: float) -> void:
 	var distance := ray_cast.global_transform.origin - ground
 	var dust_strength := 1 - (distance.length() / 7)
 
+	self.is_on_ground = dust_strength > 0.99
 	self.rotor.power = self.engine_speed
 	self.dust_particles.strength = self.engine_speed * dust_strength if colliding else 0.0
 
@@ -108,6 +110,9 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var turn_strength := Input.get_axis("turn_right", "turn_left")
 	var direction := Vector3(-turn_strength, 0, movement_strength).normalized()
 	var sound_state_machine := anim_state_machine(self.child_engine_sound_tree)
+
+	if climb < 0 && self.is_on_ground && self.engine_speed == 1:
+		self.engine_speed -= 0.001
 
 	if self.engine_speed < 1:
 		if climb > 0:

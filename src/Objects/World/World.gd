@@ -1,3 +1,4 @@
+@uid("uid://v2mac8r6ox4f") # Generated automatically, do not modify.
 extends Node3D
 
 const TimeBudget := preload("../../util/TimeBudget.gd")
@@ -6,7 +7,6 @@ const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
 const Networks := preload("res://src/Objects/World/Networks.gd")
 const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 const Logger := preload("res://src/util/Logger.gd")
-const Buildings := preload("res://src/Objects/World/Buildings.gd")
 const Terrain := preload("res://src/Objects/Terrain/Terrain.gd")
 const Backdrop := preload("res://src/Objects/World/Backdrop.gd")
 const Helicopter := preload("res://src/Objects/Helicopters/Helicopter.gd")
@@ -62,7 +62,9 @@ func _on_spawn_point_encountered(tile_coords: Array[int], size: int, altitude: i
 func _load_map_async(city: Dictionary):
 	await self.terrain.build_async(city)
 	await self.networks.build_async(city)
-	await self.buildings.build_async(city)
+	self.buildings.build_async(city)
+
+	await self.buildings.ready
 	
 	var city_size: int = city.get("city_size")
 

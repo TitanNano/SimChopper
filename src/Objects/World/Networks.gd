@@ -84,10 +84,12 @@ func build_async(city: Dictionary):
 		var car_spawner: CarSpawner = (load("res://resources/Objects/Spawner/CarSpawner.tscn") as PackedScene).instantiate()
 		var random_child: Node3D = road_network.get_child(randi() % road_network.get_child_count()) 
 		var transform := random_child.global_transform.origin
+		@warning_ignore("unsafe_property_access")
 		car_spawner.road_network_path = road_network.get_path()
 		car_spawner.translate(transform)
 		car_spawner.translate(Vector3.UP * 2)
 		self.get_parent().add_child(car_spawner)
+		@warning_ignore("unsafe_method_access")
 		car_spawner.start_auto_spawn()
 
 

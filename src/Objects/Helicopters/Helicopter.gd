@@ -91,6 +91,7 @@ func _physics_process(_delta: float) -> void:
 	var dust_strength := 1 - (distance.length() / 7)
 
 	self.rotor.power = self.engine_speed
+	@warning_ignore("unsafe_property_access")
 	self.dust_particles.strength = self.engine_speed * dust_strength if colliding else 0.0
 
 	if colliding:

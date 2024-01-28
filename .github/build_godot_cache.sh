@@ -27,4 +27,4 @@ done
 
 godot_job=$(jobs -p)
 
-kill $godot_job
+kill -s TERM $godot_job

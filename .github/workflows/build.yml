@@ -130,27 +130,53 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: libnative-linux-x86_64
-          path: native/target/x86_64-unknown-linux-gnu/release/
+          path: native/target/x86_64-unknown-linux-gnu/debug/
       - name: download x86_64 libs
         if: matrix.x86_64
         uses: actions/download-artifact@v3
         with:
           name: libnative-${{ matrix.platform }}-x86_64
-          path: native/target/x86_64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/release/
+          path: native/target/x86_64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/debug/
       - name: download aarch64 libs
         if: matrix.aarch64
         uses: actions/download-artifact@v3
         with:
           name: libnative-${{ matrix.platform }}-aarch64
-          path: native/target/aarch64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/release/
+          path: native/target/aarch64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/debug/
       - name: create universal libnative
         if: matrix.platform == 'darwin'
         run: |
           platform_dir="${{ matrix.vendor }}-${{ matrix.platform }}"
-          mkdir -p native/target/universal-$platform_dir/release/
-          lipo -create native/target/x86_64-$platform_dir/release/${{ matrix.lib }} native/target/aarch64-$platform_dir/release/${{ matrix.lib }} -output native/target/universal-$platform_dir/release/${{ matrix.lib }}
+          mkdir -p native/target/universal-$platform_dir/debug/
+          lipo -create native/target/x86_64-$platform_dir/debug/${{ matrix.lib }} native/target/aarch64-$platform_dir/debug/${{ matrix.lib }} -output native/target/universal-$platform_dir/debug/${{ matrix.lib }}
+      - name: copy libs
+        run: |
+          set -x
+          platform_dir="${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}"
+          x86_64="native/target/x86_64-$platform_dir"
+          aarch64="native/target/aarch64-$platform_dir"
+          universal="native/target/universal-$platform_dir"
+          
+          if [[ -d "$x86_64/debug/" ]]; then
+            mkdir -p "$x86_64/release/"
+            cp $x86_64/debug/* "$x86_64/release/"
+          fi
+
+          if [[ -d "$aarch64/debug/" ]]; then 
+            mkdir -p "$aarch64/release/"
+            cp $aarch64/debug/* "$aarch64/release/"
+          fi
+
+          if [[ -d "$universal/debug/" ]]; then
+            mkdir -p "$universal/release/"
+            cp $universal/debug/* "$universal/release/"
+          fi
       - name: import godot project
-        run: .github/build_godot_cache.sh
+        run: |
+          # import assets
+          .github/build_godot_cache.sh
+          # restart to make sure all rust scripts are detected
+          .github/build_godot_cache.sh
       - name: export-debug
         if: ${{ !inputs.release }}
         run: |

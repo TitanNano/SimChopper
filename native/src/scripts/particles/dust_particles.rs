@@ -12,14 +12,10 @@ use godot_rust_script::{
 #[script(base = GpuParticles3D)]
 struct DustParticles {
     /// The strength of the emitted dust.
-    /// This is used for the rotor effects
-    /**
-     * This is more documentation
-     * please read it carefully
-     */
     #[prop(get = Self::strength, set = Self::set_strength)]
     #[export(range(min = 0.1, max = 1.5, step = 0.05))]
     strength: f64,
+
     base: Gd<GpuParticles3D>,
 }
 

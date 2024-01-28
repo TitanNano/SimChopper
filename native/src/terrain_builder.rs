@@ -402,7 +402,7 @@ impl TerrainBuilder {
 
         for (surface_type, surface) in surfaces {
             generator.clear();
-            generator.begin(PrimitiveType::PRIMITIVE_TRIANGLES);
+            generator.begin(PrimitiveType::TRIANGLES);
 
             for vertex_cell in surface {
                 let vertex = Arc::try_unwrap(vertex_cell)
@@ -434,7 +434,7 @@ impl TerrainBuilder {
             let surface_arrays = generator.commit_to_arrays();
             let new_index = mesh.get_surface_count();
 
-            mesh.add_surface_from_arrays(PrimitiveType::PRIMITIVE_TRIANGLES, surface_arrays);
+            mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, surface_arrays);
 
             let surface_material_variant = context.materials.get(surface_type.to_string());
 

@@ -7,9 +7,12 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = { git = "https://github.com/godot-rust/gdext", rev = "b4e6fd6c9c23e0fd3a124c2893a9592c861ab780" }
+godot = { git = "https://github.com/godot-rust/gdext", rev = "7fd1be904efccd71a9eb980c2e6fffa2d8705ec4" }
 lerp = "0.4.0"
 backtrace = "0.3.64"
 num = "0.4.0"
 rayon = "1.5.1"
 itertools = "0.10.3"
+num_enum = "0.7.1"
+
+godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "e06373cb0d8efce3ec097bbedde3e98e08a9ebfa" }

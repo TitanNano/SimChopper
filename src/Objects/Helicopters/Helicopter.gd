@@ -1,6 +1,5 @@
 extends RigidBody3D
 
-const DustParticles := preload("res://src/Objects/Particles/DustParticles.gd")
 const Rotor := preload("res://src/Objects/Helicopters/Rotor.gd")
 const Logger := preload("res://src/util/Logger.gd")
 
@@ -94,6 +93,7 @@ func _physics_process(_delta: float) -> void:
 
 	self.is_on_ground = dust_strength > 0.99
 	self.rotor.power = self.engine_speed
+	@warning_ignore("unsafe_property_access")
 	self.dust_particles.strength = self.engine_speed * dust_strength if colliding else 0.0
 
 	if colliding:

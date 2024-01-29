@@ -3,7 +3,6 @@ extends Node
 const TimeBudget := preload("res://src/util/TimeBudget.gd")
 const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
-const CarSpawner := preload("res://src/Objects/Spawner/CarSpawner.gd")
 const Building := preload("res://src/Objects/Map/Building.gd")
 const RoadNavigation := preload("res://src/Objects/Networks/RoadNavigation.gd")
 
@@ -85,10 +84,12 @@ func build_async(city: Dictionary):
 		var car_spawner: CarSpawner = (load("res://resources/Objects/Spawner/CarSpawner.tscn") as PackedScene).instantiate()
 		var random_child: Node3D = road_network.get_child(randi() % road_network.get_child_count()) 
 		var transform := random_child.global_transform.origin
+		@warning_ignore("unsafe_property_access")
 		car_spawner.road_network_path = road_network.get_path()
 		car_spawner.translate(transform)
 		car_spawner.translate(Vector3.UP * 2)
 		self.get_parent().add_child(car_spawner)
+		@warning_ignore("unsafe_method_access")
 		car_spawner.start_auto_spawn()
 
 

@@ -87,6 +87,7 @@ transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, 
 script = ExtResource("10")
 snap = true
 track_y_axis = true
+active = true
 
 [node name="DebugCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/Schweizer_300"]
 process_mode = 3

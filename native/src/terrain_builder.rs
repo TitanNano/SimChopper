@@ -6,7 +6,7 @@ mod ybuffer;
 
 use godot::engine::mesh::PrimitiveType;
 use godot::engine::{ArrayMesh, Material, SurfaceTool};
-use godot::prelude::meta::VariantMetadata;
+use godot::prelude::meta::GodotType;
 use godot::prelude::*;
 
 use std::cmp::{max, min};
@@ -27,12 +27,12 @@ use ybuffer::{HashMapYBuffer, YBuffer};
 
 pub use terrain_rotation::TerrainRotation;
 
-struct Shared<T: VariantMetadata>(T);
+struct Shared<T: GodotType>(T);
 
-unsafe impl<T: VariantMetadata> Send for Shared<T> {}
-unsafe impl<T: VariantMetadata> Sync for Shared<T> {}
+unsafe impl<T: GodotType> Send for Shared<T> {}
+unsafe impl<T: GodotType> Sync for Shared<T> {}
 
-impl<T: VariantMetadata> Deref for Shared<T> {
+impl<T: GodotType> Deref for Shared<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
@@ -40,7 +40,7 @@ impl<T: VariantMetadata> Deref for Shared<T> {
     }
 }
 
-impl<T: VariantMetadata> Shared<T> {
+impl<T: GodotType> Shared<T> {
     fn inner(self) -> T {
         self.0
     }
@@ -173,7 +173,7 @@ struct ThreadContext<'a> {
 }
 
 #[derive(GodotClass)]
-#[class(base=RefCounted)]
+#[class(base=RefCounted, init)]
 pub struct TerrainBuilder {
     tile_size: u8,
     city_size: u16,
@@ -186,6 +186,23 @@ pub struct TerrainBuilder {
 
 #[godot_api]
 impl TerrainBuilder {
+    #[func]
+    fn new(
+        tilelist: Dictionary,
+        rotation: Gd<TerrainRotation>,
+        materials: Dictionary,
+    ) -> Gd<TerrainBuilder> {
+        Gd::from_object(TerrainBuilder {
+            tile_size: 16,
+            city_size: 0,
+            tile_height: 8,
+            sea_level: 0,
+            rotation,
+            tilelist,
+            materials,
+        })
+    }
+
     #[func]
     fn set_city_size(&mut self, value: u16) {
         self.city_size = value;
@@ -207,11 +224,11 @@ impl TerrainBuilder {
     }
 
     fn tilelist(&self) -> Shared<Dictionary> {
-        Shared(self.tilelist.share())
+        Shared(self.tilelist.clone())
     }
 
     fn materials(&self) -> Shared<Dictionary> {
-        Shared(self.materials.share())
+        Shared(self.materials.clone())
     }
 
     fn rotation(&self) -> &Gd<TerrainRotation> {
@@ -379,13 +396,13 @@ impl TerrainBuilder {
     }
 
     fn build_terain_chunk(context: &ThreadContext, surfaces: SurfaceMap) -> Shared<Gd<ArrayMesh>> {
-        let mut generator = SurfaceTool::new();
-        let mut mesh = ArrayMesh::new();
+        let mut generator = SurfaceTool::new_gd();
+        let mut mesh = ArrayMesh::new_gd();
         let mut vertex_count = 0;
 
         for (surface_type, surface) in surfaces {
             generator.clear();
-            generator.begin(PrimitiveType::PRIMITIVE_TRIANGLES);
+            generator.begin(PrimitiveType::TRIANGLES);
 
             for vertex_cell in surface {
                 let vertex = Arc::try_unwrap(vertex_cell)
@@ -417,7 +434,7 @@ impl TerrainBuilder {
             let surface_arrays = generator.commit_to_arrays();
             let new_index = mesh.get_surface_count();
 
-            mesh.add_surface_from_arrays(PrimitiveType::PRIMITIVE_TRIANGLES, surface_arrays);
+            mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, surface_arrays);
 
             let surface_material_variant = context.materials.get(surface_type.to_string());
 
@@ -506,7 +523,7 @@ impl TerrainBuilderFactory {
         rotation: Gd<TerrainRotation>,
         materials: Dictionary,
     ) -> Gd<TerrainBuilder> {
-        Gd::new(TerrainBuilder {
+        Gd::from_object(TerrainBuilder {
             tile_size: 16,
             city_size: 0,
             tile_height: 8,

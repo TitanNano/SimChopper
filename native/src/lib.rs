@@ -1,5 +1,8 @@
+mod objects;
 mod scripts;
 mod terrain_builder;
+mod util;
+mod world;
 
 use godot::prelude::{gdextension, ExtensionLibrary, InitLevel};
 

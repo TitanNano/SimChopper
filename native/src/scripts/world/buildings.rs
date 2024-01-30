@@ -125,7 +125,7 @@ impl Buildings {
         };
 
         if building_id == scene_object_registry::Buildings::Tarmac
-            && is_spawn_point(&building, &tiles)
+            && is_spawn_point(&building, tiles)
         {
             info!("encountered a spawn point: {:?}", building);
             let mut spawn_building = Dictionary::new();
@@ -209,6 +209,8 @@ impl Buildings {
     }
 }
 
+type LocalJob<T, H> = Box<dyn Fn(&mut H, T)>;
+
 #[derive(Dbg)]
 struct LocalJobRunner<T, H>
 where
@@ -217,7 +219,7 @@ where
     budget: u64,
     tasks: VecDeque<T>,
     #[dbg(skip)]
-    callback: Box<dyn Fn(&mut H, T)>,
+    callback: LocalJob<T, H>,
 }
 
 impl<T: Debug, H> LocalJobRunner<T, H> {
@@ -270,14 +272,11 @@ fn is_spawn_point(building: &Dictionary, tiles: &Dictionary) -> bool {
 
             let tile = tile.to::<Dictionary>();
 
-            let matches = tile
-                .get("building")
+            tile.get("building")
                 .and_then(|building| building.try_to::<Dictionary>().ok())
                 .and_then(|building| building.get("building_id"))
                 .map(|id| id.to::<u8>() == scene_object_registry::Buildings::Tarmac)
-                .unwrap_or(false);
-
-            matches
+                .unwrap_or(false)
         })
         .not();
 

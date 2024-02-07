@@ -1,4 +1,3 @@
-@uid("uid://v2mac8r6ox4f") # Generated automatically, do not modify.
 extends Node3D
 
 const TimeBudget := preload("../../util/TimeBudget.gd")
@@ -30,7 +29,11 @@ func _ready():
 	assert(world_constants is WorldConstants, "world_constants is not of type WorldConstants")
 
 	self.networks.loading_progress.connect(self._on_child_progress)
+	@warning_ignore("unsafe_property_access")
+	@warning_ignore("unsafe_method_access")
 	self.buildings.spawn_point_encountered.connect(self._on_spawn_point_encountered)
+	@warning_ignore("unsafe_property_access")
+	@warning_ignore("unsafe_method_access")
 	self.buildings.loading_progress.connect(self._on_child_progress)
 
 	call_deferred("_ready_deferred")
@@ -62,6 +65,7 @@ func _on_spawn_point_encountered(tile_coords: Array[int], size: int, altitude: i
 func _load_map_async(city: Dictionary):
 	await self.terrain.build_async(city)
 	await self.networks.build_async(city)
+	@warning_ignore("unsafe_method_access")
 	self.buildings.build_async(city)
 
 	await self.buildings.ready

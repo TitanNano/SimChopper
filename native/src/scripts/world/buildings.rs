@@ -1,15 +1,26 @@
-use std::{collections::VecDeque, fmt::Debug, ops::Not};
+use std::{
+    collections::{BTreeMap, VecDeque},
+    fmt::Debug,
+    ops::Not,
+};
 
+use anyhow::Context;
 use derive_debug::Dbg;
 use godot::{
-    builtin::{meta::ToGodot, Array, Dictionary, VariantArray},
+    builtin::{meta::ToGodot, Array, Dictionary},
     engine::{utilities::snappedi, Node, Node3D, NodeExt, Resource, Time},
-    log::{godot_error, godot_print},
     obj::{Gd, NewAlloc},
 };
 use godot_rust_script::{godot_script_impl, GodotScript, ScriptSignal, Signal};
 
-use crate::{info, objects::scene_object_registry, world::city_coords_feature::CityCoordsFeature};
+use crate::{
+    objects::scene_object_registry,
+    util::logger,
+    world::{
+        city_coords_feature::CityCoordsFeature,
+        city_data::{self, TryFromDictionary},
+    },
+};
 
 #[derive(GodotScript, Debug)]
 #[script(base = Node)]
@@ -18,7 +29,7 @@ struct Buildings {
     pub world_constants: Option<Gd<Resource>>,
 
     city_coords_feature: CityCoordsFeature,
-    job_runner: Option<LocalJobRunner<Dictionary, Self>>,
+    job_runner: Option<LocalJobRunner<city_data::Building, Self>>,
 
     /// tile_coords, size, altitude
     #[signal]
@@ -51,10 +62,19 @@ impl Buildings {
     }
 
     pub fn build_async(&mut self, city: Dictionary) {
-        let simulator_settings: Dictionary = city.get_or_nil("simulator_settings").to();
-        let sea_level: u32 = simulator_settings.get_or_nil("GlobalSeaLevel").to();
-        let buildings: Dictionary = city.get_or_nil("buildings").to();
-        let tiles: Dictionary = city.get_or_nil("tilelist").to();
+        let city = match crate::world::city_data::City::try_from_dict(&city)
+            .context("Failed to deserialize city data")
+        {
+            Ok(v) => v,
+            Err(err) => {
+                logger::error!("{:?}", err);
+                return;
+            }
+        };
+
+        let sea_level = city.simulator_settings.sea_level;
+        let buildings = city.buildings;
+        let tiles = city.tilelist;
 
         self.city_coords_feature = CityCoordsFeature::new(
             self.world_constants
@@ -64,12 +84,12 @@ impl Buildings {
             sea_level,
         );
 
-        info!("starting to load buildings...");
+        logger::info!("starting to load buildings...");
 
         let mut job_runner = LocalJobRunner::new(
-            move |host: &mut Self, building: Dictionary| {
-                if building.get_or_nil("building_id").to::<u8>() == 0x00 {
-                    info!("skipping empty building");
+            move |host: &mut Self, building: city_data::Building| {
+                if building.building_id == 0x00 {
+                    logger::info!("skipping empty building");
                     return;
                 }
 
@@ -78,87 +98,62 @@ impl Buildings {
             50,
         );
 
-        let buildings_array = buildings
-            .values_array()
-            .iter_shared()
-            .map(|variant| variant.to())
-            .collect();
+        let buildings_array = buildings.into_values().collect();
 
         job_runner.tasks(buildings_array);
 
         self.job_runner = Some(job_runner);
     }
 
-    fn insert_building(&mut self, building: Dictionary, tiles: &Dictionary) {
-        let building_size: u8 = building
-            .get("size")
-            .expect("insert_building: missing size")
-            .to();
-        let name: String = building
-            .get("name")
-            .expect("insert_building: missing name")
-            .to();
-        let building_id: u8 = building
-            .get("building_id")
-            .expect("insert_building: missing building_id")
-            .to();
+    fn insert_building(
+        &mut self,
+        building: city_data::Building,
+        tiles: &BTreeMap<(u32, u32), city_data::Tile>,
+    ) {
+        let building_size = building.size;
+        let name = building.name.as_str();
+        let building_id = building.building_id;
         let object = scene_object_registry::load_building(building_id);
-        let tile_coords: Array<u32> = building
-            .get("tile_coords")
-            .expect("insert_building: missing tile_coords")
-            .to::<VariantArray>()
-            .iter_shared()
-            .map(|value| value.to())
-            .collect();
-        let tile: Dictionary = tiles
-            .get(tile_coords.clone())
-            .expect("insert_building: missing tile")
-            .to();
-        let altitude: u32 = tile
-            .get("altitude")
-            .expect("insert_building: missing altitude")
-            .to();
+        let tile_coords = building.tile_coords;
+        let Some(tile) = tiles.get(&tile_coords) else {
+            logger::error!("missing tile at {:?}", tile_coords);
+            return;
+        };
+
+        let altitude: u32 = tile.altitude;
 
         let Some(object) = object else {
-            godot_error!("unknown building \"{}\"", name);
+            logger::error!("unknown building \"{}\"", name);
             return;
         };
 
         if building_id == scene_object_registry::Buildings::Tarmac
             && is_spawn_point(&building, tiles)
         {
-            info!("encountered a spawn point: {:?}", building);
-            let mut spawn_building = Dictionary::new();
-
-            spawn_building.set(
-                "building_id",
-                scene_object_registry::Buildings::Hangar2 as u8,
-            );
-
-            spawn_building.set(
-                "tile_coords",
-                tile_coords
-                    .iter_shared()
-                    .map(|v| v.to_variant())
-                    .collect::<VariantArray>(),
-            );
-            spawn_building.set("name", "Hangar");
-            spawn_building.set("size", 2);
-            spawn_building.set("altitude", altitude);
+            logger::info!("encountered a spawn point: {:?}", building);
+            let spawn_building = city_data::Building {
+                building_id: scene_object_registry::Buildings::Hangar2 as u8,
+                tile_coords,
+                name: "Hangar".into(),
+                size: 2,
+            };
 
             self.insert_building(spawn_building, tiles);
-            self.spawn_point_encountered
-                .emit((tile_coords.clone(), 2, altitude));
+            self.spawn_point_encountered.emit((
+                Array::from(&[tile_coords.0, tile_coords.1]),
+                2,
+                altitude,
+            ));
         }
 
         let (Some(instance), instance_time) = with_timing(|| object.instantiate()) else {
-            godot_error!("failed to instantiate building {}", name);
+            logger::error!("failed to instantiate building {}", name);
             return;
         };
 
         let mut location = self.city_coords_feature.get_building_coords(
-            tile_coords.get(0),
-            tile_coords.get(1),
+            tile_coords.0,
+            tile_coords.1,
             altitude,
             building_size,
         );
@@ -167,8 +162,8 @@ impl Buildings {
         location.y += 0.1;
 
         let sector_name = {
-            let x = snappedi(tile_coords.get(0) as f64, 10);
-            let y = snappedi(tile_coords.get(1) as f64, 10);
+            let x = snappedi(tile_coords.0 as f64, 10);
+            let y = snappedi(tile_coords.1 as f64, 10);
 
             format!("{}_{}", x, y)
         };
@@ -183,15 +178,15 @@ impl Buildings {
         let (_, translate_time) = with_timing(|| instance.cast::<Node3D>().translate(location));
 
         if instance_time > 100 {
-            godot_error!("\"{}\" is very slow to instantiate!", name);
+            logger::warn!("\"{}\" is very slow to instantiate!", name);
         }
 
         if insert_time > 100 {
-            godot_error!("\"{}\" is very slow to insert!", name);
+            logger::warn!("\"{}\" is very slow to insert!", name);
         }
 
         if translate_time > 100 {
-            godot_error!("\"{}\" is very slow to translate!", name);
+            logger::warn!("\"{}\" is very slow to translate!", name);
         }
     }
 
@@ -252,31 +247,25 @@ impl<T: Debug, H> LocalJobRunner<T, H> {
     }
 }
 
-fn is_spawn_point(building: &Dictionary, tiles: &Dictionary) -> bool {
-    let tile_coords: Array<u8> = building
-        .get_or_nil("tile_coords")
-        .to::<VariantArray>()
-        .iter_shared()
-        .map(|item| item.to())
-        .collect();
-    let x = tile_coords.get(0);
-    let y = tile_coords.get(1);
+fn is_spawn_point(
+    building: &city_data::Building,
+    tiles: &BTreeMap<(u32, u32), city_data::Tile>,
+) -> bool {
+    let (x, y) = building.tile_coords;
 
     let x_miss = (x - 1..x + 3)
         .all(|index| {
-            let Some(tile) = tiles.get(VariantArray::from(&[index.to_variant(), y.to_variant()]))
-            else {
-                godot_error!("unable to get tile at: x = {}, y = {}", index, y);
+            let Some(tile) = tiles.get(&(index, y)) else {
+                logger::error!("unable to get tile at: x = {}, y = {}", index, y);
                 return false;
             };
 
-            let tile = tile.to::<Dictionary>();
+            let Some(building) = tile.building.as_ref() else {
+                logger::warn!("tile has no building!");
+                return false;
+            };
 
-            tile.get("building")
-                .and_then(|building| building.try_to::<Dictionary>().ok())
-                .and_then(|building| building.get("building_id"))
-                .map(|id| id.to::<u8>() == scene_object_registry::Buildings::Tarmac)
-                .unwrap_or(false)
+            building.building_id == scene_object_registry::Buildings::Tarmac
         })
         .not();
 
@@ -285,14 +274,16 @@ fn is_spawn_point(building: &Dictionary, tiles: &Dictionary) -> bool {
     }
 
     (y - 1..y + 3).all(|index| {
-        tiles
-            .get(VariantArray::from(&[x.to_variant(), index.to_variant()]))
-            .map(|tile| tile.to::<Dictionary>())
-            .and_then(|tile| tile.get("building"))
-            .and_then(|building| building.try_to::<Dictionary>().ok())
-            .and_then(|building| building.get("building_id"))
-            .map(|id| id.to::<u8>() == scene_object_registry::Buildings::Tarmac)
-            .unwrap_or(false)
+        let Some(tile) = tiles.get(&(x, index)) else {
+            logger::error!("unable to get tile at: x = {}, y = {}", x, index);
+            return false;
+        };
+
+        let Some(building) = tile.building.as_ref() else {
+            return false;
+        };
+
+        building.building_id == scene_object_registry::Buildings::Tarmac
     })
 }
 

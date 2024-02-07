@@ -15,5 +15,7 @@ rayon = "1.5.1"
 itertools = "0.10.3"
 num_enum = "0.7.1"
 derive-debug = "0.1.2"
+thiserror = "1.0.56"
+anyhow = { version = "1.0.79" }
 
 godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "e06373cb0d8efce3ec097bbedde3e98e08a9ebfa" }

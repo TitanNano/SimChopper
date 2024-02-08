@@ -1,10 +1,9 @@
-[gd_scene load_steps=20 format=3 uid="uid://cvh54xiw8586b"]
+[gd_scene load_steps=19 format=3 uid="uid://cvh54xiw8586b"]
 
 [ext_resource type="Script" path="res://src/HUD/HUDController.gd" id="1"]
 [ext_resource type="Script" path="res://src/Objects/World/World.gd" id="3"]
 [ext_resource type="Script" path="res://src/ViewPort.gd" id="3_2c332"]
 [ext_resource type="Script" path="res://src/HUD/LoadingScreen.gd" id="4"]
-[ext_resource type="Script" path="res://src/Objects/World/ReflectionManager.gd" id="5"]
 [ext_resource type="Script" path="res://src/Objects/World/Backdrop.gd" id="6"]
 [ext_resource type="PackedScene" uid="uid://csuvlu656dwm4" path="res://resources/Objects/Buildings/hangar_2.tscn" id="7"]
 [ext_resource type="Environment" uid="uid://bl607wqoa882d" path="res://resources/Environments/WorldEnv.tres" id="8"]
@@ -130,9 +129,6 @@ world_constants = ExtResource("15")
 [node name="Road" type="Node3D" parent="SubViewportContainer/SubViewport/World/Networks" groups=["road-network"]]
 script = ExtResource("17")
 world_constants = ExtResource("15")
-
-[node name="Reflections" type="Node3D" parent="SubViewportContainer/SubViewport/World"]
-script = ExtResource("5")
 
 [node name="Buildings" type="Node" parent="SubViewportContainer/SubViewport/World"]
 script = ExtResource("15_23gpq")

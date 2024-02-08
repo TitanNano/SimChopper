@@ -9,7 +9,6 @@ const Logger := preload("res://src/util/Logger.gd")
 const Terrain := preload("res://src/Objects/Terrain/Terrain.gd")
 const Backdrop := preload("res://src/Objects/World/Backdrop.gd")
 const Helicopter := preload("res://src/Objects/Helicopters/Helicopter.gd")
-const ReflectionManager := preload("res://src/Objects/World/ReflectionManager.gd")
 
 signal loading_progress(count)
 signal loading_scale(count)
@@ -18,7 +17,6 @@ signal loading_scale(count)
 
 @onready var terrain: Terrain = $Terrain
 @onready var networks: Networks = $Networks
-@onready var reflections: ReflectionManager = $Reflections
 @onready var buildings: Buildings = $Buildings
 @onready var backdrop: Backdrop = $Backdrop
 
@@ -72,7 +70,6 @@ func _load_map_async(city: Dictionary):
 	
 	var city_size: int = city.get("city_size")
 
-	self._setup_probing(city_size)
 	self.backdrop.build(
 		city_size,
 		self.world_constants.tile_size,
@@ -113,12 +110,3 @@ func _insert_spawn_point(building_coords: Array[int], building_size: int, altitu
 
 	spawn_host.translate(location)
 	self.add_child(spawn_host)
-
-
-func _setup_probing(city_size: int) -> void:
-	self.reflections.sea_level = self.sea_level * self.world_constants.tile_height
-	self.reflections.tile_size = self.world_constants.tile_size
-	self.reflections.tile_height = self.world_constants.tile_height
-	self.reflections.city_size = city_size
-
-	self.reflections.build_probes()

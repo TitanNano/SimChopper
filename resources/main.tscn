@@ -119,7 +119,7 @@ directional_shadow_split_1 = 0.3
 directional_shadow_split_2 = 0.0
 directional_shadow_split_3 = 0.0
 directional_shadow_blend_splits = true
-directional_shadow_max_distance = 300.0
+directional_shadow_max_distance = 200.0
 
 [node name="Networks" type="Node" parent="SubViewportContainer/SubViewport/World"]
 script = ExtResource("14")

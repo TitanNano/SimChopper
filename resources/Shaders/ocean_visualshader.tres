@@ -77,6 +77,11 @@ operator = 2
 default_input_values = [0, 1.0, 1, 0.0]
 operator = 1
 
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_vol2q"]
+parameter_name = "Roughness"
+hint = 1
+default_value_enabled = true
+
 [sub_resource type="VisualShaderNodeFloatConstant" id="8"]
 
 [sub_resource type="VisualShaderNodeColorParameter" id="9"]
@@ -99,9 +104,6 @@ input_name = "screen_uv"
 [sub_resource type="VisualShaderNodeTexture" id="14"]
 source = 5
 
-[sub_resource type="VisualShaderNodeFloatConstant" id="16"]
-constant = 0.3
-
 [sub_resource type="VisualShaderNodeMix" id="17"]
 default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(1, 1, 1), 2, Vector3(0, 0, 0)]
 op_type = 3
@@ -111,7 +113,7 @@ default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(0, 0, 0), 2, Vector3(0, 
 op_type = 3
 
 [sub_resource type="VisualShaderNodeClamp" id="28"]
-default_input_values = [0, 1.0, 1, 0.15, 2, 1.0]
+default_input_values = [0, 1.0, 1, 2.08165e-12, 2, 1.0]
 
 [sub_resource type="VisualShaderNodeFloatParameter" id="29"]
 parameter_name = "Depth_Scale"
@@ -173,6 +175,7 @@ uniform float IOR;
 uniform sampler2D screen_text : filter_linear_mipmap, hint_screen_texture;
 uniform sampler2D depth_text : source_color, filter_nearest, repeat_disable, hint_depth_texture;
 uniform float Depth_Scale;
+uniform float Roughness : hint_range(0, 1) = 0;
 uniform vec3 uv_aspectratio;
 uniform float Normal_Resolution;
 uniform sampler2D TextureUniform : hint_normal;
@@ -675,7 +678,7 @@ void fragment() {
 
 
 // Clamp:59
-	float n_in59p1 = 0.15000;
+	float n_in59p1 = 0.00000;
 	float n_in59p2 = 1.00000;
 	float n_out59p0 = clamp(n_out140p0, n_in59p1, n_in59p2);
 
@@ -684,8 +687,8 @@ void fragment() {
 	vec3 n_out40p0 = mix(vec3(n_out18p0.xyz), n_out19p0, vec3(n_out59p0));
 
 
-// FloatConstant:39
-	float n_out39p0 = 0.300000;
+// FloatParameter:141
+	float n_out141p0 = Roughness;
 
 
 // Mix:41
@@ -746,7 +749,7 @@ void fragment() {
 
 // Output:0
 	ALBEDO = n_out40p0;
-	ROUGHNESS = n_out39p0;
+	ROUGHNESS = n_out141p0;
 	EMISSION = n_out41p0;
 	NORMAL_MAP = vec3(n_out111p0.xyz);
 	NORMAL_MAP_DEPTH = n_out95p0;
@@ -795,8 +798,6 @@ nodes/fragment/33/node = SubResource("13")
 nodes/fragment/33/position = Vector2(800, -1660)
 nodes/fragment/35/node = SubResource("14")
 nodes/fragment/35/position = Vector2(1520, -1660)
-nodes/fragment/39/node = SubResource("16")
-nodes/fragment/39/position = Vector2(7540, -1640)
 nodes/fragment/40/node = SubResource("17")
 nodes/fragment/40/position = Vector2(7180, -1840)
 nodes/fragment/41/node = SubResource("18")
@@ -856,4 +857,6 @@ nodes/fragment/139/node = SubResource("VisualShaderNodeFloatOp_f51ga")
 nodes/fragment/139/position = Vector2(5220, -1980)
 nodes/fragment/140/node = SubResource("VisualShaderNodeFloatOp_msonu")
 nodes/fragment/140/position = Vector2(5680, -1980)
-nodes/fragment/connections = PackedInt32Array(17, 0, 19, 2, 20, 0, 19, 0, 33, 0, 35, 0, 26, 0, 19, 3, 39, 0, 0, 3, 102, 0, 101, 1, 101, 0, 103, 0, 104, 0, 106, 0, 104, 0, 105, 0, 106, 0, 105, 1, 105, 0, 103, 1, 108, 0, 101, 0, 100, 0, 108, 0, 107, 0, 108, 1, 109, 0, 19, 7, 110, 0, 19, 8, 59, 0, 40, 2, 19, 0, 40, 1, 18, 0, 40, 0, 19, 1, 41, 1, 59, 0, 41, 2, 95, 0, 0, 10, 99, 0, 111, 2, 103, 0, 111, 0, 111, 0, 0, 9, 110, 0, 35, 2, 35, 0, 125, 0, 133, 0, 134, 0, 125, 0, 134, 1, 136, 0, 137, 0, 137, 2, 138, 0, 134, 0, 138, 1, 138, 0, 139, 1, 61, 0, 139, 0, 40, 0, 0, 0, 41, 0, 0, 5, 140, 0, 59, 0, 139, 0, 140, 1)
+nodes/fragment/141/node = SubResource("VisualShaderNodeFloatParameter_vol2q")
+nodes/fragment/141/position = Vector2(7520, -2300)
+nodes/fragment/connections = PackedInt32Array(17, 0, 19, 2, 20, 0, 19, 0, 33, 0, 35, 0, 26, 0, 19, 3, 102, 0, 101, 1, 101, 0, 103, 0, 104, 0, 106, 0, 104, 0, 105, 0, 106, 0, 105, 1, 105, 0, 103, 1, 108, 0, 101, 0, 100, 0, 108, 0, 107, 0, 108, 1, 109, 0, 19, 7, 110, 0, 19, 8, 59, 0, 40, 2, 19, 0, 40, 1, 18, 0, 40, 0, 19, 1, 41, 1, 59, 0, 41, 2, 95, 0, 0, 10, 99, 0, 111, 2, 103, 0, 111, 0, 111, 0, 0, 9, 110, 0, 35, 2, 35, 0, 125, 0, 133, 0, 134, 0, 125, 0, 134, 1, 136, 0, 137, 0, 137, 2, 138, 0, 134, 0, 138, 1, 138, 0, 139, 1, 61, 0, 139, 0, 40, 0, 0, 0, 41, 0, 0, 5, 140, 0, 59, 0, 139, 0, 140, 1, 141, 0, 0, 3)

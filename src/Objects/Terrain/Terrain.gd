@@ -47,3 +47,5 @@ func build_async(city: Dictionary):
 
 		self.add_child(mesh_instance, true)
 		mesh_instance.owner = get_tree().current_scene
+	
+	prints("generated terain:", self.get_child_count(), "nodes generated")

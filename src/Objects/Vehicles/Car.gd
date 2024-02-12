@@ -22,7 +22,6 @@ var last_transform := Transform3D.IDENTITY
 var target_nav_node: Building
 var current_nav_node: Building
 
-@onready var navigation: NavigationAgent3D = $NavigationAgent3D
 @onready var debug_target: MeshInstance3D = $DebugTarget
 @onready var ground_detector: RayCast3D = $GroundDetector
 @onready var road_network: RoadNavigation = get_node(road_network_path)

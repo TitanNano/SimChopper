@@ -34,6 +34,10 @@ impl CarSpawner {
     }
 
     pub fn spawn_car(&mut self) {
+        if self.base.get_child_count() > 20 {
+            return;
+        }
+
         let inst = self
             .default_car
             .as_ref()
@@ -50,9 +54,10 @@ impl CarSpawner {
             self.road_network_path.to_variant(),
         );
 
-        if let Some(mut parent) = self.base.get_parent() {
-            parent.add_child(inst.clone());
-        }
+        self.base
+            .add_child_ex(inst.clone())
+            .force_readable_name(true)
+            .done();
 
         let Some(current_scene) = self
             .base
@@ -64,10 +69,6 @@ impl CarSpawner {
         };
 
         inst.set_owner(current_scene);
-
-        let mut inst: Gd<Node3D> = inst.cast();
-
-        inst.global_translate(self.base.get_global_transform().origin);
         inst.call(StringName::from("activate"), &[]);
     }
 

@@ -71,6 +71,8 @@ func build_async(city: Dictionary):
 		else:
 			print("network secction doesn't belong to any network, ", network_section)
 
+		instance.set_owner(self.get_tree().current_scene)
+		
 		self.emit_signal("loading_progress", 1)
 
 		if budget.is_exceded():
@@ -96,3 +98,4 @@ func build_async(city: Dictionary):
 	# yield at least once at the end, to let the engine catch up
 	await self.get_tree().process_frame
 	self.is_built = true
+	prints("generated networks:", self.road_network.get_child_count(), "nodes in road network,", self.powerline_network.get_child_count(), "nodes in powerline network")

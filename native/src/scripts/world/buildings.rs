@@ -8,7 +8,7 @@ use anyhow::Context;
 use derive_debug::Dbg;
 use godot::{
     builtin::{meta::ToGodot, Array, Dictionary},
-    engine::{utilities::snappedi, Node, Node3D, NodeExt, Resource, Time},
+    engine::{utilities::snappedi, Node, Node3D, Resource, Time},
     obj::{Gd, NewAlloc},
 };
 use godot_rust_script::{godot_script_impl, GodotScript, ScriptSignal, Signal};
@@ -146,7 +146,7 @@ impl Buildings {
             ));
         }
 
-        let (Some(instance), instance_time) = with_timing(|| object.instantiate()) else {
+        let (Some(mut instance), instance_time) = with_timing(|| object.instantiate()) else {
             logger::error!("failed to instantiate building {}", name);
             return;
         };
@@ -172,7 +172,18 @@ impl Buildings {
             self.get_sector(sector_name)
                 .add_child_ex(instance.clone())
                 .force_readable_name(true)
-                .done()
+                .done();
+
+            let Some(root) = self
+                .base
+                .get_tree()
+                .and_then(|tree| tree.get_current_scene())
+            else {
+                logger::warn!("there is no active scene!");
+                return;
+            };
+
+            instance.set_owner(root);
         });
 
         let (_, translate_time) = with_timing(|| instance.cast::<Node3D>().translate(location));
@@ -198,8 +209,17 @@ impl Buildings {
 
                 sector.set_name(name.to_godot());
 
-                self.base.add_child(sector);
-                self.base.get_node_as(name)
+                self.base.add_child(sector.clone());
+
+                if let Some(root) = self
+                    .base
+                    .get_tree()
+                    .and_then(|tree| tree.get_current_scene())
+                {
+                    sector.set_owner(root);
+                };
+
+                sector
             })
     }
 }

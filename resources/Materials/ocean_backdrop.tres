@@ -1,16 +1,33 @@
-[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://7h8w8gb1xjbk"]
+[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://7h8w8gb1xjbk"]
 
-[ext_resource type="Texture2D" uid="uid://ckj5pmqjto75o" path="res://resources/Textures/Ocean/procedural_ocean_noise.tres" id="1"]
 [ext_resource type="Shader" uid="uid://buh5ms3vm1n7" path="res://resources/Shaders/ocean_visualshader.tres" id="2"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ifgtm"]
+noise_type = 4
+fractal_type = 2
+fractal_gain = 0.3
+fractal_weighted_strength = 0.3
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_50160"]
+seamless = true
+noise = SubResource("FastNoiseLite_ifgtm")
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_a72rs"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_ifgtm")
 
 [resource]
 render_priority = 0
 shader = ExtResource("2")
-shader_parameter/Wave_Height = 0.0
+shader_parameter/Wave_Ratio = 0.5
+shader_parameter/Wave_Dir = 0.124
+shader_parameter/speed = 0.1
+shader_parameter/Wave2_Dir = 0.569
+shader_parameter/wave_height = null
 shader_parameter/Albedo = Color(0.129412, 0.180392, 0.262745, 1)
 shader_parameter/IOR = 1.333
 shader_parameter/Depth_Scale = 1.0
-shader_parameter/Roughness = 0.5
-shader_parameter/uv_aspectratio = Vector3(1, 1, 1)
-shader_parameter/Normal_Resolution = 60.0
-shader_parameter/TextureUniform = ExtResource("1")
+shader_parameter/Roughness = 0.2
+shader_parameter/Noise = SubResource("NoiseTexture2D_50160")
+shader_parameter/TextureUniform = SubResource("NoiseTexture2D_a72rs")

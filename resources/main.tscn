@@ -20,7 +20,7 @@
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lhcij"]
 dof_blur_far_enabled = true
 dof_blur_far_distance = 180.0
-dof_blur_far_transition = 20.0
+dof_blur_far_transition = -1.0
 
 [sub_resource type="StandardMaterial3D" id="1"]
 albedo_color = Color(0, 0, 0, 1)
@@ -142,7 +142,6 @@ transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, 
 doppler_tracking = 2
 current = true
 near = 3.0
-far = 200000.0
 
 [node name="Start" type="Node3D" parent="SubViewportContainer/SubViewport"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.5, 0, 0)

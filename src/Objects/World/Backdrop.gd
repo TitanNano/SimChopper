@@ -8,19 +8,14 @@ const merge_margin := 4 # this is related to the wave height of the main ocean m
 func _ready() -> void:
 	pass
 
-func create_mesh_instance(size_x: int, size_z: int, size_city: int) -> MeshInstance3D:
-	@warning_ignore("integer_division")
-	var uv_aspect_ratio := Vector3((size_x / size_city), (size_z / size_city), 1)
+func create_mesh_instance(size_x: int, size_z: int) -> MeshInstance3D:
 	var instance: MeshInstance3D = MeshInstance3D.new()
-
-	var inst_material: ShaderMaterial = self.material.duplicate()
-	inst_material.set_shader_parameter('uv_aspectratio', uv_aspect_ratio)
 
 	instance.name = "backdrop"
 	
 	var mesh := PlaneMesh.new()
 	mesh.size = Vector2(size_x, size_z)
-	mesh.surface_set_material(0, inst_material)
+	mesh.surface_set_material(0, self.material)
 
 	instance.mesh = mesh
 
@@ -30,7 +25,7 @@ func create_mesh_instance(size_x: int, size_z: int, size_city: int) -> MeshInsta
 func create_quadrant(size_city: int, size_depth: int, sea_level: int, offset_x: int, offset_z: int) -> MeshInstance3D:
 	var size_x := size_city if offset_x == 1 else size_depth
 	var size_z := size_city if offset_z == 1 else size_depth
-	var instance := self.create_mesh_instance(size_x, size_z, size_city)
+	var instance := self.create_mesh_instance(size_x, size_z)
 
 	@warning_ignore("integer_division")
 	instance.position.z = (size_city / 2 * offset_z) + (size_z / 2 * (offset_z - 1))

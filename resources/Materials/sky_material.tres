@@ -1,0 +1,26 @@
+[gd_resource type="ShaderMaterial" load_steps=6 format=3 uid="uid://c26tq15swq4at"]
+
+[ext_resource type="Shader" uid="uid://dadtbq4ym2chm" path="res://resources/Shaders/sky.tres" id="1_gixr0"]
+
+[sub_resource type="Gradient" id="Gradient_klkl5"]
+offsets = PackedFloat32Array(0.354386, 0.421053, 0.610526)
+colors = PackedColorArray(0, 0, 0, 1, 0.137255, 0.32549, 0.639216, 1, 0.137255, 0.32549, 0.639216, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_scq8q"]
+gradient = SubResource("Gradient_klkl5")
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Gradient" id="Gradient_0sht1"]
+interpolation_color_space = 1
+offsets = PackedFloat32Array(0.0350877, 0.463158)
+colors = PackedColorArray(1, 0.466667, 0, 1, 0.375132, 0.588795, 0.748625, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_lmpjt"]
+gradient = SubResource("Gradient_0sht1")
+
+[resource]
+shader = ExtResource("1_gixr0")
+shader_parameter/moon_size = 0.06
+shader_parameter/Texture2DParameter = SubResource("GradientTexture2D_scq8q")
+shader_parameter/sun_rise_gradient = SubResource("GradientTexture1D_lmpjt")

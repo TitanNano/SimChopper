@@ -7,11 +7,6 @@ uniform vec4 albedo: source_color;
 uniform float specular;
 uniform float metallic;
 uniform float roughness : hint_range(0,1);
-uniform sampler2D texture_ambient_occlusion : hint_default_white;
-uniform vec4 ao_texture_channel;
-uniform float ao_light_affect;
-uniform vec4 transmission : source_color;
-uniform sampler2D texture_transmission : hint_default_black;
 uniform vec3 uv1_scale;
 uniform vec3 uv1_offset;
 varying vec3 world_normal;
@@ -26,15 +21,10 @@ void vertex() {
 
 
 void fragment() {
-	vec2 base_uv = UV;
 	float grass_contribution = clamp(((world_normal.y - 0.95) / 0.05), 0.0, 1.0);
 	float dirt_contribution = clamp(((1.0 - world_normal.y) / 0.05), 0.0, 1.0);
 	ALBEDO = (dirt_contribution  * albedo.rgb) + (albedo_grass.rgb * grass_contribution);
 	METALLIC = metallic;
 	ROUGHNESS = roughness;
 	SPECULAR = specular;
-	AO = dot(texture(texture_ambient_occlusion,base_uv),ao_texture_channel);
-	AO_LIGHT_AFFECT = ao_light_affect;
-	vec3 transmission_tex = texture(texture_transmission,base_uv).rgb;
-	BACKLIGHT = (transmission.rgb+transmission_tex);
 }

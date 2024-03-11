@@ -42,7 +42,7 @@ func build_async(city: Dictionary):
 		var mesh_instance := MeshInstance3D.new()
 
 		mesh_instance.mesh = mesh
-		mesh_instance.cast_shadow = MeshInstance3D.SHADOW_CASTING_SETTING_OFF
+		mesh_instance.cast_shadow = MeshInstance3D.SHADOW_CASTING_SETTING_DOUBLE_SIDED
 		mesh_instance.create_trimesh_collision()
 
 		self.add_child(mesh_instance, true)

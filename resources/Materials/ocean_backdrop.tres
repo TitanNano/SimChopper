@@ -21,6 +21,7 @@ noise = SubResource("FastNoiseLite_ifgtm")
 render_priority = 0
 shader = ExtResource("2")
 shader_parameter/Wave_Ratio = 0.5
+shader_parameter/noise_scale = 0.02
 shader_parameter/Wave_Dir = 0.124
 shader_parameter/speed = 0.1
 shader_parameter/Wave2_Dir = 0.569

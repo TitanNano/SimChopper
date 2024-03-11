@@ -18,7 +18,7 @@ tracks/0/loop_wrap = true
 tracks/0/keys = {
 "clips": [{
 "end_offset": 0.0,
-"start_offset": 0.0,
+"start_offset": 0.3,
 "stream": ExtResource("1_vcbvg")
 }],
 "times": PackedFloat32Array(0)

@@ -41,6 +41,9 @@ strength = null
 
 [node name="RotorAudioTree" type="AnimationTree" parent="."]
 root_node = NodePath(".")
+libraries = {
+"": ExtResource("5_ayahk")
+}
 tree_root = ExtResource("4_8iee2")
 advance_expression_base_node = NodePath("")
 anim_player = NodePath("../RotorAudioPlayer")

@@ -8,7 +8,7 @@ use anyhow::Context;
 use derive_debug::Dbg;
 use godot::{
     builtin::{meta::ToGodot, Array, Dictionary},
-    engine::{utilities::snappedi, Node, Node3D, Resource, Time},
+    engine::{Marker3D, Node, Node3D, Resource, Time},
     obj::{Gd, NewAlloc},
 };
 use godot_rust_script::{godot_script_impl, GodotScript, ScriptSignal, Signal};
@@ -61,6 +61,12 @@ impl Buildings {
         }
     }
 
+    fn world_constants(&self) -> &Gd<Resource> {
+        self.world_constants
+            .as_ref()
+            .expect("world_constants should be set!")
+    }
+
     pub fn build_async(&mut self, city: Dictionary) {
         let city = match crate::world::city_data::City::try_from_dict(&city)
             .context("Failed to deserialize city data")
@@ -76,13 +82,8 @@ impl Buildings {
         let buildings = city.buildings;
         let tiles = city.tilelist;
 
-        self.city_coords_feature = CityCoordsFeature::new(
-            self.world_constants
-                .as_ref()
-                .expect("world_constants should be set!")
-                .to_owned(),
-            sea_level,
-        );
+        self.city_coords_feature =
+            CityCoordsFeature::new(self.world_constants().to_owned(), sea_level);
 
         logger::info!("starting to load buildings...");
 
@@ -161,15 +162,8 @@ impl Buildings {
         // fix z fighting of flat buildings
         location.y += 0.1;
 
-        let sector_name = {
-            let x = snappedi(tile_coords.0 as f64, 10);
-            let y = snappedi(tile_coords.1 as f64, 10);
-
-            format!("{}_{}", x, y)
-        };
-
         let (_, insert_time) = with_timing(|| {
-            self.get_sector(sector_name)
+            self.get_sector(tile_coords)
                 .add_child_ex(instance.clone())
                 .force_readable_name(true)
                 .done();
@@ -186,7 +180,8 @@ impl Buildings {
             instance.set_owner(root);
         });
 
-        let (_, translate_time) = with_timing(|| instance.cast::<Node3D>().translate(location));
+        let (_, translate_time) =
+            with_timing(|| instance.cast::<Node3D>().set_global_position(location));
 
         if instance_time > 100 {
             logger::warn!("\"{}\" is very slow to instantiate!", name);
@@ -201,15 +196,36 @@ impl Buildings {
         }
     }
 
-    fn get_sector(&mut self, name: String) -> Gd<Node> {
+    /// sector coordinates are expected to align with a step of 10
+    fn get_sector(&mut self, tile_coords: (u32, u32)) -> Gd<Node3D> {
+        const SECTOR_SIZE: u32 = 32;
+
+        let sector_coords = (
+            (tile_coords.0 / SECTOR_SIZE) * SECTOR_SIZE,
+            (tile_coords.1 / SECTOR_SIZE) * SECTOR_SIZE,
+        );
+
+        let sector_name = {
+            let (x, y) = sector_coords;
+
+            format!("{}_{}", x, y)
+        };
+
         self.base
-            .get_node_or_null(name.to_godot().into())
+            .get_node_or_null(sector_name.to_godot().into())
+            .map(Gd::cast)
             .unwrap_or_else(|| {
-                let mut sector = Node::new_alloc();
+                let mut sector: Gd<Node3D> = Marker3D::new_alloc().upcast();
 
-                sector.set_name(name.to_godot());
+                sector.set_name(sector_name.to_godot());
 
-                self.base.add_child(sector.clone());
+                self.base.add_child(sector.clone().upcast());
+
+                sector.translate(self.city_coords_feature.get_world_coords(
+                    sector_coords.0 + (SECTOR_SIZE / 2),
+                    sector_coords.1 + (SECTOR_SIZE / 2),
+                    0,
+                ));
 
                 if let Some(root) = self
                     .base

@@ -9,7 +9,6 @@ use godot::engine::{ArrayMesh, Material, SurfaceTool};
 use godot::prelude::meta::GodotType;
 use godot::prelude::*;
 
-use std::cmp::{max, min};
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
@@ -41,8 +40,8 @@ impl<T: GodotType> Deref for Shared<T> {
 }
 
 impl<T: GodotType> Shared<T> {
-    fn inner(self) -> T {
-        self.0
+    fn inner(&self) -> &T {
+        &self.0
     }
 }
 
@@ -162,6 +161,37 @@ fn create_tilelist_key(x: u16, y: u16) -> Variant {
     key.to_variant()
 }
 
+struct ChunkConfig {
+    tile_coords: (u16, u16),
+    size: u16,
+}
+
+#[derive(GodotClass)]
+pub struct TerrainChunk {
+    config: ChunkConfig,
+    mesh: Shared<Gd<ArrayMesh>>,
+}
+
+#[godot_api]
+impl TerrainChunk {
+    #[func]
+    pub fn mesh(&self) -> Gd<ArrayMesh> {
+        self.mesh.inner().to_owned()
+    }
+
+    #[func]
+    pub fn tile_coords(&self) -> Array<u16> {
+        let (x, y) = self.config.tile_coords;
+
+        Array::from(&[x, y])
+    }
+}
+
+struct ChunkSurfaces {
+    config: ChunkConfig,
+    surfaces: SurfaceMap,
+}
+
 struct ThreadContext<'a> {
     tile_size: u8,
     city_size: u16,
@@ -179,6 +209,7 @@ pub struct TerrainBuilder {
     city_size: u16,
     tile_height: u8,
     sea_level: u16,
+    chunk_size: u16,
     rotation: Gd<TerrainRotation>,
     tilelist: Dictionary,
     materials: Dictionary,
@@ -197,6 +228,7 @@ impl TerrainBuilder {
             city_size: 0,
             tile_height: 8,
             sea_level: 0,
+            chunk_size: 32,
             rotation,
             tilelist,
             materials,
@@ -221,6 +253,11 @@ impl TerrainBuilder {
     #[func]
     fn set_sea_level(&mut self, value: u16) {
         self.sea_level = value;
+    }
+
+    #[func]
+    fn chunk_size(&self) -> u16 {
+        self.chunk_size
     }
 
     fn tilelist(&self) -> Shared<Dictionary> {
@@ -328,14 +365,17 @@ impl TerrainBuilder {
 
     fn build_chunk_vertices(
         context: &ThreadContext,
-        chunk: (u16, u16, u16, u16),
-    ) -> (SurfaceMap, Vec<VertexRef>) {
+        chunk: ChunkConfig,
+    ) -> (ChunkSurfaces, Vec<VertexRef>) {
         let mut ybuffer: HashMapYBuffer<VertexRef> = YBuffer::new();
         let mut surfaces = SurfaceMap::new();
         let mut vertices = vec![];
         let mut edge_buffer = vec![];
 
-        let (lower_y, upper_y, lower_x, upper_x) = chunk;
+        let lower_y = chunk.tile_coords.1;
+        let lower_x = chunk.tile_coords.0;
+        let upper_y = lower_y + chunk.size;
+        let upper_x = lower_x + chunk.size;
 
         for y in lower_y..upper_y {
             for x in lower_x..upper_x {
@@ -392,17 +432,31 @@ impl TerrainBuilder {
                 vertex.set_normal(normal);
             });
 
-        (surfaces, edge_buffer)
+        (
+            ChunkSurfaces {
+                surfaces,
+                config: chunk,
+            },
+            edge_buffer,
+        )
     }
 
-    fn build_terain_chunk(context: &ThreadContext, surfaces: SurfaceMap) -> Shared<Gd<ArrayMesh>> {
+    fn build_terain_chunk(context: &ThreadContext, chunk: ChunkSurfaces) -> TerrainChunk {
         let mut generator = SurfaceTool::new_gd();
         let mut mesh = ArrayMesh::new_gd();
         let mut vertex_count = 0;
 
-        for (surface_type, surface) in surfaces {
+        for (surface_type, surface) in chunk.surfaces {
             generator.clear();
             generator.begin(PrimitiveType::TRIANGLES);
+
+            // calculate global offset. Vertex contains the wold coordinates and we have to subtract the
+            // offset to get the model coordinates.
+            let world_offset = Vector3 {
+                x: f32::from(chunk.config.tile_coords.0 * u16::from(context.tile_size)),
+                y: 0.0,
+                z: f32::from(chunk.config.tile_coords.1 * u16::from(context.tile_size)),
+            };
 
             for vertex_cell in surface {
                 let vertex = Arc::try_unwrap(vertex_cell)
@@ -423,7 +477,7 @@ impl TerrainBuilder {
                     generator.set_color(Color::from_rgb(1.0, 1.0, 1.0));
                 }
 
-                generator.add_vertex(vertex.into());
+                generator.add_vertex(Vector3::from(vertex) - world_offset);
 
                 vertex_count += 1;
             }
@@ -450,30 +504,29 @@ impl TerrainBuilder {
         godot_print!("generated {} vertices for terain", vertex_count);
         godot_print!("done generating surfaces {}ms", 0.0);
 
-        Shared(mesh)
+        TerrainChunk {
+            mesh: Shared(mesh),
+            config: chunk.config,
+        }
     }
 
     #[func]
-    pub fn build_terain_async(&self) -> Array<Gd<ArrayMesh>> {
-        let chunk_size = 16;
+    pub fn build_terain_async(&self) -> Array<Gd<TerrainChunk>> {
+        let chunk_size = self.chunk_size;
 
         // we need to be certain that we have a compatible city size
         assert!((self.city_size % chunk_size) == 0);
 
         let chunk_count = self.city_size / chunk_size;
         let timer = Instant::now();
-        let mut chunks: Vec<(u16, u16, u16, u16)> = Vec::with_capacity(chunk_count as usize);
 
-        for chunk_y in 0..chunk_count {
-            for chunk_x in 0..chunk_count {
-                let chunk_lower_y = max(chunk_y * chunk_size, 0);
-                let chunk_upper_y = min((chunk_y + 1) * chunk_size, self.city_size);
-                let chunk_lower_x = max(chunk_x * chunk_size, 0);
-                let chunk_upper_x = min((chunk_x + 1) * chunk_size, self.city_size);
-
-                chunks.push((chunk_lower_y, chunk_upper_y, chunk_lower_x, chunk_upper_x));
-            }
-        }
+        let chunks: Vec<_> = (0..chunk_count)
+            .flat_map(|y| (0..chunk_count).map(move |x| (x, y)))
+            .map(|(x, y)| ChunkConfig {
+                tile_coords: (x * chunk_size, y * chunk_size),
+                size: chunk_size,
+            })
+            .collect();
 
         let rotation = self.rotation().bind();
         let context = self.thread_context(rotation.deref());
@@ -485,14 +538,14 @@ impl TerrainBuilder {
 
         stitch_chunk_seams(chunk_edge_vertices);
 
-        let result: Vec<Shared<Gd<ArrayMesh>>> = surface_chunks
+        let result: Vec<_> = surface_chunks
             .into_par_iter()
             .map(|chunk| Self::build_terain_chunk(&context, chunk))
             .collect();
 
         godot_print!("terrain build time: {}ms", timer.elapsed().as_millis());
 
-        result.into_iter().map(|mesh| mesh.inner()).collect()
+        result.into_iter().map(Gd::from_object).collect()
     }
 }
 
@@ -523,14 +576,6 @@ impl TerrainBuilderFactory {
         rotation: Gd<TerrainRotation>,
         materials: Dictionary,
     ) -> Gd<TerrainBuilder> {
-        Gd::from_object(TerrainBuilder {
-            tile_size: 16,
-            city_size: 0,
-            tile_height: 8,
-            sea_level: 0,
-            rotation,
-            tilelist,
-            materials,
-        })
+        TerrainBuilder::new(tilelist, rotation, materials)
     }
 }

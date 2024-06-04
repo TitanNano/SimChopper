@@ -7,7 +7,7 @@
 [ext_resource type="AudioStream" uid="uid://ce4jpnr7uxq1o" path="res://resources/Sounds/Helicopter/start.wav" id="5_ibin8"]
 
 [sub_resource type="Animation" id="Animation_875du"]
-length = 1.58
+length = 1.27
 loop_mode = 1
 tracks/0/type = "audio"
 tracks/0/imported = false

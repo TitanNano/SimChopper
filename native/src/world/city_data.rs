@@ -14,16 +14,32 @@ pub(crate) enum TryFromDictError {
     #[error("dictionary key \"{0}\" is missing")]
     MissingKey(&'static str),
     #[error("dictionary key \"{0}\" has an unexpected type")]
-    InvalidType(Box<str>, #[source] ConvertError),
+    InvalidType(Box<str>, #[source] ErasedConvertError),
     #[error(transparent)]
-    InvalidKey(ConvertError),
+    InvalidKey(ErasedConvertError),
 }
+
+#[derive(thiserror::Error, Debug)]
+#[error("{message}")]
+pub(crate) struct ErasedConvertError {
+    message: String,
+}
+
+impl From<ConvertError> for ErasedConvertError {
+    fn from(value: ConvertError) -> Self {
+        Self {
+            message: value.to_string(),
+        }
+    }
+}
+
+pub type TileList = BTreeMap<(u32, u32), Tile>;
 
 #[derive(Debug)]
 pub(crate) struct City {
     pub simulator_settings: SimulatorSettings,
     pub buildings: BTreeMap<(u32, u32), Building>,
-    pub tilelist: BTreeMap<(u32, u32), Tile>,
+    pub tilelist: TileList,
 }
 
 impl TryFromDictionary for City {
@@ -96,11 +112,12 @@ impl<T: TryFromDictionary> TryFromDictionary for BTreeMap<(u32, u32), T> {
             .map(|(key, value)| {
                 let key = key
                     .try_to()
+                    .map_err(ErasedConvertError::from)
                     .map_err(TryFromDictError::InvalidKey)
                     .and_then(array_to_tuple)?;
 
                 let value: Dictionary = value.try_to().map_err(|err| {
-                    TryFromDictError::InvalidType(format!("{:?}", key).into(), err)
+                    TryFromDictError::InvalidType(format!("{:?}", key).into(), err.into())
                 })?;
 
                 Ok((key, T::try_from_dict(&value)?))
@@ -117,7 +134,7 @@ fn get_dict_key<T: FromGodot>(
         .get(key)
         .ok_or(TryFromDictError::MissingKey(key))?
         .try_to()
-        .map_err(|err| TryFromDictError::InvalidType(key.into(), err))
+        .map_err(|err| TryFromDictError::InvalidType(key.into(), err.into()))
 }
 
 fn get_dict_key_optional<T: FromGodot>(
@@ -132,7 +149,7 @@ fn get_dict_key_optional<T: FromGodot>(
 
     variant
         .try_to()
-        .map_err(|err| TryFromDictError::InvalidType(key.into(), err))
+        .map_err(|err| TryFromDictError::InvalidType(key.into(), err.into()))
         .map(Some)
 }
 
@@ -142,11 +159,11 @@ fn array_to_tuple(value: VariantArray) -> Result<(u32, u32), TryFromDictError> {
             .try_get(0)
             .ok_or(TryFromDictError::MissingKey("(x, _)"))?
             .try_to()
-            .map_err(|err| TryFromDictError::InvalidType("(x, _)".into(), err))?,
+            .map_err(|err| TryFromDictError::InvalidType("(x, _)".into(), err.into()))?,
         value
             .try_get(1)
             .ok_or(TryFromDictError::MissingKey("(_, y)"))?
             .try_to()
-            .map_err(|err| TryFromDictError::InvalidType("(x, _)".into(), err))?,
+            .map_err(|err| TryFromDictError::InvalidType("(x, _)".into(), err.into()))?,
     ))
 }

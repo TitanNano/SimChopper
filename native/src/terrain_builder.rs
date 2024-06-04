@@ -4,9 +4,9 @@ mod terrain_rotation;
 mod tile_surface;
 mod ybuffer;
 
+use godot::builtin::meta::GodotType;
 use godot::engine::mesh::PrimitiveType;
 use godot::engine::{ArrayMesh, Material, SurfaceTool};
-use godot::prelude::meta::GodotType;
 use godot::prelude::*;
 
 use std::collections::HashMap;
@@ -167,6 +167,7 @@ struct ChunkConfig {
 }
 
 #[derive(GodotClass)]
+#[class(no_init)]
 pub struct TerrainChunk {
     config: ChunkConfig,
     mesh: Shared<Gd<ArrayMesh>>,

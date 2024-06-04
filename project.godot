@@ -38,7 +38,7 @@ window/size/mode.release=3
 [editor]
 
 export/convert_text_resources_to_binary=false
-required_version="4.2.1"
+required_version="4.2.2"
 
 [editor_plugins]
 

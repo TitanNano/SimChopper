@@ -63,16 +63,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aca749d3d3f5b87a0d6100509879f9cf486ab510803a4a4e1001da1ff61c2bd6"
 
 [[package]]
-name = "crossbeam-channel"
-version = "0.5.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5aaa7bd5fb665c6864b5f963dd9097905c54125909c7aa94c9e18507cdbe6c53"
-dependencies = [
- "cfg-if",
- "crossbeam-utils",
-]
-
-[[package]]
 name = "crossbeam-deque"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -202,14 +192,14 @@ checksum = "78cc372d058dcf6d5ecd98510e7fbc9e5aec4d21de70f65fea8fecebcd881bd4"
 
 [[package]]
 name = "glam"
-version = "0.23.0"
+version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e4afd9ad95555081e109fe1d21f2a30c691b5f0919c67dfa690a2e1eb6bd51c"
+checksum = "9e05e7e6723e3455f4818c7b26e855439f7546cf617ef669d1adedb8669e5cb9"
 
 [[package]]
 name = "godot"
 version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=7fd1be904efccd71a9eb980c2e6fffa2d8705ec4#7fd1be904efccd71a9eb980c2e6fffa2d8705ec4"
+source = "git+https://github.com/godot-rust/gdext?rev=22fd33d4d5213a3fe5db9a58547888cebe35c647#22fd33d4d5213a3fe5db9a58547888cebe35c647"
 dependencies = [
  "godot-core",
  "godot-macros",
@@ -218,7 +208,7 @@ dependencies = [
 [[package]]
 name = "godot-bindings"
 version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=7fd1be904efccd71a9eb980c2e6fffa2d8705ec4#7fd1be904efccd71a9eb980c2e6fffa2d8705ec4"
+source = "git+https://github.com/godot-rust/gdext?rev=22fd33d4d5213a3fe5db9a58547888cebe35c647#22fd33d4d5213a3fe5db9a58547888cebe35c647"
 dependencies = [
  "godot4-prebuilt",
 ]
@@ -226,12 +216,12 @@ dependencies = [
 [[package]]
 name = "godot-cell"
 version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=7fd1be904efccd71a9eb980c2e6fffa2d8705ec4#7fd1be904efccd71a9eb980c2e6fffa2d8705ec4"
+source = "git+https://github.com/godot-rust/gdext?rev=22fd33d4d5213a3fe5db9a58547888cebe35c647#22fd33d4d5213a3fe5db9a58547888cebe35c647"
 
 [[package]]
 name = "godot-codegen"
 version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=7fd1be904efccd71a9eb980c2e6fffa2d8705ec4#7fd1be904efccd71a9eb980c2e6fffa2d8705ec4"
+source = "git+https://github.com/godot-rust/gdext?rev=22fd33d4d5213a3fe5db9a58547888cebe35c647#22fd33d4d5213a3fe5db9a58547888cebe35c647"
 dependencies = [
  "godot-bindings",
  "godot-fmt",
@@ -245,7 +235,7 @@ dependencies = [
 [[package]]
 name = "godot-core"
 version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=7fd1be904efccd71a9eb980c2e6fffa2d8705ec4#7fd1be904efccd71a9eb980c2e6fffa2d8705ec4"
+source = "git+https://github.com/godot-rust/gdext?rev=22fd33d4d5213a3fe5db9a58547888cebe35c647#22fd33d4d5213a3fe5db9a58547888cebe35c647"
 dependencies = [
  "glam",
  "godot-bindings",
@@ -257,18 +247,19 @@ dependencies = [
 [[package]]
 name = "godot-ffi"
 version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=7fd1be904efccd71a9eb980c2e6fffa2d8705ec4#7fd1be904efccd71a9eb980c2e6fffa2d8705ec4"
+source = "git+https://github.com/godot-rust/gdext?rev=22fd33d4d5213a3fe5db9a58547888cebe35c647#22fd33d4d5213a3fe5db9a58547888cebe35c647"
 dependencies = [
  "gensym",
  "godot-bindings",
  "godot-codegen",
+ "libc",
  "paste",
 ]
 
 [[package]]
 name = "godot-fmt"
 version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=7fd1be904efccd71a9eb980c2e6fffa2d8705ec4#7fd1be904efccd71a9eb980c2e6fffa2d8705ec4"
+source = "git+https://github.com/godot-rust/gdext?rev=22fd33d4d5213a3fe5db9a58547888cebe35c647#22fd33d4d5213a3fe5db9a58547888cebe35c647"
 dependencies = [
  "proc-macro2",
 ]
@@ -276,7 +267,7 @@ dependencies = [
 [[package]]
 name = "godot-macros"
 version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=7fd1be904efccd71a9eb980c2e6fffa2d8705ec4#7fd1be904efccd71a9eb980c2e6fffa2d8705ec4"
+source = "git+https://github.com/godot-rust/gdext?rev=22fd33d4d5213a3fe5db9a58547888cebe35c647#22fd33d4d5213a3fe5db9a58547888cebe35c647"
 dependencies = [
  "godot-bindings",
  "proc-macro2",
@@ -287,10 +278,11 @@ dependencies = [
 [[package]]
 name = "godot-rust-script"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=e06373cb0d8efce3ec097bbedde3e98e08a9ebfa#e06373cb0d8efce3ec097bbedde3e98e08a9ebfa"
+source = "git+https://github.com/titannano/godot-rust-script?rev=bb0fa8aafe79aab911789a9c6b0689b4d51a727d#bb0fa8aafe79aab911789a9c6b0689b4d51a727d"
 dependencies = [
  "const-str",
  "godot",
+ "godot-cell",
  "godot-rust-script-derive",
  "itertools",
  "once_cell",
@@ -300,7 +292,7 @@ dependencies = [
 [[package]]
 name = "godot-rust-script-derive"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=e06373cb0d8efce3ec097bbedde3e98e08a9ebfa#e06373cb0d8efce3ec097bbedde3e98e08a9ebfa"
+source = "git+https://github.com/titannano/godot-rust-script?rev=bb0fa8aafe79aab911789a9c6b0689b4d51a727d#bb0fa8aafe79aab911789a9c6b0689b4d51a727d"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -311,7 +303,7 @@ dependencies = [
 [[package]]
 name = "godot4-prebuilt"
 version = "0.0.0"
-source = "git+https://github.com/godot-rust/godot4-prebuilt?branch=4.2#9e60296be502e294dde3f245971f2868ce553677"
+source = "git+https://github.com/godot-rust/godot4-prebuilt?branch=4.2.2#5e6130a47f3dd31bfd02548cf8d90f47cb741916"
 
 [[package]]
 name = "hashbrown"
@@ -324,15 +316,6 @@ name = "heck"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2540771e65fc8cb83cd6e8a237f70c319bd5c29f78ed1084ba5d50eeac86f7f9"
-
-[[package]]
-name = "hermit-abi"
-version = "0.1.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62b467343b94ba476dcb2500d242dadbb39557df889310ac77c5d99100aaac33"
-dependencies = [
- "libc",
-]
 
 [[package]]
 name = "ident_case"
@@ -376,9 +359,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.149"
+version = "0.2.155"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a08173bc88b7955d1b3145aa561539096c421ac8debde8cbc3612ec635fee29b"
+checksum = "97b3888a4aecf77e811145cadf6eef5901f4782c53886191b2f693f24761847c"
 
 [[package]]
 name = "memchr"
@@ -514,16 +497,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num_cpus"
-version = "1.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19e64526ebdee182341572e50e9ad03965aa510cd94427a4549448f285e957a1"
-dependencies = [
- "hermit-abi",
- "libc",
-]
-
-[[package]]
 name = "num_enum"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -630,26 +603,22 @@ dependencies = [
 
 [[package]]
 name = "rayon"
-version = "1.5.2"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd249e82c21598a9a426a4e00dd7adc1d640b22445ec8545feef801d1a74c221"
+checksum = "b418a60154510ca1a002a752ca9714984e21e4241e804d32555251faf8b78ffa"
 dependencies = [
- "autocfg",
- "crossbeam-deque",
  "either",
  "rayon-core",
 ]
 
 [[package]]
 name = "rayon-core"
-version = "1.9.2"
+version = "1.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f51245e1e62e1f1629cbfec37b5793bbabcaeb90f30e94d2ba03564687353e4"
+checksum = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2"
 dependencies = [
- "crossbeam-channel",
  "crossbeam-deque",
  "crossbeam-utils",
- "num_cpus",
 ]
 
 [[package]]
@@ -761,9 +730,9 @@ dependencies = [
 
 [[package]]
 name = "venial"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61584a325b16f97b5b25fcc852eb9550843a251057a5e3e5992d2376f3df4bb2"
+checksum = "6816bc32f30bf8dd1b3adb04de8406c7bf187d2f923bd9e4c0b99365d012613f"
 dependencies = [
  "proc-macro2",
  "quote",

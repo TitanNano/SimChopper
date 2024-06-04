@@ -1,4 +1,4 @@
-use std::fmt;
+use std::fmt::{self, Display};
 use std::sync::{Arc, RwLock};
 
 use godot::prelude::*;
@@ -336,9 +336,9 @@ impl FixedPoint for Vertex {
     }
 }
 
-impl ToString for Vertex {
-    fn to_string(&self) -> String {
-        format!("{}x{}y{}z", self.x, self.y, self.z)
+impl Display for Vertex {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}x{}y{}z", self.x, self.y, self.z)
     }
 }
 

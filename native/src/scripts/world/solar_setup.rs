@@ -29,7 +29,7 @@ struct SolarSetup {
 impl SolarSetup {
     fn sun(&mut self) -> Option<Gd<DirectionalLight3D>> {
         if self.sun_ref.is_none() {
-            self.sun_ref = self.base.get_node(self.sun.clone()).map(|node| node.cast());
+            self.sun_ref = self.base.try_get_node_as(self.sun.clone());
         }
 
         self.sun_ref.clone()

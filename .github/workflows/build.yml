@@ -16,7 +16,7 @@ jobs:
         arch: ['x86_64', 'aarch64']
         include:
           - platform: linux
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             vendor: unknown
             env: -gnu
             lib: libnative.so
@@ -26,7 +26,7 @@ jobs:
             env: '-msvc'
             lib: native.dll
           - platform: darwin
-            os: macos-11
+            os: macos-14
             vendor: apple
             lib: libnative.dylib
         exclude:
@@ -42,18 +42,18 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Set up clang64
       if: contains(matrix.os, 'windows')
       run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
-    - name: Add Build target
-      run: |
-        cd native/
-        rustup target add ${{ env.TARGET_TRIPLET }}
     - uses: Swatinem/rust-cache@v2
       with:
         workspaces: ./native/
         key: ${{ matrix.arch }}
+    - name: Add Build target
+      run: |
+        cd native/
+        rustup target add ${{ env.TARGET_TRIPLET }}
     - name: Build Debug
       if: ${{ !inputs.release }}
       run: |
@@ -65,7 +65,7 @@ jobs:
         cd native/
         ${{ env.CARGO_BUILD }} ${{ env.TARGET_TRIPLET}} --release
     - name: Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: libnative-${{ matrix.platform }}-${{ matrix.arch }}
           path: native/target/${{ env.TARGET_TRIPLET }}/${{ inputs.release && 'release' || 'debug' }}/${{ matrix.lib }}
@@ -79,7 +79,7 @@ jobs:
           - profile: 'macOS'
             platform: darwin
             vendor: apple
-            os: macos-12
+            os: macos-14
             x86_64: true
             aarch64: true
             extension: '.dmg'
@@ -89,7 +89,7 @@ jobs:
             platform: windows
             env: '-msvc'
             vendor: pc
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             x86_64: true
             aarch64: true
             extension: '.exe'
@@ -113,9 +113,9 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: setup Godot
-        uses: lihop/setup-godot@4aad9daa7dd81c11329c4b54fdc26dbd39eea7d6
+        uses: lihop/setup-godot@v2
         with:
           version: ${{ matrix.version }}
           export-templates: false
@@ -127,19 +127,19 @@ jobs:
           unzip -j Godot_v${{ matrix.version }}-stable_export_templates.tpz
       - name: download host libs
         if: ${{ matrix.platform != 'linux' && startsWith(matrix.os, 'ubuntu') }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: libnative-linux-x86_64
           path: native/target/x86_64-unknown-linux-gnu/debug/
       - name: download x86_64 libs
         if: matrix.x86_64
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: libnative-${{ matrix.platform }}-x86_64
           path: native/target/x86_64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/debug/
       - name: download aarch64 libs
         if: matrix.aarch64
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: libnative-${{ matrix.platform }}-aarch64
           path: native/target/aarch64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/debug/
@@ -192,7 +192,7 @@ jobs:
       - name: describe revision
         id: describe
         run: echo "ref=$(git describe --tags --always)" >> $GITHUB_OUTPUT
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: SimChopper_${{ matrix.profile }}_${{ steps.describe.outputs.ref }}
           path: ${{ env.EXPORT_DIR }}

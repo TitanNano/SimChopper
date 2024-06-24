@@ -51,6 +51,7 @@ mesh = SubResource("BoxMesh_483kg")
 [node name="DebugTarget" type="MeshInstance3D" parent="." index="4"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 151, 10)
 visible = false
+cast_shadow = 0
 mesh = SubResource("BoxMesh_483kg")
 
 [node name="GroundDetector" type="RayCast3D" parent="." index="5"]

@@ -1,12 +1,11 @@
 [gd_scene load_steps=13 format=3 uid="uid://uvhjdh84glq8"]
 
 [ext_resource type="PackedScene" uid="uid://blyermwgncstx" path="res://resources/Objects/Spawner/CarSpawner.tscn" id="1"]
+[ext_resource type="RoadNavigationRes" uid="uid://dkfv08m34f2fr" path="res://resources/Data/road_navigation.tres" id="1_msi07"]
 [ext_resource type="PackedScene" uid="uid://c6cmp45buruhr" path="res://resources/Objects/Networks/Road/left_right.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://k8hd8bpyy0c3" path="res://resources/Objects/Networks/Road/bottom_right.tscn" id="3"]
 [ext_resource type="PackedScene" uid="uid://ctiydbpunmky5" path="res://resources/Objects/Networks/Road/top_bottom.tscn" id="4"]
 [ext_resource type="PackedScene" uid="uid://ciibxiig2g8k" path="res://resources/Objects/Networks/Road/top_high_bottom.tscn" id="5"]
-[ext_resource type="Script" path="res://src/Objects/Networks/RoadNavigation.gd" id="6"]
-[ext_resource type="Resource" path="res://resources/Data/world_constants.tres" id="7"]
 [ext_resource type="PackedScene" uid="uid://4hpb44n7ocar" path="res://resources/Objects/Networks/Road/bottom_left.tscn" id="8"]
 [ext_resource type="PackedScene" uid="uid://cvvvoyifx4bcy" path="res://resources/Objects/Networks/Road/high_top_bottom.tscn" id="9"]
 [ext_resource type="PackedScene" uid="uid://c6iv8edftjmas" path="res://resources/Objects/Networks/Road/top_right.tscn" id="10"]
@@ -17,30 +16,41 @@ resource_name = "Scene"
 script/source = "extends Node3D
 
 const Building := preload(\"res://src/Objects/Map/Building.gd\")
-const RoadNavigation := preload(\"res://src/Objects/Networks/RoadNavigation.gd\")
+
+@export var road_navigation: RoadNavigationRes
+
+func scale_window():
+	var scale := DisplayServer.screen_get_scale(DisplayServer.SCREEN_OF_MAIN_WINDOW)
+	var window := self.get_window()
+	
+	window.size *= scale
+	window.position -= Vector2i(self.get_window().size / scale / 2)
+
 
 func _ready() -> void:
+	scale_window()
+	
 	var building_ids = {
-		0: 0x26,
+		0: 0x24,
 		1: 0x1D,
 		2: 0x20,
 		3: 0x1D,
 		4: 0x1F,
-		5: 0x23,
+		5: 0x25,
 		6: 0x1E,
 		7: 0x1E,
-		8: 0x25,
+		8: 0x23,
 		9: 0x1E,
 		10: 0x1E,
 		11: 0x1E,
 		12: 0x1E,
-		13: 0x24,
+		13: 0x26,
 	}
 
 	var idx = 0
-	var road_naviagtion := $Road as RoadNavigation
+	var road_network := $Road
 
-	for item in road_naviagtion.get_children():
+	for item in road_network.get_children():
 		var child := item as Node3D
 		var node: Building
 
@@ -74,23 +84,26 @@ func _ready() -> void:
 					\"name\": \"Road\",
 				})
 
-		road_naviagtion.insert_node(node)
-		road_naviagtion.associate_object(node, child)
+		road_navigation.insert_node(node.data, child)
 		idx += 1
 
-	road_naviagtion.update_debug()
+#	road_navigation.update_debug()
 	($CarSpawner as CarSpawner).spawn_car()
 "
 
+[sub_resource type="Environment" id="Environment_dejjk"]
+background_energy_multiplier = 5.0
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 10.0
+
 [node name="Node3D" type="Node3D"]
 script = SubResource("2")
+road_navigation = ExtResource("1_msi07")
 
 [node name="Road" type="Node3D" parent="." groups=["road-network"]]
 unique_name_in_owner = true
-script = ExtResource("6")
-world_constants = ExtResource("7")
 
-[node name="BottomLeft" parent="Road" instance=ExtResource("3")]
+[node name="BottomRight" parent="Road" instance=ExtResource("3")]
 
 [node name="TopBottom" parent="Road" instance=ExtResource("4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 0)
@@ -104,7 +117,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 8, 0)
 [node name="HighTopBottom" parent="Road" instance=ExtResource("9")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 0, 0)
 
-[node name="TopLeft" parent="Road" instance=ExtResource("8")]
+[node name="BottomLeft" parent="Road" instance=ExtResource("8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 0)
 
 [node name="LeftRight" parent="Road" instance=ExtResource("2")]
@@ -113,7 +126,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 16)
 [node name="LeftRight2" parent="Road" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 16)
 
-[node name="BottomRight" parent="Road" instance=ExtResource("10")]
+[node name="TopRight" parent="Road" instance=ExtResource("10")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 32)
 
 [node name="TopBottom3" parent="Road" instance=ExtResource("4")]
@@ -128,7 +141,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 0, 32)
 [node name="TopBottom6" parent="Road" instance=ExtResource("4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 0, 32)
 
-[node name="TopRight" parent="Road" instance=ExtResource("11")]
+[node name="TopLeft" parent="Road" instance=ExtResource("11")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 32)
 
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
@@ -153,3 +166,6 @@ transform = Transform3D(0.993568, -0.0886679, 0.0704306, 0, 0.621979, 0.783034, 
 [node name="CarSpawner" parent="." instance=ExtResource("1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2, 2)
 road_network_path = NodePath("../Road")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_dejjk")

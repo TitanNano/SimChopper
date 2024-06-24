@@ -4,17 +4,17 @@ const TimeBudget := preload("res://src/util/TimeBudget.gd")
 const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
 const Building := preload("res://src/Objects/Map/Building.gd")
-const RoadNavigation := preload("res://src/Objects/Networks/RoadNavigation.gd")
 
 signal loading_progress(value)
 
 @export var is_built := false
 @export var world_constants: WorldConstants
+@export var road_navigation: RoadNavigationRes
 
 var city_coords_feature: CityCoordsFeature
 
 @onready var powerline_network := $Powerlines
-@onready var road_network: RoadNavigation = $Road
+@onready var road_network := $Road
 
 func _ready() -> void:
 	assert(world_constants is WorldConstants, "Networks.world_constants is not of type WorldConstants")
@@ -66,8 +66,7 @@ func build_async(city: Dictionary):
 			powerline_network.add_child(instance, true)
 		elif network_section.building_id() in (range(0x1D, 0x2C) + range(0x51, 0x5E) + range(0x43, 0x45)):
 			road_network.add_child(instance, true)
-			road_network.insert_node(network_section)
-			road_network.associate_object(network_section, instance)
+			road_navigation.insert_node(network_section.data, instance)
 		else:
 			print("network secction doesn't belong to any network, ", network_section)
 
@@ -79,8 +78,6 @@ func build_async(city: Dictionary):
 			print("yielding after ", budget.elapsed(), "ms of work")
 			budget.restart()
 			await self.get_tree().process_frame
-
-	road_network.update_debug()
 
 	for _i in range(3):
 		var car_spawner: CarSpawner = (load("res://resources/Objects/Spawner/CarSpawner.tscn") as PackedScene).instantiate()

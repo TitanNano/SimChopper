@@ -1,7 +1,6 @@
 extends RigidBody3D
 
 const V3Util := preload("res://src/util/V3Util.gd")
-const RoadNavigation := preload("res://src/Objects/Networks/RoadNavigation.gd")
 const Building := preload("res://src/Objects/Map/Building.gd")
 const Logger := preload("res://src/util/Logger.gd")
 const CustomProjectSettings := preload("res://src/CustomProjectSettings.gd")
@@ -24,7 +23,8 @@ var current_nav_node: Building
 
 @onready var debug_target: MeshInstance3D = $DebugTarget
 @onready var ground_detector: RayCast3D = $GroundDetector
-@onready var road_network: RoadNavigation = get_node(road_network_path)
+
+@export var road_network: RoadNavigationRes = preload("res://resources/Data/road_navigation.tres")
 
 func _ready() -> void:
 	self.rng = RandomNumberGenerator.new()
@@ -52,6 +52,7 @@ func _physics_process(_delta: float) -> void:
 	if self.stuck >= 5:
 		Logger.info("despawning stuck car")
 		self.queue_free()
+		debug_target.queue_free()
 
 	self.last_transform = self.global_transform
 
@@ -148,13 +149,13 @@ func _on_choose_target() -> void:
 	if not self.current_nav_node:
 		var node := self.road_network.get_nearest_node(self.global_transform.origin)
 
-		self.current_nav_node = node
+		self.current_nav_node = Building.new(node)
 
 	Logger.debug(["car next target:", target_translation])
 
 
 func get_random_street_location() -> Vector3:
-	var node := self.road_network.get_random_node()
+	var node := Building.new(self.road_network.get_random_node())
 
 	if self.target_nav_node != null:
 		var current := self.current_nav_node.tile_coords()
@@ -169,14 +170,14 @@ func get_random_street_location() -> Vector3:
 
 	self.target_nav_node = node
 
-	return self.road_network.get_global_transform(node).origin
+	return self.road_network.get_global_transform(node.data, Vector3.ZERO).origin
 
 
 func is_target_reached() -> bool:
 	@warning_ignore("shadowed_variable_base_class")
 	var rotation := self.global_rotation
 	var orientation := Vector3.FORWARD.rotated(Vector3.UP, rotation.y)
-	return self.road_network.has_arrived(self.global_transform.origin, orientation, self.target_nav_node)
+	return self.road_network.has_arrived(self.global_transform.origin, orientation, self.target_nav_node.data)
 
 
 func get_next_location() -> Vector3:
@@ -185,10 +186,10 @@ func get_next_location() -> Vector3:
 
 	Logger.debug(["agent rotation:", self.global_rotation.y])
 
-	if not self.road_network.has_arrived(agent_pos, agent_rot, self.current_nav_node):
-		return self.road_network.get_global_transform(self.current_nav_node, agent_rot).origin
+	if not self.road_network.has_arrived(agent_pos, agent_rot, self.current_nav_node.data):
+		return self.road_network.get_global_transform(self.current_nav_node.data, agent_rot).origin
 
-	self.current_nav_node = self.road_network.get_next_node(self.current_nav_node, self.target_nav_node, agent_rot)
+	self.current_nav_node = Building.new(self.road_network.get_next_node(self.current_nav_node.data, self.target_nav_node.data, agent_rot))
 	return self.get_next_location()
 
 

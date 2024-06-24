@@ -13,10 +13,10 @@
 [ext_resource type="Script" path="res://native/src/scripts/world/solar_setup.rs" id="12_88vys"]
 [ext_resource type="Material" uid="uid://bmp5rvu5slnnt" path="res://resources/Materials/ocean_material.tres" id="13"]
 [ext_resource type="Script" path="res://src/Objects/World/Networks.gd" id="14"]
-[ext_resource type="Resource" path="res://resources/Data/world_constants.tres" id="15"]
+[ext_resource type="RoadNavigationRes" uid="uid://dkfv08m34f2fr" path="res://resources/Data/road_navigation.tres" id="14_x2ouh"]
+[ext_resource type="WorldConstants" uid="uid://dbxp5cngs1a5g" path="res://resources/Data/world_constants.tres" id="15"]
 [ext_resource type="Script" path="res://native/src/scripts/world/buildings.rs" id="15_23gpq"]
 [ext_resource type="PackedScene" uid="uid://cmv7rt4gqew38" path="res://resources/Objects/Helis/schweizer_300.tscn" id="16_e6k8r"]
-[ext_resource type="Script" path="res://src/Objects/Networks/RoadNavigation.gd" id="17"]
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lhcij"]
 dof_blur_far_enabled = true
@@ -143,12 +143,11 @@ directional_shadow_max_distance = 400.0
 [node name="Networks" type="Node" parent="SubViewportContainer/SubViewport/World"]
 script = ExtResource("14")
 world_constants = ExtResource("15")
+road_navigation = ExtResource("14_x2ouh")
 
 [node name="Powerlines" type="Node" parent="SubViewportContainer/SubViewport/World/Networks"]
 
 [node name="Road" type="Node3D" parent="SubViewportContainer/SubViewport/World/Networks" groups=["road-network"]]
-script = ExtResource("17")
-world_constants = ExtResource("15")
 
 [node name="Buildings" type="Node" parent="SubViewportContainer/SubViewport/World"]
 script = ExtResource("15_23gpq")

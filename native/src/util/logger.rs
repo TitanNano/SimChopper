@@ -1,4 +1,5 @@
-pub use crate::{error, info, warn};
+#[allow(unused)]
+pub use crate::{debug, error, info, warn};
 
 #[macro_export(local_inner_macros)]
 macro_rules! log {

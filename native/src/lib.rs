@@ -1,4 +1,6 @@
 mod objects;
+mod resources;
+mod road_navigation;
 mod scripts;
 mod terrain_builder;
 mod util;

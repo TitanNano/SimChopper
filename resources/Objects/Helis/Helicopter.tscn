@@ -41,9 +41,6 @@ strength = null
 
 [node name="RotorAudioTree" type="AnimationTree" parent="."]
 root_node = NodePath(".")
-libraries = {
-"": ExtResource("5_ayahk")
-}
 tree_root = ExtResource("4_8iee2")
 advance_expression_base_node = NodePath("")
 anim_player = NodePath("../RotorAudioPlayer")
@@ -53,11 +50,12 @@ parameters/conditions/spin_down = false
 parameters/conditions/spin_up = false
 
 [node name="RotorAudioPlayer" type="AnimationPlayer" parent="."]
+active = false
 root_node = NodePath("../RotorAudioTree")
 libraries = {
 "": ExtResource("5_ayahk")
 }
 
 [node name="RotorAudioSource" type="AudioStreamPlayer3D" parent="."]
-unit_size = 30.0
+unit_size = 5.0
 doppler_tracking = 2

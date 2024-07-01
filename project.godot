@@ -116,9 +116,9 @@ limits/debugger_stdout/max_chars_per_second=1000000
 [physics]
 
 3d/default_gravity=9.81
+common/physics_interpolation=true
 common/physics_fps=120
 common/enable_pause_aware_picking=true
-common/physics_interpolation=true
 
 [rendering]
 
@@ -126,6 +126,7 @@ textures/vram_compression/import_s3tc_bptc=true
 lights_and_shadows/directional_shadow/size=8192
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=4
 lights_and_shadows/directional_shadow/16_bits=false
+environment/volumetric_fog/volume_size=200
+environment/volumetric_fog/volume_depth=200
 lights_and_shadows/positional_shadow/atlas_16_bits=false
 threads/thread_model=2
-environment/default_environment="res://resources/Environments/default_env.tres"

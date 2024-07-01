@@ -1,0 +1,24 @@
+[gd_resource type="Shader" format=3 uid="uid://dwmxlfa00u2l7"]
+
+[resource]
+code = "
+// NOTE: Shader automatically converted from Godot Engine 4.2.2.stable's FogMaterial.
+
+shader_type fog;
+
+uniform float density : hint_range(0, 8, 0.0001) = 1.0;
+uniform vec3 color : source_color = vec3(0, 0, 0);
+uniform sampler3D density_texture: hint_default_white;
+
+
+float fire_noise(vec3 uvw, float time_scale) {
+	return texture(density_texture, vec3(uvw.x, fract(uvw.y + (-TIME * time_scale)), uvw.z)).r;
+}
+
+void fog() {
+	float s_noise = fire_noise(UVW, 0.4);
+
+    DENSITY = s_noise * density;
+    ALBEDO = color;
+}
+"

@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://hyoixndx1seb"]
+
+[ext_resource type="PackedScene" uid="uid://5lcllve4d4s5" path="res://resources/Objects/Buildings/home_middle_class_3.tscn" id="1_daqnl"]
+
+[node name="HomeMiddleClass3" instance=ExtResource("1_daqnl")]
+
+[node name="CollisionShape3D" parent="." index="1"]
+visible = false
+
+[node name="Camera3D" type="Camera3D" parent="." index="2"]
+transform = Transform3D(-0.830816, 0.200801, -0.519061, 0, 0.932644, 0.360798, 0.556548, 0.299757, -0.774855, -17.8978, 11.3634, -20.2184)
+current = true

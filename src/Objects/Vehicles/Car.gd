@@ -1,7 +1,7 @@
 extends RigidBody3D
 
 const V3Util := preload("res://src/util/V3Util.gd")
-const Building := preload("res://src/Objects/Map/Building.gd")
+const MapBuilding := preload("res://src/Objects/Map/Building.gd")
 const Logger := preload("res://src/util/Logger.gd")
 const CustomProjectSettings := preload("res://src/CustomProjectSettings.gd")
 
@@ -18,8 +18,8 @@ var stuck := 0
 var new := true
 var last_transform := Transform3D.IDENTITY
 
-var target_nav_node: Building
-var current_nav_node: Building
+var target_nav_node: MapBuilding
+var current_nav_node: MapBuilding
 
 @onready var debug_target: MeshInstance3D = $DebugTarget
 @onready var ground_detector: RayCast3D = $GroundDetector
@@ -149,13 +149,13 @@ func _on_choose_target() -> void:
 	if not self.current_nav_node:
 		var node := self.road_network.get_nearest_node(self.global_transform.origin)
 
-		self.current_nav_node = Building.new(node)
+		self.current_nav_node = MapBuilding.new(node)
 
 	Logger.debug(["car next target:", target_translation])
 
 
 func get_random_street_location() -> Vector3:
-	var node := Building.new(self.road_network.get_random_node())
+	var node := MapBuilding.new(self.road_network.get_random_node())
 
 	if self.target_nav_node != null:
 		var current := self.current_nav_node.tile_coords()
@@ -189,7 +189,7 @@ func get_next_location() -> Vector3:
 	if not self.road_network.has_arrived(agent_pos, agent_rot, self.current_nav_node.data):
 		return self.road_network.get_global_transform(self.current_nav_node.data, agent_rot).origin
 
-	self.current_nav_node = Building.new(self.road_network.get_next_node(self.current_nav_node.data, self.target_nav_node.data, agent_rot))
+	self.current_nav_node = MapBuilding.new(self.road_network.get_next_node(self.current_nav_node.data, self.target_nav_node.data, agent_rot))
 	return self.get_next_location()
 
 

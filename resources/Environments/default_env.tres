@@ -1,10 +1,14 @@
-[gd_resource type="Environment" load_steps=2 format=2]
+[gd_resource type="Environment" load_steps=3 format=3 uid="uid://dq1rh4w14o3ri"]
 
-[sub_resource type="Sky" id=1]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tv10b"]
+
+[sub_resource type="Sky" id="1"]
+sky_material = SubResource("ProceduralSkyMaterial_tv10b")
 
 [resource]
 background_mode = 2
-background_sky = SubResource( 1 )
-ss_reflections_enabled = true
-dof_blur_far_distance = 180.0
-dof_blur_far_transition = 0.45
+sky = SubResource("1")
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0
+volumetric_fog_anisotropy = -3.46945e-18
+volumetric_fog_length = 2000.0

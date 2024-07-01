@@ -1,0 +1,26 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://dbuspcbhwqr7g"]
+
+[ext_resource type="Shader" uid="uid://dwmxlfa00u2l7" path="res://resources/Shaders/smoke_shader.tres" id="1_hb22f"]
+
+[sub_resource type="Gradient" id="Gradient_tt0nr"]
+offsets = PackedFloat32Array(0.466346, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_vso3d"]
+seed = 1
+fractal_octaves = 3
+fractal_gain = 0.7
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_xjpji"]
+width = 100
+height = 100
+depth = 100
+seamless = true
+seamless_blend_skirt = 0.5
+color_ramp = SubResource("Gradient_tt0nr")
+noise = SubResource("FastNoiseLite_vso3d")
+
+[resource]
+shader = ExtResource("1_hb22f")
+shader_parameter/density = 0.8
+shader_parameter/color = Color(0.133196, 0.133196, 0.133196, 1)
+shader_parameter/density_texture = SubResource("NoiseTexture3D_xjpji")

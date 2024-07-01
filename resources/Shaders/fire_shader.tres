@@ -1,0 +1,55 @@
+[gd_resource type="Shader" format=3 uid="uid://b3ohn1ek5kics"]
+
+[resource]
+code = "
+// NOTE: Shader automatically converted from Godot Engine 4.2.2.stable's FogMaterial.
+
+shader_type fog;
+
+uniform float density : hint_range(0, 8, 0.0001) = 1.0;
+uniform sampler2D color : hint_default_white;
+uniform float height_falloff = 0.0;
+uniform sampler3D density_texture: hint_default_white, repeat_enable;
+uniform sampler3D flame_texture: hint_default_white, repeat_enable;
+uniform float strength : hint_range(1.0, 10.0, 0.1);
+
+vec3 uvw_over_time(vec3 uvw, float time_scale) {
+	return vec3(
+		uvw.x + sin(TIME * time_scale) * 0.1, 
+		uvw.y + (-TIME * 1.5), 
+		uvw.z + sin(TIME * time_scale) * 0.1
+	);
+}
+
+float fire_noise(vec2 ground_uv, vec3 uvw, float time_scale) {
+	const float STEP_INTERVAL = 0.3;
+	const float STEP_SIZE = 0.4;
+
+	int steps = int(TIME / STEP_INTERVAL);
+	int steps_next = steps + 1;
+	float steps_slide = mod(TIME, STEP_INTERVAL) / STEP_INTERVAL;
+	
+	vec3 ground_uvw = vec3(ground_uv.x + float(steps) * STEP_SIZE, 0.0, ground_uv.y + float(steps) * STEP_SIZE);
+	vec3 ground_uvw_next = vec3(ground_uv.x + float(steps_next) * STEP_SIZE, 0.0, ground_uv.y + float(steps_next) * STEP_SIZE);
+
+	float mask_lookup = texture(density_texture, ground_uvw).r;
+	float mask_lookup_next = texture(density_texture, ground_uvw_next).r;
+	
+	float mask = mix(mask_lookup, mask_lookup_next, steps_slide);
+	float shape = texture(flame_texture, uvw_over_time(uvw, 4.0)).r;
+	
+	return mask * shape;
+}
+
+void fog() {
+	vec3 world_offset = fract(OBJECT_POSITION);
+	float f_noise = fire_noise(UVW.xz + world_offset.xz, UVW + world_offset, 3.0);
+	
+	float f_density = density * clamp(exp2(-height_falloff * (WORLD_POSITION.y - OBJECT_POSITION.y)), 0.0, 1.0);
+	f_density *= f_noise;
+	
+    DENSITY = f_density;
+
+    EMISSION = texture(color, vec2(f_noise)).rgb * 3.0;
+}
+"

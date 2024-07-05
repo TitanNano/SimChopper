@@ -1,3 +1,4 @@
+mod objects;
 mod particles;
 mod spawner;
 mod world;

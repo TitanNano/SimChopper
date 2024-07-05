@@ -3,7 +3,7 @@ extends Node
 const TimeBudget := preload("res://src/util/TimeBudget.gd")
 const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
 const SceneObjectRegistry := preload("res://src/SceneObjectRegistry.gd")
-const Building := preload("res://src/Objects/Map/Building.gd")
+const MapBuilding := preload("res://src/Objects/Map/Building.gd")
 
 signal loading_progress(value)
 
@@ -29,7 +29,7 @@ func build_async(city: Dictionary):
 	self.city_coords_feature = CityCoordsFeature.new(world_constants, sea_level)
 
 	for key in networks:
-		var network_section: Building = Building.new(networks.get(key) as Dictionary)
+		var network_section := MapBuilding.new(networks.get(key) as Dictionary)
 		var object := SceneObjectRegistry.load_network(network_section.building_id())
 		@warning_ignore("shadowed_variable_base_class")
 		var name: String = network_section.name()

@@ -1,0 +1,54 @@
+[gd_resource type="ShaderMaterial" load_steps=10 format=3 uid="uid://dm0vav0ade2gp"]
+
+[ext_resource type="Shader" uid="uid://b3ohn1ek5kics" path="res://resources/Shaders/fire_shader.tres" id="1_p6ais"]
+
+[sub_resource type="Gradient" id="Gradient_qagn7"]
+offsets = PackedFloat32Array(0.185096, 0.512019, 0.992788)
+colors = PackedColorArray(0.768627, 0.0745098, 0.00392157, 1, 0.980392, 0.309804, 0.00392157, 1, 0.992157, 0.705882, 0.0509804, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_gmckf"]
+gradient = SubResource("Gradient_qagn7")
+
+[sub_resource type="Gradient" id="Gradient_hkbw6"]
+offsets = PackedFloat32Array(0.514423, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_rbw6l"]
+noise_type = 0
+seed = 2
+frequency = 0.03
+fractal_lacunarity = 6.0
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_td2w5"]
+width = 100
+height = 100
+depth = 100
+seamless = true
+seamless_blend_skirt = 0.5
+color_ramp = SubResource("Gradient_hkbw6")
+noise = SubResource("FastNoiseLite_rbw6l")
+
+[sub_resource type="Gradient" id="Gradient_hx50x"]
+colors = PackedColorArray(0, 0, 0, 1, 0.74558, 0.74558, 0.74558, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_b0r66"]
+frequency = 0.008
+fractal_type = 2
+fractal_octaves = 2
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_as1dx"]
+width = 256
+height = 256
+depth = 256
+seamless = true
+seamless_blend_skirt = 0.5
+color_ramp = SubResource("Gradient_hx50x")
+noise = SubResource("FastNoiseLite_b0r66")
+
+[resource]
+shader = ExtResource("1_p6ais")
+shader_parameter/density = 8.0
+shader_parameter/height_falloff = 0.5
+shader_parameter/strength = 2.0
+shader_parameter/color = SubResource("GradientTexture1D_gmckf")
+shader_parameter/density_texture = SubResource("NoiseTexture3D_td2w5")
+shader_parameter/flame_texture = SubResource("NoiseTexture3D_as1dx")

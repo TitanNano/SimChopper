@@ -147,10 +147,21 @@ impl Buildings {
             ));
         }
 
-        let (Some(mut instance), instance_time) = with_timing(|| object.instantiate()) else {
+        let (Some(mut instance), instance_time) =
+            with_timing(|| object.try_instantiate_as::<Node3D>())
+        else {
             logger::error!("failed to instantiate building {}", name);
             return;
         };
+
+        if !instance.get("tile_coords_array".into()).is_nil() {
+            let mut array = Array::new();
+
+            array.push(tile_coords.0);
+            array.push(tile_coords.1);
+
+            instance.set("tile_coords_array".into(), array.to_variant());
+        }
 
         let mut location = self.city_coords_feature.get_building_coords(
             tile_coords.0,
@@ -164,7 +175,7 @@ impl Buildings {
 
         let (_, insert_time) = with_timing(|| {
             self.get_sector(tile_coords)
-                .add_child_ex(instance.clone())
+                .add_child_ex(instance.clone().upcast())
                 .force_readable_name(true)
                 .done();
 

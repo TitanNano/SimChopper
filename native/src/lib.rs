@@ -1,3 +1,5 @@
+#[cfg(debug_assertions)]
+mod editor;
 mod objects;
 mod resources;
 mod road_navigation;
@@ -29,4 +31,14 @@ unsafe impl ExtensionLibrary for NativeLib {
             InitLevel::Core => (),
         }
     }
+}
+
+#[macro_export]
+macro_rules! callable {
+    ($path:ty, $fn:ident, $instance:expr) => {{
+        let inst: &Gd<$path> = $instance;
+        let _fn_ptr = <$path>::$fn;
+
+        godot::builtin::Callable::from_object_method(inst, stringify!($fn))
+    }};
 }

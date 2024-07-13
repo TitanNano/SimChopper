@@ -1,9 +1,8 @@
-[gd_resource type="StandardMaterial3D" format=2]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c5gb1flf8wfbl"]
 
 [resource]
 resource_name = "matcolour-19"
-flags_transparent = true
-params_cull_mode = 2
-params_depth_draw_mode = 1
-albedo_color = Color( 1, 1, 1, 0.12549 )
+transparency = 4
+albedo_color = Color(1, 1, 1, 0.0588235)
 roughness = 0.0
+refraction_scale = 2.08167e-17

@@ -128,5 +128,6 @@ lights_and_shadows/directional_shadow/soft_shadow_filter_quality=4
 lights_and_shadows/directional_shadow/16_bits=false
 environment/volumetric_fog/volume_size=200
 environment/volumetric_fog/volume_depth=200
+occlusion_culling/use_occlusion_culling=true
 lights_and_shadows/positional_shadow/atlas_16_bits=false
 threads/thread_model=2

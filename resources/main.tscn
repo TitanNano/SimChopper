@@ -67,6 +67,7 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer" node_paths=PackedStringArray("current_camera_controller")]
 handle_input_locally = false
+use_occlusion_culling = true
 scaling_3d_mode = 1
 audio_listener_enable_3d = true
 size = Vector2i(1152, 648)

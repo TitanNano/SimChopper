@@ -1,0 +1,58 @@
+[gd_resource type="VisualShader" load_steps=5 format=3 uid="uid://n32x634wfxs7"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_dppsg"]
+input_name = "uv2"
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_iyvyu"]
+parameter_name = "ao_texture"
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_2ys06"]
+source = 5
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_ugk10"]
+parameter_name = "light_affect"
+hint = 1
+default_value_enabled = true
+default_value = 0.2
+
+[resource]
+code = "shader_type spatial;
+render_mode blend_mul, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx;
+
+uniform sampler2D ao_texture;
+uniform float light_affect : hint_range(0, 1) = 0.20000000298023;
+
+
+
+void fragment() {
+// Input:2
+	vec2 n_out2p0 = UV2;
+
+
+	vec4 n_out4p0;
+// Texture2D:4
+	n_out4p0 = texture(ao_texture, n_out2p0);
+
+
+// FloatParameter:5
+	float n_out5p0 = light_affect;
+
+
+// Output:0
+	AO = n_out4p0.x;
+	AO_LIGHT_AFFECT = n_out5p0;
+
+
+}
+"
+modes/blend = 3
+nodes/fragment/0/position = Vector2(220, 80)
+nodes/fragment/2/node = SubResource("VisualShaderNodeInput_dppsg")
+nodes/fragment/2/position = Vector2(-880, 320)
+nodes/fragment/3/node = SubResource("VisualShaderNodeTexture2DParameter_iyvyu")
+nodes/fragment/3/position = Vector2(-880, 540)
+nodes/fragment/4/node = SubResource("VisualShaderNodeTexture_2ys06")
+nodes/fragment/4/position = Vector2(-220, 240)
+nodes/fragment/5/node = SubResource("VisualShaderNodeFloatParameter_ugk10")
+nodes/fragment/5/position = Vector2(-880, 1220)
+nodes/fragment/connections = PackedInt32Array(3, 0, 4, 2, 2, 0, 4, 0, 5, 0, 0, 7, 4, 0, 0, 6)

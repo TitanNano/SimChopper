@@ -1,33 +1,12 @@
-[gd_scene load_steps=17 format=3 uid="uid://cmv7rt4gqew38"]
+[gd_scene load_steps=14 format=3 uid="uid://cmv7rt4gqew38"]
 
 [ext_resource type="PackedScene" uid="uid://dl34exjsm3sq4" path="res://resources/Objects/Helis/Helicopter.tscn" id="1"]
-[ext_resource type="PackedScene" uid="uid://b0ln8n5f4i7ks" path="res://resources/Meshes/Helis/schweizer_300/main.glb" id="2"]
+[ext_resource type="PackedScene" uid="uid://dewjdss5yelsc" path="res://resources/Meshes/Helis/schweizer_300/main.gltf" id="2"]
 [ext_resource type="PackedScene" uid="uid://c0wggsy543kf2" path="res://resources/Meshes/Helis/schweizer_300/rotor.glb" id="3"]
 [ext_resource type="PackedScene" uid="uid://din03my4vl3s6" path="res://resources/Meshes/Helis/schweizer_300/tail_rotor.glb" id="4"]
 [ext_resource type="Material" uid="uid://ckkpoyyglqm80" path="res://resources/Particles/Rotor/rotor_dust_particles_schweizer.tres" id="6"]
 [ext_resource type="Material" uid="uid://ckwvw4rptthjv" path="res://resources/Materials/rotor_material.tres" id="6_y4h4o"]
 [ext_resource type="Script" path="res://src/Objects/Helicopters/Rotor.gd" id="7"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5whq0"]
-resource_name = "matcolour-80"
-vertex_color_use_as_albedo = true
-albedo_color = Color(0.466477, 0.417003, 0.218649, 1)
-clearcoat_enabled = true
-clearcoat_roughness = 0.7
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tyxvo"]
-resource_name = "matcolour-16"
-vertex_color_use_as_albedo = true
-albedo_color = Color(0.774056, 0.277847, 0.150005, 1)
-clearcoat_enabled = true
-clearcoat_roughness = 0.7
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kuryk"]
-resource_name = "matcolour-0"
-vertex_color_use_as_albedo = true
-albedo_color = Color(0, 0, 0, 1)
-roughness = 0.0
-subsurf_scatter_strength = 0.3
 
 [sub_resource type="CapsuleShape3D" id="22"]
 radius = 0.63507
@@ -69,11 +48,6 @@ process_material = ExtResource("6")
 
 [node name="main" parent="." index="3" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.00369608)
-
-[node name="Maxis-3d2-mesh-106" parent="main" index="0"]
-surface_material_override/0 = SubResource("StandardMaterial3D_5whq0")
-surface_material_override/1 = SubResource("StandardMaterial3D_tyxvo")
-surface_material_override/2 = SubResource("StandardMaterial3D_kuryk")
 
 [node name="rotor" parent="." index="4" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.04184)

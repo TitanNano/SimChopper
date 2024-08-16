@@ -46,9 +46,9 @@ noise = SubResource("FastNoiseLite_b0r66")
 
 [resource]
 shader = ExtResource("1_p6ais")
+shader_parameter/strength = 1.0
 shader_parameter/density = 8.0
 shader_parameter/height_falloff = 0.5
-shader_parameter/strength = 2.0
 shader_parameter/color = SubResource("GradientTexture1D_gmckf")
 shader_parameter/density_texture = SubResource("NoiseTexture3D_td2w5")
 shader_parameter/flame_texture = SubResource("NoiseTexture3D_as1dx")

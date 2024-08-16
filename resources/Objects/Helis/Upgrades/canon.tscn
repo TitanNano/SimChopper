@@ -1,0 +1,178 @@
+[gd_scene load_steps=24 format=3 uid="uid://c0pat4v54oe86"]
+
+[ext_resource type="PackedScene" uid="uid://daf3wyyha2hm" path="res://resources/Meshes/Helis/upgrades/cannon.gltf" id="1_54ycj"]
+[ext_resource type="Script" path="res://native/src/scripts/objects/canon_upgrade.rs" id="2_1jnub"]
+[ext_resource type="Material" uid="uid://bamhf7as5ev7r" path="res://resources/Particles/water_jet.tres" id="2_nsqv1"]
+[ext_resource type="Material" uid="uid://cdtr7t6dqskao" path="res://resources/Materials/watter_particle_material.tres" id="3_lyjqx"]
+[ext_resource type="Script" path="res://native/src/scripts/objects/water_jet.rs" id="4_3ki7x"]
+[ext_resource type="Texture2D" uid="uid://cgajeno6v3mbj" path="res://resources/Textures/Water/water_particle_alpha.png" id="4_owba1"]
+[ext_resource type="Texture2D" uid="uid://d17vaba581i6" path="res://resources/Textures/Water/water_particle_normal.png" id="5_cxogv"]
+[ext_resource type="Texture2D" uid="uid://b0fqgpuodjpvg" path="res://resources/Textures/Water/red.png" id="6_8vk3t"]
+[ext_resource type="Script" path="res://native/src/scripts/effects/water_decal.rs" id="9_v48py"]
+[ext_resource type="Script" path="res://native/src/scripts/objects/debugger_3_d.rs" id="10_7u3rm"]
+[ext_resource type="PackedScene" uid="uid://c36tta374cm54" path="res://resources/HUD/debug/water_jet_debug.tscn" id="10_51x2k"]
+[ext_resource type="AnimationLibrary" uid="uid://ccdoql0ui30qd" path="res://resources/Animations/canon_water_jet.tres" id="10_u6k6a"]
+[ext_resource type="AnimationNodeStateMachine" uid="uid://bhxg4j3d3uxr0" path="res://resources/Animations/canon_water_jet_animation_states.tres" id="11_sjwuo"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_tggho"]
+points = PackedVector3Array(0.0634894, 0.28541, 1.47195, -0.1009, 0.219458, 1.10271, -0.1009, 0.412842, 1.10271, 0.0935621, 0.4137, 1.1008, -0.1009, 0.412842, 1.43675, 0.0934082, 0.2184, 1.10108, -0.1009, 0.219458, 1.43675, 0.0935621, 0.4137, 1.43846, 0.0934082, 0.2184, 1.43821, -0.0138567, 0.459466, 1.3559, -0.0332037, 0.208029, 1.47195, 0.0248164, 0.459466, 1.16252, -0.0332037, 0.324124, 1.47195, 0.0441425, 0.208029, 1.47195, -0.0138567, 0.459466, 1.16252, 0.0248164, 0.459466, 1.3559, -0.0525298, 0.304755, 1.47195, 0.0441425, 0.324124, 1.47195, -0.0525298, 0.227374, 1.47195, 0.0634894, 0.246719, 1.47195)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_yhox5"]
+points = PackedVector3Array(-0.0560845, 0.225026, 1.4461, 0.0635008, 0.285379, 2.32289, 0.0635008, 0.246727, 2.32289, 0.0670385, 0.286558, 1.4461, -0.0332018, 0.324066, 2.32289, -0.03556, 0.327603, 1.4461, -0.0332018, 0.208041, 2.32289, 0.0441557, 0.208041, 1.47204, 0.046514, 0.327603, 1.4461, -0.0525468, 0.304722, 2.32289, 0.0441557, 0.324066, 2.32289, 0.0441557, 0.208041, 2.32289, -0.0560845, 0.30708, 1.4461, -0.0525468, 0.227384, 2.32289, -0.0332018, 0.208041, 1.47204, 0.0670385, 0.245549, 1.4461)
+
+[sub_resource type="QuadMesh" id="QuadMesh_wqt7j"]
+material = ExtResource("3_lyjqx")
+size = Vector2(0.7, 0.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aet65"]
+size = Vector3(15.1061, 26.5005, 75.1869)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_e4rg2"]
+radius = 0.4
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_b52ix"]
+radius = 1.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ujlq7"]
+radius = 2.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_y6xdm"]
+radius = 4.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_wrup6"]
+radius = 7.0
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_0mey1"]
+viewport_path = NodePath("WaterJetDebugger/SubViewport")
+
+[node name="Canon" instance=ExtResource("1_54ycj")]
+transform = Transform3D(-1, 3.48787e-16, -8.74228e-08, 3.48787e-16, 1, -3.48787e-16, 8.74228e-08, -3.48787e-16, -1, 0, 0, 0)
+script = ExtResource("2_1jnub")
+mode = 0
+water_jet_path = NodePath("WaterJet")
+
+[node name="Maxis-3d2-mesh-143" parent="." index="0"]
+transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="CollisionShape3D_B" type="CollisionShape3D" parent="Maxis-3d2-mesh-143" index="0"]
+transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_tggho")
+
+[node name="CollisionShape3D_A" type="CollisionShape3D" parent="Maxis-3d2-mesh-143" index="1"]
+transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_yhox5")
+
+[node name="WaterJet" type="GPUParticles3D" parent="." index="1"]
+transform = Transform3D(-1, 3.48787e-16, -8.74228e-08, 3.48787e-16, 1, -3.48787e-16, 8.74228e-08, -3.48787e-16, -1, -5.06016e-15, 0.266152, 2.15765)
+emitting = false
+amount = 2000
+lifetime = 2.0
+visibility_aabb = AABB(-2.55386, -1.94139, -5.68435, 5.10773, 3.88278, 6.79545)
+draw_order = 3
+process_material = ExtResource("2_nsqv1")
+draw_pass_1 = SubResource("QuadMesh_wqt7j")
+script = ExtResource("4_3ki7x")
+impact_casts_path = [NodePath("ParticleImpactCastA"), NodePath("ParticleImpactCastB"), NodePath("ParticleImpactCastC"), NodePath("ParticleImpactCastD"), NodePath("ParticleImpactCastE"), NodePath("ParticleImpactCastF")]
+impact_area_path = NodePath("ParticleImpactArea")
+decal_path = NodePath("WaterDecal")
+debugger_path = NodePath("../WaterJetDebugger")
+max_decal_count = 10
+max_delay = 1.8
+
+[node name="WaterDecal" type="Decal" parent="WaterJet" index="0" groups=["wet_surface_decal"]]
+visible = false
+texture_albedo = ExtResource("4_owba1")
+texture_normal = ExtResource("5_cxogv")
+texture_orm = ExtResource("6_8vk3t")
+albedo_mix = 0.7
+upper_fade = 0.8
+lower_fade = 0.8
+script = ExtResource("9_v48py")
+
+[node name="ParticleImpactArea" type="Area3D" parent="WaterJet" index="1"]
+transform = Transform3D(1, -1.47268e-30, 0, -1.47268e-30, 1, 0, 0, 0, 1, 0, 0, 0)
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WaterJet/ParticleImpactArea" index="0"]
+transform = Transform3D(1, 0, -9.67226e-10, 0, 1, 0, -9.67226e-10, 0, 1, -0.0208936, -12.7502, -37.0935)
+shape = SubResource("BoxShape3D_aet65")
+
+[node name="ParticleImpactCastA" type="ShapeCast3D" parent="WaterJet" index="2"]
+transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 3.94868e-08, -0.0772753, -0.225838)
+enabled = false
+shape = SubResource("SphereShape3D_e4rg2")
+target_position = Vector3(2.08165e-12, 2.08165e-12, -5)
+collision_mask = 3
+
+[node name="ParticleImpactCastB" type="ShapeCast3D" parent="WaterJet" index="3"]
+transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 4.38711e-08, 0, -5.2439)
+enabled = false
+shape = SubResource("SphereShape3D_e4rg2")
+target_position = Vector3(2.08165e-12, -0.5, -6)
+collision_mask = 3
+
+[node name="ParticleImpactCastC" type="ShapeCast3D" parent="WaterJet" index="4"]
+transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 4.32584e-08, -0.483, -11.2524)
+enabled = false
+shape = SubResource("SphereShape3D_b52ix")
+target_position = Vector3(2.08165e-12, -1, -6)
+collision_mask = 3
+
+[node name="ParticleImpactCastD" type="ShapeCast3D" parent="WaterJet" index="5"]
+transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 3.00757e-08, -1.454, -17.258)
+enabled = false
+shape = SubResource("SphereShape3D_ujlq7")
+target_position = Vector3(2.08165e-12, -2, -10.5)
+collision_mask = 3
+
+[node name="ParticleImpactCastE" type="ShapeCast3D" parent="WaterJet" index="6"]
+transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 3.5019e-08, -3.643, -27.7673)
+enabled = false
+shape = SubResource("SphereShape3D_y6xdm")
+target_position = Vector3(2.08165e-12, -7, -20)
+collision_mask = 3
+
+[node name="ParticleImpactCastF" type="ShapeCast3D" parent="WaterJet" index="7"]
+transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 5.93257e-08, -10.871, -47.7673)
+enabled = false
+shape = SubResource("SphereShape3D_wrup6")
+target_position = Vector3(2.08165e-12, -8, -18)
+collision_mask = 3
+
+[node name="ParticleCollision" type="GPUParticlesCollisionHeightField3D" parent="WaterJet" index="8"]
+transform = Transform3D(1, 0, 1.19942e-09, 0, 1, 0, 1.19942e-09, 0, 1, 0.425537, -22.2146, -55.7903)
+size = Vector3(219.237, 52.5883, 115.03)
+
+[node name="AudioSource" type="AudioStreamPlayer3D" parent="WaterJet" index="9"]
+transform = Transform3D(1, 1.68276e-30, 0, -1.47268e-30, 1, -4.73317e-30, 0, 0, 1, 0.121209, -0.140246, -2.91244)
+volume_db = 15.0
+unit_size = 2.0
+max_db = 6.0
+
+[node name="AudioPlayer" type="AnimationPlayer" parent="WaterJet" index="10"]
+libraries = {
+"": ExtResource("10_u6k6a")
+}
+
+[node name="AnimationTree" type="AnimationTree" parent="WaterJet" index="11"]
+tree_root = ExtResource("11_sjwuo")
+advance_expression_base_node = NodePath("..")
+anim_player = NodePath("../AudioPlayer")
+
+[node name="WaterJetDebugger" type="Sprite3D" parent="." index="2"]
+process_mode = 4
+transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, -2.98064, 1.59321, 1.60687)
+visible = false
+billboard = 1
+no_depth_test = true
+texture = SubResource("ViewportTexture_0mey1")
+script = ExtResource("10_7u3rm")
+title = "Water Jet Debugger"
+text_view_path = NodePath("SubViewport/WaterJetDebugControl/MarginContainer/RichTextLabel")
+
+[node name="SubViewport" type="SubViewport" parent="WaterJetDebugger" index="0"]
+disable_3d = true
+transparent_bg = true
+size = Vector2i(300, 500)
+
+[node name="WaterJetDebugControl" parent="WaterJetDebugger/SubViewport" index="0" instance=ExtResource("10_51x2k")]

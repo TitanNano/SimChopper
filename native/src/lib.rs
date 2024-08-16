@@ -1,5 +1,6 @@
 #[cfg(debug_assertions)]
 mod editor;
+mod ext;
 mod objects;
 mod resources;
 mod road_navigation;
@@ -34,11 +35,36 @@ unsafe impl ExtensionLibrary for NativeLib {
 }
 
 #[macro_export]
-macro_rules! callable {
-    ($path:ty, $fn:ident, $instance:expr) => {{
-        let inst: &Gd<$path> = $instance;
-        let _fn_ptr = <$path>::$fn;
+macro_rules! class_callable {
+    ($instance:expr, $host:ident::$fn:ident) => {{
+        let instance: &$host = &*$instance;
 
-        godot::builtin::Callable::from_object_method(inst, stringify!($fn))
+        let _fn_ptr = $host::$fn;
+
+        instance.base().callable(stringify!($fn))
+    }};
+}
+
+#[macro_export]
+macro_rules! script_callable {
+    ($instance:expr, $host:ident::$fn:ident) => {{
+        let instance: &$host = &*$instance;
+
+        let _fn_ptr = $host::$fn;
+
+        instance.base.callable(stringify!($fn))
+    }};
+}
+
+#[macro_export]
+macro_rules! engine_callable {
+    ($instance:expr, $host:ident::$fn:ident) => {{
+        fn __typecheck<T: ::godot::obj::Inherits<$host>>(instance: &Gd<T>) -> &Gd<T> {
+            instance
+        }
+
+        let _fn_ptr = $host::$fn;
+
+        __typecheck($instance).callable(stringify!($fn))
     }};
 }

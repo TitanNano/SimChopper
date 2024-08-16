@@ -6,12 +6,12 @@ code = "
 
 shader_type fog;
 
+uniform float strength : hint_range(0.0, 1.0, 0.1);
 uniform float density : hint_range(0, 8, 0.0001) = 1.0;
 uniform sampler2D color : hint_default_white;
 uniform float height_falloff = 0.0;
 uniform sampler3D density_texture: hint_default_white, repeat_enable;
 uniform sampler3D flame_texture: hint_default_white, repeat_enable;
-uniform float strength : hint_range(1.0, 10.0, 0.1);
 
 vec3 uvw_over_time(vec3 uvw, float time_scale) {
 	return vec3(
@@ -48,7 +48,7 @@ void fog() {
 	float f_density = density * clamp(exp2(-height_falloff * (WORLD_POSITION.y - OBJECT_POSITION.y)), 0.0, 1.0);
 	f_density *= f_noise;
 	
-    DENSITY = f_density;
+    DENSITY = f_density * strength;
 
     EMISSION = texture(color, vec2(f_noise)).rgb * 3.0;
 }

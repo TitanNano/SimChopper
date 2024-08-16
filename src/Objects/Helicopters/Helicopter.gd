@@ -11,11 +11,17 @@ const Logger := preload("res://src/util/Logger.gd")
 @export_group("Slots", "child_")
 
 @export var child_engine_sound_tree: AnimationTree
-@export var child_camera: Node3D
 @export var child_dust_particles: GPUParticles3D
+@export var child_upgrade_mount: Node3D
 @export var child_rotor: Node3D
+@export var child_camera: Node3D
 @export var child_main_camera: Node3D
 @export var child_debug_camera: Node3D
+
+@export_group("Upgrades", "upgrades_")
+
+@export var upgrades_available: Array[HelicopterUpgrade]
+@export var upgrades_owned: Array[HelicopterUpgrade]
 
 const MAX_TILT := 45.0 # degrees
 const ACCELERATION_TIME := 0.4 # amount of seconds to accelerate to top speed
@@ -27,6 +33,7 @@ var directional_velocity := Vector3.ZERO
 var rotational_velocity := 0.0
 var engine_speed := 0.0
 var is_on_ground := true
+var upgrade_action_dispatch: Dictionary = {}
 
 @onready var camera: CameraInterpolation = self.child_camera
 @onready var dust_particles: DustParticles = self.child_dust_particles
@@ -38,6 +45,8 @@ var is_on_ground := true
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.rotor.power = 0
+	self.mount_upgrades()
+		
 
 func _get_top_speed(delta: float) -> float:
 	return CRUISE_SPEED_MS * delta
@@ -177,3 +186,36 @@ func switch_debug_camera():
 		self.debug_camera.active = true
 	else:
 		self.main_camera.active = true
+
+
+func _unhandled_key_input(event: InputEvent):
+	for action: StringName in upgrade_action_dispatch:
+		var target: Node3D = upgrade_action_dispatch[action]
+
+		if event.is_action_pressed(action):
+			target.call("action_start", action)
+			continue
+		
+		if event.is_action_released(action):
+			target.call("action_end", action)
+			continue
+			
+func mount_upgrades():
+	for upgrade in self.upgrades_owned:
+		var scene = upgrade.object
+		var object := scene.instantiate()
+		var duplicate := false
+
+		object.set_meta("scene_instance_id", scene.get_instance_id())
+
+		for child in self.child_upgrade_mount.get_children():
+			if child.get_meta("scene_instance_id") == scene.get_instance_id():
+				duplicate = true
+				break
+
+		if duplicate:
+			return
+
+		self.child_upgrade_mount.add_child(object, true)
+		object.owner = self.child_upgrade_mount
+		self.upgrade_action_dispatch[upgrade.action] = object

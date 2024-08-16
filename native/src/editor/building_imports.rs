@@ -14,7 +14,7 @@ use godot::{
 use pomsky_macro::pomsky;
 use regex::Regex;
 
-use crate::{callable, util::logger};
+use crate::{class_callable, util::logger};
 
 #[derive(GodotClass)]
 #[class(base = Object, init, tool)]
@@ -46,12 +46,12 @@ impl SetupBuildingImports {
 
         dialog.connect(
             "file_selected".into(),
-            callable!(Self, on_file_selected, &self.base().clone().cast()),
+            class_callable!(self, Self::on_file_selected),
         );
 
         dialog.connect(
             "dir_selected".into(),
-            callable!(Self, on_dir_selected, &self.base().clone().cast()),
+            class_callable!(self, Self::on_dir_selected),
         );
 
         let Some(ui) = editor.get_base_control() else {

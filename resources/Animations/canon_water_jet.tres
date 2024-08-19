@@ -1,0 +1,31 @@
+[gd_resource type="AnimationLibrary" load_steps=4 format=3 uid="uid://ccdoql0ui30qd"]
+
+[ext_resource type="AudioStream" uid="uid://cbx2eoah7cfih" path="res://resources/Sounds/Helicopter/water_jet.wav" id="1_jvos4"]
+
+[sub_resource type="Animation" id="Animation_0utdi"]
+length = 0.001
+
+[sub_resource type="Animation" id="Animation_pmtyp"]
+resource_name = "water_jet"
+length = 30.0
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("1_jvos4")
+}],
+"times": PackedFloat32Array(0)
+}
+tracks/0/use_blend = true
+
+[resource]
+_data = {
+"RESET": SubResource("Animation_0utdi"),
+"water_jet": SubResource("Animation_pmtyp")
+}

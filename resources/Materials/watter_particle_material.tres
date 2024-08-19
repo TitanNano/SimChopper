@@ -1,0 +1,63 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://cdtr7t6dqskao"]
+
+[ext_resource type="Texture2D" uid="uid://noqfqbi7ovdw" path="res://resources/Textures/Water/water_particle.png" id="1_cypix"]
+
+[sub_resource type="Shader" id="Shader_8lo1q"]
+code = "// NOTE: Shader automatically converted from Godot Engine 4.2.2.stable's StandardMaterial3D.
+
+shader_type spatial;
+render_mode blend_mix,depth_draw_always,cull_back,diffuse_burley,specular_schlick_ggx;
+
+uniform sampler2D texture_alpha : source_color,repeat_enable;
+uniform float roughness : hint_range(0,1);
+uniform float specular;
+uniform float refraction : hint_range(-16,16);
+uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_linear_mipmap;
+uniform sampler2D texture_normal : hint_normal,filter_linear_mipmap,repeat_enable;
+
+void vertex() {
+	// particle billboard
+	mat4 mat_world = mat4(normalize(INV_VIEW_MATRIX[0]), normalize(INV_VIEW_MATRIX[1]) ,normalize(INV_VIEW_MATRIX[2]), MODEL_MATRIX[3]);
+	mat_world = mat_world * mat4(vec4(cos(INSTANCE_CUSTOM.x), -sin(INSTANCE_CUSTOM.x), 0.0, 0.0), vec4(sin(INSTANCE_CUSTOM.x), cos(INSTANCE_CUSTOM.x), 0.0, 0.0), vec4(0.0, 0.0, 1.0, 0.0), vec4(0.0, 0.0, 0.0, 1.0));
+	
+	// scale over lifetime
+	float current_scale =  1.0 + (pow(INSTANCE_CUSTOM.y, 2) * 10.0);
+	mat4 scale = mat4(vec4(current_scale, 0, 0, 0), vec4(0, current_scale, 0, 0), vec4(0, 0, current_scale, 0), vec4(0, 0, 0, 1.0));
+	mat_world = mat_world * scale;
+	
+	MODELVIEW_MATRIX = VIEW_MATRIX * mat_world;
+	MODELVIEW_NORMAL_MATRIX = mat3(MODELVIEW_MATRIX);
+}
+
+void fragment() {
+	vec2 base_uv = UV;
+	ROUGHNESS = roughness;
+	SPECULAR = specular;
+	NORMAL_MAP = texture(texture_normal,base_uv).rgb;
+	vec3 unpacked_normal = NORMAL_MAP;
+	unpacked_normal.xy = unpacked_normal.xy * 2.0 - 1.0;
+	unpacked_normal.z = sqrt(max(0.0, 1.0 - dot(unpacked_normal.xy, unpacked_normal.xy)));
+	vec3 ref_normal = normalize( mix(NORMAL,TANGENT * unpacked_normal.x + BINORMAL * unpacked_normal.y + NORMAL * unpacked_normal.z,NORMAL_MAP_DEPTH) );
+	vec2 ref_ofs = SCREEN_UV - ref_normal.xy * refraction;
+	float ref_amount = 1.0;
+	EMISSION += textureLod(screen_texture,ref_ofs,ROUGHNESS * 8.0).rgb * ref_amount * EXPOSURE;
+	ALBEDO *= 1.0 - ref_amount;
+	ALPHA = texture(texture_alpha,base_uv).r;
+}
+"
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_1p6sg"]
+fractal_octaves = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_hk72y"]
+as_normal_map = true
+noise = SubResource("FastNoiseLite_1p6sg")
+
+[resource]
+render_priority = 0
+shader = SubResource("Shader_8lo1q")
+shader_parameter/roughness = 0.5
+shader_parameter/specular = 0.5
+shader_parameter/refraction = 0.500001
+shader_parameter/texture_alpha = ExtResource("1_cypix")
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_hk72y")

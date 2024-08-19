@@ -173,7 +173,7 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 [[package]]
 name = "gdextension-api"
 version = "0.1.0"
-source = "git+https://github.com/godot-rust/godot4-prebuilt?branch=4.2#2831ebde06033c7942e832155c48bd821540177b"
+source = "git+https://github.com/godot-rust/godot4-prebuilt?branch=releases#e3c0d8d397a593aa23da4a19b535c959754f3604"
 
 [[package]]
 name = "gensym"
@@ -212,8 +212,8 @@ checksum = "9e05e7e6723e3455f4818c7b26e855439f7546cf617ef669d1adedb8669e5cb9"
 
 [[package]]
 name = "godot"
-version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=4c8ea83fc3452485f7b33f2411c136a248457334#4c8ea83fc3452485f7b33f2411c136a248457334"
+version = "0.1.3"
+source = "git+https://github.com/godot-rust/gdext?tag=v0.1.3#6d34dade6be130552ca5754e1f287ab0a67c042c"
 dependencies = [
  "godot-core",
  "godot-macros",
@@ -221,21 +221,21 @@ dependencies = [
 
 [[package]]
 name = "godot-bindings"
-version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=4c8ea83fc3452485f7b33f2411c136a248457334#4c8ea83fc3452485f7b33f2411c136a248457334"
+version = "0.1.3"
+source = "git+https://github.com/godot-rust/gdext?tag=v0.1.3#6d34dade6be130552ca5754e1f287ab0a67c042c"
 dependencies = [
  "gdextension-api",
 ]
 
 [[package]]
 name = "godot-cell"
-version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=4c8ea83fc3452485f7b33f2411c136a248457334#4c8ea83fc3452485f7b33f2411c136a248457334"
+version = "0.1.3"
+source = "git+https://github.com/godot-rust/gdext?tag=v0.1.3#6d34dade6be130552ca5754e1f287ab0a67c042c"
 
 [[package]]
 name = "godot-codegen"
-version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=4c8ea83fc3452485f7b33f2411c136a248457334#4c8ea83fc3452485f7b33f2411c136a248457334"
+version = "0.1.3"
+source = "git+https://github.com/godot-rust/gdext?tag=v0.1.3#6d34dade6be130552ca5754e1f287ab0a67c042c"
 dependencies = [
  "godot-bindings",
  "heck",
@@ -247,8 +247,8 @@ dependencies = [
 
 [[package]]
 name = "godot-core"
-version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=4c8ea83fc3452485f7b33f2411c136a248457334#4c8ea83fc3452485f7b33f2411c136a248457334"
+version = "0.1.3"
+source = "git+https://github.com/godot-rust/gdext?tag=v0.1.3#6d34dade6be130552ca5754e1f287ab0a67c042c"
 dependencies = [
  "glam",
  "godot-bindings",
@@ -259,8 +259,8 @@ dependencies = [
 
 [[package]]
 name = "godot-ffi"
-version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=4c8ea83fc3452485f7b33f2411c136a248457334#4c8ea83fc3452485f7b33f2411c136a248457334"
+version = "0.1.3"
+source = "git+https://github.com/godot-rust/gdext?tag=v0.1.3#6d34dade6be130552ca5754e1f287ab0a67c042c"
 dependencies = [
  "gensym",
  "godot-bindings",
@@ -271,8 +271,8 @@ dependencies = [
 
 [[package]]
 name = "godot-macros"
-version = "0.1.0"
-source = "git+https://github.com/godot-rust/gdext?rev=4c8ea83fc3452485f7b33f2411c136a248457334#4c8ea83fc3452485f7b33f2411c136a248457334"
+version = "0.1.3"
+source = "git+https://github.com/godot-rust/gdext?tag=v0.1.3#6d34dade6be130552ca5754e1f287ab0a67c042c"
 dependencies = [
  "godot-bindings",
  "proc-macro2",
@@ -283,7 +283,7 @@ dependencies = [
 [[package]]
 name = "godot-rust-script"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=7549d6fc208c545d3f06f02a68a7ce163073ce5d#7549d6fc208c545d3f06f02a68a7ce163073ce5d"
+source = "git+https://github.com/titannano/godot-rust-script?rev=501596ccbec7019632221d2218ab1806f973c412#501596ccbec7019632221d2218ab1806f973c412"
 dependencies = [
  "const-str",
  "godot",
@@ -292,12 +292,13 @@ dependencies = [
  "itertools",
  "once_cell",
  "rand",
+ "thiserror",
 ]
 
 [[package]]
 name = "godot-rust-script-derive"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=7549d6fc208c545d3f06f02a68a7ce163073ce5d#7549d6fc208c545d3f06f02a68a7ce163073ce5d"
+source = "git+https://github.com/titannano/godot-rust-script?rev=501596ccbec7019632221d2218ab1806f973c412#501596ccbec7019632221d2218ab1806f973c412"
 dependencies = [
  "darling",
  "proc-macro2",

@@ -1,3 +1,4 @@
+mod items;
 mod road_navigation;
 mod world_constants;
 

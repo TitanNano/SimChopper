@@ -1,10 +1,8 @@
-use godot::obj::NewAlloc;
+use godot::{obj::NewAlloc, tools::load};
 use godot_rust_script::{
     godot::{
-        engine::{ResourceLoader, Timer},
-        prelude::{
-            godot_error, Callable, GString, Gd, Node3D, NodePath, PackedScene, StringName, ToGodot,
-        },
+        engine::Timer,
+        prelude::{godot_error, Callable, Gd, Node3D, NodePath, PackedScene, StringName, ToGodot},
     },
     godot_script_impl, GodotScript,
 };
@@ -21,16 +19,12 @@ struct CarSpawner {
     base: Gd<Node3D>,
 }
 
+const CAR_STATION_WAGON_PATH: &str = "res://resources/Objects/Vehicles/car_station_wagon.tscn";
+
 #[godot_script_impl]
 impl CarSpawner {
-    pub fn _init(&mut self) {
-        let mut loader = ResourceLoader::singleton();
-
-        self.default_car = loader
-            .load(GString::from(
-                "res://resources/Objects/Vehicles/car_station_wagon.tscn",
-            ))
-            .map(|res| res.cast());
+    pub fn _ready(&mut self) {
+        self.default_car = Some(load(CAR_STATION_WAGON_PATH));
     }
 
     pub fn spawn_car(&mut self) {

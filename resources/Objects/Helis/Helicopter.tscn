@@ -1,5 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://dl34exjsm3sq4"]
+[gd_scene load_steps=9 format=3 uid="uid://dl34exjsm3sq4"]
 
+[ext_resource type="HelicopterUpgrade" uid="uid://c02c65wkdq1r5" path="res://resources/Items/water_canon_helicopter_upgrade.tres" id="2_0cfwx"]
 [ext_resource type="Material" uid="uid://cjoloelf8ku4k" path="res://resources/Materials/dust_material.tres" id="2_8yiqd"]
 [ext_resource type="Script" path="res://native/src/scripts/particles/dust_particles.rs" id="2_ocmjg"]
 [ext_resource type="Script" path="res://src/Objects/Helicopters/Helicopter.gd" id="3"]
@@ -13,7 +14,7 @@ bounce = 0.7
 [sub_resource type="QuadMesh" id="QuadMesh_e0n42"]
 material = ExtResource("2_8yiqd")
 
-[node name="Helicopter" type="RigidBody3D" node_paths=PackedStringArray("child_engine_sound_tree", "child_dust_particles")]
+[node name="Helicopter" type="RigidBody3D" node_paths=PackedStringArray("child_engine_sound_tree", "child_dust_particles", "child_upgrade_mount")]
 mass = 929.8
 physics_material_override = SubResource("20")
 sleeping = true
@@ -22,6 +23,9 @@ continuous_cd = true
 script = ExtResource("3")
 child_engine_sound_tree = NodePath("RotorAudioTree")
 child_dust_particles = NodePath("Dust")
+child_upgrade_mount = NodePath("UpgradeMount")
+upgrades_available = Array[HelicopterUpgrade]([ExtResource("2_0cfwx")])
+upgrades_owned = Array[HelicopterUpgrade]([ExtResource("2_0cfwx")])
 
 [node name="RayCast3D" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.61416)
@@ -59,3 +63,5 @@ libraries = {
 [node name="RotorAudioSource" type="AudioStreamPlayer3D" parent="."]
 unit_size = 5.0
 doppler_tracking = 2
+
+[node name="UpgradeMount" type="Node3D" parent="."]

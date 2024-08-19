@@ -1,0 +1,49 @@
+[gd_resource type="AnimationNodeStateMachine" load_steps=10 format=3 uid="uid://bhxg4j3d3uxr0"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_mdr5j"]
+animation = &"RESET"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_q7edu"]
+animation = &"water_jet"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_1ufnc"]
+animation = &"water_jet"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_rdaw5"]
+xfade_time = 0.1
+switch_mode = 2
+advance_mode = 2
+advance_expression = "true"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_o06ha"]
+xfade_time = 0.1
+switch_mode = 2
+advance_mode = 2
+advance_expression = "true"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_hb8ue"]
+advance_mode = 2
+advance_expression = "true"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_mm0qf"]
+advance_mode = 2
+advance_expression = "emitting"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_dr3ee"]
+xfade_time = 1.0
+advance_mode = 2
+advance_expression = "!emitting"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qic6e"]
+advance_mode = 2
+advance_expression = "!emitting"
+
+[resource]
+states/RESET/node = SubResource("AnimationNodeAnimation_mdr5j")
+states/RESET/position = Vector2(379.25, 12.39)
+states/water_jet/node = SubResource("AnimationNodeAnimation_1ufnc")
+states/water_jet/position = Vector2(553.125, 138.3)
+"states/water_jet 2/node" = SubResource("AnimationNodeAnimation_q7edu")
+"states/water_jet 2/position" = Vector2(681.625, -15.67)
+transitions = ["water_jet", "water_jet 2", SubResource("AnimationNodeStateMachineTransition_rdaw5"), "water_jet 2", "water_jet", SubResource("AnimationNodeStateMachineTransition_o06ha"), "Start", "RESET", SubResource("AnimationNodeStateMachineTransition_hb8ue"), "RESET", "water_jet", SubResource("AnimationNodeStateMachineTransition_mm0qf"), "water_jet", "RESET", SubResource("AnimationNodeStateMachineTransition_dr3ee"), "water_jet 2", "RESET", SubResource("AnimationNodeStateMachineTransition_qic6e")]
+graph_offset = Vector2(-145.75, -101.74)

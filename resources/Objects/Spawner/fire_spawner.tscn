@@ -1,56 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://5jijewumod80"]
+[gd_scene load_steps=6 format=3 uid="uid://5jijewumod80"]
 
 [ext_resource type="Material" uid="uid://dm0vav0ade2gp" path="res://resources/Materials/fire_material.tres" id="1_5pwr1"]
 [ext_resource type="Script" path="res://native/src/scripts/spawner/fire_spawner.rs" id="1_aar5t"]
 [ext_resource type="Material" uid="uid://dbuspcbhwqr7g" path="res://resources/Materials/smoke_material.tres" id="2_4mcgg"]
-[ext_resource type="AudioStream" uid="uid://c16sfk06v1lwv" path="res://resources/Sounds/Events/burning_building.wav" id="4_03bkw"]
-[ext_resource type="AudioStream" uid="uid://c0kgvo2cc0oi0" path="res://resources/Sounds/Events/fire_alarm.wav" id="5_bemcb"]
-
-[sub_resource type="Animation" id="Animation_0dav3"]
-resource_name = "burning"
-length = 4.0
-loop_mode = 1
-tracks/0/type = "audio"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("FireAudioSource")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"clips": [{
-"end_offset": 0.0,
-"start_offset": 0.0,
-"stream": ExtResource("4_03bkw")
-}, {
-"end_offset": 0.0,
-"start_offset": 0.0,
-"stream": ExtResource("4_03bkw")
-}],
-"times": PackedFloat32Array(0, 2)
-}
-tracks/0/use_blend = false
-tracks/1/type = "audio"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("FireAudioSource")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"clips": [{
-"end_offset": 0.0,
-"start_offset": 0.0,
-"stream": ExtResource("5_bemcb")
-}],
-"times": PackedFloat32Array(0)
-}
-tracks/1/use_blend = false
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_sivcg"]
-_data = {
-"burning": SubResource("Animation_0dav3")
-}
-
-[sub_resource type="AudioStreamPolyphonic" id="AudioStreamPolyphonic_0go4g"]
+[ext_resource type="AnimationLibrary" uid="uid://dtoyo725l55bb" path="res://resources/Animations/fire_spawner.tres" id="4_rhyet"]
+[ext_resource type="AnimationNodeStateMachine" uid="uid://dfjcsgxlys31s" path="res://resources/Animations/fire_spawner_animation_states.tres" id="5_smqef"]
 
 [node name="FireSpawner" type="Marker3D"]
 gizmo_extents = 3.0
@@ -58,7 +12,6 @@ script = ExtResource("1_aar5t")
 fire_path = NodePath("FireLarge")
 smoke_path = NodePath("SmokeLarge")
 light_source_path = NodePath("FireLightSource")
-audio_player_path = NodePath("FireAudioPlayer")
 
 [node name="FireLarge" type="FogVolume" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 26.8181, 0)
@@ -73,15 +26,20 @@ material = ExtResource("2_4mcgg")
 
 [node name="FireAudioPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_sivcg")
+"": ExtResource("4_rhyet")
 }
+blend_times = [&"burning", &"burning", 0.2]
 
 [node name="FireAudioSource" type="AudioStreamPlayer3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.1948, 0)
-stream = SubResource("AudioStreamPolyphonic_0go4g")
 
 [node name="FireLightSource" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.01561, -3.39593)
 light_color = Color(0.980392, 0.309804, 0.00392157, 1)
-light_energy = 5.0
 light_volumetric_fog_energy = 0.0
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = ExtResource("5_smqef")
+advance_expression_base_node = NodePath("..")
+anim_player = NodePath("../FireAudioPlayer")
+parameters/burning/Combine/add_amount = 1.0

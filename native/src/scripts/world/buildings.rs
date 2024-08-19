@@ -46,8 +46,6 @@ struct Buildings {
 
 #[godot_script_impl]
 impl Buildings {
-    pub fn _ready(&mut self) {}
-
     pub fn _process(&mut self, _delta: f64) {
         if let Some(mut job_runner) = self.job_runner.take() {
             let progress = job_runner.poll(self);

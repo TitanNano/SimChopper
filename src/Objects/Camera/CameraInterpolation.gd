@@ -21,7 +21,7 @@ var in_transition := false
 		var viewport := self.get_viewport() as ViewPort
 		
 		if viewport == null:
-			return false
+			return self.buffered_active
 		
 		return viewport.current_camera_controller == self
 	

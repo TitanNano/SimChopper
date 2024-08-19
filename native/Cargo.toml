@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = { git = "https://github.com/godot-rust/gdext", rev = "4c8ea83fc3452485f7b33f2411c136a248457334", features = ["experimental-threads"] }
+godot = { git = "https://github.com/godot-rust/gdext", tag = "v0.1.3", features = ["experimental-threads"] }
 lerp = "0.4.0"
 backtrace = "0.3.64"
 num = "0.4.0"
@@ -21,4 +21,4 @@ rand = "0.8.5"
 pomsky-macro = "0.11.0"
 regex = "1.10.5"
 
-godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "7549d6fc208c545d3f06f02a68a7ce163073ce5d" }
+godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "501596ccbec7019632221d2218ab1806f973c412" }

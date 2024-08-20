@@ -1,5 +1,5 @@
 use godot::builtin::math::ApproxEq;
-use godot::builtin::{NodePath, Transform3D, Vector3, Vector3Axis};
+use godot::builtin::{Transform3D, Vector3, Vector3Axis};
 use godot::classes::{light_3d, FogVolume, Node, OmniLight3D, ShaderMaterial};
 use godot::meta::ToGodot;
 use godot::obj::Gd;
@@ -11,25 +11,20 @@ use crate::util::logger;
 #[script(base = Node)]
 pub struct FireSpawner {
     /// Node path to the fog volume for the flames.
-    #[export(node_path = ["FogVolume"])]
-    pub fire_path: NodePath,
-    fire: Option<Gd<FogVolume>>,
+    #[export]
+    pub fire: Option<Gd<FogVolume>>,
 
     /// Node path to the fog volume for the smoke.
-    #[export(node_path = ["FogVolume"])]
-    pub smoke_path: NodePath,
-    smoke: Option<Gd<FogVolume>>,
+    #[export]
+    pub smoke: Option<Gd<FogVolume>>,
 
     /// Node path to the omni light source of the fire.
-    #[export(node_path = ["OmniLight3D"])]
-    pub light_source_path: NodePath,
-    light_source: Option<Gd<OmniLight3D>>,
+    #[export]
+    pub light_source: Option<Gd<OmniLight3D>>,
 
     default_light_energy: f32,
 
     strength: f64,
-
-    base: Gd<Node>,
 }
 
 #[godot_script_impl]
@@ -40,9 +35,6 @@ impl FireSpawner {
 
     pub fn _ready(&mut self) {
         logger::debug!("Init Fire spawner...");
-        self.fire = self.base.try_get_node_as(self.fire_path.clone());
-        self.smoke = self.base.try_get_node_as(self.smoke_path.clone());
-        self.light_source = self.base.try_get_node_as(self.light_source_path.clone());
 
         if let Some(ref mut fire) = self.fire {
             if let Some(material) = fire.get_material() {

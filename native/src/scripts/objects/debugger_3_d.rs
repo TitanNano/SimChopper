@@ -1,5 +1,5 @@
 use godot::{
-	builtin::{Dictionary, GString, NodePath},
+	builtin::{Dictionary, GString},
 	engine::{Node3D, RichTextLabel},
 	obj::Gd,
 };
@@ -14,22 +14,14 @@ struct Debugger3D {
 	#[export]
 	pub title: GString,
 
-	#[export(node_path = ["RichTextLabel"])]
-	pub text_view_path: NodePath,
+	#[export]
+	pub text_view: Option<Gd<RichTextLabel>>,
 
 	pub debug_data: Dictionary,
-
-	text_view: Option<Gd<RichTextLabel>>,
-
-	base: Gd<Node3D>,
 }
 
 #[godot_script_impl]
 impl Debugger3D {
-	pub fn _ready(&mut self) {
-		self.text_view = self.base.try_get_node_as(self.text_view_path.clone());
-	}
-
 	pub fn _process(&mut self, _delta: f64) {
 		let title = &self.title;
 

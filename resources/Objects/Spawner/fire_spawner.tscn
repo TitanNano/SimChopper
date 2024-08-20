@@ -6,12 +6,12 @@
 [ext_resource type="AnimationLibrary" uid="uid://dtoyo725l55bb" path="res://resources/Animations/fire_spawner.tres" id="4_rhyet"]
 [ext_resource type="AnimationNodeStateMachine" uid="uid://dfjcsgxlys31s" path="res://resources/Animations/fire_spawner_animation_states.tres" id="5_smqef"]
 
-[node name="FireSpawner" type="Marker3D"]
+[node name="FireSpawner" type="Marker3D" node_paths=PackedStringArray("fire", "smoke", "light_source")]
 gizmo_extents = 3.0
 script = ExtResource("1_aar5t")
-fire_path = NodePath("FireLarge")
-smoke_path = NodePath("SmokeLarge")
-light_source_path = NodePath("FireLightSource")
+fire = NodePath("FireLarge")
+smoke = NodePath("SmokeLarge")
+light_source = NodePath("FireLightSource")
 
 [node name="FireLarge" type="FogVolume" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 26.8181, 0)

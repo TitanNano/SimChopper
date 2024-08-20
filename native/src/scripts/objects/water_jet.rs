@@ -1,9 +1,7 @@
 use std::{cmp::Ordering, ops::DerefMut};
 
 use anyhow::{bail, Result};
-use godot::builtin::{
-    Array, Callable, Dictionary, GString, NodePath, StringName, Variant, Vector3,
-};
+use godot::builtin::{Array, Callable, Dictionary, GString, StringName, Variant, Vector3};
 use godot::engine::object::ConnectFlags;
 use godot::engine::{
     Area3D, Decal, GpuParticles3D, Node, Node3D, Object, PhysicsRayQueryParameters3D,
@@ -13,7 +11,7 @@ use godot::global::{clampf, deg_to_rad, randf_range};
 use godot::meta::ToGodot;
 use godot::obj::bounds::Declarer;
 use godot::obj::{Bounds, EngineEnum, Gd, Inherits, InstanceId};
-use godot::prelude::GodotClass;
+use godot::prelude::{GodotClass, NodePath};
 use godot_rust_script::{godot_script_impl, GodotScript};
 use itertools::Itertools;
 
@@ -26,25 +24,20 @@ use crate::{
 #[derive(GodotScript, Debug)]
 #[script(base = GpuParticles3D)]
 struct WaterJet {
-    #[export(node_path = ["Array[ShapeCast]"])]
-    pub impact_casts_path: Array<NodePath>,
+    /// List of ShapeCast3D nodes to aproximate particle impact.
+    #[export(node_path = ["ShapeCast3D"])]
+    pub impact_cast_paths: Array<NodePath>,
 
     impact_casts: Vec<Gd<ShapeCast3D>>,
 
-    #[export(node_path = ["Area3D"])]
-    pub impact_area_path: NodePath,
+    #[export]
+    pub impact_area: Option<Gd<Area3D>>,
 
-    impact_area: Option<Gd<Area3D>>,
+    #[export]
+    pub decal: Option<Gd<Decal>>,
 
-    #[export(node_path = ["Decal"])]
-    pub decal_path: NodePath,
-
-    decal: Option<Gd<Decal>>,
-
-    #[export(node_path = ["Debugger3D"])]
-    pub debugger_path: NodePath,
-
-    debugger: Option<Gd<Node3D>>,
+    #[export]
+    pub debugger: Option<Gd<Node3D>>,
 
     /// Maximum number of decals that will be spawned at an impact point.
     #[export(range(min = 1.0, max = 255.0, step = 1.0))]
@@ -65,6 +58,14 @@ struct Intersection {
 #[godot_script_impl]
 impl WaterJet {
     const MAX_DISTANCE: f64 = 60.0;
+
+    pub fn _ready(&mut self) {
+        self.impact_casts = self
+            .impact_cast_paths
+            .iter_shared()
+            .map(|path| self.base.get_node_as(path))
+            .collect();
+    }
 
     fn impact_area(&self) -> &Gd<Area3D> {
         let Some(impact_area) = self.impact_area.as_ref() else {
@@ -145,18 +146,6 @@ impl WaterJet {
                 .expect("result struct musst have a normal key")
                 .to(),
         }))
-    }
-
-    pub fn _ready(&mut self) {
-        self.impact_casts = self
-            .impact_casts_path
-            .iter_shared()
-            .map(|path| self.base.get_node_as(path))
-            .collect();
-
-        self.impact_area = self.base.try_get_node_as(self.impact_area_path.clone());
-        self.decal = self.base.try_get_node_as(self.decal_path.clone());
-        self.debugger = self.base.try_get_node_as(self.debugger_path.clone());
     }
 
     pub fn _physics_process(&mut self, delta: f64) {

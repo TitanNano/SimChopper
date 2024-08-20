@@ -1,4 +1,4 @@
-use godot::builtin::{NodePath, Vector3};
+use godot::builtin::Vector3;
 use godot::engine::{light_3d, DirectionalLight3D, Node3D, Time};
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript};
@@ -9,14 +9,12 @@ use crate::util::logger;
 #[script(base = Node3D)]
 struct SolarSetup {
     /// Reference to the sun child node.
-    #[export(node_path = ["DirectionalLight3D"])]
-    pub sun: NodePath,
-
-    sun_ref: Option<Gd<DirectionalLight3D>>,
+    #[export]
+    pub sun: Option<Gd<DirectionalLight3D>>,
 
     /// Reference to the moon child node.
-    #[export(node_path = ["DirectionalLight3D"])]
-    pub moon: NodePath,
+    #[export]
+    pub moon: Option<Gd<DirectionalLight3D>>,
 
     // duration from sun rise to sun set in minutes
     #[export(range(min = 1.0, max = 120.0, step = 1.0))]
@@ -27,21 +25,13 @@ struct SolarSetup {
 
 #[godot_script_impl]
 impl SolarSetup {
-    fn sun(&mut self) -> Option<Gd<DirectionalLight3D>> {
-        if self.sun_ref.is_none() {
-            self.sun_ref = self.base.try_get_node_as(self.sun.clone());
-        }
-
-        self.sun_ref.clone()
-    }
-
     pub fn _physics_process(&mut self, _delta: f64) {
         let day_length = self.day_length * 60 * 1000;
         let time = Time::singleton().get_ticks_msec() % (day_length * 2);
 
         let sun_pos = time as f32 * (360.0 / (day_length * 2) as f32);
 
-        let Some(mut sun) = self.sun() else {
+        let Some(ref mut sun) = self.sun else {
             logger::error!("no sun is assigned to solar setup!");
             logger::error!("node path: {}", self.base.get_path());
 

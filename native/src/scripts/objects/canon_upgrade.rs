@@ -1,6 +1,6 @@
 use anyhow::{bail, Context};
 use godot::{
-    builtin::{NodePath, StringName},
+    builtin::StringName,
     engine::{GpuParticles3D, Node3D},
     obj::Gd,
 };
@@ -70,11 +70,8 @@ struct CanonUpgrade {
     #[prop(set = Self::set_mode)]
     pub mode: u8,
 
-    #[export(node_path = ["GPUParticles3D"])]
-    #[prop(set = Self::set_water_jet_path)]
-    pub water_jet_path: NodePath,
-
-    water_jet: Option<Gd<GpuParticles3D>>,
+    #[export]
+    pub water_jet: Option<Gd<GpuParticles3D>>,
 
     base: Gd<Node3D>,
 }
@@ -82,27 +79,7 @@ struct CanonUpgrade {
 #[godot_script_impl]
 impl CanonUpgrade {
     pub fn _ready(&mut self) {
-        self.water_jet = self.base.try_get_node_as(self.water_jet_path.clone());
-
-        if self.water_jet.is_none() {
-            logger::error!("Failed to resolve node path: {}", self.water_jet_path);
-        }
-
         self.set_mode(self.mode);
-    }
-
-    pub fn set_water_jet_path(&mut self, value: NodePath) {
-        self.water_jet_path = value.clone();
-
-        if !self.base.is_node_ready() {
-            return;
-        }
-
-        self.water_jet = self.base.try_get_node_as(value.clone());
-
-        if self.water_jet.is_none() {
-            logger::error!("Failed to resolve node path: {}", value);
-        }
     }
 
     pub fn set_mode(&mut self, value: u8) {

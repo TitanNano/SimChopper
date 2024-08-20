@@ -1,11 +1,11 @@
 use godot::{
-    builtin::{math::ApproxEq, Array, NodePath, Transform3D, Vector3},
+    builtin::{math::ApproxEq, Array, Transform3D, Vector3},
     engine::{MeshInstance3D, Node, Node3D, PackedScene, Time},
     meta::ToGodot,
     obj::{Gd, Inherits},
     tools::load,
 };
-use godot_rust_script::{godot_script_impl, CastToScript, Context, GodotScript, RsRef};
+use godot_rust_script::{godot_script_impl, CastToScript, GodotScript, RsRef};
 use rand::Rng;
 use std::{any::Any, fmt::Debug};
 
@@ -203,14 +203,13 @@ struct Building {
     #[export(flags = ["Fire:1"])]
     pub events: u8,
 
-    #[export(node_path = ["MeshInstance3D"])]
-    pub mesh_path: NodePath,
+    #[export]
+    pub mesh: Option<Gd<MeshInstance3D>>,
 
     pub tile_coords_array: Array<u32>,
 
     tile_coords: TileCoords,
 
-    mesh: Option<Gd<MeshInstance3D>>,
     features: Features<dyn BuildingFeature<Node>>,
 
     base: Gd<Node>,
@@ -218,16 +217,8 @@ struct Building {
 
 #[godot_script_impl]
 impl Building {
-    pub fn _ready(&mut self, mut context: Context<Self>) {
+    pub fn _ready(&mut self) {
         let events = BuildingEventFlags(self.events);
-
-        self.mesh = {
-            let mesh_path = self.mesh_path.clone();
-
-            context.reentrant_scope(self, |base: Gd<Node>| {
-                base.try_get_node_as(mesh_path.to_owned())
-            })
-        };
 
         self.tile_coords = (
             self.tile_coords_array.get(0).unwrap_or(0),

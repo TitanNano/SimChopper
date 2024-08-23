@@ -7,6 +7,12 @@ on:
         type: boolean
         default: false
         required: false
+  workflow_dispatch:
+    inputs:
+      release:
+        type: boolean
+        default: true
+        required: false
 
 jobs:
   rust-build:

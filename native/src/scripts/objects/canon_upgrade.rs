@@ -4,43 +4,17 @@ use godot::{
     engine::{GpuParticles3D, Node3D},
     obj::Gd,
 };
-use godot_rust_script::{godot_script_impl, GodotScript};
+use godot_rust_script::{godot_script_impl, GodotScript, GodotScriptEnum};
 
 use crate::util::logger;
 
-#[derive(Debug, Default)]
-enum CanonMode {
+#[derive(Debug, Default, GodotScriptEnum, Clone, Copy)]
+#[script_enum(export)]
+pub enum CanonMode {
     #[default]
     Inactive,
     Water,
     Teargas,
-}
-
-impl TryFrom<u8> for CanonMode {
-    type Error = anyhow::Error;
-
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
-        let result = match value {
-            0 => Self::Inactive,
-            1 => Self::Water,
-            2 => Self::Teargas,
-            _ => {
-                bail!("Failed to parse cannon mode {}, invalid variant!", value);
-            }
-        };
-
-        Ok(result)
-    }
-}
-
-impl From<CanonMode> for u8 {
-    fn from(value: CanonMode) -> Self {
-        match value {
-            CanonMode::Inactive => 0,
-            CanonMode::Water => 1,
-            CanonMode::Teargas => 2,
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -66,9 +40,9 @@ impl TryFrom<StringName> for CanonAction {
 #[derive(GodotScript, Debug)]
 #[script(base = Node3D)]
 struct CanonUpgrade {
-    #[export(enum_options = ["Inactive", "Water", "Teargas"])]
+    #[export]
     #[prop(set = Self::set_mode)]
-    pub mode: u8,
+    pub mode: CanonMode,
 
     #[export]
     pub water_jet: Option<Gd<GpuParticles3D>>,
@@ -82,19 +56,12 @@ impl CanonUpgrade {
         self.set_mode(self.mode);
     }
 
-    pub fn set_mode(&mut self, value: u8) {
+    pub fn set_mode(&mut self, value: CanonMode) {
         self.mode = value;
 
         if !self.base.is_node_ready() {
             return;
         }
-
-        let variant = CanonMode::try_from(value)
-            .context("Failed to parse mode!")
-            .unwrap_or_else(|err| {
-                logger::error!("{:?}", err);
-                CanonMode::default()
-            });
 
         let Some(water_jet) = self.water_jet.as_mut() else {
             logger::error!("Water jet node is not available!");
@@ -103,7 +70,7 @@ impl CanonUpgrade {
 
         water_jet.set_emitting(false);
 
-        match variant {
+        match value {
             CanonMode::Inactive => (),
             CanonMode::Water => water_jet.set_emitting(true),
             CanonMode::Teargas => (),
@@ -119,22 +86,15 @@ impl CanonUpgrade {
             }
         };
 
-        let current_mode: CanonMode = match self.mode.try_into().context("Current mode is invalid")
-        {
-            Ok(mode) => mode,
-            Err(err) => {
-                logger::error!("{:?}", err);
-                return;
-            }
-        };
+        let current_mode = self.mode;
 
         match (action, current_mode) {
             (CanonAction::FirePrimary, CanonMode::Inactive) => {
-                self.set_mode(CanonMode::Water.into());
+                self.set_mode(CanonMode::Water);
             }
 
             (CanonAction::FireSecondary, CanonMode::Inactive) => {
-                self.set_mode(CanonMode::Teargas.into());
+                self.set_mode(CanonMode::Teargas);
             }
 
             _ => (),
@@ -150,19 +110,12 @@ impl CanonUpgrade {
             }
         };
 
-        let current_mode: CanonMode = match self.mode.try_into().context("Current mode is invalid")
-        {
-            Ok(mode) => mode,
-            Err(err) => {
-                logger::error!("{:?}", err);
-                return;
-            }
-        };
+        let current_mode: CanonMode = self.mode;
 
         match (action, current_mode) {
             (CanonAction::FireSecondary, CanonMode::Teargas)
             | (CanonAction::FirePrimary, CanonMode::Water) => {
-                self.set_mode(CanonMode::Inactive.into());
+                self.set_mode(CanonMode::Inactive);
             }
 
             _ => (),

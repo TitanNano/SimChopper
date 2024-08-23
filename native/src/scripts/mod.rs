@@ -6,4 +6,4 @@ mod world;
 
 pub use spawner::*;
 
-godot_rust_script::setup_library!();
+godot_rust_script::define_script_root!();

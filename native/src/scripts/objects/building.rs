@@ -1,11 +1,13 @@
 use godot::{
     builtin::{math::ApproxEq, Array, Transform3D, Vector3},
     engine::{MeshInstance3D, Node, Node3D, PackedScene, Time},
-    meta::ToGodot,
+    global::PropertyHint,
+    meta::{FromGodot, GodotConvert, ToGodot},
     obj::{Gd, Inherits},
+    prelude::ConvertError,
     tools::load,
 };
-use godot_rust_script::{godot_script_impl, CastToScript, GodotScript, RsRef};
+use godot_rust_script::{godot_script_impl, CastToScript, GodotScript, GodotScriptExport, RsRef};
 use rand::Rng;
 use std::{any::Any, fmt::Debug};
 
@@ -21,11 +23,46 @@ trait BuildingFeature<N: Inherits<Node>>: Debug {
     fn dispatch_notification(&mut self, _notification: BuildingNotification) {}
 }
 
+#[derive(Debug, Default)]
 struct BuildingEventFlags(u8);
 
 impl BuildingEventFlags {
     fn fire(&self) -> bool {
         self.0 & 0b00000001 == 1
+    }
+}
+
+impl GodotConvert for BuildingEventFlags {
+    type Via = u8;
+}
+
+impl FromGodot for BuildingEventFlags {
+    fn try_from_godot(via: Self::Via) -> Result<Self, ConvertError> {
+        Ok(Self(via))
+    }
+}
+
+impl ToGodot for BuildingEventFlags {
+    fn to_godot(&self) -> Self::Via {
+        self.0
+    }
+}
+
+impl GodotScriptExport for BuildingEventFlags {
+    fn hint_string(_custom_hint: Option<PropertyHint>, custom_string: Option<String>) -> String {
+        if let Some(custom_string) = custom_string {
+            return custom_string;
+        }
+
+        String::from("Fire:1")
+    }
+
+    fn hint(custom: Option<PropertyHint>) -> PropertyHint {
+        if let Some(custom) = custom {
+            return custom;
+        }
+
+        PropertyHint::FLAGS
     }
 }
 
@@ -200,8 +237,8 @@ impl<N: Inherits<Node>> BuildingFeature<N> for FireFeature {
 #[derive(GodotScript, Debug)]
 #[script(base = Node)]
 struct Building {
-    #[export(flags = ["Fire:1"])]
-    pub events: u8,
+    #[export]
+    pub events: BuildingEventFlags,
 
     #[export]
     pub mesh: Option<Gd<MeshInstance3D>>,
@@ -218,14 +255,12 @@ struct Building {
 #[godot_script_impl]
 impl Building {
     pub fn _ready(&mut self) {
-        let events = BuildingEventFlags(self.events);
-
         self.tile_coords = (
             self.tile_coords_array.get(0).unwrap_or(0),
             self.tile_coords_array.get(1).unwrap_or(0),
         );
 
-        if events.fire() {
+        if self.events.fire() {
             if let Some(ref mesh) = self.mesh {
                 self.features
                     .push(Box::new(FireFeature::new(self.tile_coords, mesh)));

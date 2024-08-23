@@ -1,13 +1,11 @@
 mod building_imports;
 
-use godot::{
-    builtin::Callable,
-    engine::{notify::NodeNotification, EditorPlugin, IEditorPlugin},
-    obj::{Base, Gd, WithBaseField},
-    register::{godot_api, GodotClass},
-};
+use godot::builtin::Callable;
+use godot::engine::notify::NodeNotification;
+use godot::engine::{EditorPlugin, IEditorPlugin};
+use godot::obj::{Base, Gd, WithBaseField};
+use godot::register::{godot_api, GodotClass};
 
-use crate::util::logger;
 use building_imports::SetupBuildingImports;
 
 #[derive(GodotClass)]
@@ -37,7 +35,6 @@ impl IEditorPlugin for EditorExtension {
 
     fn on_notification(&mut self, what: NodeNotification) {
         if what == NodeNotification::PREDELETE {
-            logger::debug!("godots destructor was called for EditorExtension...");
             self.setup_building_imports.clone().free();
         }
     }

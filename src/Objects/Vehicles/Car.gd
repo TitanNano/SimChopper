@@ -14,7 +14,7 @@ var rng: RandomNumberGenerator
 
 var ground_normal := Vector3.DOWN
 
-var stuck := 0
+var stuck := 0.0
 var new := true
 var last_transform := Transform3D.IDENTITY
 
@@ -40,16 +40,16 @@ func activate() -> void:
 	self._on_choose_target()
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if not self.target_nav_node:
 		return
 
 	if self.last_transform.origin.is_equal_approx(self.global_transform.origin):
-		self.stuck += 1
+		self.stuck += 1.0 * delta
 	else:
-		self.stuck = 0
+		self.stuck = 0.0
 
-	if self.stuck >= 5:
+	if self.stuck >= 5.0:
 		Logger.info("despawning stuck car")
 		self.queue_free()
 		debug_target.queue_free()

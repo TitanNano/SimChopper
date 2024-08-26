@@ -33,13 +33,13 @@ struct Buildings {
 
     /// tile_coords, size, altitude
     #[signal]
-    spawn_point_encountered: Signal<(Array<u32>, u8, u32)>,
+    pub spawn_point_encountered: Signal<(Array<u32>, u8, u32)>,
 
     #[signal]
-    loading_progress: Signal<u32>,
+    pub loading_progress: Signal<u32>,
 
     #[signal]
-    ready: Signal<()>,
+    pub ready: Signal<()>,
 
     base: Gd<Node>,
 }

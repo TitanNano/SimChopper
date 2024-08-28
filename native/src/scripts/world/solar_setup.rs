@@ -16,6 +16,8 @@ struct SolarSetup {
     #[export]
     pub moon: Option<Gd<DirectionalLight3D>>,
 
+    cached_moon_brightness: f32,
+
     // duration from sun rise to sun set in minutes
     #[export(range(min = 1.0, max = 120.0, step = 1.0))]
     pub day_length: u64,
@@ -25,6 +27,16 @@ struct SolarSetup {
 
 #[godot_script_impl]
 impl SolarSetup {
+    pub fn _ready(&mut self) {
+        let Some(ref mut moon) = self.moon else {
+            logger::error!("no moon is assinged to solar setup!");
+            logger::error!("node path: {}", self.base.get_path());
+            return;
+        };
+
+        self.cached_moon_brightness = moon.get_param(light_3d::Param::ENERGY);
+    }
+
     pub fn _physics_process(&mut self, _delta: f64) {
         let day_length = self.day_length * 60 * 1000;
         let time = Time::singleton().get_ticks_msec() % (day_length * 2);
@@ -38,6 +50,12 @@ impl SolarSetup {
             return;
         };
 
+        let Some(ref mut moon) = self.moon else {
+            logger::error!("no moon is assinged to solar setup!");
+            logger::error!("node path: {}", self.base.get_path());
+            return;
+        };
+
         self.base
             .set_rotation_degrees(Vector3::new(sun_pos, 0.0, 0.0));
 
@@ -45,5 +63,16 @@ impl SolarSetup {
             light_3d::Param::ENERGY,
             if sun_pos > 190.0 { 0.0 } else { 1.0 },
         );
+        sun.set_shadow(sun_pos < 190.0);
+
+        moon.set_param(
+            light_3d::Param::ENERGY,
+            if sun_pos > 180.0 {
+                self.cached_moon_brightness
+            } else {
+                0.0
+            },
+        );
+        moon.set_shadow(sun_pos > 180.0);
     }
 }

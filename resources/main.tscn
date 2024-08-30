@@ -1,11 +1,10 @@
-[gd_scene load_steps=20 format=3 uid="uid://cvh54xiw8586b"]
+[gd_scene load_steps=18 format=3 uid="uid://cvh54xiw8586b"]
 
 [ext_resource type="Script" path="res://src/HUD/HUDController.gd" id="1"]
 [ext_resource type="Script" path="res://src/Objects/World/World.gd" id="3"]
 [ext_resource type="Script" path="res://src/ViewPort.gd" id="3_2c332"]
 [ext_resource type="Script" path="res://src/HUD/LoadingScreen.gd" id="4"]
 [ext_resource type="Script" path="res://src/Objects/World/Backdrop.gd" id="6"]
-[ext_resource type="PackedScene" uid="uid://csuvlu656dwm4" path="res://resources/Objects/Buildings/hangar_2.tscn" id="7"]
 [ext_resource type="Environment" uid="uid://bl607wqoa882d" path="res://resources/Environments/WorldEnv.tres" id="8"]
 [ext_resource type="Script" path="res://src/Objects/Camera/CameraInterpolation.gd" id="10"]
 [ext_resource type="Script" path="res://src/Objects/Terrain/Terrain.gd" id="11"]
@@ -22,9 +21,6 @@
 dof_blur_far_enabled = true
 dof_blur_far_distance = 180.0
 dof_blur_far_transition = -1.0
-
-[sub_resource type="StandardMaterial3D" id="1"]
-albedo_color = Color(0, 0, 0, 1)
 
 [node name="HUDController" type="Control"]
 layout_mode = 3
@@ -60,6 +56,7 @@ offset_bottom = 23.0
 step = 1.0
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -72,37 +69,13 @@ scaling_3d_mode = 1
 audio_listener_enable_3d = true
 size = Vector2i(1152, 648)
 size_2d_override_stretch = true
-render_target_update_mode = 4
+render_target_update_mode = 0
 script = ExtResource("3_2c332")
-current_camera_controller = NodePath("Schweizer_300/MainCameraAnchor")
-
-[node name="Schweizer_300" parent="SubViewportContainer/SubViewport" node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)
-child_camera = NodePath("MainCameraAnchor")
-child_main_camera = NodePath("MainCameraAnchor")
-child_debug_camera = NodePath("DebugCameraAnchor")
-
-[node name="MainCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/Schweizer_300"]
-process_mode = 3
-transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, 0, 5.669, 7.354)
-script = ExtResource("10")
-snap = true
-track_y_axis = true
-active = true
-
-[node name="DebugCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/Schweizer_300"]
-process_mode = 3
-transform = Transform3D(-0.0697565, 0.65051, -0.756287, 2.64427e-16, 0.758134, 0.652098, 0.997564, 0.0454881, -0.0528848, -34.7616, 32.649, -0.770037)
-script = ExtResource("10")
+current_camera_controller = NodePath("World/Schweizer_300/MainCameraAnchor")
 
 [node name="World" type="Node3D" parent="SubViewportContainer/SubViewport"]
+process_mode = 4
 script = ExtResource("3")
-world_constants = ExtResource("15")
-
-[node name="Terrain" type="Node3D" parent="SubViewportContainer/SubViewport/World"]
-script = ExtResource("11")
-terrain_material = ExtResource("12")
-ocean_material = ExtResource("13")
 world_constants = ExtResource("15")
 
 [node name="Environment" type="WorldEnvironment" parent="SubViewportContainer/SubViewport/World"]
@@ -141,6 +114,37 @@ directional_shadow_blend_splits = true
 directional_shadow_fade_start = 0.6
 directional_shadow_max_distance = 400.0
 
+[node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport/World"]
+transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, -45.4393, 5.66891, 25.269)
+doppler_tracking = 2
+current = true
+near = 3.0
+
+[node name="Schweizer_300" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)
+child_camera = NodePath("MainCameraAnchor")
+child_main_camera = NodePath("MainCameraAnchor")
+child_debug_camera = NodePath("DebugCameraAnchor")
+
+[node name="MainCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/World/Schweizer_300"]
+process_mode = 3
+transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, 0, 5.669, 7.354)
+script = ExtResource("10")
+snap = true
+track_y_axis = true
+active = true
+
+[node name="DebugCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/World/Schweizer_300"]
+process_mode = 3
+transform = Transform3D(-0.0697565, 0.65051, -0.756287, 2.64427e-16, 0.758134, 0.652098, 0.997564, 0.0454881, -0.0528848, -34.7616, 32.649, -0.770037)
+script = ExtResource("10")
+
+[node name="Terrain" type="Node3D" parent="SubViewportContainer/SubViewport/World"]
+script = ExtResource("11")
+terrain_material = ExtResource("12")
+ocean_material = ExtResource("13")
+world_constants = ExtResource("15")
+
 [node name="Networks" type="Node" parent="SubViewportContainer/SubViewport/World"]
 script = ExtResource("14")
 world_constants = ExtResource("15")
@@ -156,22 +160,3 @@ world_constants = ExtResource("15")
 
 [node name="Backdrop" type="Node" parent="SubViewportContainer/SubViewport/World"]
 script = ExtResource("6")
-
-[node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport"]
-transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, -45.4393, 5.66891, 25.269)
-doppler_tracking = 2
-current = true
-near = 3.0
-
-[node name="Start" type="Node3D" parent="SubViewportContainer/SubViewport"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.5, 0, 0)
-visible = false
-
-[node name="CSGPolygon3D" type="CSGPolygon3D" parent="SubViewportContainer/SubViewport/Start"]
-transform = Transform3D(50, 0, 0, 0, -2.18557e-06, 1, 0, -50, -4.37114e-08, -24.9718, -0.122162, 25.0614)
-depth = 0.001
-smooth_faces = true
-material = SubResource("1")
-
-[node name="hangar" parent="SubViewportContainer/SubViewport/Start" instance=ExtResource("7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.68345, 0, -4.04857)

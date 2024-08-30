@@ -1,35 +1,30 @@
-use std::{
-    collections::{BTreeMap, VecDeque},
-    fmt::Debug,
-    ops::Not,
-};
+use std::{collections::BTreeMap, ops::Not};
 
-use anyhow::Context;
+use anyhow::Context as _;
 use derive_debug::Dbg;
-use godot::{
-    builtin::{meta::ToGodot, Array, Dictionary},
-    engine::{Marker3D, Node, Node3D, Resource, Time},
-    obj::{Gd, NewAlloc},
-};
-use godot_rust_script::{godot_script_impl, GodotScript, ScriptSignal, Signal};
-
-use crate::{
-    objects::scene_object_registry,
-    util::logger,
-    world::{
-        city_coords_feature::CityCoordsFeature,
-        city_data::{self, TryFromDictionary},
-    },
+use godot::builtin;
+use godot::builtin::meta::ToGodot;
+use godot::builtin::{Array, Dictionary};
+use godot::engine::{Marker3D, Node, Node3D, Resource, Time};
+use godot::obj::{Gd, NewAlloc};
+use godot_rust_script::{
+    godot_script_impl, CastToScript, GodotScript, RsRef, ScriptSignal, Signal,
 };
 
-#[derive(GodotScript, Debug)]
+use crate::objects::scene_object_registry;
+use crate::util::async_support::{self, godot_task, GodotFuture, TaskHandle, ToSignalFuture};
+use crate::util::logger;
+use crate::world::city_coords_feature::CityCoordsFeature;
+use crate::world::city_data::{self, TryFromDictionary};
+
+#[derive(GodotScript, Dbg)]
 #[script(base = Node)]
 struct Buildings {
+    #[dbg(skip)]
+    pending_build_tasks: Vec<TaskHandle>,
+
     #[export]
     pub world_constants: Option<Gd<Resource>>,
-
-    city_coords_feature: CityCoordsFeature,
-    job_runner: Option<LocalJobRunner<city_data::Building, Self>>,
 
     /// tile_coords, size, altitude
     #[signal]
@@ -38,24 +33,23 @@ struct Buildings {
     #[signal]
     pub loading_progress: Signal<u32>,
 
-    #[signal]
-    pub ready: Signal<()>,
-
     base: Gd<Node>,
 }
 
 #[godot_script_impl]
 impl Buildings {
+    const TIME_BUDGET: u64 = 50;
+
     pub fn _process(&mut self, _delta: f64) {
-        if let Some(mut job_runner) = self.job_runner.take() {
-            let progress = job_runner.poll(self);
+        self.pending_build_tasks.retain(|task| task.is_pending());
 
-            self.job_runner = Some(job_runner);
+        let tasks = self.pending_build_tasks.len();
 
-            match progress {
-                0 => self.ready.emit(()),
-                progress => self.loading_progress.emit(progress),
-            }
+        if tasks > 0 {
+            logger::debug!(
+                "World Buildings Node: {} active tasks!",
+                self.pending_build_tasks.len()
+            );
         }
     }
 
@@ -65,49 +59,71 @@ impl Buildings {
             .expect("world_constants should be set!")
     }
 
-    pub fn build_async(&mut self, city: Dictionary) {
-        let city = match crate::world::city_data::City::try_from_dict(&city)
-            .context("Failed to deserialize city data")
-        {
-            Ok(v) => v,
-            Err(err) => {
-                logger::error!("{:?}", err);
-                return;
-            }
-        };
+    pub fn build_async(&mut self, city: Dictionary) -> Gd<GodotFuture> {
+        let world_constants = self.world_constants().clone();
+        let mut base = self.base.clone();
+        let mut slf: RsRef<Self> = base.to_script();
+        let tree = base.get_tree().expect("Node must be part of the tree!");
+        let (resolve, godot_future) = async_support::godot_future();
 
-        let sea_level = city.simulator_settings.sea_level;
-        let buildings = city.buildings;
-        let tiles = city.tilelist;
+        let handle = godot_task(async move {
+            let next_tick = builtin::Signal::from_object_signal(&tree, "process_frame");
+            let time = Time::singleton();
 
-        self.city_coords_feature =
-            CityCoordsFeature::new(self.world_constants().to_owned(), sea_level);
-
-        logger::info!("starting to load buildings...");
-
-        let mut job_runner = LocalJobRunner::new(
-            move |host: &mut Self, building: city_data::Building| {
-                if building.building_id == 0x00 {
-                    logger::info!("skipping empty building");
+            let city = match crate::world::city_data::City::try_from_dict(&city)
+                .context("Failed to deserialize city data")
+            {
+                Ok(v) => v,
+                Err(err) => {
+                    logger::error!("{:?}", err);
                     return;
                 }
+            };
 
-                host.insert_building(building, &tiles);
-            },
-            50,
-        );
+            let sea_level = city.simulator_settings.sea_level;
+            let buildings = city.buildings;
+            let tiles = city.tilelist;
+            let city_coords_feature = CityCoordsFeature::new(world_constants, sea_level);
 
-        let buildings_array = buildings.into_values().collect();
+            logger::info!("starting to load buildings...");
 
-        job_runner.tasks(buildings_array);
+            let mut count = 0;
+            let mut start = time.get_ticks_msec();
 
-        self.job_runner = Some(job_runner);
+            for building in buildings.into_values() {
+                if (time.get_ticks_msec() - start) > Self::TIME_BUDGET {
+                    slf.emit_progress(count);
+                    count = 0;
+                    start = time.get_ticks_msec();
+
+                    let _: () = next_tick.to_future().await;
+                }
+
+                count += 1;
+
+                if building.building_id == 0x00 {
+                    logger::info!("skipping empty building");
+                    continue;
+                }
+
+                Self::insert_building(&mut base, building, &tiles, &city_coords_feature);
+            }
+
+            slf.emit_progress(count);
+
+            resolve(());
+        });
+
+        self.pending_build_tasks.push(handle);
+        godot_future
     }
 
+    /// Insert a new building into the world.
     fn insert_building(
-        &mut self,
+        base: &mut Gd<Node>,
         building: city_data::Building,
         tiles: &BTreeMap<(u32, u32), city_data::Tile>,
+        city_coords_feature: &CityCoordsFeature,
     ) {
         let building_size = building.size;
         let name = building.name.as_str();
@@ -137,12 +153,12 @@ impl Buildings {
                 size: 2,
             };
 
-            self.insert_building(spawn_building, tiles);
-            self.spawn_point_encountered.emit((
+            Self::insert_building(base, spawn_building, tiles, city_coords_feature);
+            CastToScript::<Buildings>::to_script(base).emit_spawn_point_encountered(
                 Array::from(&[tile_coords.0, tile_coords.1]),
                 2,
                 altitude,
-            ));
+            );
         }
 
         let (Some(mut instance), instance_time) =
@@ -161,7 +177,7 @@ impl Buildings {
             instance.set("tile_coords_array".into(), array.to_variant());
         }
 
-        let mut location = self.city_coords_feature.get_building_coords(
+        let mut location = city_coords_feature.get_building_coords(
             tile_coords.0,
             tile_coords.1,
             altitude,
@@ -172,16 +188,12 @@ impl Buildings {
         location.y += 0.1;
 
         let (_, insert_time) = with_timing(|| {
-            self.get_sector(tile_coords)
+            Self::get_sector(base, tile_coords, city_coords_feature)
                 .add_child_ex(instance.clone().upcast())
                 .force_readable_name(true)
                 .done();
 
-            let Some(root) = self
-                .base
-                .get_tree()
-                .and_then(|tree| tree.get_current_scene())
-            else {
+            let Some(root) = base.get_tree().and_then(|tree| tree.get_current_scene()) else {
                 logger::warn!("there is no active scene!");
                 return;
             };
@@ -206,7 +218,11 @@ impl Buildings {
     }
 
     /// sector coordinates are expected to align with a step of 10
-    fn get_sector(&mut self, tile_coords: (u32, u32)) -> Gd<Node3D> {
+    fn get_sector(
+        base: &mut <Self as GodotScript>::Base,
+        tile_coords: (u32, u32),
+        city_coords_feature: &CityCoordsFeature,
+    ) -> Gd<Node3D> {
         const SECTOR_SIZE: u32 = 32;
 
         let sector_coords = (
@@ -220,75 +236,36 @@ impl Buildings {
             format!("{}_{}", x, y)
         };
 
-        self.base
-            .get_node_or_null(sector_name.to_godot().into())
+        base.get_node_or_null(sector_name.to_godot().into())
             .map(Gd::cast)
             .unwrap_or_else(|| {
                 let mut sector: Gd<Node3D> = Marker3D::new_alloc().upcast();
 
                 sector.set_name(sector_name.to_godot());
 
-                self.base.add_child(sector.clone().upcast());
+                base.add_child(sector.clone().upcast());
 
-                sector.translate(self.city_coords_feature.get_world_coords(
+                sector.translate(city_coords_feature.get_world_coords(
                     sector_coords.0 + (SECTOR_SIZE / 2),
                     sector_coords.1 + (SECTOR_SIZE / 2),
                     0,
                 ));
 
-                if let Some(root) = self
-                    .base
-                    .get_tree()
-                    .and_then(|tree| tree.get_current_scene())
-                {
+                if let Some(root) = base.get_tree().and_then(|tree| tree.get_current_scene()) {
                     sector.set_owner(root);
                 };
 
                 sector
             })
     }
-}
 
-type LocalJob<T, H> = Box<dyn Fn(&mut H, T)>;
-
-#[derive(Dbg)]
-struct LocalJobRunner<T, H>
-where
-    T: Debug,
-{
-    budget: u64,
-    tasks: VecDeque<T>,
-    #[dbg(skip)]
-    callback: LocalJob<T, H>,
-}
-
-impl<T: Debug, H> LocalJobRunner<T, H> {
-    fn new<C: Fn(&mut H, T) + 'static>(callback: C, budget: u64) -> Self {
-        Self {
-            callback: Box::new(callback),
-            tasks: VecDeque::new(),
-            budget,
-        }
+    pub fn emit_spawn_point_encountered(&self, tile_coords: Array<u32>, size: u8, altitide: u32) {
+        self.spawn_point_encountered
+            .emit((tile_coords, size, altitide))
     }
 
-    fn poll(&mut self, host: &mut H) -> u32 {
-        let start = Time::singleton().get_ticks_msec();
-        let mut count = 0;
-
-        while Time::singleton().get_ticks_msec() - start < self.budget {
-            let Some(item) = self.tasks.remove(0) else {
-                return count;
-            };
-
-            (self.callback)(host, item);
-            count += 1;
-        }
-
-        count
-    }
-
-    fn tasks(&mut self, mut tasks: VecDeque<T>) {
-        self.tasks.append(&mut tasks);
+    pub fn emit_progress(&self, new_building_count: u32) {
+        self.loading_progress.emit(new_building_count);
     }
 }
 

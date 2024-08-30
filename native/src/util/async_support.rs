@@ -12,7 +12,8 @@ use godot::builtin::{Callable, RustCallable, Signal, Variant};
 use godot::classes::object::ConnectFlags;
 use godot::classes::Os;
 use godot::meta::{FromGodot, ToGodot};
-use godot::obj::EngineEnum;
+use godot::obj::{EngineEnum, Gd, NewGd};
+use godot::prelude::{godot_api, GodotClass};
 
 pub fn godot_task(future: impl Future<Output = ()> + 'static) -> TaskHandle {
     let os = Os::singleton();
@@ -80,6 +81,7 @@ impl<T> FutureSlot<T> {
         self.value = FutureSlotState::Empty;
     }
 
+    #[allow(dead_code)]
     fn cancel(&mut self) {
         self.value = FutureSlotState::Gone;
     }
@@ -126,6 +128,7 @@ impl TaskHandle {
         }
     }
 
+    #[allow(dead_code)]
     pub fn cancel(self) {
         ASYNC_RUNTIME.with_borrow_mut(|rt| {
             let Some(task) = rt.tasks.get(self.index) else {
@@ -550,6 +553,7 @@ impl<R: FromSignalArgs> ToSignalFuture<R> for Signal {
 }
 
 pub trait ToGuaranteedSignalFuture<R: FromSignalArgs + Debug> {
+    #[allow(dead_code)]
     fn to_guaranteed_future(&self) -> GuaranteedSignalFuture<R>;
 }
 
@@ -557,6 +561,46 @@ impl<R: FromSignalArgs + Debug> ToGuaranteedSignalFuture<R> for Signal {
     fn to_guaranteed_future(&self) -> GuaranteedSignalFuture<R> {
         GuaranteedSignalFuture::new(self.clone())
     }
+}
+
+#[derive(GodotClass)]
+#[class(base = RefCounted, init)]
+pub struct GodotFuture;
+
+#[godot_api]
+impl GodotFuture {
+    /// Returns an object which emits the completed signal once the asynchronus method has finished processing.
+
+    /// Is emitted as soon as the async operation of the function has been completed.
+    #[signal]
+    fn completed(result: Variant);
+}
+
+/// Creates a new GodotFuture that can be returned from a function which performs an async operation. This works similar to GdFunctionState.
+///
+/// Example:
+/// ```rs
+/// fn async_do_task() -> Gd<GodotFuture> {
+///     let (resolve, future) = godot_future();
+///
+///     godot_task(async move {
+///         // do async operations
+///         resolve(true);
+///     });
+///
+///     future
+/// }
+/// ```
+pub fn godot_future<R: ToGodot>() -> (impl Fn(R), Gd<GodotFuture>) {
+    let future = GodotFuture::new_gd();
+    let sender = future.clone();
+
+    (
+        move |value: R| {
+            Signal::from_object_signal(&sender, "completed").emit(&[value.to_variant()])
+        },
+        future,
+    )
 }
 
 #[cfg(test)]

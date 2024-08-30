@@ -27,14 +27,10 @@ func _ready():
 	assert(world_constants is WorldConstants, "world_constants is not of type WorldConstants")
 
 	self.networks.loading_progress.connect(self._on_child_progress)
-	@warning_ignore("unsafe_property_access")
-	@warning_ignore("unsafe_method_access")
 	self.buildings.spawn_point_encountered.connect(self._on_spawn_point_encountered)
-	@warning_ignore("unsafe_property_access")
-	@warning_ignore("unsafe_method_access")
 	self.buildings.loading_progress.connect(self._on_child_progress)
 
-	call_deferred("_ready_deferred")
+	self._ready_deferred.call_deferred()
 
 
 func _ready_deferred():
@@ -63,10 +59,7 @@ func _on_spawn_point_encountered(tile_coords: Array[int], size: int, altitude: i
 func _load_map_async(city: Dictionary):
 	await self.terrain.build_async(city)
 	await self.networks.build_async(city)
-	@warning_ignore("unsafe_method_access")
-	self.buildings.build_async(city)
-
-	await self.buildings.ready
+	await self.buildings.build_async(city).completed
 	
 	var city_size: int = city.get("city_size")
 
@@ -94,11 +87,11 @@ func _create_snapshot() -> void:
 func _spawn_player() -> void:
 	var spawns := get_tree().get_nodes_in_group("spawn")
 	var players := get_tree().get_nodes_in_group("player")
-	var player: Helicopter = players[0]
-	var spawn: Node3D = spawns[0]
+	var player := players[0] as Helicopter
+	var spawn := spawns[0] as Node3D
 
-	player.global_transform.origin = spawn.global_transform.origin
-	player.force_update_transform()
+	player.global_transform.origin = spawn.global_transform.origin + Vector3(0, -0.1, 0)
+#	player.force_update_transform()
 	player.snap_camera()
 
 

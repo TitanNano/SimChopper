@@ -1,6 +1,7 @@
 use godot::engine::{SceneTree, SceneTreeTimer};
 use godot::obj::Gd;
 
+pub mod async_support;
 pub mod logger;
 
 /// Create a new ingame one-shot timer in seconds.

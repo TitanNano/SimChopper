@@ -21,4 +21,4 @@ rand = "0.8.5"
 pomsky-macro = "0.11.0"
 regex = "1.10.5"
 
-godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "657a6b15d19b702b3aa6ad0fd23986ceb8598562" }
+godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "ca371c120774412e4a222ba0362fdf4f5e844b6f" }

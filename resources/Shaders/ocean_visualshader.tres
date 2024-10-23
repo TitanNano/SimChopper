@@ -1,42 +1,7 @@
-[gd_resource type="VisualShader" load_steps=71 format=3 uid="uid://buh5ms3vm1n7"]
+[gd_resource type="VisualShader" load_steps=54 format=3 uid="uid://buh5ms3vm1n7"]
 
-[ext_resource type="Script" path="res://addons/visual_shader_node_library/shader_nodes/3d/screenspace_refraction.gd" id="1"]
 [ext_resource type="Script" path="res://addons/shaderV/tools/vec2Compose.gd" id="3_mbxw3"]
 [ext_resource type="Script" path="res://addons/shaderV/tools/TimeScaled.gd" id="4"]
-
-[sub_resource type="VisualShaderNodeInput" id="1"]
-output_port_for_preview = 0
-input_name = "uv"
-
-[sub_resource type="VisualShaderNodeVectorOp" id="2"]
-operator = 2
-
-[sub_resource type="VisualShaderNodeFloatParameter" id="3"]
-parameter_name = "Normal_Resolution"
-
-[sub_resource type="VisualShaderNodeVectorOp" id="4"]
-
-[sub_resource type="VisualShaderNodeCustom" id="5"]
-default_input_values = [0, 0.1]
-initialized = true
-script = ExtResource("4")
-
-[sub_resource type="VisualShaderNodeVectorCompose" id="6"]
-
-[sub_resource type="VisualShaderNodeFloatOp" id="7"]
-default_input_values = [0, 0.0, 1, -1.0]
-operator = 2
-
-[sub_resource type="VisualShaderNodeVec3Parameter" id="49"]
-parameter_name = "uv_aspectratio"
-
-[sub_resource type="VisualShaderNodeVectorOp" id="50"]
-operator = 2
-
-[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_vly2v"]
-parameter_name = "screen_text"
-texture_filter = 4
-texture_source = 1
 
 [sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_wo80b"]
 parameter_name = "depth_text"
@@ -86,27 +51,17 @@ varying_type = 3
 
 [sub_resource type="VisualShaderNodeMix" id="VisualShaderNodeMix_mdnln"]
 default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(1, 1, 1), 2, Vector3(0.5, 0.5, 0.5)]
+expanded_output_ports = [0]
 op_type = 3
 
 [sub_resource type="VisualShaderNodeParameterRef" id="VisualShaderNodeParameterRef_g4v0h"]
 parameter_name = "Wave_Ratio"
 
-[sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_eiyi0"]
-function = 31
+[sub_resource type="VisualShaderNodeClamp" id="VisualShaderNodeClamp_egybe"]
+default_input_values = [0, 0.0, 1, 0.1, 2, 0.999]
 
 [sub_resource type="VisualShaderNodeColorParameter" id="9"]
 parameter_name = "Albedo"
-
-[sub_resource type="VisualShaderNodeCustom" id="10"]
-default_input_values = [1, 1.0, 2, 0.0, 4, 0.0]
-initialized = true
-script = ExtResource("1")
-
-[sub_resource type="VisualShaderNodeFloatParameter" id="11"]
-parameter_name = "IOR"
-
-[sub_resource type="VisualShaderNodeColorConstant" id="12"]
-constant = Color(1, 1, 1, 0)
 
 [sub_resource type="VisualShaderNodeInput" id="13"]
 input_name = "screen_uv"
@@ -114,17 +69,6 @@ input_name = "screen_uv"
 [sub_resource type="VisualShaderNodeTexture" id="14"]
 expanded_output_ports = [0]
 source = 5
-
-[sub_resource type="VisualShaderNodeMix" id="17"]
-default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(1, 1, 1), 2, Vector3(0, 0, 0)]
-op_type = 3
-
-[sub_resource type="VisualShaderNodeMix" id="18"]
-default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(0, 0, 0), 2, Vector3(0, 0, 0)]
-op_type = 3
-
-[sub_resource type="VisualShaderNodeClamp" id="28"]
-default_input_values = [0, 1.0, 1, 2.08165e-12, 2, 1.0]
 
 [sub_resource type="VisualShaderNodeFloatParameter" id="29"]
 parameter_name = "Depth_Scale"
@@ -281,10 +225,8 @@ uniform sampler2D Noise : hint_default_black;
 uniform float Wave2_Dir : hint_range(0, 1);
 uniform float wave_height;
 uniform vec4 Albedo : source_color;
-uniform float IOR;
-uniform sampler2D screen_text : filter_linear_mipmap, hint_screen_texture;
-uniform sampler2D depth_text : source_color, filter_nearest, repeat_disable, hint_depth_texture;
 uniform float Depth_Scale;
+uniform sampler2D depth_text : source_color, filter_nearest, repeat_disable, hint_depth_texture;
 uniform float Roughness : hint_range(0, 1) = 0;
 uniform sampler2D TextureUniform : hint_normal;
 
@@ -293,236 +235,6 @@ uniform sampler2D TextureUniform : hint_normal;
 
 vec2 vec2ComposeFunc(float _vec2_length, float _vec2_angl_rad){
 	return vec2(cos(_vec2_angl_rad), sin(_vec2_angl_rad)) * _vec2_length;
-}
-
-// ScreenSpaceRefraction
-
-const int SSR_MAX_STEPS = 256;
-
-vec3 line_plane_intersect(vec3 lineorigin, vec3 linedirection, vec3 planeorigin, vec3 planenormal) {
-	float dist = dot(planenormal, planeorigin - lineorigin) / dot(planenormal, linedirection);
-	return lineorigin + linedirection * dist;
-}
-
-float line_unit_box_intersect_dist(vec3 lineorigin, vec3 linedirection) {
-  /* https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
-   */
-  vec3 firstplane = (vec3(1.0) - lineorigin) / linedirection;
-  vec3 secondplane = (vec3(-1.0) - lineorigin) / linedirection;
-  vec3 furthestplane = max(firstplane, secondplane);
-
-  return min(furthestplane.x, min(furthestplane.y, furthestplane.z));
-}
-
-vec3 project_point(mat4 projection_matrix, vec3 point) {
-	vec4 ndc = projection_matrix * vec4(point, 1.0);
-	return ndc.xyz / ndc.w;
-}
-
-float F_eta(float eta, float cos_theta) {
-	/* compute fresnel reflectance without explicitly computing
-	* the refracted direction */
-	float c = abs(cos_theta);
-	float g = eta * eta - 1.0 + c * c;
-	float result;
-	
-	if (g > 0.0) {
-		g = sqrt(g);
-		vec2 g_c = vec2(g) + vec2(c, -c);
-		float A = g_c.y / g_c.x;
-		A *= A;
-		g_c *= c;
-		float B = (g_c.y - 1.0) / (g_c.x + 1.0);
-		B *= B;
-		result = 0.5 * A * (1.0 + B);
-	} else {
-		result = 1.0; /* TIR (no refracted component) */
-	}
-	
-	return result;
-}
-
-void prepare_raycast(mat4 projection_matrix, vec3 ray_origin, vec3 ray_dir, float ssr_thickness, vec2 pixel_size, out vec4 ss_step, out vec4 ss_ray, out float max_time) {
-	/* Negate the ray direction if it goes towards the camera.
-	* This way we don't need to care if the projected point
-	* is behind the near plane. */
-	float z_sign = -sign(ray_dir.z);
-	vec3 ray_end = ray_origin + z_sign * ray_dir;
-	
-	/* Project into screen space. */
-	vec4 ss_start, ss_end;
-	ss_start.xyz = project_point(projection_matrix, ray_origin);
-	ss_end.xyz = project_point(projection_matrix, ray_end);
-	
-	/* We interpolate the ray Z + ssr_thickness values to check if depth is within threshold. */
-	ray_origin.z -= ssr_thickness;
-	ray_end.z -= ssr_thickness;
-	ss_start.w = project_point(projection_matrix, ray_origin).z;
-	ss_end.w = project_point(projection_matrix, ray_end).z;
-	
-	/* XXX This is a hack. A better method is welcome! */
-	/* We take the delta between the offsetted depth and the depth and subtract it from the ray
-	* depth. This will change the world space ssr_thickness appearance a bit but we can have negative
-	* values without worries. We cannot do this in viewspace because of the perspective division. */
-	ss_start.w = 2.0 * ss_start.z - ss_start.w;
-	ss_end.w = 2.0 * ss_end.z - ss_end.w;
-	
-	ss_step = ss_end - ss_start;
-	max_time = length(ss_step.xyz);
-	ss_step = z_sign * ss_step / length(ss_step.xyz);
-	
-	/* If the line is degenerate, make it cover at least one pixel
-	* to not have to handle zero-pixel extent as a special case later */
-	ss_step.xy += vec2((dot(ss_step.xy, ss_step.xy) < 0.00001) ? 0.001 : 0.0);
-	
-	/* Make ss_step cover one pixel. */
-	ss_step /= max(abs(ss_step.x), abs(ss_step.y));
-	ss_step *= (abs(ss_step.x) > abs(ss_step.y)) ? pixel_size.x : pixel_size.y;
-	
-	/* Clip to segment's end. */
-	max_time /= length(ss_step.xyz);
-	
-	/* Clipping to frustum sides. */
-	max_time = min(max_time, line_unit_box_intersect_dist(ss_start.xyz, ss_step.xyz));
-	
-	/* Convert to texture coords. Z component included
-	* since this is how it's stored in the depth buffer.
-	* 4th component how far we are on the ray */
-	ss_ray = ss_start * 0.5 + 0.5;
-	ss_step *= 0.5;
-	
-	/* take the center of the texel. */
-}
-
-// #define GROUPED_FETCHES /* is still slower, need to see where is the bottleneck. */
-/* Return the hit position, and negate the z component (making it positive) if not hit occurred. */
-/* __ray_dir__ is the ray direction premultiplied by it's maximum length */
-vec3 raycast(mat4 projection_matrix, sampler2D depth_texture, vec3 ray_origin, vec3 ray_dir, float ssr_thickness, float ray_jitter, float trace_quality, float ssr_roughness, bool discard_backface) {
-	vec4 ss_step, ss_start;
-	float max_time;
-	prepare_raycast(projection_matrix, ray_origin, ray_dir, ssr_thickness, 1.0 / vec2(textureSize(depth_texture, 0)), ss_step, ss_start, max_time);
-	
-	float max_trace_time = max(0.01, max_time - 0.01);
-	
-	/* x : current_time, y: previous_time, z: current_delta, w: previous_delta */
-	vec4 times_and_deltas = vec4(0.0);
-	
-	float ray_time = 0.0;
-	float depth_sample = textureLod(depth_texture, ss_start.xy, 0.0).x;
-	times_and_deltas.z = depth_sample - ss_start.z;
-	
-	float lod_fac = clamp(sqrt(ssr_roughness) * 2.0 - 0.4, 0.0, 1.0);
-	bool hit = false;
-
-	for(float iter = 1.0; !hit && (ray_time < max_time) && (iter < float(SSR_MAX_STEPS)); iter++) {
-		/* Minimum stride of 2 because we are using half res minmax zbuffer. */
-		float stride = max(1.0, iter * trace_quality) * 2.0;
-		float lod = log2(stride * 0.5 * trace_quality) * lod_fac;
-		ray_time += stride;
-		
-		/* Save previous values. */
-		times_and_deltas.xyzw = times_and_deltas.yxwz;
-		
-		float jit_stride = mix(2.0, stride, ray_jitter);
-		
-		times_and_deltas.x = min(ray_time + jit_stride, max_trace_time);
-		vec4 ss_ray = ss_start + ss_step * times_and_deltas.x;
-		
-		depth_sample = textureLod(depth_texture, ss_ray.xy, lod).x;
-		
-		float prev_w = ss_start.w + ss_step.w * times_and_deltas.y;
-		times_and_deltas.z = depth_sample - ss_ray.z;
-		hit = (times_and_deltas.z <= 0.0) && (prev_w <= depth_sample);
-	}
-	
-	if (discard_backface) {
-		/* Discard backface hits */
-		hit = hit && (times_and_deltas.w > 0.0);
-	}
-	
-	/* Reject hit if background. */
-	hit = hit && (depth_sample != 1.0);
-	
-	times_and_deltas.x = hit ? mix(times_and_deltas.y, times_and_deltas.x, clamp(times_and_deltas.w / (times_and_deltas.w - times_and_deltas.z), 0.0, 1.0)) : times_and_deltas.x;
-	ray_time = hit ? times_and_deltas.x : ray_time;
-	
-	/* Clip to frustum. */
-	ray_time = max(0.001, min(ray_time, max_time - 1.5));
-	
-	vec4 ss_ray = ss_start + ss_step * ray_time;
-	
-	/* Tag Z if ray failed. */
-//	ss_ray.z *= (hit) ? 1.0 : -1.0;
-	return ss_ray.xyz;
-}
-
-float screen_border_mask(vec2 hit_co) {
-	const float ssrBorderFac = 0.1;
-	
-	const float margin = 0.003;
-	float atten = ssrBorderFac + margin; /* Screen percentage */
-	hit_co = smoothstep(margin, atten, hit_co) * (1.0 - smoothstep(1.0 - atten, 1.0 - margin, hit_co));
-	float screenfade = hit_co.x * hit_co.y;
-	return screenfade;
-}
-
-vec4 ssr(vec3 position, mat4 projection_matrix, mat4 view_matrix, sampler2D screen_texture, sampler2D depth_texture, vec3 N, vec3 V, float ssr_ior, float ssr_roughnessSquared) {
-	vec3 H = N;
-	
-	float eta = 1.0 / ssr_ior;
-	if (dot(H, V) < 0.0) {
-		H = -H;
-		eta = ssr_ior;
-	}
-	
-	vec3 R = refract(-V, H, 1.0 / ssr_ior);
-	
-	R = (view_matrix * vec4(R, 0.0)).xyz;
-	
-	const float ssrssr_thickness = 1.0;
-	const float ssrQuality = 0.0;
-	
-	vec3 hit_pos = raycast(projection_matrix, depth_texture, position, R * 1e16, ssrssr_thickness, 0.0, ssrQuality, ssr_roughnessSquared, false);
-	
-	if ((hit_pos.z > 0.0) && (F_eta(ssr_ior, dot(H, V)) < 1.0)) {
-		vec2 hit_uvs = project_point(projection_matrix, hit_pos).xy * 0.5 + 0.5;
-		
-		vec3 spec = textureLod(screen_texture, hit_pos.xy, ssr_roughnessSquared * 8.0).xyz;
-		float mask = screen_border_mask(hit_uvs);
-		return vec4(spec, mask);
-	}
-	
-	return vec4(0.0);
-}
-
-void screenspace_refraction(in float ssr_ior, in float ssr_roughness, in float ssr_thickness, in vec3 albedo_in, in float alpha_in, in vec3 emission_in, in vec2 screen_uv, in sampler2D screen_texture, in sampler2D depth_texture, in vec3 view, in vec3 normal, in vec3 position, in mat4 view_matrix, in mat4 camera_matrix, in mat4 projection_matrix, out vec3 albedo_out, out vec3 emission_out) { 
-	vec3 V = (camera_matrix * vec4(view, 0.0)).xyz;
-	vec3 N = (camera_matrix * vec4(normal, 0.0)).xyz;
-	vec3 world_pos = (camera_matrix * vec4(position, 1.0)).xyz;
-	
-	/* Refract the view vector using the depth heuristic.
-	* Then later Refract a second time the already refracted
-	* ray using the inverse ssr_ior. */
-	float final_ior = (ssr_thickness > 0.0) ? 1.0 / ssr_ior : ssr_ior;
-	vec3 refr_V = (ssr_thickness > 0.0) ? -refract(-V, N, final_ior) : V;
-	vec3 refr_pos = (ssr_thickness > 0.0) ?
-			line_plane_intersect(world_pos, refr_V, world_pos - N * ssr_thickness, N) :
-			world_pos;
-	
-	/* ---------------------------- */
-	/*   Screen Space Refraction    */
-	/* ---------------------------- */
-	/* Find approximated position of the 2nd refraction event. */
-	vec3 refr_vpos = (ssr_thickness > 0.0) ? (view_matrix * vec4(refr_pos, 1.0)).xyz :
-			position;
-	vec4 trans = ssr(refr_vpos, projection_matrix, view_matrix, screen_texture, depth_texture, N, refr_V, final_ior, ssr_roughness * ssr_roughness);
-	trans.a *= smoothstep(1.0 + 0.2, 1.0, ssr_roughness);
-	
-	float fac = 1.0 - alpha_in;
-	fac *= 1.0 - pow(1.0 - dot(V, N), 5.0) * (1.0 - ssr_roughness);
-	
-	emission_out = emission_in + trans.rgb * albedo_in * fac;
-	albedo_out = albedo_in * 1.0 - fac;
 }
 
 
@@ -681,25 +393,6 @@ void fragment() {
 	vec4 n_out18p0 = Albedo;
 
 
-// FloatParameter:20
-	float n_out20p0 = IOR;
-
-
-// ColorConstant:26
-	vec4 n_out26p0 = vec4(1.000000, 1.000000, 1.000000, 0.000000);
-
-
-	vec3 n_out19p0;
-	vec3 n_out19p1;
-// ScreenSpaceRefraction:19
-	float n_in19p1 = 1.00000;
-	float n_in19p2 = 0.00000;
-	float n_in19p4 = 0.00000;
-	{
-		screenspace_refraction(n_out20p0, n_in19p2, n_in19p1, vec3(n_out26p0.xyz), n_in19p4, vec3(0.0), SCREEN_UV, screen_text, depth_text, VIEW, NORMAL, VERTEX, VIEW_MATRIX, INV_VIEW_MATRIX, PROJECTION_MATRIX, n_out19p0, n_out19p1);
-	}
-
-
 // FloatParameter:61
 	float n_out61p0 = Depth_Scale;
 
@@ -742,27 +435,14 @@ void fragment() {
 	float n_out139p0 = n_out61p0 * n_out138p0;
 
 
-// FloatFunc:147
-	float n_out147p0 = 1.0 - n_out139p0;
-
-
-// Clamp:59
-	float n_in59p1 = 0.00000;
-	float n_in59p2 = 1.00000;
-	float n_out59p0 = clamp(n_out147p0, n_in59p1, n_in59p2);
-
-
-// Mix:40
-	vec3 n_out40p0 = mix(vec3(n_out18p0.xyz), n_out19p0, vec3(n_out59p0));
+// Clamp:150
+	float n_in150p1 = 0.10000;
+	float n_in150p2 = 0.99900;
+	float n_out150p0 = clamp(n_out139p0, n_in150p1, n_in150p2);
 
 
 // FloatParameter:141
 	float n_out141p0 = Roughness;
-
-
-// Mix:41
-	vec3 n_in41p0 = vec3(0.00000, 0.00000, 0.00000);
-	vec3 n_out41p0 = mix(n_in41p0, n_out19p1, vec3(n_out59p0));
 
 
 // VaryingGetter:142
@@ -789,6 +469,7 @@ void fragment() {
 
 // Mix:145
 	vec3 n_out145p0 = mix(vec3(n_out111p0.xyz), vec3(n_out143p0.xyz), vec3(n_out146p0));
+	float n_out145p1 = n_out145p0.r;
 
 
 // FloatConstant:95
@@ -796,15 +477,17 @@ void fragment() {
 
 
 // Output:0
-	ALBEDO = n_out40p0;
+	ALBEDO = vec3(n_out18p0.xyz);
+	ALPHA = n_out150p0;
 	ROUGHNESS = n_out141p0;
-	EMISSION = n_out41p0;
+	SPECULAR = n_out145p1;
 	NORMAL_MAP = n_out145p0;
 	NORMAL_MAP_DEPTH = n_out95p0;
 
 
 }
 "
+graph_offset = Vector2(263.253, -737.657)
 varyings/vary_world_uv = "0,3"
 varyings/vary_world_uv2 = "0,3"
 nodes/vertex/0/position = Vector2(3340, -540)
@@ -871,59 +554,27 @@ nodes/vertex/61/position = Vector2(-2360, 640)
 nodes/vertex/62/node = SubResource("VisualShaderNodeFloatParameter_j1fss")
 nodes/vertex/62/position = Vector2(-2360, -60)
 nodes/vertex/connections = PackedInt32Array(7, 0, 0, 0, 22, 0, 11, 1, 23, 0, 11, 0, 14, 0, 25, 1, 24, 0, 25, 0, 5, 1, 7, 0, 5, 3, 7, 2, 8, 0, 7, 1, 5, 2, 8, 0, 11, 0, 8, 1, 34, 0, 33, 2, 25, 1, 31, 0, 25, 3, 31, 1, 31, 0, 29, 0, 29, 0, 36, 0, 36, 0, 33, 0, 36, 0, 45, 0, 46, 0, 36, 1, 49, 0, 50, 0, 49, 0, 48, 0, 47, 0, 49, 1, 29, 0, 49, 0, 33, 1, 51, 0, 50, 1, 51, 1, 51, 0, 23, 0, 52, 0, 51, 2, 34, 0, 50, 2, 54, 0, 53, 0, 53, 0, 46, 1, 53, 0, 47, 1, 56, 0, 47, 0, 57, 0, 58, 1, 58, 0, 56, 1, 60, 0, 61, 1, 61, 0, 59, 1, 59, 0, 46, 0, 62, 0, 29, 1)
-nodes/fragment/0/position = Vector2(8880, -1880)
+nodes/fragment/0/position = Vector2(8920, -1700)
 nodes/fragment/18/node = SubResource("9")
-nodes/fragment/18/position = Vector2(6180, -2280)
-nodes/fragment/19/node = SubResource("10")
-nodes/fragment/19/position = Vector2(3920, -660)
-nodes/fragment/20/node = SubResource("11")
-nodes/fragment/20/position = Vector2(2980, -1200)
-nodes/fragment/26/node = SubResource("12")
-nodes/fragment/26/position = Vector2(3100, -660)
+nodes/fragment/18/position = Vector2(7940, -2400)
 nodes/fragment/33/node = SubResource("13")
-nodes/fragment/33/position = Vector2(800, -1660)
+nodes/fragment/33/position = Vector2(2340, -1580)
 nodes/fragment/35/node = SubResource("14")
-nodes/fragment/35/position = Vector2(1520, -1660)
-nodes/fragment/40/node = SubResource("17")
-nodes/fragment/40/position = Vector2(7180, -1840)
-nodes/fragment/41/node = SubResource("18")
-nodes/fragment/41/position = Vector2(7160, -1460)
-nodes/fragment/59/node = SubResource("28")
-nodes/fragment/59/position = Vector2(6320, -1820)
+nodes/fragment/35/position = Vector2(3060, -1580)
 nodes/fragment/61/node = SubResource("29")
-nodes/fragment/61/position = Vector2(4480, -2340)
+nodes/fragment/61/position = Vector2(6020, -2260)
 nodes/fragment/95/node = SubResource("30")
-nodes/fragment/95/position = Vector2(8320, -1320)
+nodes/fragment/95/position = Vector2(8220, -700)
 nodes/fragment/99/node = SubResource("32")
 nodes/fragment/99/position = Vector2(6240, -900)
-nodes/fragment/100/node = SubResource("1")
-nodes/fragment/100/position = Vector2(3480, 2380)
-nodes/fragment/101/node = SubResource("2")
-nodes/fragment/101/position = Vector2(5420, 1980)
-nodes/fragment/102/node = SubResource("3")
-nodes/fragment/102/position = Vector2(4520, 2460)
-nodes/fragment/103/node = SubResource("4")
-nodes/fragment/103/position = Vector2(5920, 1780)
-nodes/fragment/104/node = SubResource("5")
-nodes/fragment/104/position = Vector2(4560, 2840)
-nodes/fragment/105/node = SubResource("6")
-nodes/fragment/105/position = Vector2(5620, 2380)
-nodes/fragment/106/node = SubResource("7")
-nodes/fragment/106/position = Vector2(5240, 2800)
-nodes/fragment/107/node = SubResource("49")
-nodes/fragment/107/position = Vector2(3520, 2900)
-nodes/fragment/108/node = SubResource("50")
-nodes/fragment/108/position = Vector2(4500, 2160)
-nodes/fragment/109/node = SubResource("VisualShaderNodeTexture2DParameter_vly2v")
-nodes/fragment/109/position = Vector2(2480, -840)
 nodes/fragment/110/node = SubResource("VisualShaderNodeTexture2DParameter_wo80b")
-nodes/fragment/110/position = Vector2(500, -760)
+nodes/fragment/110/position = Vector2(2040, -680)
 nodes/fragment/111/node = SubResource("VisualShaderNodeTexture_d387j")
 nodes/fragment/111/position = Vector2(7760, -1320)
 nodes/fragment/133/node = SubResource("VisualShaderNodeInput_svam0")
-nodes/fragment/133/position = Vector2(2500, -1900)
+nodes/fragment/133/position = Vector2(3760, -1940)
 nodes/fragment/134/node = SubResource("VisualShaderNodeExpression_kf1ub")
-nodes/fragment/134/position = Vector2(3040, -1960)
+nodes/fragment/134/position = Vector2(4580, -1880)
 nodes/fragment/134/size = Vector2(792.119, 502.087)
 nodes/fragment/134/input_ports = "0,7,matrix;1,0,depth;"
 nodes/fragment/134/output_ports = "0,0,linear_depth;"
@@ -932,13 +583,13 @@ vec4 view = matrix * vec4(ndc, 1.0);
 view.xyz /= view.w;
 linear_depth = view.z;"
 nodes/fragment/136/node = SubResource("VisualShaderNodeInput_suofc")
-nodes/fragment/136/position = Vector2(3680, -2280)
+nodes/fragment/136/position = Vector2(5220, -2200)
 nodes/fragment/138/node = SubResource("VisualShaderNodeFloatOp_xjae2")
-nodes/fragment/138/position = Vector2(4600, -1920)
+nodes/fragment/138/position = Vector2(6140, -1840)
 nodes/fragment/139/node = SubResource("VisualShaderNodeFloatOp_f51ga")
-nodes/fragment/139/position = Vector2(5220, -1980)
+nodes/fragment/139/position = Vector2(6760, -2020)
 nodes/fragment/141/node = SubResource("VisualShaderNodeFloatParameter_vol2q")
-nodes/fragment/141/position = Vector2(7520, -2300)
+nodes/fragment/141/position = Vector2(6140, -1500)
 nodes/fragment/142/node = SubResource("VisualShaderNodeVaryingGetter_t8e1f")
 nodes/fragment/142/position = Vector2(6880, -1060)
 nodes/fragment/143/node = SubResource("VisualShaderNodeTexture_ovy80")
@@ -949,6 +600,6 @@ nodes/fragment/145/node = SubResource("VisualShaderNodeMix_mdnln")
 nodes/fragment/145/position = Vector2(8200, -1080)
 nodes/fragment/146/node = SubResource("VisualShaderNodeParameterRef_g4v0h")
 nodes/fragment/146/position = Vector2(7480, -380)
-nodes/fragment/147/node = SubResource("VisualShaderNodeFloatFunc_eiyi0")
-nodes/fragment/147/position = Vector2(5720, -1880)
-nodes/fragment/connections = PackedInt32Array(20, 0, 19, 0, 33, 0, 35, 0, 26, 0, 19, 3, 102, 0, 101, 1, 101, 0, 103, 0, 104, 0, 106, 0, 104, 0, 105, 0, 106, 0, 105, 1, 108, 0, 101, 0, 100, 0, 108, 0, 107, 0, 108, 1, 109, 0, 19, 7, 110, 0, 19, 8, 59, 0, 40, 2, 19, 0, 40, 1, 18, 0, 40, 0, 19, 1, 41, 1, 59, 0, 41, 2, 99, 0, 111, 2, 110, 0, 35, 2, 133, 0, 134, 0, 134, 0, 138, 1, 138, 0, 139, 1, 61, 0, 139, 0, 40, 0, 0, 0, 41, 0, 0, 5, 141, 0, 0, 3, 142, 0, 111, 0, 144, 0, 143, 0, 99, 0, 143, 2, 111, 0, 145, 0, 143, 0, 145, 1, 145, 0, 0, 9, 146, 0, 145, 2, 136, 3, 138, 0, 35, 1, 134, 1, 139, 0, 147, 0, 147, 0, 59, 0, 95, 0, 0, 10)
+nodes/fragment/150/node = SubResource("VisualShaderNodeClamp_egybe")
+nodes/fragment/150/position = Vector2(7240, -1860)
+nodes/fragment/connections = PackedInt32Array(33, 0, 35, 0, 99, 0, 111, 2, 110, 0, 35, 2, 133, 0, 134, 0, 134, 0, 138, 1, 138, 0, 139, 1, 61, 0, 139, 0, 141, 0, 0, 3, 142, 0, 111, 0, 144, 0, 143, 0, 99, 0, 143, 2, 111, 0, 145, 0, 143, 0, 145, 1, 146, 0, 145, 2, 136, 3, 138, 0, 35, 1, 134, 1, 95, 0, 0, 10, 145, 0, 0, 9, 145, 1, 0, 4, 139, 0, 150, 0, 150, 0, 0, 1, 18, 0, 0, 0)

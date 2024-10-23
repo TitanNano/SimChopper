@@ -27,7 +27,6 @@ shader_parameter/speed = 0.1
 shader_parameter/Wave2_Dir = 0.569
 shader_parameter/wave_height = null
 shader_parameter/Albedo = Color(0.129412, 0.180392, 0.262745, 1)
-shader_parameter/IOR = 1.333
 shader_parameter/Depth_Scale = 1.0
 shader_parameter/Roughness = 0.2
 shader_parameter/Noise = SubResource("NoiseTexture2D_50160")

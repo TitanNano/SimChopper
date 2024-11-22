@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://djrh870bg3ckr"]
+[gd_scene load_steps=9 format=3 uid="uid://djrh870bg3ckr"]
 
 [ext_resource type="Material" uid="uid://bmp5rvu5slnnt" path="res://resources/Materials/ocean_material.tres" id="2"]
 [ext_resource type="Material" uid="uid://7h8w8gb1xjbk" path="res://resources/Materials/ocean_backdrop.tres" id="2_en16t"]
@@ -19,6 +19,8 @@ sky_material = SubResource("PhysicalSkyMaterial_2x1hw")
 background_mode = 2
 sky = SubResource("4")
 tonemap_mode = 3
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_jtm2k"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_2q6u6"]
 size = Vector2(512, 512)
@@ -79,6 +81,7 @@ shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("5")
+camera_attributes = SubResource("CameraAttributesPractical_jtm2k")
 
 [node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
 

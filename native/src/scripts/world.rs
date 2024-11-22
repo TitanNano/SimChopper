@@ -1,2 +1,2 @@
 mod buildings;
-mod solar_setup;
+pub mod solar_setup;

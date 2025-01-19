@@ -1,6 +1,6 @@
 use godot::{
     builtin::{math::FloatExt, Basis, Transform3D, Vector3},
-    engine::Node3D,
+    classes::Node3D,
 };
 
 pub trait Node3DExt {

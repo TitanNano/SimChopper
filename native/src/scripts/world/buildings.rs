@@ -3,9 +3,9 @@ use std::{collections::BTreeMap, ops::Not};
 use anyhow::Context as _;
 use derive_debug::Dbg;
 use godot::builtin;
-use godot::builtin::meta::ToGodot;
 use godot::builtin::{Array, Dictionary};
-use godot::engine::{Marker3D, Node, Node3D, Resource, Time};
+use godot::classes::{Marker3D, Node, Node3D, Resource, Time};
+use godot::meta::ToGodot;
 use godot::obj::{Gd, NewAlloc};
 use godot_rust_script::{
     godot_script_impl, CastToScript, GodotScript, RsRef, ScriptSignal, Signal,
@@ -168,13 +168,13 @@ impl Buildings {
             return;
         };
 
-        if !instance.get("tile_coords_array".into()).is_nil() {
+        if !instance.get("tile_coords_array").is_nil() {
             let mut array = Array::new();
 
             array.push(tile_coords.0);
             array.push(tile_coords.1);
 
-            instance.set("tile_coords_array".into(), array.to_variant());
+            instance.set("tile_coords_array", &array.to_variant());
         }
 
         let mut location = city_coords_feature.get_building_coords(
@@ -189,7 +189,7 @@ impl Buildings {
 
         let (_, insert_time) = with_timing(|| {
             Self::get_sector(base, tile_coords, city_coords_feature)
-                .add_child_ex(instance.clone().upcast())
+                .add_child_ex(&instance)
                 .force_readable_name(true)
                 .done();
 
@@ -198,7 +198,7 @@ impl Buildings {
                 return;
             };
 
-            instance.set_owner(root);
+            instance.set_owner(&root);
         });
 
         let (_, translate_time) =
@@ -236,14 +236,14 @@ impl Buildings {
             format!("{}_{}", x, y)
         };
 
-        base.get_node_or_null(sector_name.to_godot().into())
+        base.get_node_or_null(&sector_name)
             .map(Gd::cast)
             .unwrap_or_else(|| {
                 let mut sector: Gd<Node3D> = Marker3D::new_alloc().upcast();
 
-                sector.set_name(sector_name.to_godot());
+                sector.set_name(&sector_name);
 
-                base.add_child(sector.clone().upcast());
+                base.add_child(&sector);
 
                 sector.translate(city_coords_feature.get_world_coords(
                     sector_coords.0 + (SECTOR_SIZE / 2),
@@ -252,7 +252,7 @@ impl Buildings {
                 ));
 
                 if let Some(root) = base.get_tree().and_then(|tree| tree.get_current_scene()) {
-                    sector.set_owner(root);
+                    sector.set_owner(&root);
                 };
 
                 sector

@@ -1,9 +1,8 @@
 use std::collections::BTreeMap;
 
-use godot::builtin::{
-    meta::{ConvertError, FromGodot, ToGodot},
-    Dictionary, VariantArray,
-};
+use godot::builtin::{Dictionary, VariantArray};
+use godot::meta::error::ConvertError;
+use godot::meta::{FromGodot, ToGodot};
 
 pub(crate) trait TryFromDictionary: Sized {
     fn try_from_dict(value: &Dictionary) -> Result<Self, TryFromDictError>;
@@ -190,8 +189,8 @@ fn array_to_tuple(value: VariantArray) -> Result<TileCoords, TryFromDictError> {
 fn tuple_to_array(value: TileCoords) -> VariantArray {
     let mut array = VariantArray::new();
 
-    array.push(value.0.to_variant());
-    array.push(value.1.to_variant());
+    array.push(&value.0.to_variant());
+    array.push(&value.1.to_variant());
 
     array
 }

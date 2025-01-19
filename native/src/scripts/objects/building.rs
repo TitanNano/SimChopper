@@ -1,7 +1,7 @@
 mod fire;
 
 use godot::builtin::Array;
-use godot::engine::{MeshInstance3D, Node};
+use godot::classes::{MeshInstance3D, Node};
 use godot::global::PropertyHint;
 use godot::meta::{FromGodot, GodotConvert, ToGodot};
 use godot::obj::{Gd, Inherits};
@@ -39,6 +39,8 @@ impl FromGodot for BuildingEventFlags {
 }
 
 impl ToGodot for BuildingEventFlags {
+    type ToVia<'v> = Self::Via;
+
     fn to_godot(&self) -> Self::Via {
         self.0
     }

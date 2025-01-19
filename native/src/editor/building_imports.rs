@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 
 use godot::{
-    builtin::{Dictionary, GString, PackedStringArray, Vector2i},
-    engine::{
+    builtin::{Dictionary, GString, Vector2i},
+    classes::{
         editor_file_dialog, ConfigFile, DirAccess, EditorFileDialog, EditorInterface, FileAccess,
         MeshInstance3D, Object, PackedScene, ResourceLoader,
     },
@@ -31,7 +31,7 @@ impl SetupBuildingImports {
     }
 
     #[func]
-    fn start(&mut self) {
+    pub fn start(&mut self) {
         let Some(editor) = self.editor.as_ref() else {
             logger::error!("Editor is unavailable!");
             return;
@@ -39,19 +39,19 @@ impl SetupBuildingImports {
 
         let mut dialog = EditorFileDialog::new_alloc();
 
-        dialog.set_current_dir("res://".into());
+        dialog.set_current_dir("res://");
         dialog.set_file_mode(editor_file_dialog::FileMode::OPEN_ANY);
         dialog.set_access(editor_file_dialog::Access::RESOURCES);
         dialog.set_hide_on_ok(true);
 
         dialog.connect(
-            "file_selected".into(),
-            class_callable!(self, Self::on_file_selected),
+            "file_selected",
+            &class_callable!(self, Self::on_file_selected),
         );
 
         dialog.connect(
-            "dir_selected".into(),
-            class_callable!(self, Self::on_dir_selected),
+            "dir_selected",
+            &class_callable!(self, Self::on_dir_selected),
         );
 
         let Some(ui) = editor.get_base_control() else {
@@ -60,7 +60,7 @@ impl SetupBuildingImports {
         };
 
         dialog
-            .popup_exclusive_centered_clamped_ex(ui.upcast())
+            .popup_exclusive_centered_clamped_ex(&ui)
             .minsize(Vector2i::new(2048, 1024))
             .fallback_ratio(0.5)
             .done();
@@ -75,7 +75,7 @@ impl SetupBuildingImports {
 
         let import_config_name = format!("{}.import", file_path);
 
-        if !FileAccess::file_exists(GString::from(&import_config_name)) {
+        if !FileAccess::file_exists(&import_config_name) {
             logger::warn!("Resource has never been imported by the editor!");
             return;
         }
@@ -84,7 +84,7 @@ impl SetupBuildingImports {
         editor
             .get_resource_filesystem()
             .unwrap()
-            .reimport_files(PackedStringArray::from(&[file_path]));
+            .reimport_files(&[file_path].into());
     }
 
     #[func]
@@ -105,7 +105,7 @@ impl SetupBuildingImports {
 
         while let Some(dir_path) = dir_queue.pop_front() {
             logger::info!("Traversing dir \"{}\"...", dir_path);
-            let Some(mut dir) = DirAccess::open(dir_path.clone()) else {
+            let Some(mut dir) = DirAccess::open(&dir_path) else {
                 logger::error!("Directory not accessible: {}", root_dir);
                 return;
             };
@@ -134,7 +134,7 @@ impl SetupBuildingImports {
 
             logger::info!("Processing import config \"{}\"...", import_config_name);
 
-            if !FileAccess::file_exists(GString::from(&import_config_name)) {
+            if !FileAccess::file_exists(&import_config_name) {
                 logger::warn!("Resource has never been imported by the editor!");
                 return;
             }
@@ -145,13 +145,13 @@ impl SetupBuildingImports {
         editor
             .get_resource_filesystem()
             .unwrap()
-            .reimport_files(PackedStringArray::from(file_queue.as_slice()));
+            .reimport_files(&file_queue.as_slice().into());
     }
 
     fn update_import_config(config_file_name: &str) {
         let mut file = ConfigFile::new_gd();
 
-        let error = file.load(GString::from(config_file_name));
+        let error = file.load(config_file_name);
 
         if error != Error::OK {
             logger::error!(
@@ -163,8 +163,8 @@ impl SetupBuildingImports {
         }
 
         let mut subresources: Dictionary = file
-            .get_value_ex("params".into(), "_subresources".into())
-            .default(Dictionary::new().to_variant())
+            .get_value_ex("params", "_subresources")
+            .default(&Dictionary::new().to_variant())
             .done()
             .try_to()
             .inspect_err(|err| {
@@ -184,8 +184,8 @@ impl SetupBuildingImports {
             .unwrap_or_default();
 
         let scene = ResourceLoader::singleton()
-            .load_ex(config_file_name.replace(".import", "").into())
-            .type_hint(PackedScene::class_name().to_gstring())
+            .load_ex(&config_file_name.replace(".import", ""))
+            .type_hint(&PackedScene::class_name().to_gstring())
             .done();
 
         let Some(scene) = scene else {
@@ -236,13 +236,9 @@ impl SetupBuildingImports {
 
         subresources.set("nodes", nodes);
 
-        file.set_value(
-            "params".into(),
-            "_subresources".into(),
-            subresources.to_variant(),
-        );
+        file.set_value("params", "_subresources", &subresources.to_variant());
 
-        let error = file.save(config_file_name.into());
+        let error = file.save(config_file_name);
 
         if error != Error::OK {
             logger::error!(

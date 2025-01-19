@@ -5,7 +5,7 @@ pub use crate::{debug, error, info, warn};
 macro_rules! log {
     ($level:ident, $out:ident, $($param:expr),+) => {
         {
-            let time = ::godot::engine::Time::singleton().get_ticks_msec();
+            let time = ::godot::classes::Time::singleton().get_ticks_msec();
             let minutes = time / 1000 / 60;
             let seconds = time / 1000 % 60;
             let milliseconds = time % 1000;
@@ -17,15 +17,15 @@ macro_rules! log {
     };
 
     (print:default, $string_lit:literal, $($arg:expr),*) => {
-        ::godot::log::godot_print!($string_lit, $($arg),*);
+        ::godot::global::godot_print!($string_lit, $($arg),*);
     };
 
     (print:warn, $string_lit:literal, $($arg:expr),*) => {
-        ::godot::log::godot_warn!($string_lit, $($arg),*);
+        ::godot::global::godot_warn!($string_lit, $($arg),*);
     };
 
     (print:error, $string_lit:literal, $($arg:expr),*) => {
-        ::godot::log::godot_error!($string_lit, $($arg),*);
+        ::godot::global::godot_error!($string_lit, $($arg),*);
     }
 }
 

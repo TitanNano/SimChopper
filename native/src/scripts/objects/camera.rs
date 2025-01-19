@@ -1,4 +1,6 @@
-use godot::{builtin::Dictionary, classes::Camera3D, engine::Node3D, obj::Gd};
+use godot::builtin::Dictionary;
+use godot::classes::{Camera3D, Node3D};
+use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, CastToScript, GodotScript, RsRef};
 use itertools::Itertools;
 

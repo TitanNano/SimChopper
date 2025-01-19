@@ -1,11 +1,8 @@
 #![allow(dead_code)]
 
-use godot::{
-    builtin::meta::ToGodot,
-    engine::{PackedScene, ResourceLoader},
-    log::godot_warn,
-    obj::Gd,
-};
+use godot::classes::{PackedScene, ResourceLoader};
+use godot::global::godot_warn;
+use godot::obj::Gd;
 use num_enum::TryFromPrimitive;
 
 #[derive(TryFromPrimitive)]
@@ -486,9 +483,7 @@ fn load(parser: fn(u8) -> Option<&'static str>, object_id: u8) -> Option<Gd<Pack
         return None;
     };
 
-    ResourceLoader::singleton()
-        .load(object.to_godot())
-        .map(Gd::cast)
+    ResourceLoader::singleton().load(object).map(Gd::cast)
 }
 
 pub fn load_network(object_id: u8) -> Option<Gd<PackedScene>> {

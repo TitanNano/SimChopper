@@ -1,11 +1,12 @@
+use godot::meta::ToGodot;
 use godot::{obj::NewAlloc, tools::load};
+use godot_rust_script::godot::classes::Timer;
 use godot_rust_script::{
-    godot::{
-        engine::Timer,
-        prelude::{godot_error, Callable, Gd, Node3D, NodePath, PackedScene, StringName, ToGodot},
-    },
+    godot::prelude::{godot_error, Gd, Node3D, NodePath, PackedScene},
     godot_script_impl, GodotScript,
 };
+
+use crate::script_callable;
 
 #[derive(Debug, GodotScript)]
 #[script(base = Node3D)]
@@ -43,13 +44,10 @@ impl CarSpawner {
             return;
         };
 
-        inst.set(
-            StringName::from("road_network_path"),
-            self.road_network_path.to_variant(),
-        );
+        inst.set("road_network_path", &self.road_network_path.to_variant());
 
         self.base
-            .add_child_ex(inst.clone())
+            .add_child_ex(&inst)
             .force_readable_name(true)
             .done();
 
@@ -62,8 +60,8 @@ impl CarSpawner {
             return;
         };
 
-        inst.set_owner(current_scene);
-        inst.call(StringName::from("activate"), &[]);
+        inst.set_owner(&current_scene);
+        inst.call("activate", &[]);
     }
 
     pub fn start_auto_spawn(&mut self) {
@@ -73,14 +71,11 @@ impl CarSpawner {
                 self.timer = Some(timer.clone());
 
                 self.base
-                    .add_child_ex(timer.clone().upcast())
+                    .add_child_ex(&timer)
                     .force_readable_name(true)
                     .done();
 
-                timer.connect(
-                    StringName::from("timeout"),
-                    Callable::from_object_method(&self.base, "start_auto_spawn"),
-                );
+                timer.connect("timeout", &script_callable!(self, Self::start_auto_spawn));
 
                 self.timer.as_mut().unwrap()
             }

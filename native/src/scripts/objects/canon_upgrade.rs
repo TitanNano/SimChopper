@@ -1,9 +1,7 @@
 use anyhow::{bail, Context};
-use godot::{
-    builtin::StringName,
-    engine::{GpuParticles3D, Node3D},
-    obj::Gd,
-};
+use godot::builtin::StringName;
+use godot::classes::{GpuParticles3D, Node3D};
+use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript, GodotScriptEnum};
 
 use crate::util::logger;

@@ -1,9 +1,9 @@
 use std::{cmp::Ordering, ops::DerefMut};
 
 use anyhow::{bail, Result};
-use godot::builtin::{Array, Callable, Dictionary, GString, StringName, Variant, Vector3};
-use godot::engine::object::ConnectFlags;
-use godot::engine::{
+use godot::builtin::{Array, Callable, Dictionary, GString, Variant, Vector3};
+use godot::classes::object::ConnectFlags;
+use godot::classes::{
     Area3D, Decal, GpuParticles3D, Node, Node3D, Object, PhysicsRayQueryParameters3D,
     RenderingServer, ShapeCast3D,
 };
@@ -63,7 +63,7 @@ impl WaterJet {
         self.impact_casts = self
             .impact_cast_paths
             .iter_shared()
-            .map(|path| self.base.get_node_as(path))
+            .map(|path| self.base.get_node_as(&path))
             .collect();
     }
 
@@ -130,7 +130,7 @@ impl WaterJet {
         query.set_hit_from_inside(true);
         query.set_hit_back_faces(false);
 
-        let result = space.intersect_ray(query);
+        let result = space.intersect_ray(&query);
 
         if result.is_empty() {
             return Ok(None);
@@ -152,7 +152,7 @@ impl WaterJet {
         let mut debugger = self
             .debugger
             .as_ref()
-            .map(|dbg| dbg.get("debug_data".into()).to())
+            .map(|dbg| dbg.get("debug_data").to())
             .unwrap_or_else(|| {
                 logger::warn!("Trying to access 3D debugger but none is available!");
                 Dictionary::new()
@@ -206,7 +206,7 @@ impl WaterJet {
                     }
                 };
 
-                impact_targets.push(target_node.get_name().into());
+                impact_targets.push(target_node.get_name().arg());
 
                 let point = Intersection {
                     position: shape_cast.get_collision_point(index),
@@ -254,8 +254,8 @@ impl WaterJet {
 
                 timer
                     .connect_ex(
-                        StringName::from("timeout"),
-                        Callable::from_fn("timeout", move |_| {
+                        "timeout",
+                        &Callable::from_local_fn("timeout", move |_| {
                             let target: Gd<Node3D> =
                                 Gd::try_from_instance_id(target_id).map_err(|err| {
                                     logger::error!("Failed to obtain target node ref: {}", err);
@@ -434,15 +434,15 @@ impl WaterJet {
         let decal_size = decal_inst.get_size() * Vector3::new(decal_scale, 1.0, decal_scale);
 
         decal_inst.set_size(decal_size);
-        decal_inst.set(StringName::from("is_active"), true.to_variant());
+        decal_inst.set("is_active", &true.to_variant());
 
-        target_node.add_child(decal_inst.clone().upcast());
+        target_node.add_child(&decal_inst);
 
         decal_inst.set_global_position(point.position);
         decal_inst.align_up(point.normal);
         decal_inst.global_rotate(point.normal, deg_to_rad(randf_range(-90.0, 90.0)) as f32);
         decal_inst.translate(offset);
-        decal_inst.set_owner(target_node.clone().upcast());
+        decal_inst.set_owner(&*target_node);
 
         let surface_intersect = self.raycast_to_surface(
             decal_inst.get_global_position(),
@@ -470,10 +470,10 @@ impl WaterJet {
     }
 
     fn propagate_impact(mut target: Gd<Node3D>, delta: f64) {
-        if !target.has_method("impact_water".into()) {
+        if !target.has_method("impact_water") {
             return;
         }
 
-        target.call("impact_water".into(), &[delta.to_variant()]);
+        target.call("impact_water", &[delta.to_variant()]);
     }
 }

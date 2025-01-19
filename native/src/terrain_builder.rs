@@ -4,9 +4,9 @@ mod terrain_rotation;
 mod tile_surface;
 mod ybuffer;
 
-use godot::builtin::meta::GodotType;
-use godot::engine::mesh::PrimitiveType;
-use godot::engine::{ArrayMesh, Material, SurfaceTool};
+use godot::classes::mesh::PrimitiveType;
+use godot::classes::{ArrayMesh, Material, SurfaceTool};
+use godot::meta::GodotType;
 use godot::prelude::*;
 
 use std::collections::HashMap;
@@ -489,7 +489,7 @@ impl TerrainBuilder {
             let surface_arrays = generator.commit_to_arrays();
             let new_index = mesh.get_surface_count();
 
-            mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, surface_arrays);
+            mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, &surface_arrays);
 
             let surface_material_variant = context.materials.get(surface_type.to_string());
 
@@ -497,7 +497,7 @@ impl TerrainBuilder {
                 surface_material_variant.map(|material| material.to());
 
             match surface_material {
-                Some(material) => mesh.surface_set_material(new_index, material),
+                Some(material) => mesh.surface_set_material(new_index, &material),
                 None => godot_error!("no material for surface type {}", surface_type),
             };
         }

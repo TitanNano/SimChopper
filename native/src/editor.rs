@@ -1,15 +1,16 @@
 mod building_imports;
 
-use godot::builtin::Callable;
-use godot::engine::notify::NodeNotification;
-use godot::engine::{EditorPlugin, IEditorPlugin};
+use godot::classes::notify::NodeNotification;
+use godot::classes::{EditorPlugin, IEditorPlugin};
 use godot::obj::{Base, Gd, WithBaseField};
 use godot::register::{godot_api, GodotClass};
 
 use building_imports::SetupBuildingImports;
 
+use crate::engine_callable;
+
 #[derive(GodotClass)]
-#[class(editor_plugin, tool, base=EditorPlugin)]
+#[class(tool, base=EditorPlugin)]
 struct EditorExtension {
     setup_building_imports: Gd<SetupBuildingImports>,
     base: Base<EditorPlugin>,
@@ -28,8 +29,8 @@ impl IEditorPlugin for EditorExtension {
         let building_imports = self.setup_building_imports.clone();
 
         self.base_mut().add_tool_menu_item(
-            "Setup Building Imports...".into(),
-            Callable::from_object_method(&building_imports, "start"),
+            "Setup Building Imports...",
+            &engine_callable!(&building_imports, SetupBuildingImports::start),
         );
     }
 

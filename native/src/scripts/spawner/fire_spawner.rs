@@ -1,6 +1,6 @@
 use godot::builtin::math::ApproxEq;
 use godot::builtin::{Transform3D, Vector3, Vector3Axis};
-use godot::classes::{light_3d, FogVolume, Node, OmniLight3D, ShaderMaterial};
+use godot::classes::{light_3d, FogVolume, Material, Node, OmniLight3D, ShaderMaterial};
 use godot::meta::ToGodot;
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript};
@@ -39,10 +39,10 @@ impl FireSpawner {
         if let Some(ref mut fire) = self.fire {
             if let Some(material) = fire.get_material() {
                 fire.set_material(
-                    material
+                    &material
                         .duplicate()
                         .expect("Duplicating shouldn't fail")
-                        .cast(),
+                        .cast::<Material>(),
                 );
             } else {
                 logger::error!("Fire volume has no material assigned!");
@@ -122,7 +122,7 @@ impl FireSpawner {
             .expect("fire must have a material!")
             .cast();
 
-        material.set_shader_parameter("strength".into(), strenght.to_variant());
+        material.set_shader_parameter("strength", &strenght.to_variant());
 
         let light_source_energy: f32 = self.default_light_energy;
 

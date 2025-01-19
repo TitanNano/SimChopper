@@ -1,8 +1,6 @@
+use godot_rust_script::godot::classes::{GpuParticles3D, PrimitiveMesh, StandardMaterial3D};
 use godot_rust_script::{
-    godot::{
-        engine::{GpuParticles3D, PrimitiveMesh, StandardMaterial3D},
-        prelude::{godot_error, Gd},
-    },
+    godot::prelude::{godot_error, Gd},
     godot_script_impl, GodotScript,
 };
 

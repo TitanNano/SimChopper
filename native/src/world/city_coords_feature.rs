@@ -1,4 +1,7 @@
-use godot::{builtin::Vector3, engine::Resource, log::godot_error, obj::Gd};
+use godot::builtin::Vector3;
+use godot::classes::Resource;
+use godot::global::godot_error;
+use godot::obj::Gd;
 
 #[derive(Debug, Default)]
 pub struct CityCoordsFeature {
@@ -15,8 +18,8 @@ impl CityCoordsFeature {
     }
 
     pub fn get_world_coords(&self, x: u32, y: u32, z: u32) -> Vector3 {
-        let tile_size: u8 = self.world_constants.get("tile_size".into()).to();
-        let tile_height: u32 = self.world_constants.get("tile_height".into()).to();
+        let tile_size: u8 = self.world_constants.get("tile_size").to();
+        let tile_height: u32 = self.world_constants.get("tile_height").to();
 
         Vector3 {
             x: (x * u32::from(tile_size)) as f32,
@@ -28,7 +31,7 @@ impl CityCoordsFeature {
     pub fn get_building_coords(&self, x: u32, y: u32, z: u32, size: u8) -> Vector3 {
         let tile_size: u8 = self
             .world_constants
-            .get("tile_size".into())
+            .get("tile_size")
             .try_to()
             .map_err(|err| godot_error!("failed to get tile_size of world_constants: {}", err))
             .unwrap();

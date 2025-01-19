@@ -247,7 +247,7 @@ impl GodotWaker {
 
 impl Wake for GodotWaker {
     fn wake(self: std::sync::Arc<Self>) {
-        let callable = Callable::from_fn("GodotWaker::wake", move |_args| {
+        let callable = Callable::from_sync_fn("GodotWaker::wake", move |_args| {
             let current_thread = thread::current().id();
 
             if self.thread_id != current_thread {
@@ -309,7 +309,7 @@ impl<R: FromSignalArgs> SignalFuture<R> {
         let callback_state = state.clone();
 
         // the callable currently requires that the return value is Sync + Send
-        let callable = Callable::from_fn("async_task", move |args: &[&Variant]| {
+        let callable = Callable::from_sync_fn("async_task", move |args: &[&Variant]| {
             let mut lock = callback_state.lock().unwrap();
             let waker = lock.1.take();
 
@@ -323,7 +323,7 @@ impl<R: FromSignalArgs> SignalFuture<R> {
             Ok(Variant::nil())
         });
 
-        signal.connect(callable.clone(), ConnectFlags::ONE_SHOT.ord() as i64);
+        signal.connect(&callable, ConnectFlags::ONE_SHOT.ord() as i64);
 
         Self {
             state,
@@ -359,8 +359,8 @@ impl<R: FromSignalArgs> Drop for SignalFuture<R> {
             return;
         }
 
-        if self.signal.is_connected(self.callable.clone()) {
-            self.signal.disconnect(self.callable.clone());
+        if self.signal.is_connected(&self.callable) {
+            self.signal.disconnect(&self.callable);
         }
     }
 }
@@ -471,7 +471,7 @@ impl<R: FromSignalArgs + Debug> GuaranteedSignalFuture<R> {
         let callable = GuaranteedSignalFutureWaker::new(state.clone());
 
         signal.connect(
-            Callable::from_custom(callable.clone()),
+            &Callable::from_custom(callable.clone()),
             ConnectFlags::ONE_SHOT.ord() as i64,
         );
 
@@ -512,8 +512,8 @@ impl<R: FromSignalArgs> Drop for GuaranteedSignalFuture<R> {
 
         let gd_callable = Callable::from_custom(self.callable.clone());
 
-        if self.signal.is_connected(gd_callable.clone()) {
-            self.signal.disconnect(gd_callable);
+        if self.signal.is_connected(&gd_callable) {
+            self.signal.disconnect(&gd_callable);
         }
     }
 }

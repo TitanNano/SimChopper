@@ -1,4 +1,4 @@
-use godot::engine::{SceneTree, SceneTreeTimer};
+use godot::classes::{SceneTree, SceneTreeTimer};
 use godot::obj::Gd;
 
 pub mod async_support;

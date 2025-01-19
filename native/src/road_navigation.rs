@@ -4,8 +4,8 @@ use std::sync::OnceLock;
 
 use anyhow::{anyhow, Result};
 use godot::builtin::{Transform3D, Vector3};
-use godot::engine::utilities::snappedf;
-use godot::engine::Node3D;
+use godot::classes::Node3D;
+use godot::global::snappedf;
 use godot::obj::Gd;
 use rand::distributions::Uniform;
 use rand::Rng;

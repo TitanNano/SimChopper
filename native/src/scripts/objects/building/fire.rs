@@ -1,5 +1,5 @@
 use godot::builtin::{math::ApproxEq, Transform3D, Vector3};
-use godot::engine::{MeshInstance3D, Node, Node3D, PackedScene, Time};
+use godot::classes::{MeshInstance3D, Node, Node3D, PackedScene, Time};
 use godot::meta::ToGodot;
 use godot::obj::{Gd, Inherits};
 use godot::tools::load;
@@ -114,10 +114,10 @@ impl<N: Inherits<Node>> BuildingFeature<N> for FireFeature {
             * aabb.size)
             .abs();
 
-        scene_instance.call_deferred("resize".into(), &[aabb_size.to_variant()]);
+        scene_instance.call_deferred("resize", &[aabb_size.to_variant()]);
 
         node.upcast_mut()
-            .add_child_ex(scene_instance.clone().upcast())
+            .add_child_ex(&scene_instance)
             .force_readable_name(true)
             .done();
 

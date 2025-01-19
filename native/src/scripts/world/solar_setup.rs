@@ -1,6 +1,6 @@
 use godot::builtin::math::FloatExt;
 use godot::builtin::Vector3;
-use godot::engine::{light_3d, DirectionalLight3D, Node3D, Time};
+use godot::classes::{light_3d, DirectionalLight3D, Node3D, Time};
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript};
 

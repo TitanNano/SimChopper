@@ -1,9 +1,7 @@
-use godot::{
-    builtin::{GString, StringName},
-    engine::{PackedScene, Resource},
-    obj::{Base, Gd},
-    prelude::GodotClass,
-};
+use godot::builtin::{GString, StringName};
+use godot::classes::{PackedScene, Resource};
+use godot::obj::{Base, Gd};
+use godot::prelude::GodotClass;
 
 #[derive(GodotClass)]
 #[class(base = Resource, init)]

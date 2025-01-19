@@ -1,6 +1,6 @@
 use godot::{
     builtin::{Dictionary, Transform3D, Vector3},
-    engine::{IResource, Node3D, Resource},
+    classes::{IResource, Node3D, Resource},
     obj::{Base, Gd},
     register::{godot_api, GodotClass},
 };

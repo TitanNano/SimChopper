@@ -24,7 +24,7 @@ impl WaterDecal {
         }
 
         util::timer(&mut self.base.get_tree().unwrap(), Self::LIFETIME)
-            .connect("timeout".into(), script_callable!(self, Self::on_timeout));
+            .connect("timeout", &script_callable!(self, Self::on_timeout));
     }
 
     pub fn on_timeout(&mut self, mut ctx: Context<Self>) {
@@ -35,13 +35,13 @@ impl WaterDecal {
 
         ctx.reentrant_scope(self, |base: Gd<Decal>| {
             tween.tween_property(
-                base.clone().upcast(),
-                NodePath::from("modulate"),
-                Color::TRANSPARENT_WHITE.to_variant(),
+                &base,
+                &NodePath::from("modulate"),
+                &Color::TRANSPARENT_WHITE.to_variant(),
                 1.0,
             );
 
-            tween.tween_callback(engine_callable!(&base, Node::queue_free));
+            tween.tween_callback(&engine_callable!(&base, Node::queue_free));
         })
     }
 }

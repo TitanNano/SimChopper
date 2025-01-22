@@ -6,13 +6,14 @@ const Logger := preload("res://src/util/Logger.gd")
 # pseudo constants
 @export var CRUISE_SPEED := 159.0 # km/h
 @export var RATE_OF_CLIMB := 3.8 # m/s
-@export var RATE_OF_ROTATION := 90 # degrees / s
+@export var RATE_OF_ROTATION := 1 # degrees / s
 
 @export_group("Slots", "child_")
 
 @export var child_engine_sound_tree: AnimationTree
 @export var child_dust_particles: GPUParticles3D
 @export var child_upgrade_mount: Node3D
+@export var child_body_mesh: MeshInstance3D
 @export var child_rotor: Node3D
 @export var child_camera: Node3D
 @export var child_main_camera: Node3D
@@ -23,15 +24,22 @@ const Logger := preload("res://src/util/Logger.gd")
 @export var upgrades_available: Array[HelicopterUpgrade]
 @export var upgrades_owned: Array[HelicopterUpgrade]
 
-const MAX_TILT := 45.0 # degrees
+const AIR_DENSITY := 1.2
+const MAX_TILT := 10.0 # degrees
 const ACCELERATION_TIME := 0.4 # amount of seconds to accelerate to top speed
-var CRUISE_SPEED_MS := (CRUISE_SPEED * 1000) / 3600
+const TILT_ACCELERATION_TIME := 0.4
+const THRUST_INCREASE := 1.0 / ACCELERATION_TIME
+var CRUISE_SPEED_MS := (CRUISE_SPEED * 1000) / 3600 # cruise velocity in m/s
+var THRUST_ACCELERATION := CRUISE_SPEED_MS / ACCELERATION_TIME
 var DIRECTIONAL_ACCELERATION := CRUISE_SPEED_MS / ACCELERATION_TIME
 var ROTATIONAL_ACCELERATION := RATE_OF_ROTATION / ACCELERATION_TIME
+@onready var DRAG_CONSTANT := self.get_drag_constant()
 
-var directional_velocity := Vector3.ZERO
+# rotational velocity in local space
 var rotational_velocity := 0.0
+
 var engine_speed := 0.0
+var engine_thrust := Vector3.ZERO
 var is_on_ground := true
 var upgrade_action_dispatch: Dictionary = {}
 
@@ -46,7 +54,7 @@ var upgrade_action_dispatch: Dictionary = {}
 func _ready():
 	self.rotor.power = 0
 	self.mount_upgrades()
-		
+
 
 func _get_top_speed(delta: float) -> float:
 	return CRUISE_SPEED_MS * delta
@@ -56,31 +64,48 @@ func _get_top_rotation(delta: float) -> float:
 	return deg_to_rad(RATE_OF_ROTATION) * delta
 
 
-func _update_directional_velocity(direction: Vector3, state: PhysicsDirectBodyState3D) -> Vector3:
-	var acceleration := DIRECTIONAL_ACCELERATION
-	var target_velocity := (direction * CRUISE_SPEED_MS)
+func _get_acceleration(direction: Vector3, state: PhysicsDirectBodyState3D) -> Vector3:
+	var velocity_target := direction * CRUISE_SPEED_MS
+	var velocity_delta := velocity_target - state.linear_velocity
+	var normal := velocity_delta.normalized()
+	var signs := normal.sign()
+	var acceleration := normal * DIRECTIONAL_ACCELERATION
 
-	return state.linear_velocity.move_toward(target_velocity, acceleration)
+	acceleration = _min_vector3(acceleration.abs(), velocity_delta.abs()) * signs
+	
+	return acceleration
+
+
+func _min_vector3(a: Vector3, b: Vector3) -> Vector3:
+	return Vector3(
+		minf(a.x, b.x),
+		minf(a.y, b.y),
+		minf(a.z, b.z)
+	)
 
 
 func _update_rotational_velocity(direction: float, delta: float) -> float:
-	var acceleration := deg_to_rad(ROTATIONAL_ACCELERATION) * delta
+	var acceleration := deg_to_rad(ROTATIONAL_ACCELERATION)
 
 	if direction == 0:
-		self.rotational_velocity = move_toward(self.rotational_velocity, 0, acceleration)
+		var sign := signf(self.rotational_velocity)
+		self.rotational_velocity = min(acceleration, abs(self.rotational_velocity)) * sign * -1.0
 		return self.rotational_velocity
 
-	var target_velocity := self._get_top_rotation(1) * direction
-	self.rotational_velocity = move_toward(self.rotational_velocity, target_velocity, acceleration)
+	var target_velocity := RATE_OF_ROTATION * direction
+	var velocity_delta := target_velocity - self.rotational_velocity
+	var sign := signf(velocity_delta)
+
+	self.rotational_velocity += minf(absf(acceleration), absf(velocity_delta)) * sign
 
 	return self.rotational_velocity
 
 
-func _get_tilt(velocity: Vector3) -> Vector3:
-	var top_speed := self._get_top_speed(1)
-	var direction := velocity.rotated(Vector3.UP, -self.rotation.y) # revert rotation
-	var tilt_z := MAX_TILT * (-direction.x / top_speed)
-	var tilt_x := MAX_TILT * (direction.z / top_speed)
+func _get_tilt(rotation_velocity: float, delta: float) -> Vector3:
+	var virt_thrust := self.engine_thrust.rotated(Vector3.UP, rotation_velocity * (1 + delta))
+	
+	var tilt_z := MAX_TILT * -virt_thrust.x
+	var tilt_x := MAX_TILT * virt_thrust.z
 	var tilt := Vector3(deg_to_rad(tilt_x), 0, deg_to_rad(tilt_z))
 
 	return tilt
@@ -116,8 +141,9 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var climb := (RATE_OF_CLIMB) * (climb_strength if climb_strength > land_strength else land_strength * -1)
 
 	var movement_strength := Input.get_axis("forward", "back")
-	var turn_strength := Input.get_axis("turn_right", "turn_left")
-	var direction := Vector3(-turn_strength, 0, movement_strength).normalized()
+	var strafe_strength := Input.get_axis("strafe_right", "strafe_left")
+	var turn_strength := Input.get_axis("turn_right", "turn_left") if strafe_strength == 0.0 else 0.0
+	var direction := Vector3(-strafe_strength, 0, movement_strength).normalized()
 	var sound_state_machine := anim_state_machine(self.child_engine_sound_tree)
 
 	if climb < 0 && self.is_on_ground && self.engine_speed == 1:
@@ -136,36 +162,49 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	self.bind_states(climb_strength)
 
 	# apply climb first
-	var target_climb_velocity := Vector3(0, climb, 0) + (state.total_gravity * -1)
-
-	if direction.z == 0:
-		direction = Vector3.ZERO
-
-	direction = direction.rotated(Vector3.UP, self.rotation.y)
-
-	@warning_ignore("shadowed_variable")
-	var directional_velocity := self._update_directional_velocity(direction, state)
-
-	# we calculate the velocity difference between what we target and what we actually got
-	var required_force := ((directional_velocity + target_climb_velocity) - state.linear_velocity) * self.mass
-
-	state.apply_central_force(required_force)
+	var target_climb_velocity := climb + (state.total_gravity.y * -1)
 
 	# apply rotational velocity
-	@warning_ignore("incompatible_ternary")
-	var target_rotation_velocity: float = (self._update_rotational_velocity(turn_strength, delta) if direction == Vector3.ZERO else 0)
-	var rotation_velocity := self.global_transform.basis.y * target_rotation_velocity
+	var rotation_velocity := self._update_rotational_velocity(turn_strength, delta)
+	var global_rotation_velocity := self.global_transform.basis.y * rotation_velocity
 
+	# calculate thrust
+	var thrust_increase := direction * THRUST_INCREASE * delta
+
+	if direction.is_zero_approx():
+		var old_thrust := self.engine_thrust
+		self.engine_thrust -= self.engine_thrust.normalized() * THRUST_INCREASE * delta
+		self.engine_thrust = self.engine_thrust.clamp(Vector3.ZERO, old_thrust)
+	elif self.engine_thrust.length() < 1.0:
+		self.engine_thrust += thrust_increase
+
+		if self.engine_thrust.length() > 1.0:
+			self.engine_thrust = self.engine_thrust.normalized()
+
+	var current_linear_velocity := state.linear_velocity * (Vector3.RIGHT + Vector3.BACK)
+	var drag_force := self.drag_force(current_linear_velocity, self.get_front_size())
+	var thrust_force := self.engine_thrust * (THRUST_ACCELERATION * self.mass)
+	var rotated_thrust_force := thrust_force.rotated(Vector3.UP, self.rotation.y)
+	var climb_force := Vector3(0, target_climb_velocity - state.linear_velocity.y, 0) * self.mass
+
+	state.apply_central_force(rotated_thrust_force + (drag_force * -1) + climb_force)
+	
 	# apply tilt due to linear velocity generated by the engine
-	var target_tilt := self._get_tilt(directional_velocity)
+	var target_tilt := self._get_tilt(rotation_velocity, delta)
 	var tilt_offset := target_tilt - (self.rotation * (Vector3.RIGHT + Vector3.BACK))
-	var tilt_velocity_x := (tilt_offset.x * self.global_transform.basis.x)
-	var tilt_velocity_z := (tilt_offset.z * self.global_transform.basis.z)
+	var tilt_transform := self.global_transform.rotated(Vector3.UP, rotation_velocity * 1.5)
+	var tilt_velocity_x := (tilt_offset.x * tilt_transform.basis.x)
+	var tilt_velocity_z := (tilt_offset.z * tilt_transform.basis.z)
+	var tilt_velocity := tilt_velocity_x + tilt_velocity_z
+	
+	var target_torque_velocity := tilt_velocity + global_rotation_velocity
+	var torque_offset := target_torque_velocity - state.angular_velocity
+	
+	var torque := self.get_inverse_inertia_tensor().inverse() * torque_offset
 
-	var torque_offset := tilt_velocity_x + tilt_velocity_z * 10 + rotation_velocity - state.angular_velocity
-	var torque_impulse := self.get_inverse_inertia_tensor().inverse() * torque_offset
+	state.apply_torque(torque / delta)
 
-	state.apply_torque_impulse(torque_impulse)
+	Logger.info(["linear velocity:", state.linear_velocity.length()])
 
 
 func snap_camera():
@@ -219,3 +258,30 @@ func mount_upgrades():
 		self.child_upgrade_mount.add_child(object, true)
 		object.owner = self.child_upgrade_mount
 		self.upgrade_action_dispatch[upgrade.action] = object
+
+
+func drag_force(velocity: Vector3, area: float) -> Vector3:
+	var velocity_magnitude := velocity.length()
+	var direction := velocity.normalized()
+
+	var force = 0.5 * AIR_DENSITY * (velocity_magnitude ** 2) * area * DRAG_CONSTANT
+	
+	return direction * force
+
+
+func get_model_size() -> Vector3:      
+	var mesh_aabb := self.child_body_mesh.get_aabb()
+	var mesh_basis := self.child_body_mesh.basis
+	
+	return (Transform3D(mesh_basis, Vector3.ZERO) * mesh_aabb.size).abs()
+
+
+func get_front_size() -> float:
+	var size := self.get_model_size()
+	
+	return size.x * size.y
+	
+
+func get_drag_constant() -> float:
+	# 0.5 * AIR_DENSITY * velocity ^ 2 * area * dc = acceleartion * mass
+	return (CRUISE_SPEED_MS / ACCELERATION_TIME) * self.mass / 0.5 / AIR_DENSITY / (CRUISE_SPEED_MS ** 2) / self.get_front_size()

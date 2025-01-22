@@ -12,8 +12,9 @@ An open source mission driven helicopter pilot sandbox game.
 | Backwards              | S             |
 | Turn Clockwise         | D             |
 | Turn Counter Clockwise | A             |
-| Diagonally Left        | (W / S) + A   |
-| Diagonally Right       | (W / S) + D   |
+| Strafe Left            | Shift + A     |
+| Strafe Right           | Shift + D     |
+| (Water) Canon          | Enter         |
 | Quit Game (Windows)    | Alt + F4      |
 | Quit Game (macOS)      | Cmd + Q       |
 | Quit Game (Linux)      | Ctrl + Q      |
@@ -35,6 +36,11 @@ The game uses SimCity 2000 city files to generate its maps. The original city fi
 - Helicopter Ground Proximity Dust
 - Ground Collision
 - Building Collision
+- Helicopter Equipment
+  - Water Canon
+- Burning Buildings
+- Day / Night cycle
+- City Traffic
 
 ## Planed Features
 
@@ -43,7 +49,6 @@ The game uses SimCity 2000 city files to generate its maps. The original city fi
 - Helicopter Damage
 - Helicopter Equipment
   - Megaphone
-  - Water Cannon
   - Water Bucket
   - Hoist Line
   - Tear Gass
@@ -52,9 +57,7 @@ The game uses SimCity 2000 city files to generate its maps. The original city fi
   - Seats
 - Third Person Pilot Control on the ground
 - City Pedestrians
-- City Traffic
 - City Air Traffic
-- Day / Night cycle
 - Weather
   - Rain
   - Thunder
@@ -78,7 +81,7 @@ The game uses SimCity 2000 city files to generate its maps. The original city fi
   - Military Missions
 
 ## Building From Source
-The game is built with the [Godot Game Engine 4.1.1](https://github.com/godotengine/godot/tree/4.1.1-stable) and new builds can be exported with the engines own editor. The game relies on a GDNative module written in Rust. The native module has to be built from source before it can be used by the engine. See the [`/native` directory](./native) for detailed instructions.
+The game is built with the [Godot Game Engine 4.2.2](https://github.com/godotengine/godot/tree/4.2.2-stable) and new builds can be exported with the engines own editor. The game relies on a GDNative module written in Rust. The native module has to be built from source before it can be used by the engine. See the [`/native` directory](./native) for detailed instructions.
 
 ## Contributing
 Pull Requests should always reference existing issues. Please do not submit PRs which have no related issue. To suggest new features, not listed above, or discuss current features / implementations, please use the discussions Section of the repository.

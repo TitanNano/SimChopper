@@ -29,10 +29,10 @@ vec2 vec2ComposeFunc(float _vec2_length, float _vec2_angl_rad){
 float depth(vec2 screen_uv, mat4 inv_projection_matrix) {
 	float depth = texture(depth_texture, screen_uv).x;
 	vec3 ndc = vec3(screen_uv * 2.0 - 1.0, depth);
-	
+
 	vec4 view = inv_projection_matrix * vec4(ndc, 1.0);
 	view.xyz /= view.w;
-	
+
 	return -view.z;
 }
 
@@ -76,31 +76,31 @@ void vertex() {
 void fragment() {
 	vec2 world_uv = mix(vary_world_uv, vary_world_uv2, Wave_Ratio);
 	vec3 normal = texture(Normal_Map, world_uv).rgb;
-	
+
 	vec3 refraction_offset = (2.0 * normal.xyz - 1.0) * vec3(0.075, 0.075, 1.0);
-	
+
 	float n_dot_l = max(dot(VIEW, NORMAL), 0);
 	float facing = (1.0 - n_dot_l);
 	float fresnel = fresnel(n_dot_l, 0.2, 5.0);
-	
+
 	float depth_diff = FRAGCOORD.z - texture(depth_texture, SCREEN_UV + refraction_offset.rg).r;
 	float depth_mask = ceil(clamp(depth_diff, 0.0, 1.0));
-	
-	vec4 refraction_a = texture(screen_texture, SCREEN_UV.xy + refraction_offset.xy);	
+
+	vec4 refraction_a = texture(screen_texture, SCREEN_UV.xy + refraction_offset.xy);
 	vec4 refraction_b = texture(screen_texture, SCREEN_UV.xy);
 	vec4 refraction_value = refraction_b * depth_mask + refraction_a * (1.0 - depth_mask);
-	
+
 	float dist_scale = clamp(10.0 / depth(SCREEN_UV, INV_PROJECTION_MATRIX), 0.0, 1.0);
-	
+
 	vec3 water_deep_albedo = (refraction_value.xyz * dist_scale + (1.0 - dist_scale) * water_deep_color);
-  	
+
 	// Lerp between water color and deep water color
   	vec3 water_albedo = (water_color * facing + water_deep_albedo * (1.0 - facing));
 
 	ROUGHNESS = 1.0 - max(fresnel, 1.0);
 	NORMAL_MAP = normal;
 	NORMAL_MAP_DEPTH = Normal_Depth;
-	
+
 	// Refraction output
 	ALBEDO = water_albedo;
 }

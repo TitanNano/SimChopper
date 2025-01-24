@@ -204,14 +204,15 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 
 	state.apply_torque(torque / delta)
 
-	Logger.info(["linear velocity:", state.linear_velocity.length()])
-
 
 func snap_camera():
 	self.camera.snap = true
 
 func anim_state_machine(tree: AnimationTree) -> AnimationNodeStateMachinePlayback:
-	return tree.get("parameters/playback") as AnimationNodeStateMachinePlayback
+	var playback: AnimationNodeStateMachinePlayback = tree.get("parameters/playback")
+	
+	return playback
+
 
 func bind_states(climb_strength: float):
 	self.child_engine_sound_tree.set("parameters/conditions/engine_off", self.engine_speed == 0 and climb_strength == 0)

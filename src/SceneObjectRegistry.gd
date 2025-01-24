@@ -159,9 +159,9 @@ const buildings = {
 
 static func _load(index: Dictionary, object_id: int) -> PackedScene:
 	assert(object_id in index, "0x%x is not a vaild object id" % object_id)
-	assert(ResourceLoader.exists(index.get(object_id) as String, "PackedScene"), "\"%s\" is not a PackedScene" % index[object_id])
+	assert(ResourceLoader.exists(str(index.get(object_id)), "PackedScene"), "\"%s\" is not a PackedScene" % index[object_id])
 
-	return ResourceLoader.load(index.get(object_id) as String) as PackedScene
+	return ResourceLoader.load(str(index.get(object_id))) as PackedScene
 
 static func load_network(object_id: int) -> PackedScene:
 	return _load(networks, object_id)

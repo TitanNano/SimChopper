@@ -22,7 +22,7 @@ jobs:
         arch: ['x86_64', 'aarch64']
         include:
           - platform: linux
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             vendor: unknown
             env: -gnu
             lib: libnative.so
@@ -50,7 +50,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
       with:
-        lfs: true
+        lfs: false
     - name: Set up clang64
       if: contains(matrix.os, 'windows')
       run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
@@ -76,40 +76,43 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
           name: libnative-${{ matrix.platform }}-${{ matrix.arch }}
-          path: native/target/${{ env.TARGET_TRIPLET }}/${{ inputs.release && 'release' || 'debug' }}/${{ matrix.lib }}
+          path: native/target/${{ env.TARGET_TRIPLET }}/${{ inputs.release && 'release' || 'debug' }}/${{ matrix.lib }}
 
   godot-export:
     strategy:
       matrix:
         profile: ['macOS', 'Windows', 'Linux']
-        version: ['4.2.2']
+        version: ['4.3']
         include:
           - profile: 'macOS'
             platform: darwin
             vendor: apple
-            os: macos-14
+            os: macos-15
             x86_64: true
             aarch64: true
             extension: '.dmg'
             lib: libnative.dylib
             template_dir: '$HOME/Library/Application\ Support/Godot/export_templates'
+            godot_artefact: 'macOS.universal'
           - profile: 'Windows'
             platform: windows
             env: '-msvc'
             vendor: pc
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             x86_64: true
             aarch64: true
             extension: '.exe'
             lib: native.dll
             template_dir: '$HOME/.local/share/godot/export_templates'
+            godot_artefact: 'linux.x86_64'
           - profile: 'Linux'
             platform: 'linux'
             env: '-gnu'
             vendor: 'unknown'
-            os: ubuntu-20.04
+            os: ubuntu-24.04
             lib: libnative.so
             template_dir: '$HOME/.local/share/godot/export_templates'
+            godot_artefact: 'linux.x86_64'
             x86_64: true
 
     needs: rust-build
@@ -124,11 +127,23 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
-      - name: setup Godot
-        uses: lihop/setup-godot@v2
+      - uses: hustcer/setup-nu@main
         with:
-          version: ${{ matrix.version }}
-          export-templates: false
+          version: "0.101.*"
+
+      - name: setup Godot
+        shell: nu {0}
+        run: |
+          let bin_path = "${{ startsWith(matrix.os, 'ubuntu') && format('./Godot_v{0}-stable_linux.x86_64', matrix.version) || './Godot.app/Contents/MacOS/Godot' }}"
+          mkdir .godot_bin
+          http get "https://github.com/godotengine/godot/releases/download/${{ matrix.version }}-stable/Godot_v${{ matrix.version }}-stable_${{ matrix.godot_artefact }}.zip"
+            | save -rf .godot_bin/godot.zip
+          cd .godot_bin
+          unzip godot.zip
+          chmod +x $bin_path
+          ln -s $bin_path "./godot"
+          ls -a
+
       - name: download Godot export template
         run: |
           mkdir -p ${{ matrix.template_dir }}/${{ matrix.version }}.stable
@@ -158,47 +173,52 @@ jobs:
         run: |
           platform_dir="${{ matrix.vendor }}-${{ matrix.platform }}"
           mkdir -p native/target/universal-$platform_dir/debug/
-          lipo -create native/target/x86_64-$platform_dir/debug/${{ matrix.lib }} native/target/aarch64-$platform_dir/debug/${{ matrix.lib }} -output native/target/universal-$platform_dir/debug/${{ matrix.lib }}
+          lipo -create native/target/x86_64-$platform_dir/debug/${{ matrix.lib }} native/target/aarch64-$platform_dir/debug/${{ matrix.lib }} -output native/target/universal-$platform_dir/debug/${{ matrix.lib }}
       - name: copy libs
+        shell: nu {0}
         run: |
-          set -x
-          platform_dir="${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}"
-          x86_64="native/target/x86_64-$platform_dir"
-          aarch64="native/target/aarch64-$platform_dir"
-          universal="native/target/universal-$platform_dir"
+          let platform_dir = "${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}"
+          let x86_64 = $"native/target/x86_64-($platform_dir)"
+          let aarch64 = $"native/target/aarch64-($platform_dir)"
+          let universal = $"native/target/universal-($platform_dir)"
           
-          if [[ -d "$x86_64/debug/" ]]; then
-            mkdir -p "$x86_64/release/"
-            cp $x86_64/debug/* "$x86_64/release/"
-          fi
+          if ($"($x86_64)/debug/" | path type) == "dir" {
+            mkdir $"($x86_64)/release/"
+            cp -v ($"($x86_64)/debug/*" | into glob) $"($x86_64)/release/"
+          }
 
-          if [[ -d "$aarch64/debug/" ]]; then 
-            mkdir -p "$aarch64/release/"
-            cp $aarch64/debug/* "$aarch64/release/"
-          fi
+          if ($"($aarch64)/debug/" | path type) == "dir" {
+            mkdir $"($aarch64)/release/"
+            cp -v ($"($aarch64)/debug/*" | into glob) $"($aarch64)/release/"
+          }
 
-          if [[ -d "$universal/debug/" ]]; then
-            mkdir -p "$universal/release/"
-            cp $universal/debug/* "$universal/release/"
-          fi
+          if ($"($universal)/debug/" | path type) == "dir" {
+            mkdir $"($universal)/release/"
+            cp -v ($"($universal)/debug/*" | into glob) $"($universal)/release/"
+          }
       - name: import godot project
+        shell: nu {0}
         run: |
-          # import assets
-          .github/build_godot_cache.sh
-          # restart to make sure all rust scripts are detected
-          .github/build_godot_cache.sh
+          $env.PATH = $env.PATH | append ("./.godot_bin" | path expand)
+
+          godot --headless --verbose --import
+
       - name: export-debug
+        shell: nu {0}
         if: ${{ !inputs.release }}
         run: |
-          mkdir -p "${{ env.EXPORT_DIR }}"
-          godot --headless --export-debug ${{ env.EXPORT_ARGS }}
-          test $(ls -al "${{ env.EXPORT_DIR }}" | wc -l) -gt 1
+          $env.PATH = $env.PATH | append ("./.godot_bin" | path expand)
+          mkdir "${{ env.EXPORT_DIR }}"
+          godot --headless --verbose --export-debug ${{ env.EXPORT_ARGS }}
+          if (ls -a "${{ env.EXPORT_DIR }}" | length) < 1 { exit 1 }
       - name: export-release
+        shell: nu {0}
         if: inputs.release
         run: |
-          mkdir -p "${{ env.EXPORT_DIR }}"
+          $env.PATH = $env.PATH | append ("./.godot_bin" | path expand)
+          mkdir "${{ env.EXPORT_DIR }}"
           godot --headless --export-release ${{ env.EXPORT_ARGS }}
-          test $(ls -al "${{ env.EXPORT_DIR }}" | wc -l) -gt 1
+          if (ls -a "${{ env.EXPORT_DIR }}" | length) < 1 { exit 1 }
       - name: describe revision
         id: describe
         run: echo "ref=$(git describe --tags --always)" >> $GITHUB_OUTPUT

@@ -17,7 +17,7 @@ static func verify(editor: EditorInterface) -> void:
 	var version_parts := desired_version.split(".")
 	var major := int(version_parts[0])
 	var minor := int(version_parts[1])
-	var patch := int(version_parts[2])
+	var patch := int(version_parts[2] if version_parts.size() >= 3 else 0)
 
 	if major != engine_version.major || minor != engine_version.minor || engine_version.patch != patch:
 		var dialog_scene: PackedScene = load("res://addons/customization/force_quit_control/force_quit_control.tscn")

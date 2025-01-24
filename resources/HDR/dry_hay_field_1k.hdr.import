@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://b2hjdtr47u4b7"
 path.bptc="res://.godot/imported/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.bptc.ctex"
+path.astc="res://.godot/imported/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.astc.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://resources/HDR/dry_hay_field_1k.hdr"
-dest_files=["res://.godot/imported/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.bptc.ctex"]
+dest_files=["res://.godot/imported/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.bptc.ctex", "res://.godot/imported/dry_hay_field_1k.hdr-1c32ce5190b2295acc6c681ff9ed7adc.astc.ctex"]
 
 [params]
 

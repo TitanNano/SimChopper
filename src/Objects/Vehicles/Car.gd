@@ -98,8 +98,9 @@ func _physics_process(delta: float) -> void:
 	self.target_angle = target_angle
 	self.set_velocity(current_velocity)
 
-	if ProjectSettings.get_setting(CustomProjectSettings.DEBUG_SHAPES_ROAD_NAVIGATION_DISPLAY_VEHICLE_TARGET) as bool \
-		and debug_target.is_inside_tree():
+	var display_vehicle_target: bool = ProjectSettings.get_setting(CustomProjectSettings.DEBUG_SHAPES_ROAD_NAVIGATION_DISPLAY_VEHICLE_TARGET)
+	
+	if  display_vehicle_target and debug_target.is_inside_tree():
 			debug_target.global_transform.origin = target
 
 

@@ -29,7 +29,8 @@ func build_async(city: Dictionary):
 	self.city_coords_feature = CityCoordsFeature.new(world_constants, sea_level)
 
 	for key in networks:
-		var network_section := MapBuilding.new(networks.get(key) as Dictionary)
+		var value: Dictionary = networks.get(key)
+		var network_section := MapBuilding.new(value)
 		var object := SceneObjectRegistry.load_network(network_section.building_id())
 		@warning_ignore("shadowed_variable_base_class")
 		var name: String = network_section.name()

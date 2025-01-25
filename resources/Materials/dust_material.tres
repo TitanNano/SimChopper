@@ -3,9 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://bjpn68ehwxofg" path="res://resources/Textures/Dust/dust.png" id="1_3b3ya"]
 
 [resource]
-transparency = 1
-shading_mode = 0
-vertex_color_use_as_albedo = true
+transparency = 4
+blend_mode = 1
 albedo_texture = ExtResource("1_3b3ya")
 billboard_mode = 3
 billboard_keep_scale = true

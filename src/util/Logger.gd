@@ -63,10 +63,10 @@ static func _log(message: Variant, level: int, skip_stack := 0) -> void:
 			"file": file_name,
 			"fun": fun,
 		})
-
-	var max_level := (LEVEL_FILTER_MAP.get(target) as int) if target in LEVEL_FILTER_MAP else LEVEL_FILTER
-
-	if level > max_level:
+	
+	var filter: int = LEVEL_FILTER_MAP.get(target) if LEVEL_FILTER_MAP.has(target) else LEVEL_FILTER
+	
+	if level > filter:
 		return
 		
 	var time := Time.get_ticks_msec()
@@ -77,7 +77,8 @@ static func _log(message: Variant, level: int, skip_stack := 0) -> void:
 	var milliseconds := time % 1000
 
 	if typeof(message) == TYPE_ARRAY:
-		message = " ".join(PackedStringArray(message as Array))
+		var message_parts: Array = message
+		message = " ".join(PackedStringArray(message_parts))
 
 	var logline = "[{min}:{sec}:{msec}] [{level}] [{target}] {msg}".format({
 		"target": target,

@@ -108,7 +108,7 @@ static func _encode(buf: StreamPeerBuffer, value: Variant, ctx: Dictionary):
 			buf.put_float(float_value)
 
 		TYPE_STRING:
-			var bytes: PackedByteArray = (value as String).to_utf8_buffer()
+			var bytes: PackedByteArray = str(value).to_utf8_buffer()
 			var size := bytes.size()
 
 			if size <= (1 << 5) - 1:

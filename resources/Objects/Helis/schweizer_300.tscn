@@ -1,9 +1,10 @@
-[gd_scene load_steps=17 format=4 uid="uid://cmv7rt4gqew38"]
+[gd_scene load_steps=18 format=4 uid="uid://cmv7rt4gqew38"]
 
 [ext_resource type="PackedScene" uid="uid://dl34exjsm3sq4" path="res://resources/Objects/Helis/Helicopter.tscn" id="1"]
-[ext_resource type="PackedScene" uid="uid://b0ln8n5f4i7ks" path="res://resources/Meshes/Helis/schweizer_300/main.glb" id="2"]
-[ext_resource type="PackedScene" uid="uid://c0wggsy543kf2" path="res://resources/Meshes/Helis/schweizer_300/rotor.glb" id="3"]
-[ext_resource type="PackedScene" uid="uid://din03my4vl3s6" path="res://resources/Meshes/Helis/schweizer_300/tail_rotor.glb" id="4"]
+[ext_resource type="PackedScene" uid="uid://cfek2a6eg86vo" path="res://resources/Meshes/Helis/schweizer_300/main.gltf" id="2"]
+[ext_resource type="PackedScene" uid="uid://cnqfo57vlyy3w" path="res://resources/Meshes/Helis/schweizer_300/rotor.gltf" id="3"]
+[ext_resource type="PackedScene" uid="uid://bbcfwjl2304l5" path="res://resources/Meshes/Helis/schweizer_300/tail_rotor.gltf" id="4"]
+[ext_resource type="Texture2D" uid="uid://cyg3hcw00h4bo" path="res://resources/Textures/ambient_occlusion/Helis/schweizer_300/main.png" id="4_jsk7h"]
 [ext_resource type="Material" uid="uid://ckkpoyyglqm80" path="res://resources/Particles/Rotor/rotor_dust_particles_schweizer.tres" id="6"]
 [ext_resource type="Material" uid="uid://ckwvw4rptthjv" path="res://resources/Materials/rotor_material.tres" id="6_y4h4o"]
 [ext_resource type="Script" path="res://src/Objects/Helicopters/Rotor.gd" id="7"]
@@ -14,6 +15,9 @@ vertex_color_use_as_albedo = true
 albedo_color = Color(0.466477, 0.417003, 0.218649, 1)
 clearcoat_enabled = true
 clearcoat_roughness = 0.7
+ao_enabled = true
+ao_texture = ExtResource("4_jsk7h")
+ao_on_uv2 = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tyxvo"]
 resource_name = "matcolour-16"
@@ -21,12 +25,18 @@ vertex_color_use_as_albedo = true
 albedo_color = Color(0.774056, 0.277847, 0.150005, 1)
 clearcoat_enabled = true
 clearcoat_roughness = 0.7
+ao_enabled = true
+ao_texture = ExtResource("4_jsk7h")
+ao_on_uv2 = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kuryk"]
 resource_name = "matcolour-0"
 vertex_color_use_as_albedo = true
 albedo_color = Color(0, 0, 0, 1)
 roughness = 0.0
+ao_enabled = true
+ao_texture = ExtResource("4_jsk7h")
+ao_on_uv2 = true
 subsurf_scatter_strength = 0.3
 
 [sub_resource type="CapsuleShape3D" id="22"]

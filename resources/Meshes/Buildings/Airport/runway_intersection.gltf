@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.1.63",
+		"generator":"Khronos glTF Blender I/O v4.3.47",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -8,7 +8,8 @@
 		{
 			"name":"Scene",
 			"nodes":[
-				0
+				0,
+				1
 			]
 		}
 	],
@@ -22,16 +23,55 @@
 				0,
 				0.7071066498756409
 			]
+		},
+		{
+			"extras":{
+				"gd_node":"Decal",
+				"lower_fade":9,
+				"upper_fade":10
+			},
+			"mesh":1,
+			"name":"Ground_AO",
+			"scale":[
+				17.00000762939453,
+				1,
+				17.0000057220459
+			],
+			"translation":[
+				0,
+				-2.4235712317022262e-06,
+				0
+			]
 		}
 	],
 	"materials":[
 		{
 			"name":"mat40-61.004",
+			"occlusionTexture":{
+				"index":0,
+				"texCoord":1
+			},
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
-					"index":0
+					"index":1
 				},
 				"metallicFactor":0
+			}
+		},
+		{
+			"name":"Ground_AO",
+			"occlusionTexture":{
+				"index":2
+			},
+			"pbrMetallicRoughness":{
+				"baseColorFactor":[
+					0.800000011920929,
+					0.800000011920929,
+					0.800000011920929,
+					1
+				],
+				"metallicFactor":0,
+				"roughnessFactor":0.5
 			}
 		}
 	],
@@ -43,10 +83,25 @@
 					"attributes":{
 						"POSITION":0,
 						"NORMAL":1,
-						"TEXCOORD_0":2
+						"TEXCOORD_0":2,
+						"TEXCOORD_1":3
 					},
-					"indices":3,
+					"indices":4,
 					"material":0
+				}
+			]
+		},
+		{
+			"name":"Plane",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":5,
+						"NORMAL":6,
+						"TEXCOORD_0":7
+					},
+					"indices":8,
+					"material":1
 				}
 			]
 		}
@@ -55,13 +110,31 @@
 		{
 			"sampler":0,
 			"source":0
+		},
+		{
+			"sampler":0,
+			"source":1
+		},
+		{
+			"sampler":0,
+			"source":2
 		}
 	],
 	"images":[
 		{
 			"mimeType":"image/png",
+			"name":"runway_intersection.png",
+			"uri":"../../../Textures/ambient_occlusion/Buildings/Airport/runway_intersection.png"
+		},
+		{
+			"mimeType":"image/png",
 			"name":"tex40-61",
 			"uri":"../../../Textures/tex40-61.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"runway_intersection_ground.png",
+			"uri":"../../../Textures/ambient_occlusion/Buildings/Airport/runway_intersection_ground.png"
 		}
 	],
 	"accessors":[
@@ -95,6 +168,46 @@
 		},
 		{
 			"bufferView":3,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":4,
+			"componentType":5123,
+			"count":6,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":5,
+			"componentType":5126,
+			"count":4,
+			"max":[
+				0.5,
+				0,
+				0.5
+			],
+			"min":[
+				-0.5,
+				0,
+				-0.5
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":6,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":7,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":8,
 			"componentType":5123,
 			"count":6,
 			"type":"SCALAR"
@@ -121,8 +234,38 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":12,
+			"byteLength":32,
 			"byteOffset":128,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":12,
+			"byteOffset":160,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":172,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":220,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":32,
+			"byteOffset":268,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":12,
+			"byteOffset":300,
 			"target":34963
 		}
 	],
@@ -134,7 +277,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":140,
+			"byteLength":312,
 			"uri":"runway_intersection.bin"
 		}
 	]

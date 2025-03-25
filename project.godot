@@ -50,15 +50,6 @@ enabled=PackedStringArray("res://addons/customization/plugin.cfg")
 
 import/blender/enabled=false
 
-[gdnative]
-
-singletons=[]
-
-[global]
-
-vsync=false
-type=true
-
 [importer_defaults]
 
 scene={

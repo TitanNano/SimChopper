@@ -1,6 +1,6 @@
 [gd_resource type="AnimationLibrary" load_steps=4 format=3 uid="uid://ccdoql0ui30qd"]
 
-[ext_resource type="AudioStream" uid="uid://cbx2eoah7cfih" path="res://resources/Sounds/Helicopter/water_jet.wav" id="1_jvos4"]
+[ext_resource type="AudioStream" uid="uid://bqy33a7p1vvf3" path="res://resources/Sounds/Helicopter/water_jet.ogg" id="1_w2qtc"]
 
 [sub_resource type="Animation" id="Animation_0utdi"]
 length = 0.001
@@ -18,7 +18,7 @@ tracks/0/keys = {
 "clips": [{
 "end_offset": 0.0,
 "start_offset": 0.0,
-"stream": ExtResource("1_jvos4")
+"stream": ExtResource("1_w2qtc")
 }],
 "times": PackedFloat32Array(0)
 }

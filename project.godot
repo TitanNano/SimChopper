@@ -37,7 +37,6 @@ window/size/mode.release=3
 
 [editor]
 
-export/convert_text_resources_to_binary=false
 required_version="4.3"
 baking/ambient_occlusion_model_base_path="res://resources/Meshes"
 baking/ambient_occlusion_textures="res://resources/Textures/ambient_occlusion"

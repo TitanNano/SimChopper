@@ -3,6 +3,9 @@ entry_symbol = "gdext_rust_init"
 compatibility_minimum = 4.1
 reloadable = true
 
+[build]
+source = "res://native/"
+
 [libraries]
 macos.universal="res://native/target/universal-apple-darwin/release/libnative.dylib"
 macos.debug.arm64="res://native/target/aarch64-apple-darwin/debug/libnative.dylib"

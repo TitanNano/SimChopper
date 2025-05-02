@@ -3,11 +3,11 @@
 use godot::classes::{PackedScene, ResourceLoader};
 use godot::global::godot_warn;
 use godot::obj::Gd;
-use num_enum::TryFromPrimitive;
+use num_enum::{TryFromPrimitive, TryFromPrimitiveError};
 
 #[derive(TryFromPrimitive)]
 #[repr(u8)]
-enum Powerlines {
+pub(crate) enum Powerlines {
     LeftRight = 0x0E,
     TopBottom = 0x0F,
     HighTopBottom = 0x10,
@@ -73,7 +73,7 @@ impl Powerlines {
 
 #[derive(TryFromPrimitive)]
 #[repr(u8)]
-enum Road {
+pub(crate) enum Road {
     LeftRight = 0x1D,
     TopBottom = 0x1E,
     HighTopBottom = 0x1F,
@@ -125,7 +125,7 @@ impl Road {
 
 #[derive(TryFromPrimitive)]
 #[repr(u8)]
-enum SuspensionBridge {
+pub(crate) enum SuspensionBridge {
     StartBottom = 0x51,
     MiddleBottom = 0x52,
     Center = 0x53,
@@ -155,7 +155,7 @@ impl SuspensionBridge {
 
 #[derive(TryFromPrimitive)]
 #[repr(u8)]
-enum PylonBridge {
+pub(crate) enum PylonBridge {
     RaisingTowerTopBottom = 0x56,
     BridgeTopA = 0x57,
     BridgeTopB = 0x58,
@@ -170,6 +170,26 @@ impl PylonBridge {
             Self::BridgeTopA => "res://resources/Objects/Networks/Bridge/bridge_top.tscn",
             Self::BridgeTopB => "res://resources/Objects/Networks/Bridge/bridge_top.tscn",
         }
+    }
+}
+
+pub(crate) enum Bridge {
+    Suspension(SuspensionBridge),
+    Pylon(PylonBridge),
+}
+
+impl TryFromPrimitive for Bridge {
+    type Primitive = u8;
+
+    type Error = TryFromPrimitiveError<Self>;
+
+    const NAME: &'static str = "Bridge";
+
+    fn try_from_primitive(number: Self::Primitive) -> Result<Self, Self::Error> {
+        SuspensionBridge::try_from_primitive(number)
+            .map(Self::Suspension)
+            .or_else(|_err| PylonBridge::try_from_primitive(number).map(Self::Pylon))
+            .map_err(|err| TryFromPrimitiveError::new(err.number))
     }
 }
 
@@ -196,7 +216,7 @@ fn networks(id: u8) -> Option<&'static str> {
 
 #[derive(TryFromPrimitive, Clone, Copy)]
 #[repr(u8)]
-pub enum Buildings {
+pub(crate) enum Buildings {
     ParkSmall = 0x0D,
     TreeSingle = 0x06,
     HomeMiddleClass1 = 0x73,

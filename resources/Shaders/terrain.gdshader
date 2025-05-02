@@ -23,8 +23,13 @@ void vertex() {
 void fragment() {
 	float grass_contribution = clamp(((world_normal.y - 0.95) / 0.05), 0.0, 1.0);
 	float dirt_contribution = clamp(((1.0 - world_normal.y) / 0.05), 0.0, 1.0);
-	ALBEDO = (dirt_contribution  * albedo.rgb) + (albedo_grass.rgb * grass_contribution);
-	METALLIC = metallic;
-	ROUGHNESS = roughness;
-	SPECULAR = specular;
+
+	if (COLOR != vec4(0, 0, 0, 1)) {
+		ALBEDO = COLOR.rgb;
+	} else {
+		ALBEDO = (dirt_contribution  * albedo.rgb) + (albedo_grass.rgb * grass_contribution);
+		METALLIC = metallic;
+		ROUGHNESS = roughness;
+		SPECULAR = specular;
+	}
 }

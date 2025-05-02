@@ -2,29 +2,32 @@ mod lerp;
 mod point;
 mod terrain_rotation;
 mod tile_surface;
-mod ybuffer;
+
+use std::collections::HashMap;
+use std::ops::{Deref, Not};
+use std::time::Instant;
 
 use godot::classes::mesh::PrimitiveType;
 use godot::classes::{ArrayMesh, Material, SurfaceTool};
 use godot::meta::GodotType;
 use godot::prelude::*;
-
-use std::collections::HashMap;
-use std::ops::Deref;
-use std::sync::Arc;
-use std::time::Instant;
-
 use itertools::Itertools;
+use kanal::{ReceiveError, Receiver};
+use num_enum::TryFromPrimitive;
 use rayon::prelude::*;
 
 use point::{DimensionX, DimensionZ};
-use terrain_rotation::TerrainRotationBehaviour;
-use tile_surface::{
-    SurfaceAssociated, TileEdgeType, TileFaces, TileSurface, TileSurfaceType, Vertex, VertexRef,
-};
-use ybuffer::{HashMapYBuffer, YBuffer};
+use tile_surface::{Face, SurfaceAssociated, TileFaces, TileSurface, TileSurfaceType, Vertex};
 
-pub use terrain_rotation::TerrainRotation;
+pub(crate) use terrain_rotation::TerrainRotation;
+
+use crate::objects::scene_object_registry::{Bridge, Powerlines, Road};
+use crate::util::async_support::{godot_future, godot_task, GodotFuture};
+use crate::util::logger;
+use crate::world::city_data::{
+    TerrainSlope, TerrainType, Tile, TileCoords, TileList, TileListExt, TileValidationResult,
+    TryFromDictionary,
+};
 
 struct Shared<T: GodotType>(T);
 
@@ -45,125 +48,11 @@ impl<T: GodotType> Shared<T> {
     }
 }
 
-struct TileData(Dictionary);
-
-impl TileData {
-    pub fn new(object: Dictionary) -> Self {
-        Self(object)
-    }
-
-    fn property(&self, name: &str) -> Variant {
-        self.0.get(name).unwrap_or_else(Variant::nil)
-    }
-
-    pub fn terrain(&self) -> i64 {
-        self.property("terrain").to()
-    }
-
-    pub fn altitude(&self) -> i64 {
-        self.property("altitude").to()
-    }
-
-    pub fn coordinates(&self) -> Vec<i64> {
-        let array: VariantArray = self.property("coordinates").to();
-
-        array
-            .iter_shared()
-            .map(|value: Variant| value.to())
-            .collect()
-    }
-
-    pub fn has_building(&self) -> bool {
-        let variant = self.property("building");
-
-        if variant.is_nil() {
-            return false;
-        }
-
-        let building: Dictionary = variant.to();
-
-        let building_id: i64 = building
-            .get("building_id")
-            .unwrap_or_else(Variant::nil)
-            .to();
-
-        building_id > 0
-    }
-}
-
-type SurfaceMap = HashMap<TileSurfaceType, Vec<VertexRef>>;
-
-fn stitch_chunk_seams(vertices: Vec<Vec<VertexRef>>) {
-    let mut normal_map: HashMap<String, Vector3> = HashMap::new();
-    let vertices: Vec<_> = vertices.into_iter().flatten().collect();
-
-    vertices.iter().for_each(|vertex| {
-        let vertex = vertex.read().unwrap();
-        let vertex_key = vertex.to_string();
-
-        let normal = {
-            let normal = normal_map.get(&vertex_key).unwrap_or(&Vector3::ZERO);
-
-            *normal + *vertex.normal()
-        };
-
-        normal_map.insert(vertex_key, normal);
-    });
-
-    vertices.into_iter().for_each(|vertex| {
-        let mut vertex = vertex.write().unwrap();
-        let normal = normal_map.get(&vertex.to_string()).unwrap();
-
-        vertex.set_normal(normal.normalized());
-    });
-}
-
-fn calculate_normals<'a, I: Iterator<Item = &'a VertexRef>>(
-    vertices: I,
-) -> HashMap<String, Vector3> {
-    let normal_map: HashMap<String, Vector3> = HashMap::new();
-
-    vertices
-        .chunks(3)
-        .into_iter()
-        .fold(normal_map, |mut normal_map, face| {
-            let [v0, v1, v2]: [&VertexRef; 3] =
-                face.collect::<Vec<_>>().as_slice().try_into().unwrap();
-
-            let v0 = v0.read().unwrap();
-            let v1 = v1.read().unwrap();
-            let v2 = v2.read().unwrap();
-
-            let plane = Plane::from_points(v0.as_vector(), v1.as_vector(), v2.as_vector());
-
-            let v0_normal = *normal_map.get(&v0.to_string()).unwrap_or(&Vector3::ZERO);
-
-            normal_map.insert(v0.to_string(), v0_normal + plane.normal);
-
-            let v1_normal = *normal_map.get(&v1.to_string()).unwrap_or(&Vector3::ZERO);
-
-            normal_map.insert(v1.to_string(), v1_normal + plane.normal);
-
-            let v2_normal = *normal_map.get(&v2.to_string()).unwrap_or(&Vector3::ZERO);
-
-            normal_map.insert(v2.to_string(), v2_normal + plane.normal);
-
-            normal_map
-        })
-}
-
-fn create_tilelist_key(x: u16, y: u16) -> Variant {
-    let mut key = Array::new();
-
-    key.push(x as i32);
-    key.push(y as i32);
-
-    key.to_variant()
-}
+type SurfaceMap = HashMap<TileSurfaceType, Vec<Vertex>>;
 
 struct ChunkConfig {
-    tile_coords: (u16, u16),
-    size: u16,
+    tile_coords: (u32, u32),
+    size: u32,
 }
 
 #[derive(GodotClass)]
@@ -181,7 +70,7 @@ impl TerrainChunk {
     }
 
     #[func]
-    pub fn tile_coords(&self) -> Array<u16> {
+    pub fn tile_coords(&self) -> Array<u32> {
         let (x, y) = self.config.tile_coords;
 
         Array::from(&[x, y])
@@ -193,27 +82,74 @@ struct ChunkSurfaces {
     surfaces: SurfaceMap,
 }
 
-struct ThreadContext<'a> {
+struct CoordinatorThreadContext {
     tile_size: u8,
-    city_size: u16,
+    city_size: u32,
+    tile_height: u8,
+    sea_level: u16,
+    chunk_size: u32,
+    rotation: TerrainRotation,
+    materials: Shared<Dictionary>,
+    debug_render_invalid: bool,
+    render_water: bool,
+}
+
+impl<'a> CoordinatorThreadContext {
+    fn to_worker(&'a self, tilelist: &'a TileList) -> WorkerThreadContext<'a> {
+        WorkerThreadContext {
+            tile_size: self.tile_size,
+            city_size: self.city_size,
+            tile_height: self.tile_height,
+            sea_level: self.sea_level,
+            rotation: &self.rotation,
+            tilelist,
+            materials: &self.materials,
+            debug_render_invalid: self.debug_render_invalid,
+            render_water: self.render_water,
+        }
+    }
+}
+
+struct WorkerThreadContext<'a> {
+    tile_size: u8,
+    city_size: u32,
     tile_height: u8,
     sea_level: u16,
     rotation: &'a TerrainRotation,
-    tilelist: Shared<Dictionary>,
-    materials: Shared<Dictionary>,
+    tilelist: &'a TileList,
+    materials: &'a Shared<Dictionary>,
+    debug_render_invalid: bool,
+    render_water: bool,
+}
+
+impl WorkerThreadContext<'_> {
+    fn tile_vertex_to_city_uv(&self, vertex: &Vertex) -> Vector2 {
+        let uv_x = vertex.x() / (self.city_size * self.tile_size as u32) as f32;
+        let uv_y = vertex.z() / (self.city_size * self.tile_size as u32) as f32;
+
+        Vector2::new(uv_x, uv_y)
+    }
+}
+
+enum TerrainBuilderProgress {
+    Progress,
+    Complete(Vec<TerrainChunk>),
 }
 
 #[derive(GodotClass)]
 #[class(base=RefCounted, init)]
 pub struct TerrainBuilder {
     tile_size: u8,
-    city_size: u16,
+    city_size: u32,
     tile_height: u8,
     sea_level: u16,
-    chunk_size: u16,
+    chunk_size: u32,
     rotation: Gd<TerrainRotation>,
     tilelist: Dictionary,
     materials: Dictionary,
+    debug_render_invalid: bool,
+    render_water: bool,
+    base: Base<RefCounted>,
 }
 
 #[godot_api]
@@ -224,7 +160,7 @@ impl TerrainBuilder {
         rotation: Gd<TerrainRotation>,
         materials: Dictionary,
     ) -> Gd<TerrainBuilder> {
-        Gd::from_object(TerrainBuilder {
+        Gd::from_init_fn(|base| TerrainBuilder {
             tile_size: 16,
             city_size: 0,
             tile_height: 8,
@@ -233,11 +169,14 @@ impl TerrainBuilder {
             rotation,
             tilelist,
             materials,
+            debug_render_invalid: false,
+            render_water: true,
+            base,
         })
     }
 
     #[func]
-    fn set_city_size(&mut self, value: u16) {
+    fn set_city_size(&mut self, value: u32) {
         self.city_size = value;
     }
 
@@ -257,13 +196,17 @@ impl TerrainBuilder {
     }
 
     #[func]
-    fn chunk_size(&self) -> u16 {
+    fn chunk_size(&self) -> u32 {
         self.chunk_size
     }
 
-    fn tilelist(&self) -> Shared<Dictionary> {
-        Shared(self.tilelist.clone())
+    #[func]
+    fn load_steps(&self) -> u32 {
+        (self.city_size / self.chunk_size).pow(2) * self.chunk_size * 2
     }
+
+    #[signal]
+    fn progress(count: u32);
 
     fn materials(&self) -> Shared<Dictionary> {
         Shared(self.materials.clone())
@@ -273,293 +216,211 @@ impl TerrainBuilder {
         &self.rotation
     }
 
-    fn add_to_surface(surfaces: &mut SurfaceMap, vertex: Vertex) -> VertexRef {
+    fn add_to_surface(surfaces: &mut SurfaceMap, vertex: Vertex) {
         let surface = vertex.surface();
-        let cell = VertexRef::from(vertex);
 
-        surfaces.entry(surface).or_default().push(Arc::clone(&cell));
-
-        cell
+        surfaces.entry(surface).or_default().push(vertex);
     }
 
-    fn tile_vertex_to_city_uv(context: &ThreadContext, vertex: &Vertex, tile_size: u8) -> Vector2 {
-        let uv_x = vertex.x() / f32::from(context.city_size * tile_size as u16);
-        let uv_y = vertex.z() / f32::from(context.city_size * tile_size as u16);
+    fn spawn_build_thread(
+        context: CoordinatorThreadContext,
+        tilelist: TileList,
+        chunk_size: u32,
+        chunk_count: u32,
+    ) -> Receiver<TerrainBuilderProgress> {
+        let (tx, rx) = kanal::unbounded::<TerrainBuilderProgress>();
 
-        Vector2::new(uv_x, uv_y)
-    }
+        std::thread::spawn(move || {
+            let timer = Instant::now();
+            let tilelist = Self::pre_process_tilelist(&context, tilelist);
 
-    fn process_tile(
-        context: &ThreadContext,
-        tile_data_dic: Dictionary,
-        edge: TileEdgeType,
-    ) -> TileFaces {
-        let tile_data: TileData = TileData::new(tile_data_dic);
-        let tile_type = ((tile_data.terrain() & 0xF0) >> 4) as u8;
-        let tile_slope = (tile_data.terrain() & 0x0F) as u8;
-        let tile_size = context.tile_size as f32;
-        let tile_height = context.tile_height;
-        let rotation = context.rotation;
-        //		assert((tile_type > 0 && tileData.is_water) || (tile_type == 0 && not tileData.is_water))
+            let chunks = (0..chunk_count)
+                .flat_map(|y| (0..chunk_count).map(move |x| (x, y)))
+                .map(|(x, y)| ChunkConfig {
+                    tile_coords: (x * chunk_size, y * chunk_size),
+                    size: chunk_size,
+                });
 
-        let tile_x = (tile_data.coordinates()[0] * tile_size as i64) as f32;
-        let tile_y = (tile_data.coordinates()[1] * tile_size as i64) as f32;
-        let tile_z = (tile_data.altitude() * tile_height as i64) as f32;
+            let worker_context = context.to_worker(&tilelist);
 
-        let mut tile = TileSurface::new(TileSurfaceType::Ground, edge);
+            let result: Vec<_> = chunks
+                .par_bridge()
+                .map(|chunk| generate_chunk_vertices(&worker_context, chunk))
+                // Send progress updates for each finished chunk
+                .inspect(|_| {
+                    if let Err(err) = tx.send(TerrainBuilderProgress::Progress) {
+                        logger::error!("Failed to send TerrainBuilder progress: {}", err);
+                    }
+                })
+                .map(|chunk| generate_chunk_mesh(&worker_context, chunk))
+                // send progress updates for each finished mesh
+                .inspect(|_| {
+                    if let Err(err) = tx.send(TerrainBuilderProgress::Progress) {
+                        logger::error!("Failed to send TerrainBuilder progress: {}", err);
+                    }
+                })
+                .collect();
 
-        tile.set_corners([
-            //			0											1
-            Vector3::new(tile_x, tile_z, tile_y),
-            Vector3::new(tile_x + tile_size, tile_z, tile_y),
-            //			2											3
-            Vector3::new(tile_x, tile_z, tile_y + tile_size),
-            Vector3::new(tile_x + tile_size, tile_z, tile_y + tile_size),
-        ]);
+            godot_print!("terrain build time: {}ms", timer.elapsed().as_millis());
 
-        tile.set_fixed(tile_data.has_building());
-
-        let mut water: Option<TileSurface> = None;
-
-        // tile is covered by water
-        if tile_type > 0 && (context.sea_level as i64) >= tile_data.altitude() {
-            let water_altitude = tile_height as usize * context.sea_level as usize;
-
-            let mut water_tile = tile.clone();
-            water_tile.set_kind(TileSurfaceType::Water);
-            water_tile.set_resolution(3);
-
-            water_tile.corners[0].y = water_altitude as f32;
-            water_tile.corners[1].y = water_altitude as f32;
-            water_tile.corners[2].y = water_altitude as f32;
-            water_tile.corners[3].y = water_altitude as f32;
-
-            water = Some(water_tile);
-        }
-
-        // tile is surface water
-        if tile_type == 3 {
-            let mut water_tile = tile.clone();
-            water_tile.set_kind(TileSurfaceType::Water);
-            water_tile.set_resolution(3);
-
-            water = Some(water_tile);
-
-            tile.corners[rotation.nw()].y -= tile_height as f32;
-            tile.corners[rotation.ne()].y -= tile_height as f32;
-            tile.corners[rotation.sw()].y -= tile_height as f32;
-            tile.corners[rotation.se()].y -= tile_height as f32;
-        }
-
-        tile.apply_slope(tile_slope, rotation, context.tile_height.into());
-
-        let mut tile_faces: Vec<_> = tile.into();
-        let mut water_faces = match water {
-            Some(water) => water.into(),
-            None => vec![],
-        };
-
-        tile_faces.append(&mut water_faces);
-
-        tile_faces
-    }
-
-    fn build_chunk_vertices(
-        context: &ThreadContext,
-        chunk: ChunkConfig,
-    ) -> (ChunkSurfaces, Vec<VertexRef>) {
-        let mut ybuffer: HashMapYBuffer<VertexRef> = YBuffer::new();
-        let mut surfaces = SurfaceMap::new();
-        let mut vertices = vec![];
-        let mut edge_buffer = vec![];
-
-        let lower_y = chunk.tile_coords.1;
-        let lower_x = chunk.tile_coords.0;
-        let upper_y = lower_y + chunk.size;
-        let upper_x = lower_x + chunk.size;
-
-        for y in lower_y..upper_y {
-            for x in lower_x..upper_x {
-                let is_left_edge = x == lower_x;
-                let is_right_edge = x == (upper_x - 1);
-                let is_top_edge = y == lower_y;
-                let is_bottom_edge = y == (upper_y - 1);
-                let edge =
-                    TileEdgeType::new(is_top_edge, is_bottom_edge, is_left_edge, is_right_edge);
-
-                let key = create_tilelist_key(x, y);
-                let tile = context
-                    .tilelist
-                    .get(key)
-                    .expect("there is a hole in the tilelist!");
-
-                let tile_faces = Self::process_tile(context, tile.to(), edge);
-
-                vertices.extend(tile_faces.into_iter().flatten());
+            if let Err(err) = tx.send(TerrainBuilderProgress::Complete(result)) {
+                logger::error!("Failed to Send TerrainBuilder final message: {}", err);
             }
-        }
+        });
 
-        for vertex in vertices {
-            let vertex = Self::add_to_surface(&mut surfaces, vertex);
-
-            if vertex.read().unwrap().is_chunk_edge() {
-                edge_buffer.push(vertex.clone());
-            }
-
-            if vertex.read().unwrap().surface() != TileSurfaceType::Water {
-                ybuffer.add(vertex);
-                continue;
-            }
-        }
-
-        godot_print!("ybuffer size: {}", ybuffer.len());
-        ybuffer.reduce();
-
-        let normal_map = calculate_normals(surfaces.iter().flat_map(|(_, value)| value));
-
-        surfaces
-            .iter()
-            .flat_map(|(_, value)| value)
-            .for_each(|vertex_ref| {
-                let mut vertex = vertex_ref.write().unwrap();
-
-                let normal = normal_map
-                    .get(&vertex.to_string())
-                    .unwrap_or_else(|| panic!("no normal for {:?}", vertex))
-                    .to_owned();
-
-                let normal = Vector3::new(normal.x, normal.y, normal.z).normalized();
-
-                vertex.set_normal(normal);
-            });
-
-        (
-            ChunkSurfaces {
-                surfaces,
-                config: chunk,
-            },
-            edge_buffer,
-        )
-    }
-
-    fn build_terain_chunk(context: &ThreadContext, chunk: ChunkSurfaces) -> TerrainChunk {
-        let mut generator = SurfaceTool::new_gd();
-        let mut mesh = ArrayMesh::new_gd();
-        let mut vertex_count = 0;
-
-        for (surface_type, surface) in chunk.surfaces {
-            generator.clear();
-            generator.begin(PrimitiveType::TRIANGLES);
-
-            // calculate global offset. Vertex contains the wold coordinates and we have to subtract the
-            // offset to get the model coordinates.
-            let world_offset = Vector3 {
-                x: f32::from(chunk.config.tile_coords.0 * u16::from(context.tile_size)),
-                y: 0.0,
-                z: f32::from(chunk.config.tile_coords.1 * u16::from(context.tile_size)),
-            };
-
-            for vertex_cell in surface {
-                let vertex = Arc::try_unwrap(vertex_cell)
-                    .expect("too many refs to vertex")
-                    .into_inner()
-                    .expect("mutex got poisoned");
-
-                generator.set_uv(Self::tile_vertex_to_city_uv(
-                    context,
-                    &vertex,
-                    context.tile_size,
-                ));
-                generator.set_normal(*vertex.normal());
-
-                if vertex.is_chunk_edge() {
-                    generator.set_color(Color::from_rgb(1.0, 0.0, 0.0));
-                } else {
-                    generator.set_color(Color::from_rgb(1.0, 1.0, 1.0));
-                }
-
-                generator.add_vertex(Vector3::from(vertex) - world_offset);
-
-                vertex_count += 1;
-            }
-
-            generator.index();
-            generator.generate_tangents();
-
-            let surface_arrays = generator.commit_to_arrays();
-            let new_index = mesh.get_surface_count();
-
-            mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, &surface_arrays);
-
-            let surface_material_variant = context.materials.get(surface_type.to_string());
-
-            let surface_material: Option<Gd<Material>> =
-                surface_material_variant.map(|material| material.to());
-
-            match surface_material {
-                Some(material) => mesh.surface_set_material(new_index, &material),
-                None => godot_error!("no material for surface type {}", surface_type),
-            };
-        }
-
-        godot_print!("generated {} vertices for terain", vertex_count);
-        godot_print!("done generating surfaces {}ms", 0.0);
-
-        TerrainChunk {
-            mesh: Shared(mesh),
-            config: chunk.config,
-        }
+        rx
     }
 
     #[func]
-    pub fn build_terain_async(&self) -> Array<Gd<TerrainChunk>> {
+    pub fn build_terain_async(&self) -> Gd<GodotFuture> {
         let chunk_size = self.chunk_size;
 
         // we need to be certain that we have a compatible city size
-        assert!((self.city_size % chunk_size) == 0);
+        debug_assert!((self.city_size % chunk_size) == 0);
 
         let chunk_count = self.city_size / chunk_size;
-        let timer = Instant::now();
+        let rotation = self.rotation().bind().deref().to_owned();
+        let tilelist = TileList::try_from_dict(&self.tilelist)
+            .expect("TileList passed from GDScript must be valid");
+        let context = self.thread_context(rotation);
+        let mut builder: Gd<Self> = self.base().clone().cast();
 
-        let chunks: Vec<_> = (0..chunk_count)
-            .flat_map(|y| (0..chunk_count).map(move |x| (x, y)))
-            .map(|(x, y)| ChunkConfig {
-                tile_coords: (x * chunk_size, y * chunk_size),
-                size: chunk_size,
+        let (resolve, future) = godot_future::<Vec<Gd<TerrainChunk>>>();
+
+        godot_task(async move {
+            let receiver = Self::spawn_build_thread(context, tilelist, chunk_size, chunk_count);
+
+            // Async loop that receives progress updates and sends them through godot signals
+            loop {
+                match receiver.as_async().recv().await {
+                    Ok(TerrainBuilderProgress::Progress) => {
+                        builder.emit_signal("progress", &[chunk_size.to_variant()]);
+                    }
+                    Ok(TerrainBuilderProgress::Complete(result)) => {
+                        let chunks = result.into_iter().map(Gd::from_object).collect();
+
+                        resolve(chunks);
+                        break;
+                    }
+
+                    Err(ReceiveError::SendClosed | ReceiveError::Closed) => {
+                        logger::error!(
+                            "orchestration thread has disconnected before completing terrain!"
+                        );
+                        break;
+                    }
+                }
+            }
+        });
+
+        future
+    }
+
+    fn pre_process_tilelist(
+        context: &CoordinatorThreadContext,
+        mut tilelist: TileList,
+    ) -> TileList {
+        let rotation = &context.rotation;
+
+        let chunks: Vec<_> = tilelist
+            .values()
+            .chunks(context.chunk_size.pow(2) as usize)
+            .into_iter()
+            .map(|chunk| chunk.collect_vec())
+            .collect();
+
+        let mut pending_tiles: Vec<_> = chunks
+            .par_iter()
+            .map(|chunk| {
+                chunk
+                    .iter()
+                    .map(|tile| (*tile, tilelist.validate_tile_slope(tile, rotation)))
+                    .filter_map(|(tile, validation_result)| {
+                        if !validation_result.is_invalid() {
+                            return None;
+                        }
+
+                        if let Some(special_case) =
+                            is_special_case(tile, &tilelist, &validation_result)
+                        {
+                            return Some((tile, validation_result, Some(special_case)));
+                        }
+
+                        (tile.has_building() || tile.has_surface_water())
+                            .not()
+                            .then_some((tile, validation_result, None))
+                    })
+                    .par_bridge()
             })
+            .flatten()
+            .map(|(tile, invalid, special_case)| (tile.to_owned(), invalid, special_case))
+            .collect::<Vec<_>>()
+            .into_iter()
+            .sorted_by(|(_, a, _), (_, b, _)| a.empty_invalid_tiles.cmp(&b.empty_invalid_tiles))
             .collect();
 
-        let rotation = self.rotation().bind();
-        let context = self.thread_context(rotation.deref());
+        drop(chunks);
 
-        let (surface_chunks, chunk_edge_vertices): (Vec<_>, Vec<_>) = chunks
-            .into_par_iter()
-            .map(|chunk| Self::build_chunk_vertices(&context, chunk))
-            .unzip();
+        // remove all the invalid tiles first
+        pending_tiles
+            .iter_mut()
+            .for_each(|(original_tile, _, special_case)| {
+                let tile = tilelist.get_mut(&original_tile.coordinates).unwrap();
 
-        stitch_chunk_seams(chunk_edge_vertices);
+                tile.terrain.slope = TerrainSlope::Undetermined;
 
-        let result: Vec<_> = surface_chunks
-            .into_par_iter()
-            .map(|chunk| Self::build_terain_chunk(&context, chunk))
-            .collect();
+                match special_case {
+                    // bridge transition pieces have to be lowered by one level of altitude.
+                    // This also applies to power line cliffs
+                    Some(TileSpecialCase::BridgeTransition | TileSpecialCase::PowerlineCliff) => {
+                        original_tile.altitude -= 1;
+                        tile.altitude -= 1;
+                    }
 
-        godot_print!("terrain build time: {}ms", timer.elapsed().as_millis());
+                    Some(TileSpecialCase::PintchedAllSlope) => {
+                        original_tile.altitude += 1;
+                        original_tile.terrain.slope = TerrainSlope::None;
+                        tile.altitude += 1;
+                    }
 
-        result.into_iter().map(Gd::from_object).collect()
+                    Some(TileSpecialCase::Powerline) | Some(TileSpecialCase::Bridge) | None => (),
+                }
+            });
+
+        let invalid_empty_tiles = pending_tiles.len();
+        let mut fixed_tiles = 0;
+
+        pending_tiles.into_iter().for_each(|(mut tile, _, _)| {
+            let options = tilelist.valid_slopes(&tile, rotation);
+
+            let Some(slope_type) = options.into_iter().next() else {
+                tilelist.insert(tile.coordinates, tile);
+                return;
+            };
+
+            tile.terrain.slope = rotation.to_reverted().normalize_slope(*slope_type);
+            tilelist.insert(tile.coordinates, tile);
+            fixed_tiles += 1;
+        });
+
+        logger::debug!("Fixed {fixed_tiles} of {invalid_empty_tiles} empty tiles");
+
+        tilelist
     }
 }
 
 impl TerrainBuilder {
-    fn thread_context<'a>(&self, rotation: &'a TerrainRotation) -> ThreadContext<'a> {
-        ThreadContext {
+    fn thread_context(&self, rotation: TerrainRotation) -> CoordinatorThreadContext {
+        CoordinatorThreadContext {
             tile_size: self.tile_size,
             city_size: self.city_size,
             tile_height: self.tile_height,
             sea_level: self.sea_level,
+            chunk_size: self.chunk_size,
             rotation,
-            tilelist: self.tilelist(),
             materials: self.materials(),
+            debug_render_invalid: self.debug_render_invalid,
+            render_water: self.render_water,
         }
     }
 }
@@ -579,4 +440,459 @@ impl TerrainBuilderFactory {
     ) -> Gd<TerrainBuilder> {
         TerrainBuilder::new(tilelist, rotation, materials)
     }
+}
+
+enum TileSpecialCase {
+    BridgeTransition,
+    Powerline,
+    PowerlineCliff,
+    Bridge,
+    PintchedAllSlope,
+}
+
+fn generate_tile_surfaces(
+    context: &WorkerThreadContext,
+    tile_data: &Tile,
+    tilelist: &TileList,
+) -> TileFaces {
+    let tile_size = context.tile_size as f32;
+    let tile_height = context.tile_height;
+    let rotation = context.rotation;
+    let coords = tile_data.coordinates();
+
+    // validate tile slope
+    let is_invalid_type = context
+        .debug_render_invalid
+        .then(|| tilelist.validate_tile_slope(tile_data, rotation))
+        .is_some_and(|invalid_result| invalid_result.is_invalid());
+
+    let tile_x = (coords.0 * tile_size as u32) as f32;
+    let tile_y = (coords.1 * tile_size as u32) as f32;
+    let tile_z = (tile_data.altitude() * tile_height as u32) as f32;
+
+    let mut tile_surface = TileSurface::new(TileSurfaceType::Ground);
+
+    tile_surface.set_corners([
+        //			0											1
+        Vector3::new(tile_x, tile_z, tile_y),
+        Vector3::new(tile_x + tile_size, tile_z, tile_y),
+        //			2											3
+        Vector3::new(tile_x, tile_z, tile_y + tile_size),
+        Vector3::new(tile_x + tile_size, tile_z, tile_y + tile_size),
+    ]);
+
+    tile_surface.set_fixed(tile_data.has_building());
+    tile_surface.set_invalid(is_invalid_type);
+
+    let mut extra_surfaces: Vec<TileSurface> = Vec::new();
+
+    tile_surface.apply_slope(
+        tile_data.terrain.slope,
+        rotation,
+        context.tile_height.into(),
+    );
+
+    match tile_data.terrain.ty {
+        TerrainType::DryLand => {
+            // (-1, 0)
+            handle_tile_cliff(
+                (tile_data.coordinates.0 - 1, tile_data.coordinates.1),
+                [
+                    Vector3::new(tile_x, tile_z, tile_y),
+                    tile_surface.corners[0],
+                    Vector3::new(tile_x, tile_z, tile_y + tile_size),
+                    tile_surface.corners[2],
+                ],
+                tile_data,
+                tilelist,
+                &mut extra_surfaces,
+            );
+
+            // (+1, 0)
+            handle_tile_cliff(
+                (tile_data.coordinates.0 + 1, tile_data.coordinates.1),
+                [
+                    Vector3::new(tile_x + tile_size, tile_z, tile_y + tile_size),
+                    tile_surface.corners[3],
+                    Vector3::new(tile_x + tile_size, tile_z, tile_y),
+                    tile_surface.corners[1],
+                ],
+                tile_data,
+                tilelist,
+                &mut extra_surfaces,
+            );
+
+            // (0, -1)
+            handle_tile_cliff(
+                (tile_data.coordinates.0, tile_data.coordinates.1 - 1),
+                [
+                    Vector3::new(tile_x + tile_size, tile_z, tile_y),
+                    tile_surface.corners[1],
+                    Vector3::new(tile_x, tile_z, tile_y),
+                    tile_surface.corners[0],
+                ],
+                tile_data,
+                tilelist,
+                &mut extra_surfaces,
+            );
+
+            // (0, +1)
+            handle_tile_cliff(
+                (tile_data.coordinates.0, tile_data.coordinates.1 + 1),
+                [
+                    Vector3::new(tile_x, tile_z, tile_y + tile_size),
+                    tile_surface.corners[2],
+                    Vector3::new(tile_x + tile_size, tile_z, tile_y + tile_size),
+                    tile_surface.corners[3],
+                ],
+                tile_data,
+                tilelist,
+                &mut extra_surfaces,
+            );
+        }
+
+        // tile is covered by water
+        TerrainType::Underwater | TerrainType::Shoreline
+            if (context.sea_level as u32) >= tile_data.altitude() =>
+        {
+            let water_altitude = tile_height as usize * context.sea_level as usize;
+
+            let mut water_tile = tile_surface.clone();
+            water_tile.set_kind(TileSurfaceType::Water);
+            water_tile.set_resolution(3);
+
+            water_tile.corners[0].y = water_altitude as f32;
+            water_tile.corners[1].y = water_altitude as f32;
+            water_tile.corners[2].y = water_altitude as f32;
+            water_tile.corners[3].y = water_altitude as f32;
+
+            if context.render_water {
+                extra_surfaces.push(water_tile);
+            }
+        }
+
+        TerrainType::Underwater | TerrainType::Shoreline => {
+            logger::warn!("Tile is Underwater or Shoreline but above sea level!");
+        }
+
+        TerrainType::SurfaceWater if tile_data.terrain.slope == TerrainSlope::VertialCliff => {
+            let mut water_tile = tile_surface.clone();
+
+            water_tile.set_kind(TileSurfaceType::Water);
+            water_tile.set_resolution(3);
+
+            extra_surfaces.push(water_tile);
+
+            tile_surface.corners[rotation.nw()].y -= tile_height as f32;
+            tile_surface.corners[rotation.ne()].y -= tile_height as f32;
+            tile_surface.corners[rotation.sw()].y -= tile_height as f32;
+            tile_surface.corners[rotation.se()].y -= tile_height as f32;
+
+            // (-1, 0)
+            handle_water_tile_cliff(
+                (tile_data.coordinates.0 - 1, tile_data.coordinates.1),
+                [
+                    Vector3::new(tile_x, tile_z, tile_y),
+                    Vector3::new(tile_x, tile_z + tile_height as f32, tile_y),
+                    Vector3::new(tile_x, tile_z, tile_y + tile_size),
+                    Vector3::new(tile_x, tile_z + tile_height as f32, tile_y + tile_size),
+                ],
+                tile_data,
+                tilelist,
+                &mut extra_surfaces,
+            );
+
+            // (+1, 0)
+            handle_water_tile_cliff(
+                (tile_data.coordinates.0 + 1, tile_data.coordinates.1),
+                [
+                    Vector3::new(tile_x + tile_size, tile_z, tile_y + tile_size),
+                    Vector3::new(
+                        tile_x + tile_size,
+                        tile_z + tile_height as f32,
+                        tile_y + tile_size,
+                    ),
+                    Vector3::new(tile_x + tile_size, tile_z, tile_y),
+                    Vector3::new(tile_x + tile_size, tile_z + tile_height as f32, tile_y),
+                ],
+                tile_data,
+                tilelist,
+                &mut extra_surfaces,
+            );
+
+            // (0, -1)
+            handle_water_tile_cliff(
+                (tile_data.coordinates.0, tile_data.coordinates.1 - 1),
+                [
+                    Vector3::new(tile_x + tile_size, tile_z, tile_y),
+                    Vector3::new(tile_x + tile_size, tile_z + tile_height as f32, tile_y),
+                    Vector3::new(tile_x, tile_z, tile_y),
+                    Vector3::new(tile_x, tile_z + tile_height as f32, tile_y),
+                ],
+                tile_data,
+                tilelist,
+                &mut extra_surfaces,
+            );
+
+            // (ß, +1)
+            handle_water_tile_cliff(
+                (tile_data.coordinates.0, tile_data.coordinates.1 + 1),
+                [
+                    Vector3::new(tile_x, tile_z, tile_y + tile_size),
+                    Vector3::new(tile_x, tile_z + tile_height as f32, tile_y + tile_size),
+                    Vector3::new(tile_x + tile_size, tile_z, tile_y + tile_size),
+                    Vector3::new(
+                        tile_x + tile_size,
+                        tile_z + tile_height as f32,
+                        tile_y + tile_size,
+                    ),
+                ],
+                tile_data,
+                tilelist,
+                &mut extra_surfaces,
+            );
+        }
+
+        // tile is surface water
+        TerrainType::SurfaceWater | TerrainType::MoreSurfaceWater => {
+            let mut water_tile = tile_surface.clone();
+            water_tile.set_kind(TileSurfaceType::Water);
+            water_tile.set_resolution(3);
+
+            water_tile.corners[rotation.nw()].y = tile_z;
+            water_tile.corners[rotation.ne()].y = tile_z;
+            water_tile.corners[rotation.sw()].y = tile_z;
+            water_tile.corners[rotation.se()].y = tile_z;
+
+            extra_surfaces.push(water_tile);
+
+            tile_surface.corners[rotation.nw()].y -= tile_height as f32;
+            tile_surface.corners[rotation.ne()].y -= tile_height as f32;
+            tile_surface.corners[rotation.sw()].y -= tile_height as f32;
+            tile_surface.corners[rotation.se()].y -= tile_height as f32
+        }
+    }
+
+    if matches!(tile_data.terrain.slope, TerrainSlope::Undetermined) {
+        return vec![];
+    }
+
+    let mut tile_faces: Vec<_> = tile_surface.into();
+    let water_faces = extra_surfaces.into_iter().flat_map(Vec::<Face>::from);
+
+    tile_faces.extend(water_faces);
+
+    tile_faces
+}
+
+fn generate_chunk_vertices(context: &WorkerThreadContext, chunk: ChunkConfig) -> ChunkSurfaces {
+    let mut surfaces = SurfaceMap::new();
+
+    let lower_y = chunk.tile_coords.1;
+    let lower_x = chunk.tile_coords.0;
+    let upper_y = lower_y + chunk.size;
+    let upper_x = lower_x + chunk.size;
+
+    for y in lower_y..upper_y {
+        for x in lower_x..upper_x {
+            let key = (x, y);
+            let tile = context
+                .tilelist
+                .get(&key)
+                .expect("there is a hole in the tilelist!");
+
+            generate_tile_surfaces(context, tile, context.tilelist)
+                .into_iter()
+                .flatten()
+                .for_each(|vertex| {
+                    TerrainBuilder::add_to_surface(&mut surfaces, vertex);
+                });
+        }
+    }
+
+    ChunkSurfaces {
+        surfaces,
+        config: chunk,
+    }
+}
+
+/// Generate an ArrayMesh from a list of surface vertecies.
+fn generate_chunk_mesh(context: &WorkerThreadContext, chunk: ChunkSurfaces) -> TerrainChunk {
+    let mut generator = SurfaceTool::new_gd();
+    let mut mesh = ArrayMesh::new_gd();
+    let mut vertex_count = 0;
+
+    for (surface_type, surface) in chunk.surfaces {
+        generator.clear();
+        generator.begin(PrimitiveType::TRIANGLES);
+
+        // calculate global offset. Vertex contains the wold coordinates and we have to subtract the
+        // offset to get the model coordinates.
+        let world_offset = Vector3 {
+            x: (chunk.config.tile_coords.0 * u32::from(context.tile_size)) as f32,
+            y: 0.0,
+            z: (chunk.config.tile_coords.1 * u32::from(context.tile_size)) as f32,
+        };
+
+        for vertex in surface {
+            generator.set_uv(context.tile_vertex_to_city_uv(&vertex));
+
+            let smooth_group = match surface_type {
+                TileSurfaceType::Ground => u32::MAX,
+                TileSurfaceType::Water => 0,
+            };
+
+            generator.set_smooth_group(smooth_group);
+            generator.set_color(
+                if context.debug_render_invalid && vertex.is_invalid_tile() {
+                    Color::RED
+                } else {
+                    Color::BLACK
+                },
+            );
+            generator.add_vertex(Vector3::from(vertex) - world_offset);
+
+            vertex_count += 1;
+        }
+
+        generator.index();
+        generator.generate_normals();
+        generator.generate_tangents();
+
+        let surface_arrays = generator.commit_to_arrays();
+        let new_index = mesh.get_surface_count();
+
+        mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, &surface_arrays);
+
+        let surface_material_variant = context.materials.get(surface_type.to_string());
+
+        let surface_material: Option<Gd<Material>> =
+            surface_material_variant.map(|material| material.to());
+
+        match surface_material {
+            Some(material) => mesh.surface_set_material(new_index, &material),
+            None => logger::error!("no material for surface type {}", surface_type),
+        };
+    }
+
+    logger::info!("generated {} vertices for terain", vertex_count);
+
+    TerrainChunk {
+        mesh: Shared(mesh),
+        config: chunk.config,
+    }
+}
+
+/// Tile is a special case and requires some additional transformation.
+fn is_special_case(
+    tile: &Tile,
+    tilelist: &TileList,
+    validation_result: &TileValidationResult,
+) -> Option<TileSpecialCase> {
+    let terrain = tile.terrain.slope;
+    let building_id = tile.building.as_ref().map(|building| building.building_id);
+
+    match (terrain, building_id, validation_result.invalid_tiles) {
+        // Terrain slope is the start of a bridge.
+        (
+            TerrainSlope::South | TerrainSlope::North | TerrainSlope::West | TerrainSlope::East,
+            Some(building_id),
+            _,
+        ) if Road::try_from_primitive(building_id).is_ok() => tilelist
+            .get_tile_neighbors(tile)
+            .filter_map(|(_, neighbor)| neighbor.building.as_ref())
+            .any(|neighbor| Bridge::try_from_primitive(neighbor.building_id).is_ok())
+            .then_some(TileSpecialCase::BridgeTransition),
+
+        // Terrain slope is raised in all corners and stuck between exactly two neighbors with two corners.
+        (TerrainSlope::All, None, 6) => Some(TileSpecialCase::PintchedAllSlope),
+
+        (
+            TerrainSlope::South | TerrainSlope::North | TerrainSlope::West | TerrainSlope::East,
+            Some(building_id),
+            _,
+        ) if Powerlines::try_from_primitive(building_id).is_ok() => tilelist
+            .get_tile_neighbors(tile)
+            .all(|(_, neighbor)| neighbor.altitude <= tile.altitude)
+            .then_some(TileSpecialCase::PowerlineCliff),
+
+        (_, Some(building_id), _) if Powerlines::try_from_primitive(building_id).is_ok() => {
+            Some(TileSpecialCase::Powerline)
+        }
+
+        (_, Some(building_id), _) if Bridge::try_from_primitive(building_id).is_ok() => {
+            Some(TileSpecialCase::Bridge)
+        }
+
+        _ => None,
+    }
+}
+
+/// Detects two neighbors that are invalid and create a 90 deg cliff.
+fn is_invalid_cliff(tile: &Tile, neighbor: &Tile) -> bool {
+    let invalid_slope = matches!(
+        tile.terrain.slope,
+        TerrainSlope::West | TerrainSlope::South | TerrainSlope::East | TerrainSlope::North
+    ) && (tile.altitude == neighbor.altitude
+        && neighbor.terrain.slope == TerrainSlope::None
+        || tile.altitude > neighbor.altitude && neighbor.terrain.slope == TerrainSlope::All);
+
+    let invalid_plateau =
+        matches!(tile.terrain.slope, TerrainSlope::All) && tile.altitude == neighbor.altitude;
+
+    invalid_slope || invalid_plateau
+}
+
+#[inline]
+fn handle_tile_cliff(
+    neighbor_coords: TileCoords,
+    cliff_corners: [Vector3; 4],
+    tile: &Tile,
+    tilelist: &TileList,
+    surfaces: &mut Vec<TileSurface>,
+) {
+    let neighbor = tilelist.get(&neighbor_coords);
+
+    if !neighbor.is_some_and(|neighbor| is_invalid_cliff(tile, neighbor)) {
+        return;
+    }
+
+    let mut cliff_side = TileSurface::new(TileSurfaceType::Ground);
+    cliff_side.set_resolution(1);
+    cliff_side.set_corners(cliff_corners);
+
+    surfaces.push(cliff_side);
+}
+
+#[inline]
+fn handle_water_tile_cliff(
+    neighbor_coords: TileCoords,
+    cliff_corners: [Vector3; 4],
+    tile_data: &Tile,
+    tilelist: &TileList,
+    surfaces: &mut Vec<TileSurface>,
+) {
+    let neighbor = tilelist.get(&neighbor_coords);
+
+    if !neighbor.is_some_and(|neighbor| is_water_cliff(tile_data, neighbor)) {
+        return;
+    }
+
+    let mut water_side = TileSurface::new(TileSurfaceType::Water);
+
+    water_side.set_resolution(3);
+    water_side.set_corners(cliff_corners);
+
+    surfaces.push(water_side);
+}
+
+/// Detects a waterfall cliff.
+#[inline]
+fn is_water_cliff(tile: &Tile, neighbor: &Tile) -> bool {
+    neighbor.altitude < tile.altitude
+        || neighbor.altitude == tile.altitude
+            && (!matches!(
+                neighbor.terrain.ty,
+                TerrainType::SurfaceWater | TerrainType::MoreSurfaceWater
+            ) || !matches!(neighbor.terrain.slope, TerrainSlope::VertialCliff))
 }

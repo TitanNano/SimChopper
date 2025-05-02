@@ -1,9 +1,8 @@
 extends Node
 
 const CityCoordsFeature := preload("res://src/features/CityCoordsFeature.gd")
-const build_progress_steps := 0
 
-signal build_progress(steps)
+signal build_progress(steps: int)
 
 @export var is_built := false
 @export var terrain_material: Material
@@ -11,11 +10,15 @@ signal build_progress(steps)
 @export var world_constants: WorldConstants
 
 var city_coords_feature: CityCoordsFeature
+var builder: TerrainBuilder
 
 func _ready() -> void:
 	assert(world_constants is WorldConstants, "Terrain.world_contstants is not of type WorldConstants")
 
-func build_async(city: Dictionary):
+func _forward_progress(count: int):
+	self.build_progress.emit(count)
+
+func init(city: Dictionary):
 	var rotation := TerrainRotation.new()
 	var builder_factory := TerrainBuilderFactory.new()
 	var simulator_settings: Dictionary = city.get("simulator_settings")
@@ -28,22 +31,30 @@ func build_async(city: Dictionary):
 
 	rotation.set_rotation(compass)
 
-	# make function async
-	await get_tree().process_frame
-
 	var materials := {
 		"Ground": terrain_material,
 		"Water": ocean_material
 	}
 
-	var builder = builder_factory.create(tilelist, rotation, materials)
+	self.builder = builder_factory.create(tilelist, rotation, materials)
 
-	builder.set_city_size(city_size)
-	builder.set_tile_size(self.world_constants.tile_size)
-	builder.set_tile_height(self.world_constants.tile_height)
-	builder.set_sea_level(sea_level)
+	self.builder.set_city_size(city_size)
+	self.builder.set_tile_size(self.world_constants.tile_size)
+	self.builder.set_tile_height(self.world_constants.tile_height)
+	self.builder.set_sea_level(sea_level)
+	self.builder.progress.connect(self._forward_progress)
 
-	for item in builder.build_terain_async():
+
+func load_steps() -> int:
+	var steps := self.builder.load_steps()
+	prints("load steps:", steps)
+	return steps
+
+
+func build_async():
+	var chunks: Array[TerrainChunk] = await self.builder.build_terain_async().completed
+	
+	for item in chunks:
 		var chunk: TerrainChunk = item
 		var tile_coords: Array[int] = chunk.tile_coords()
 		var translation := self.city_coords_feature.get_world_coords(tile_coords[0], tile_coords[1], 0)

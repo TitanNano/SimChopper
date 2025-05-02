@@ -23,4 +23,3 @@ func _set_completed_jobs(value: int):
 
 func _get_completed_jobs() -> int:
 	return self.progress.value
-

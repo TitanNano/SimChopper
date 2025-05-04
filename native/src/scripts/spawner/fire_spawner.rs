@@ -97,7 +97,7 @@ impl FireSpawner {
             Vector3Axis::Z => light_size.z,
         };
 
-        light_source.set_param(light_3d::Param::RANGE, light_size.length_squared());
+        light_source.set_param(light_3d::Param::RANGE, light_size.length_squared() * 2.0);
         light_source.set_param(light_3d::Param::SIZE, light_max_size);
         light_source.set_transform(Transform3D::default().translated(Vector3::new(
             0.0,

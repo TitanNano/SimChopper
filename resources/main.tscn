@@ -21,6 +21,7 @@
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_vnmmp"]
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lhcij"]
+exposure_sensitivity = 120.0
 dof_blur_far_enabled = true
 dof_blur_far_distance = 50.0
 dof_blur_far_transition = 50.0
@@ -127,14 +128,6 @@ doppler_tracking = 2
 current = true
 near = 3.0
 script = ExtResource("8_qw8ew")
-exposure_times = {
-0.0: 100.0,
-4.0: 70.0,
-8.0: 100.0,
-12.0: 600.0,
-14.0: 1500.0,
-23.5: 600.0
-}
 solar_setup_node = NodePath("../Environment/SolarSetup")
 
 [node name="Schweizer_300" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]

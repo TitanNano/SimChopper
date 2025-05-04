@@ -35,10 +35,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.1948, 0)
 
 [node name="FireLightSource" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.01561, -3.39593)
-light_intensity_lumens = 3000.0
+light_intensity_lumens = 1300.0
 light_temperature = 1850.0
 light_color = Color(0.980392, 0.309804, 0.00392157, 1)
 light_volumetric_fog_energy = 0.0
+light_size = 1.0
+omni_attenuation = 2.0
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = ExtResource("5_smqef")

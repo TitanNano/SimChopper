@@ -1,11 +1,8 @@
-use godot::builtin::Dictionary;
 use godot::classes::{Camera3D, Node3D};
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, CastToScript, GodotScript, RsRef};
-use itertools::Itertools;
 
 use crate::{
-    info,
     scripts::world::solar_setup::{ISolarSetup, SolarSetup},
     warn,
 };
@@ -13,9 +10,6 @@ use crate::{
 #[derive(GodotScript, Debug)]
 #[script(base = Camera3D)]
 struct Camera {
-    #[export]
-    pub exposure_times: Dictionary,
-
     #[export]
     pub solar_setup_node: Option<Gd<Node3D>>,
 
@@ -26,6 +20,10 @@ struct Camera {
 
 #[godot_script_impl]
 impl Camera {
+    const MID_DAY_EXPOSURE: f32 = 90.0;
+    const DAWN_EXPOSURE: f32 = 200.0;
+    const NIGHT_EXPOSURE: f32 = 1000.0;
+
     pub fn _ready(&mut self) {
         self.solar_setup = self.solar_setup_node.clone().map(|node| node.into_script());
     }
@@ -43,20 +41,33 @@ impl Camera {
 
         let game_time = solar_setup.get_ingame_time_h();
 
-        let exposure = self
-            .exposure_times
-            .iter_shared()
-            .sorted_by(|(key_a, _), (key_b, _)| key_a.to::<f64>().total_cmp(&key_b.to::<f64>()))
-            .rev()
-            .find(|(key, _)| key.to::<f64>() <= game_time)
-            .map(|(_, value)| value.to::<f32>())
-            .unwrap_or(0.0);
+        let exposure = match game_time {
+            0.0..6.0 => {
+                Self::DAWN_EXPOSURE
+                    - ((Self::DAWN_EXPOSURE - Self::MID_DAY_EXPOSURE) / 6.0) * game_time as f32
+            }
+            6.0..12.0 => {
+                Self::MID_DAY_EXPOSURE
+                    + ((Self::DAWN_EXPOSURE - Self::MID_DAY_EXPOSURE) / 6.0)
+                        * (game_time as f32 - 6.0)
+            }
+            12.0..13.0 => {
+                Self::DAWN_EXPOSURE
+                    + ((Self::NIGHT_EXPOSURE - Self::DAWN_EXPOSURE) / 6.0)
+                        * (game_time as f32 - 12.0)
+            }
+            13.0..23.0 => Self::NIGHT_EXPOSURE,
+            23.0..24.0 => {
+                Self::NIGHT_EXPOSURE
+                    - ((Self::NIGHT_EXPOSURE - Self::DAWN_EXPOSURE) / 6.0)
+                        * (game_time as f32 - 18.0)
+            }
+            _ => unreachable!("game time is capped to 24h"),
+        };
 
         if attributes.get_exposure_sensitivity() == exposure {
             return;
         }
-
-        info!("Updating camera exposure to {} at {}", exposure, game_time);
 
         attributes.set_exposure_sensitivity(exposure);
     }

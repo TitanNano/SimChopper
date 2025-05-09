@@ -90,7 +90,9 @@ func _spawn_player() -> void:
 	var player := players[0] as Helicopter
 	var spawn := spawns[0] as Node3D
 
-	player.global_transform.origin = spawn.global_transform.origin + Vector3(0, -0.1, 0)
+#	player.global_transform.origin = spawn.global_transform.oridgin + Vector3(0, -0.1, 0)
+	var pos := city_coords_feature.get_world_coords(127, 13, 11)
+	player.global_transform.origin = pos + Vector3(8, -0.1, 8)
 #	player.force_update_transform()
 	player.snap_camera()
 

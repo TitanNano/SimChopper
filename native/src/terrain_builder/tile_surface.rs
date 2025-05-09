@@ -1,11 +1,13 @@
 use std::fmt::{self, Display};
-use std::sync::{Arc, RwLock};
 
 use godot::prelude::*;
 
+use crate::util::logger;
+use crate::world::city_data::TerrainSlope;
+
 use super::lerp::bilerp_xyz;
 use super::point::{DimensionX, DimensionY, DimensionZ, FixedPoint, SetDimensionY};
-use super::terrain_rotation::{TerrainRotation, TerrainRotationBehaviour};
+use super::terrain_rotation::TerrainRotation;
 
 /// the type of terrain surface.
 #[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
@@ -25,41 +27,6 @@ impl fmt::Display for TileSurfaceType {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct TileEdgeType {
-    top: bool,
-    bottom: bool,
-    left: bool,
-    right: bool,
-}
-
-impl TileEdgeType {
-    pub fn new(top: bool, bottom: bool, left: bool, right: bool) -> Self {
-        Self {
-            top,
-            bottom,
-            left,
-            right,
-        }
-    }
-
-    pub fn is_top(&self) -> bool {
-        self.top
-    }
-
-    pub fn is_bottom(&self) -> bool {
-        self.bottom
-    }
-
-    pub fn is_left(&self) -> bool {
-        self.left
-    }
-
-    pub fn is_right(&self) -> bool {
-        self.right
-    }
-}
-
 /// The location of all four corners of a tile.
 type TileCorners = [Vector3; 4];
 
@@ -73,22 +40,22 @@ pub type TileFaces = Vec<Face>;
 /// intermediate tile surface meta data that will be used
 /// to compute the terrain geometry for a single tile.
 #[derive(Clone)]
-pub struct TileSurface {
+pub(crate) struct TileSurface {
     kind: TileSurfaceType,
     pub corners: TileCorners,
     resolution: u8,
-    edge: TileEdgeType,
     fixed: bool,
+    invalid: bool,
 }
 
 impl TileSurface {
-    pub fn new(kind: TileSurfaceType, edge: TileEdgeType) -> Self {
+    pub fn new(kind: TileSurfaceType) -> Self {
         Self {
             kind,
             corners: [Vector3::ZERO, Vector3::ZERO, Vector3::ZERO, Vector3::ZERO],
             resolution: 2,
             fixed: false,
-            edge,
+            invalid: false,
         }
     }
 
@@ -120,78 +87,192 @@ impl TileSurface {
         self.fixed = fixed;
     }
 
-    pub fn apply_slope(&mut self, slope: u8, rotation: &TerrainRotation, height: f32) {
+    pub fn set_invalid(&mut self, is_invalid: bool) {
+        self.invalid = is_invalid;
+    }
+
+    pub fn apply_slope(&mut self, slope: TerrainSlope, rotation: &TerrainRotation, height: f32) {
         match slope {
-            0x00 => (),
-
-            0x01 => {
+            TerrainSlope::None => (),
+            TerrainSlope::North => {
                 self.corners[rotation.nw()].y += height;
                 self.corners[rotation.ne()].y += height;
             }
-
-            0x02 => {
+            TerrainSlope::East => {
                 self.corners[rotation.ne()].y += height;
                 self.corners[rotation.se()].y += height;
             }
-
-            0x03 => {
+            TerrainSlope::South => {
                 self.corners[rotation.sw()].y += height;
                 self.corners[rotation.se()].y += height;
             }
-
-            0x04 => {
+            TerrainSlope::West => {
                 self.corners[rotation.nw()].y += height;
                 self.corners[rotation.sw()].y += height;
             }
-
-            0x05 => {
+            TerrainSlope::NorthSouthEast => {
                 self.corners[rotation.nw()].y += height;
                 self.corners[rotation.ne()].y += height;
                 self.corners[rotation.se()].y += height;
             }
-
-            0x06 => {
+            TerrainSlope::SouthNorthEast => {
                 self.corners[rotation.ne()].y += height;
                 self.corners[rotation.se()].y += height;
                 self.corners[rotation.sw()].y += height;
             }
-
-            0x07 => {
+            TerrainSlope::SouthNorthWest => {
                 self.corners[rotation.se()].y += height;
                 self.corners[rotation.sw()].y += height;
                 self.corners[rotation.nw()].y += height;
             }
-
-            0x08 => {
+            TerrainSlope::NorthSouthWest => {
                 self.corners[rotation.sw()].y += height;
                 self.corners[rotation.nw()].y += height;
                 self.corners[rotation.ne()].y += height;
             }
-
-            0x09 => {
+            TerrainSlope::NorthEast => {
                 self.corners[rotation.ne()].y += height;
             }
-
-            0x0A => {
+            TerrainSlope::SouthEast => {
                 self.corners[rotation.se()].y += height;
             }
-
-            0x0B => {
+            TerrainSlope::SouthWest => {
                 self.corners[rotation.sw()].y += height;
             }
-
-            0x0C => {
+            TerrainSlope::NorthWest => {
                 self.corners[rotation.nw()].y += height;
             }
-
-            0x0D => {
+            TerrainSlope::All => {
                 self.corners[rotation.nw()].y += height;
                 self.corners[rotation.ne()].y += height;
                 self.corners[rotation.sw()].y += height;
                 self.corners[rotation.se()].y += height;
             }
-
-            _ => {}
+            TerrainSlope::VertialCliff => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.se()].y += height;
+            }
+            TerrainSlope::Undetermined => {
+                logger::warn!("The Undetermined terrain slope should not have any corners!");
+            }
+            TerrainSlope::NorthWestEast2SouthEast => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.ne()].y += height * 2.0;
+                self.corners[rotation.se()].y += height;
+            }
+            TerrainSlope::NorthEastWest2SouthWest => {
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.nw()].y += height * 2.0;
+                self.corners[rotation.sw()].y += height;
+            }
+            TerrainSlope::SouthWestEast2NorthEast => {
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.se()].y += height * 2.0;
+                self.corners[rotation.ne()].y += height;
+            }
+            TerrainSlope::SouthEastWest2NorthWest => {
+                self.corners[rotation.se()].y += height;
+                self.corners[rotation.sw()].y += height * 2.0;
+                self.corners[rotation.nw()].y += height;
+            }
+            TerrainSlope::South2NorthEast => {
+                self.corners[rotation.se()].y += height * 2.0;
+                self.corners[rotation.sw()].y += height * 2.0;
+                self.corners[rotation.ne()].y += height;
+            }
+            TerrainSlope::East2NorthWest => {
+                self.corners[rotation.se()].y += height * 2.0;
+                self.corners[rotation.ne()].y += height * 2.0;
+                self.corners[rotation.nw()].y += height;
+            }
+            TerrainSlope::North2SouthWest => {
+                self.corners[rotation.nw()].y += height * 2.0;
+                self.corners[rotation.ne()].y += height * 2.0;
+                self.corners[rotation.sw()].y += height;
+            }
+            TerrainSlope::West2SouthEast => {
+                self.corners[rotation.nw()].y += height * 2.0;
+                self.corners[rotation.sw()].y += height * 2.0;
+                self.corners[rotation.se()].y += height;
+            }
+            TerrainSlope::South2NorthWest => {
+                self.corners[rotation.sw()].y += height * 2.0;
+                self.corners[rotation.se()].y += height * 2.0;
+                self.corners[rotation.nw()].y += height;
+            }
+            TerrainSlope::East2SouthWest => {
+                self.corners[rotation.ne()].y += height * 2.0;
+                self.corners[rotation.se()].y += height * 2.0;
+                self.corners[rotation.sw()].y += height;
+            }
+            TerrainSlope::North2SouthEast => {
+                self.corners[rotation.ne()].y += height * 2.0;
+                self.corners[rotation.nw()].y += height * 2.0;
+                self.corners[rotation.se()].y += height;
+            }
+            TerrainSlope::West2NorthEast => {
+                self.corners[rotation.nw()].y += height * 2.0;
+                self.corners[rotation.sw()].y += height * 2.0;
+                self.corners[rotation.ne()].y += height;
+            }
+            TerrainSlope::WestSouthEast2 => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.se()].y += height * 2.0;
+            }
+            TerrainSlope::SouthNorthEast2 => {
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.se()].y += height;
+                self.corners[rotation.ne()].y += height * 2.0;
+            }
+            TerrainSlope::EastNorthWest2 => {
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.se()].y += height;
+                self.corners[rotation.nw()].y += height * 2.0;
+            }
+            TerrainSlope::NorthSouthWest2 => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.sw()].y += height * 2.0;
+            }
+            TerrainSlope::NorthWest2East => {
+                self.corners[rotation.nw()].y += height * 2.0;
+                self.corners[rotation.ne()].y += height;
+            }
+            TerrainSlope::SouthWest2NorthWest => {
+                self.corners[rotation.sw()].y += height * 2.0;
+                self.corners[rotation.nw()].y += height;
+            }
+            TerrainSlope::SouthEast2West => {
+                self.corners[rotation.se()].y += height * 2.0;
+                self.corners[rotation.sw()].y += height;
+            }
+            TerrainSlope::NorthEast2SouthEast => {
+                self.corners[rotation.ne()].y += height * 2.0;
+                self.corners[rotation.se()].y += height;
+            }
+            TerrainSlope::WestNorthEast2 => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.ne()].y += height * 2.0;
+            }
+            TerrainSlope::SouthNorthWest2 => {
+                self.corners[rotation.sw()].y += height;
+                self.corners[rotation.se()].y += height;
+                self.corners[rotation.nw()].y += height * 2.0;
+            }
+            TerrainSlope::EastSouthWest2 => {
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.se()].y += height;
+                self.corners[rotation.sw()].y += height * 2.0;
+            }
+            TerrainSlope::NorthSouthEast2 => {
+                self.corners[rotation.nw()].y += height;
+                self.corners[rotation.ne()].y += height;
+                self.corners[rotation.se()].y += height * 2.0;
+            }
         };
     }
 }
@@ -216,28 +297,16 @@ impl From<TileSurface> for Vec<Face> {
                 let y0 = bilerp_xyz(corners, weight_x_start, weight_y_end);
                 let y1 = bilerp_xyz(corners, weight_x_end, weight_y_end);
 
-                let x0_edge = (x0.x == corners[0].x && tile.edge.is_left())
-                    || (x0.z == corners[0].z && tile.edge.is_top());
-
-                let x1_edge = (x1.x == corners[1].x && tile.edge.is_right())
-                    || (x1.z == corners[1].z && tile.edge.is_top());
-
-                let y0_edge = (y0.x == corners[2].x && tile.edge.is_left())
-                    || (y0.z == corners[2].z && tile.edge.is_bottom());
-
-                let y1_edge = (y1.x == corners[3].x && tile.edge.is_right())
-                    || (y1.z == corners[3].z && tile.edge.is_bottom());
-
                 faces.append(&mut vec![
                     [
-                        Vertex::from_vector(kind, x0, x0_edge, tile.fixed),
-                        Vertex::from_vector(kind, x1, x1_edge, tile.fixed),
-                        Vertex::from_vector(kind, y1, y1_edge, tile.fixed),
+                        Vertex::from_vector(kind, x0, tile.fixed, tile.invalid),
+                        Vertex::from_vector(kind, x1, tile.fixed, tile.invalid),
+                        Vertex::from_vector(kind, y1, tile.fixed, tile.invalid),
                     ],
                     [
-                        Vertex::from_vector(kind, x0, x0_edge, tile.fixed),
-                        Vertex::from_vector(kind, y1, y1_edge, tile.fixed),
-                        Vertex::from_vector(kind, y0, y0_edge, tile.fixed),
+                        Vertex::from_vector(kind, x0, tile.fixed, tile.invalid),
+                        Vertex::from_vector(kind, y1, tile.fixed, tile.invalid),
+                        Vertex::from_vector(kind, y0, tile.fixed, tile.invalid),
                     ],
                 ])
             }
@@ -250,47 +319,52 @@ impl From<TileSurface> for Vec<Face> {
 /// Surface Vertex that is used as an intermediate representation of a mesh vertex
 /// before it is passed to the SurfaceTool.
 #[derive(Debug)]
-pub struct Vertex {
+pub(crate) struct Vertex {
     x: f32,
     y: f32,
     z: f32,
-    normal: Vector3,
     surface: TileSurfaceType,
     fixed: bool,
-    is_edge: bool,
+    is_invalid_tile: bool,
 }
 
 impl Vertex {
-    fn new(surface: TileSurfaceType, x: f32, y: f32, z: f32, is_edge: bool, fixed: bool) -> Self {
+    fn new(
+        surface: TileSurfaceType,
+        x: f32,
+        y: f32,
+        z: f32,
+        fixed: bool,
+        is_invalid_tile: bool,
+    ) -> Self {
         Self {
             surface,
             x,
             y,
             z,
-            normal: Vector3::ZERO,
-            is_edge,
+            is_invalid_tile,
             fixed,
         }
     }
 
-    fn from_vector(surface: TileSurfaceType, vector: Vector3, is_edge: bool, fixed: bool) -> Self {
-        Self::new(surface, vector.x, vector.y, vector.z, is_edge, fixed)
+    fn from_vector(
+        surface: TileSurfaceType,
+        vector: Vector3,
+        fixed: bool,
+        is_invalid_tile: bool,
+    ) -> Self {
+        Self::new(
+            surface,
+            vector.x,
+            vector.y,
+            vector.z,
+            fixed,
+            is_invalid_tile,
+        )
     }
 
-    pub fn is_chunk_edge(&self) -> bool {
-        self.is_edge
-    }
-
-    pub fn as_vector(&self) -> Vector3 {
-        Vector3::new(self.x, self.y, self.z)
-    }
-
-    pub fn set_normal(&mut self, value: Vector3) {
-        self.normal = value;
-    }
-
-    pub fn normal(&self) -> &Vector3 {
-        &self.normal
+    pub fn is_invalid_tile(&self) -> bool {
+        self.is_invalid_tile
     }
 }
 
@@ -349,13 +423,5 @@ pub trait SurfaceAssociated {
 impl SurfaceAssociated for Vertex {
     fn surface(&self) -> TileSurfaceType {
         self.surface
-    }
-}
-
-pub type VertexRef = Arc<RwLock<Vertex>>;
-
-impl From<Vertex> for VertexRef {
-    fn from(value: Vertex) -> Self {
-        Arc::new(RwLock::new(value))
     }
 }

@@ -29,6 +29,7 @@ func _ready():
 	self.networks.loading_progress.connect(self._on_child_progress)
 	self.buildings.spawn_point_encountered.connect(self._on_spawn_point_encountered)
 	self.buildings.loading_progress.connect(self._on_child_progress)
+	self.terrain.build_progress.connect(self._on_child_progress)
 
 	self._ready_deferred.call_deferred()
 
@@ -44,7 +45,9 @@ func _ready_deferred():
 
 	self.sea_level = city.simulator_settings["GlobalSeaLevel"]
 	self.city_coords_feature = CityCoordsFeature.new(self.world_constants, self.sea_level)
-	self.loading_scale.emit(buildings.size() + networks.size() + 1)
+	self.terrain.init(city)
+	
+	self.loading_scale.emit(buildings.size() + networks.size() + self.terrain.load_steps() + 1)
 	self._load_map_async(city)
 
 
@@ -57,7 +60,7 @@ func _on_spawn_point_encountered(tile_coords: Array[int], size: int, altitude: i
 
 
 func _load_map_async(city: Dictionary):
-	await self.terrain.build_async(city)
+	await self.terrain.build_async()
 	await self.networks.build_async(city)
 	await self.buildings.build_async(city).completed
 	
@@ -91,7 +94,6 @@ func _spawn_player() -> void:
 	var spawn := spawns[0] as Node3D
 
 	player.global_transform.origin = spawn.global_transform.origin + Vector3(0, -0.1, 0)
-#	player.force_update_transform()
 	player.snap_camera()
 
 

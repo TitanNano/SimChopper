@@ -102,7 +102,7 @@ impl Buildings {
                 count += 1;
 
                 if building.building_id == 0x00 {
-                    logger::info!("skipping empty building");
+                    logger::info!("{:?}: skipping empty building", building.tile_coords);
                     continue;
                 }
 

@@ -37,7 +37,7 @@ func build_async(city: Dictionary):
 
 		if not object:
 			print("unknown network_section \"%s\"" % name)
-			self.emit_signal("loading_progress", 1)
+			self.loading_progress.emit(1)
 			continue
 
 		var instance: Node3D = object.instantiate()
@@ -73,7 +73,7 @@ func build_async(city: Dictionary):
 
 		instance.set_owner(self.get_tree().current_scene)
 		
-		self.emit_signal("loading_progress", 1)
+		self.loading_progress.emit(1)
 
 		if budget.is_exceded():
 			print("yielding after ", budget.elapsed(), "ms of work")

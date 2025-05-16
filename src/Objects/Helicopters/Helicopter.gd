@@ -171,21 +171,23 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	# calculate thrust
 	var thrust_increase := direction * THRUST_INCREASE * delta
 
-	if direction.is_zero_approx():
-		var old_thrust := self.engine_thrust
-		self.engine_thrust -= self.engine_thrust.normalized() * THRUST_INCREASE * delta
-		self.engine_thrust = self.engine_thrust.clamp(Vector3.ZERO, old_thrust)
-	elif self.engine_thrust.length() < 1.0:
+	if !direction.is_zero_approx() && self.engine_thrust.length() < 1.0:
 		self.engine_thrust += thrust_increase
 
 		if self.engine_thrust.length() > 1.0:
 			self.engine_thrust = self.engine_thrust.normalized()
 
 	var current_linear_velocity := state.linear_velocity * (Vector3.RIGHT + Vector3.BACK)
+
+	var climb_force := Vector3(0, target_climb_velocity - state.linear_velocity.y, 0) * self.mass
 	var drag_force := self.drag_force(current_linear_velocity, self.get_front_size())
 	var thrust_force := self.engine_thrust * (THRUST_ACCELERATION * self.mass)
 	var rotated_thrust_force := thrust_force.rotated(Vector3.UP, self.rotation.y)
-	var climb_force := Vector3(0, target_climb_velocity - state.linear_velocity.y, 0) * self.mass
+
+	# auto decelerate when releasing the thrust
+	if direction.is_zero_approx() && !current_linear_velocity.is_zero_approx():
+		self.engine_thrust = Vector3.ZERO
+		rotated_thrust_force = current_linear_velocity.normalized() * -1 * minf(THRUST_ACCELERATION, current_linear_velocity.length()) * self.mass
 
 	state.apply_central_force(rotated_thrust_force + (drag_force * -1) + climb_force)
 	

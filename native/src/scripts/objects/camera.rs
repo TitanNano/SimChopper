@@ -18,8 +18,8 @@ struct Camera {
 
 #[godot_script_impl]
 impl Camera {
-    const MID_DAY_EXPOSURE: f32 = 90.0;
-    const DAWN_EXPOSURE: f32 = 200.0;
+    const MID_DAY_EXPOSURE: f32 = 10.0;
+    const DAWN_EXPOSURE: f32 = 30.0;
     const NIGHT_EXPOSURE: f32 = 1000.0;
 
     pub fn _ready(&mut self) {}
@@ -47,13 +47,13 @@ impl Camera {
                     + ((Self::DAWN_EXPOSURE - Self::MID_DAY_EXPOSURE) / 6.0)
                         * (game_time as f32 - 6.0)
             }
-            12.0..13.0 => {
+            12.0..12.5 => {
                 Self::DAWN_EXPOSURE
                     + ((Self::NIGHT_EXPOSURE - Self::DAWN_EXPOSURE) / 6.0)
                         * (game_time as f32 - 12.0)
             }
-            13.0..23.0 => Self::NIGHT_EXPOSURE,
-            23.0..24.0 => {
+            12.5..23.5 => Self::NIGHT_EXPOSURE,
+            23.5..24.0 => {
                 Self::NIGHT_EXPOSURE
                     - ((Self::NIGHT_EXPOSURE - Self::DAWN_EXPOSURE) / 6.0)
                         * (game_time as f32 - 18.0)

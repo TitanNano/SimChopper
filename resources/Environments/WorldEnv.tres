@@ -22,7 +22,6 @@ ssao_horizon = 0.0
 ssao_sharpness = 1.0
 ssao_ao_channel_affect = 1.0
 sdfgi_enabled = true
-sdfgi_bounce_feedback = 1.0
 sdfgi_min_cell_size = 1.95312
 glow_enabled = true
 glow_levels/1 = 1.0

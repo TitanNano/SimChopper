@@ -6,12 +6,16 @@
 sky_material = SubResource("ProceduralSkyMaterial_tv10b")
 
 [resource]
-background_mode = 2
+background_mode = 1
+background_color = Color(0.5846, 0.663337, 0.79, 1)
+background_energy_multiplier = 0.0
+background_intensity = 10000.0
 sky = SubResource("1")
 ssao_enabled = true
 ssao_radius = 2.0
 ssao_intensity = 4.0
 ssao_ao_channel_affect = 1.0
+sdfgi_enabled = true
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.0
 volumetric_fog_anisotropy = -3.46945e-18

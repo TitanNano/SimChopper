@@ -21,6 +21,14 @@ pub struct SolarSetup {
     #[export(range(min = 1.0, max = 120.0, step = 1.0))]
     pub day_length: u64,
 
+    /// The minimum brightness of the sky.
+    #[export(range(min = 1.0, max = 30_000.0, step = 1.0))]
+    pub sky_min_brightness: f32,
+
+    /// The maximum brightness of the sky.
+    #[export(range(min = 1.0, max = 30_000.0, step = 1.0))]
+    pub sky_max_brightness: f32,
+
     base: Gd<Node3D>,
 }
 
@@ -64,6 +72,22 @@ impl SolarSetup {
             sun.set_temperature((5500.0).lerp(1850.0, sun_zenit_distance));
         }
 
+        let mut env = self
+            .base
+            .get_world_3d()
+            .expect("solar setup must be part of the scene tree")
+            .get_environment()
+            .expect("there must be an environment");
+
+        // Reduce the energy of the sky during night time.
+        env.set_bg_intensity(
+            self.sky_min_brightness
+                .lerp(self.sky_max_brightness, Self::sky_brightness(sun_pos)),
+        );
+
+        // disable SDFGI during night time. It's causing too much fluctuation in the overall brightness of the scene under low light conditions.
+        env.set_sdfgi_enabled(!(195.0..=355.0).contains(&sun_pos));
+
         moon.set_param(
             light_3d::Param::ENERGY,
             if sun_pos > 180.0 { 1.0 } else { 0.0 },
@@ -96,5 +120,20 @@ impl SolarSetup {
     // get the current in-game time in hours since sunrise.
     pub fn get_ingame_time_h(&self) -> f64 {
         self.get_time() as f64 / (self.day_length_ms() as f64 * 2.0 / 24.0)
+    }
+
+    /// Sky brightness depending on the time of day. Value between 0.0 and 1.0.
+    fn sky_brightness(sun_pos: f32) -> f32 {
+        match sun_pos {
+            0.0..180.0 => 1.0,
+
+            180.0..190.0 => (190.0 - sun_pos) / 10.0,
+
+            190.0..350.0 => 0.0,
+
+            350.0..=360.0 => 1.0 - (360.0 - sun_pos) / 10.0,
+
+            _ => unreachable!("sun pos goes from 0.0 to 360.0"),
+        }
     }
 }

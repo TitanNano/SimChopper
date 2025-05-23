@@ -32,7 +32,7 @@ operator = 3
 linked_parent_graph_frame = 76
 
 [sub_resource type="VisualShaderNodeClamp" id="VisualShaderNodeClamp_ne1nx"]
-default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(0, 0, 0), 2, Vector3(1, 1, 1)]
+default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(0.001, 0.001, 0.001), 2, Vector3(1, 1, 1)]
 op_type = 4
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_1cxbi"]
@@ -195,14 +195,14 @@ default_input_values = [0, 0.0, 1, 0.01, 2, 0.99]
 linked_parent_graph_frame = 96
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_1ytle"]
-size = Vector2(5656, 1496)
+size = Vector2(5656, 1290)
 title = "Sun Disc"
 tint_color_enabled = true
 tint_color = Color(1, 0.690196, 0.286275, 0.580392)
 attached_nodes = PackedInt32Array(75, 27, 26, 76, 74, 77)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_uakmd"]
-size = Vector2(4936, 1848)
+size = Vector2(4936, 1611)
 title = "Moon Disc"
 tint_color_enabled = true
 tint_color = Color(0.426979, 0.491676, 0.560547, 0.75)
@@ -210,25 +210,25 @@ attached_nodes = PackedInt32Array(32, 73, 84, 72, 39, 38, 36, 89)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_4xx76"]
 linked_parent_graph_frame = 71
-size = Vector2(1896, 1273)
+size = Vector2(1896, 870)
 title = "Create Disc"
 attached_nodes = PackedInt32Array(35, 34, 63, 28, 29, 31)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_lybwh"]
 linked_parent_graph_frame = 71
-size = Vector2(416, 396)
+size = Vector2(416, 190)
 title = "Disc Blur"
 attached_nodes = PackedInt32Array(30)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_i887l"]
 linked_parent_graph_frame = 70
-size = Vector2(2436, 721)
+size = Vector2(2436, 450)
 title = "Disc Blur from Altitude"
 attached_nodes = PackedInt32Array(21, 67, 68, 82)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_83axu"]
 linked_parent_graph_frame = 70
-size = Vector2(1916, 616)
+size = Vector2(1916, 510)
 title = "Disc Size"
 attached_nodes = PackedInt32Array(20, 22, 19, 17, 13)
 
@@ -241,7 +241,7 @@ attached_nodes = PackedInt32Array(24)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_5wmbu"]
 linked_parent_graph_frame = 70
-size = Vector2(1916, 583)
+size = Vector2(1916, 350)
 title = "Hide beneath Horizon"
 attached_nodes = PackedInt32Array(78, 79, 80, 81)
 
@@ -268,13 +268,13 @@ input_name = "light0_direction"
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_p2cfm"]
 linked_parent_graph_frame = 99
-size = Vector2(1736, 541)
+size = Vector2(1736, 250)
 title = "Sun Altitude"
 attached_nodes = PackedInt32Array(59, 60, 62)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_8nntp"]
 linked_parent_graph_frame = 71
-size = Vector2(1916, 583)
+size = Vector2(1916, 350)
 title = "Hide beneath Horizon"
 attached_nodes = PackedInt32Array(85, 86, 87, 88)
 
@@ -303,7 +303,7 @@ attached_nodes = PackedInt32Array(33)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_wys3p"]
 linked_parent_graph_frame = 97
-size = Vector2(1016, 616)
+size = Vector2(1016, 510)
 title = "Distance to Sun"
 attached_nodes = PackedInt32Array(91, 93, 92)
 
@@ -320,30 +320,30 @@ input_name = "eyedir"
 linked_parent_graph_frame = 90
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_m7koo"]
-size = Vector2(1136, 968)
+size = Vector2(1136, 430)
 title = "Sample Background Color"
 attached_nodes = PackedInt32Array(4, 6, 5)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_fwewl"]
-size = Vector2(1936, 1263)
+size = Vector2(1936, 725)
 title = "Sample Horizon Color"
 attached_nodes = PackedInt32Array(40, 41, 96)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_4o3wj"]
 linked_parent_graph_frame = 95
-size = Vector2(1376, 458)
+size = Vector2(1376, 230)
 title = "UV from Sun Altitude"
 attached_nodes = PackedInt32Array(47, 69, 46)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_ck5qm"]
-size = Vector2(3936, 978)
+size = Vector2(3936, 730)
 title = "Horizon Color Weight"
 attached_nodes = PackedInt32Array(65, 42, 66, 64, 55, 53, 52, 50, 90)
 
 [sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_hejp1"]
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_g0cd7"]
-size = Vector2(2276, 658)
+size = Vector2(2276, 385)
 title = "Sky Brightness"
 attached_nodes = PackedInt32Array(83, 58)
 
@@ -627,7 +627,7 @@ void sky() {
 
 
 // Clamp:25
-	vec3 n_in25p1 = vec3(0.00000, 0.00000, 0.00000);
+	vec3 n_in25p1 = vec3(0.00100, 0.00100, 0.00100);
 	vec3 n_in25p2 = vec3(1.00000, 1.00000, 1.00000);
 	vec3 n_out25p0 = clamp(n_out23p0, n_in25p1, n_in25p2);
 
@@ -638,14 +638,12 @@ void sky() {
 
 }
 "
-graph_offset = Vector2(-693.885, -1539.29)
 mode = 3
 flags/use_half_res_pass = false
 flags/use_quarter_res_pass = false
 flags/disable_fog = false
 flags/use_debanding = false
-nodes/sky/-1/position = Vector2(0, 0)
-nodes/sky/0/position = Vector2(-140, -3200)
+nodes/sky/0/position = Vector2(180, -3200)
 nodes/sky/4/node = SubResource("VisualShaderNodeInput_mtlpv")
 nodes/sky/4/position = Vector2(-5360, -1620)
 nodes/sky/5/node = SubResource("VisualShaderNodeTexture_8u1pc")
@@ -669,7 +667,7 @@ nodes/sky/23/position = Vector2(-1160, -3180)
 nodes/sky/24/node = SubResource("VisualShaderNodeClamp_4iiq8")
 nodes/sky/24/position = Vector2(-5560, -4620)
 nodes/sky/25/node = SubResource("VisualShaderNodeClamp_ne1nx")
-nodes/sky/25/position = Vector2(-620, -3160)
+nodes/sky/25/position = Vector2(-560, -3160)
 nodes/sky/26/node = SubResource("VisualShaderNodeInput_1cxbi")
 nodes/sky/26/position = Vector2(-3560, -4700)
 nodes/sky/27/node = SubResource("VisualShaderNodeVectorOp_sim4j")

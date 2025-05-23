@@ -1,0 +1,7 @@
+[gd_resource type="CameraAttributesPhysical" format=3 uid="uid://ckjhc3lehild4"]
+
+[resource]
+exposure_sensitivity = 20.0
+frustum_focal_length = 15.0
+exposure_aperture = 5.6
+exposure_shutter_speed = 125.0

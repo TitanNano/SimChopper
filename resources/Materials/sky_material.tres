@@ -22,5 +22,5 @@ gradient = SubResource("Gradient_0sht1")
 [resource]
 shader = ExtResource("1_gixr0")
 shader_parameter/moon_size = 0.06
-shader_parameter/Texture2DParameter = SubResource("GradientTexture2D_scq8q")
+shader_parameter/background_color = SubResource("GradientTexture2D_scq8q")
 shader_parameter/sun_rise_gradient = SubResource("GradientTexture1D_lmpjt")

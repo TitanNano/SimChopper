@@ -26,8 +26,10 @@ size = Vector3(1.82907, 0.54, 3.388)
 height = 0.226665
 radius = 0.365409
 
-[node name="car_station_wagon" instance=ExtResource("1_fohcy")]
+[node name="car_station_wagon" node_paths=PackedStringArray("debug_target", "ground_detector") instance=ExtResource("1_fohcy")]
 script = ExtResource("2")
+debug_target = NodePath("DebugTarget")
+ground_detector = NodePath("GroundDetector")
 
 [node name="Maxis-3d2-mesh-81-station" parent="." index="0"]
 surface_material_override/0 = SubResource("StandardMaterial3D_juekg")

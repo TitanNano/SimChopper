@@ -5,12 +5,9 @@ const MapBuilding := preload("res://src/Objects/Map/Building.gd")
 const Logger := preload("res://src/util/Logger.gd")
 const CustomProjectSettings := preload("res://src/CustomProjectSettings.gd")
 
-@export var road_network_path: NodePath
-
 var velocity := 30
 var safe_velocity := Vector3.ZERO
 var target_angle := 0.0
-var rng: RandomNumberGenerator
 
 var ground_normal := Vector3.DOWN
 
@@ -21,15 +18,10 @@ var last_transform := Transform3D.IDENTITY
 var target_nav_node: MapBuilding
 var current_nav_node: MapBuilding
 
-@onready var debug_target: MeshInstance3D = $DebugTarget
-@onready var ground_detector: RayCast3D = $GroundDetector
+@export var debug_target: MeshInstance3D
+@export var ground_detector: RayCast3D
 
 @export var road_network: RoadNavigationRes = preload("res://resources/Data/road_navigation.tres")
-
-func _ready() -> void:
-	self.rng = RandomNumberGenerator.new()
-	self.rng.randomize()
-
 
 func activate() -> void:
 	if ProjectSettings.get_setting(CustomProjectSettings.DEBUG_SHAPES_ROAD_NAVIGATION_DISPLAY_VEHICLE_TARGET):
@@ -187,11 +179,11 @@ func get_next_location() -> Vector3:
 
 	Logger.debug(["agent rotation:", self.global_rotation.y])
 
-	if not self.road_network.has_arrived(agent_pos, agent_rot, self.current_nav_node.data):
-		return self.road_network.get_global_transform(self.current_nav_node.data, agent_rot).origin
-
-	self.current_nav_node = MapBuilding.new(self.road_network.get_next_node(self.current_nav_node.data, self.target_nav_node.data, agent_rot))
-	return self.get_next_location()
+	if self.road_network.has_arrived(agent_pos, agent_rot, self.current_nav_node.data):
+		var next_node = MapBuilding.new(self.road_network.get_next_node(self.current_nav_node.data, self.target_nav_node.data, agent_rot))
+		self.current_nav_node = next_node
+	
+	return self.road_network.get_global_transform(self.current_nav_node.data, agent_rot).origin
 
 
 func set_velocity(value: Vector3) -> void:

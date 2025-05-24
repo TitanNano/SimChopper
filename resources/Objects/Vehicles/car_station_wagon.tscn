@@ -34,51 +34,77 @@ surface_material_override/0 = SubResource("StandardMaterial3D_juekg")
 surface_material_override/1 = SubResource("StandardMaterial3D_i4xi6")
 
 [node name="SpotLightLeft" type="SpotLight3D" parent="." index="1"]
-transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0.5, 0.8, -2.6)
-spot_range = 3.0
+transform = Transform3D(1, 0, 0, 0, 0.990983, 0.133986, 0, -0.133986, 0.990983, 0.5, 0.8, -2.6)
+light_intensity_lumens = 3000.0
+light_temperature = 5000.0
+shadow_enabled = true
+spot_range = 16.0
+spot_attenuation = 0.0
 spot_angle = 10.0
 
-[node name="SpotLightRight" type="SpotLight3D" parent="." index="2"]
-transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, -0.5, 0.8, -2.6)
-spot_range = 3.0
+[node name="SpotLightLeftCloseRange" type="SpotLight3D" parent="." index="2"]
+transform = Transform3D(1, 0, 0, 0, 0.882784, 0.46978, 0, -0.46978, 0.882784, 0.5, 0.8, -2.6)
+light_intensity_lumens = 1500.0
+light_temperature = 5000.0
+shadow_enabled = true
+spot_range = 8.0
+spot_attenuation = 0.0
+spot_angle = 25.0
+
+[node name="SpotLightRight" type="SpotLight3D" parent="." index="3"]
+transform = Transform3D(1, 0, 0, 0, 0.990983, 0.133986, 0, -0.133986, 0.990983, -0.5, 0.8, -2.6)
+light_intensity_lumens = 3000.0
+light_temperature = 5000.0
+shadow_enabled = true
+spot_range = 16.0
+spot_attenuation = 0.0
 spot_angle = 10.0
 
-[node name="Debug" type="MeshInstance3D" parent="." index="3"]
+[node name="SpotLightRightCloseRange" type="SpotLight3D" parent="." index="4"]
+transform = Transform3D(1, 0, 0, 0, 0.882784, 0.46978, 0, -0.46978, 0.882784, -0.5, 0.8, -2.6)
+light_intensity_lumens = 1500.0
+light_temperature = 5000.0
+shadow_enabled = true
+spot_range = 8.0
+spot_attenuation = 0.0
+spot_angle = 25.0
+
+[node name="Debug" type="MeshInstance3D" parent="." index="5"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 151, 0)
 visible = false
 mesh = SubResource("BoxMesh_483kg")
 
-[node name="DebugTarget" type="MeshInstance3D" parent="." index="4"]
+[node name="DebugTarget" type="MeshInstance3D" parent="." index="6"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 151, 10)
 visible = false
 cast_shadow = 0
 mesh = SubResource("BoxMesh_483kg")
 
-[node name="GroundDetector" type="RayCast3D" parent="." index="5"]
+[node name="GroundDetector" type="RayCast3D" parent="." index="7"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.398, -3.04569)
 debug_shape_custom_color = Color(0.152941, 1, 0.882353, 1)
 debug_shape_thickness = 5
 
-[node name="CollisionShapeLower" type="CollisionShape3D" parent="." index="6"]
+[node name="CollisionShapeLower" type="CollisionShape3D" parent="." index="8"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.814, 0.038)
 shape = SubResource("BoxShape3D_6viug")
 
-[node name="CollisionShapeUpper" type="CollisionShape3D" parent="." index="7"]
+[node name="CollisionShapeUpper" type="CollisionShape3D" parent="." index="9"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.01, 1.487, 0.978)
 shape = SubResource("BoxShape3D_agao4")
 
-[node name="CollisionShapeWheelFrontLeft" type="CollisionShape3D" parent="." index="8"]
+[node name="CollisionShapeWheelFrontLeft" type="CollisionShape3D" parent="." index="10"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -0.892745, 0.345847, -1.58433)
 shape = SubResource("CylinderShape3D_eoo2s")
 
-[node name="CollisionShapeWheelBackLeft" type="CollisionShape3D" parent="." index="9"]
+[node name="CollisionShapeWheelBackLeft" type="CollisionShape3D" parent="." index="11"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -0.905135, 0.345847, 1.54605)
 shape = SubResource("CylinderShape3D_eoo2s")
 
-[node name="CollisionShapeWheelFrontRight" type="CollisionShape3D" parent="." index="10"]
+[node name="CollisionShapeWheelFrontRight" type="CollisionShape3D" parent="." index="12"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0.878487, 0.346, -1.584)
 shape = SubResource("CylinderShape3D_eoo2s")
 
-[node name="CollisionShapeWheelBackRight" type="CollisionShape3D" parent="." index="11"]
+[node name="CollisionShapeWheelBackRight" type="CollisionShape3D" parent="." index="13"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0.880683, 0.346, 1.54256)
 shape = SubResource("CylinderShape3D_eoo2s")

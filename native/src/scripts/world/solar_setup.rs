@@ -86,7 +86,7 @@ impl SolarSetup {
         );
 
         // disable SDFGI during night time. It's causing too much fluctuation in the overall brightness of the scene under low light conditions.
-        env.set_sdfgi_enabled(!(195.0..=355.0).contains(&sun_pos));
+        env.set_sdfgi_enabled(!(200.0..=360.0).contains(&sun_pos));
 
         moon.set_param(
             light_3d::Param::ENERGY,

@@ -159,9 +159,9 @@ impl<'n> NavNodeRef<'n> {
         let target = Vector3::new(target.x, 0.0, target.z);
         let location = Vector3::new(location.x, 0.0, location.z);
 
-        let distance = location.distance_squared_to(target);
+        let distance = location.distance_to(target);
 
-        Ok(distance <= f32::powi(4.0, 2))
+        Ok(distance < 4.0)
     }
 
     pub fn building(&self) -> &Building {
@@ -363,7 +363,7 @@ impl RoadNavigation {
         let (_, next) =
             neighbors
                 .iter()
-                .fold((10.0, current.to_owned()), |(closest, next), coords| {
+                .fold((360.0, current.to_owned()), |(closest, next), coords| {
                     let Some(neighbor) = self.get_node(*coords) else {
                         return (closest, next);
                     };

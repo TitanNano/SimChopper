@@ -121,14 +121,14 @@ directional_shadow_blend_splits = true
 directional_shadow_fade_start = 0.6
 directional_shadow_max_distance = 400.0
 
-[node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("solar_setup_node")]
+[node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("solar_setup")]
 transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, -45.4393, 5.66891, 25.269)
 attributes = SubResource("CameraAttributesPractical_lhcij")
 doppler_tracking = 2
 current = true
 near = 3.0
 script = ExtResource("8_qw8ew")
-solar_setup_node = NodePath("../Environment/SolarSetup")
+solar_setup = NodePath("../Environment/SolarSetup")
 
 [node name="Schweizer_300" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)

@@ -4,11 +4,12 @@ use std::{
 };
 
 use godot::{
-    builtin::{GString, PackedStringArray, Signal, VariantType},
+    builtin::{GString, PackedStringArray, VariantType},
     classes::{EditorInterface, ProjectSettings, RefCounted, SceneTree},
     global::PropertyHint,
     obj::{Base, Gd},
     prelude::{godot_api, GodotClass},
+    task,
 };
 
 use crate::{
@@ -16,10 +17,7 @@ use crate::{
         new_non_zero,
         ui::{ForgroundProcess, ProgressDialog},
     },
-    util::{
-        async_support::{godot_task, ToSignalFuture},
-        logger,
-    },
+    util::logger,
 };
 
 #[derive(GodotClass)]
@@ -71,7 +69,7 @@ impl AoBaker {
         let tree = &self.scene_tree;
         let editor_interface = &self.editor_interface;
 
-        godot_task(Self::async_bake(tree.clone(), editor_interface.clone()));
+        task::spawn(Self::async_bake(tree.clone(), editor_interface.clone()));
     }
 
     async fn async_bake(tree: Gd<SceneTree>, editor_interface: Gd<EditorInterface>) {
@@ -179,7 +177,7 @@ impl AoBaker {
 
         let mut stdreader = BufReader::new(stdout);
         let mut read_buffer = String::new();
-        let next_frame = Signal::from_object_signal(&tree, "process_frame");
+        let next_frame = tree.signals().process_frame();
 
         loop {
             match blender.try_wait() {

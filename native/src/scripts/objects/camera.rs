@@ -1,6 +1,6 @@
-use godot::classes::{Camera3D, Node3D};
+use godot::classes::Camera3D;
 use godot::obj::Gd;
-use godot_rust_script::{godot_script_impl, CastToScript, GodotScript, RsRef};
+use godot_rust_script::{godot_script_impl, GodotScript, RsRef};
 
 use crate::{
     scripts::world::solar_setup::{ISolarSetup, SolarSetup},
@@ -11,9 +11,7 @@ use crate::{
 #[script(base = Camera3D)]
 struct Camera {
     #[export]
-    pub solar_setup_node: Option<Gd<Node3D>>,
-
-    solar_setup: Option<RsRef<SolarSetup>>,
+    pub solar_setup: Option<RsRef<SolarSetup>>,
 
     base: Gd<Camera3D>,
 }
@@ -24,9 +22,7 @@ impl Camera {
     const DAWN_EXPOSURE: f32 = 200.0;
     const NIGHT_EXPOSURE: f32 = 1000.0;
 
-    pub fn _ready(&mut self) {
-        self.solar_setup = self.solar_setup_node.clone().map(|node| node.into_script());
-    }
+    pub fn _ready(&mut self) {}
 
     pub fn _process(&mut self, _delta: f64) {
         let Some(solar_setup) = self.solar_setup.as_mut() else {

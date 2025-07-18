@@ -27,7 +27,7 @@ jobs:
             env: -gnu
             lib: libnative.so
           - platform: windows
-            os: windows-2019
+            os: windows-2025
             vendor: pc
             env: '-msvc'
             lib: native.dll

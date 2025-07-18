@@ -10,7 +10,7 @@ use std::time::Instant;
 use godot::classes::mesh::PrimitiveType;
 use godot::classes::{ArrayMesh, Material, SurfaceTool};
 use godot::meta::GodotType;
-use godot::prelude::*;
+use godot::{prelude::*, task};
 use itertools::Itertools;
 use kanal::{ReceiveError, Receiver};
 use num_enum::TryFromPrimitive;
@@ -22,7 +22,7 @@ use tile_surface::{Face, SurfaceAssociated, TileFaces, TileSurface, TileSurfaceT
 pub(crate) use terrain_rotation::TerrainRotation;
 
 use crate::objects::scene_object_registry::{Bridge, Powerlines, Road};
-use crate::util::async_support::{godot_future, godot_task, GodotFuture};
+use crate::util::async_support::{godot_future, GodotFuture};
 use crate::util::logger;
 use crate::world::city_data::{
     TerrainSlope, TerrainType, Tile, TileCoords, TileList, TileListExt, TileValidationResult,
@@ -283,18 +283,18 @@ impl TerrainBuilder {
         let tilelist = TileList::try_from_dict(&self.tilelist)
             .expect("TileList passed from GDScript must be valid");
         let context = self.thread_context(rotation);
-        let mut builder: Gd<Self> = self.base().clone().cast();
+        let builder: Gd<Self> = self.base().clone().cast();
 
         let (resolve, future) = godot_future::<Vec<Gd<TerrainChunk>>>();
 
-        godot_task(async move {
+        task::spawn(async move {
             let receiver = Self::spawn_build_thread(context, tilelist, chunk_size, chunk_count);
 
             // Async loop that receives progress updates and sends them through godot signals
             loop {
                 match receiver.as_async().recv().await {
                     Ok(TerrainBuilderProgress::Progress) => {
-                        builder.emit_signal("progress", &[chunk_size.to_variant()]);
+                        builder.signals().progress().emit(chunk_size);
                     }
                     Ok(TerrainBuilderProgress::Complete(result)) => {
                         let chunks = result.into_iter().map(Gd::from_object).collect();

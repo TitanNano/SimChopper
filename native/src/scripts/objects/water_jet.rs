@@ -10,7 +10,7 @@ use godot::classes::{
 use godot::global::{clampf, deg_to_rad, randf_range};
 use godot::meta::ToGodot;
 use godot::obj::bounds::Declarer;
-use godot::obj::{Bounds, EngineEnum, Gd, Inherits, InstanceId};
+use godot::obj::{Bounds, Gd, Inherits, InstanceId};
 use godot::prelude::{GodotClass, NodePath};
 use godot_rust_script::{godot_script_impl, GodotScript};
 use itertools::Itertools;
@@ -275,7 +275,7 @@ impl WaterJet {
                             Ok(Variant::nil())
                         }),
                     )
-                    .flags(ConnectFlags::ONE_SHOT.ord() as u32)
+                    .flags(ConnectFlags::ONE_SHOT.to_godot() as u32)
                     .done();
 
                 debugger.set("Decal Spawned", decal_inst.is_some());
@@ -406,30 +406,29 @@ impl WaterJet {
             .expect("Failed to duplicate decal node!")
             .cast();
 
-        let offset = decals_at_point
-            .is_empty()
-            .then(|| {
-                let offset = Vector3::new(
-                    randf_range(-extent, extent) as f32,
-                    0.0,
-                    randf_range(-extent, extent) as f32,
-                )
-                .align_up(point.normal);
+        let offset = if decals_at_point.is_empty() {
+            let offset = Vector3::new(
+                randf_range(-extent, extent) as f32,
+                0.0,
+                randf_range(-extent, extent) as f32,
+            )
+            .align_up(point.normal);
 
-                let new_point = point.position + offset;
+            let new_point = point.position + offset;
 
-                let shifted = Self::shift_new_point(
-                    point.position,
-                    decal_scale,
-                    extent as f32,
-                    point.normal,
-                    decals_at_point,
-                    new_point,
-                );
+            let shifted = Self::shift_new_point(
+                point.position,
+                decal_scale,
+                extent as f32,
+                point.normal,
+                decals_at_point,
+                new_point,
+            );
 
-                shifted - point.position
-            })
-            .unwrap_or(Vector3::ZERO);
+            shifted - point.position
+        } else {
+            Vector3::ZERO
+        };
 
         let decal_size = decal_inst.get_size() * Vector3::new(decal_scale, 1.0, decal_scale);
 

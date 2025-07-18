@@ -2,17 +2,18 @@ use std::{collections::BTreeMap, ops::Not};
 
 use anyhow::Context as _;
 use derive_debug::Dbg;
-use godot::builtin;
 use godot::builtin::{Array, Dictionary};
 use godot::classes::{Marker3D, Node, Node3D, Resource, Time};
 use godot::meta::ToGodot;
 use godot::obj::{Gd, NewAlloc};
+use godot::task;
+use godot::task::TaskHandle;
 use godot_rust_script::{
-    godot_script_impl, CastToScript, GodotScript, RsRef, ScriptSignal, Signal,
+    godot_script_impl, CastToScript, Context, GodotScript, RsRef, ScriptSignal, Signal,
 };
 
 use crate::objects::scene_object_registry;
-use crate::util::async_support::{self, godot_task, GodotFuture, TaskHandle, ToSignalFuture};
+use crate::util::async_support::{self, GodotFuture};
 use crate::util::logger;
 use crate::world::city_coords_feature::CityCoordsFeature;
 use crate::world::city_data::{self, TryFromDictionary};
@@ -59,59 +60,61 @@ impl Buildings {
             .expect("world_constants should be set!")
     }
 
-    pub fn build_async(&mut self, city: Dictionary) -> Gd<GodotFuture> {
+    pub fn build_async(&mut self, city: Dictionary, mut ctx: Context<Self>) -> Gd<GodotFuture> {
         let world_constants = self.world_constants().clone();
-        let mut base = self.base.clone();
-        let mut slf: RsRef<Self> = base.to_script();
-        let tree = base.get_tree().expect("Node must be part of the tree!");
         let (resolve, godot_future) = async_support::godot_future();
 
-        let handle = godot_task(async move {
-            let next_tick = builtin::Signal::from_object_signal(&tree, "process_frame");
-            let time = Time::singleton();
+        let handle = ctx.reentrant_scope(self, |mut base: Gd<Node>| {
+            let mut slf: RsRef<Self> = base.to_script();
+            let tree = base.get_tree().expect("Node must be part of the tree!");
 
-            let city = match crate::world::city_data::City::try_from_dict(&city)
-                .context("Failed to deserialize city data")
-            {
-                Ok(v) => v,
-                Err(err) => {
-                    logger::error!("{:?}", err);
-                    return;
+            task::spawn(async move {
+                let next_tick = tree.signals().process_frame();
+                let time = Time::singleton();
+
+                let city = match crate::world::city_data::City::try_from_dict(&city)
+                    .context("Failed to deserialize city data")
+                {
+                    Ok(v) => v,
+                    Err(err) => {
+                        logger::error!("{:?}", err);
+                        return;
+                    }
+                };
+
+                let sea_level = city.simulator_settings.sea_level;
+                let buildings = city.buildings;
+                let tiles = city.tilelist;
+                let city_coords_feature = CityCoordsFeature::new(world_constants, sea_level);
+
+                logger::info!("starting to load buildings...");
+
+                let mut count = 0;
+                let mut start = time.get_ticks_msec();
+
+                for building in buildings.into_values() {
+                    if (time.get_ticks_msec() - start) > Self::TIME_BUDGET {
+                        slf.emit_progress(count);
+                        count = 0;
+                        start = time.get_ticks_msec();
+
+                        let _: () = next_tick.to_future().await;
+                    }
+
+                    count += 1;
+
+                    if building.building_id == 0x00 {
+                        logger::info!("{:?}: skipping empty building", building.tile_coords);
+                        continue;
+                    }
+
+                    Self::insert_building(&mut base, building, &tiles, &city_coords_feature);
                 }
-            };
 
-            let sea_level = city.simulator_settings.sea_level;
-            let buildings = city.buildings;
-            let tiles = city.tilelist;
-            let city_coords_feature = CityCoordsFeature::new(world_constants, sea_level);
+                slf.emit_progress(count);
 
-            logger::info!("starting to load buildings...");
-
-            let mut count = 0;
-            let mut start = time.get_ticks_msec();
-
-            for building in buildings.into_values() {
-                if (time.get_ticks_msec() - start) > Self::TIME_BUDGET {
-                    slf.emit_progress(count);
-                    count = 0;
-                    start = time.get_ticks_msec();
-
-                    let _: () = next_tick.to_future().await;
-                }
-
-                count += 1;
-
-                if building.building_id == 0x00 {
-                    logger::info!("{:?}: skipping empty building", building.tile_coords);
-                    continue;
-                }
-
-                Self::insert_building(&mut base, building, &tiles, &city_coords_feature);
-            }
-
-            slf.emit_progress(count);
-
-            resolve(());
+                resolve(());
+            })
         });
 
         self.pending_build_tasks.push(handle);

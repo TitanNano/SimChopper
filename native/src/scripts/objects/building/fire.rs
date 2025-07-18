@@ -98,7 +98,7 @@ impl<N: Inherits<Node>> BuildingFeature<N> for FireFeature {
 
         let chance = rng * tick_damp;
 
-        if chance < 0.5 {
+        if chance < 0.9 {
             return;
         }
 

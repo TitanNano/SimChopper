@@ -2,13 +2,19 @@ use godot::builtin::math::FloatExt;
 use godot::builtin::Vector3;
 use godot::classes::{light_3d, DirectionalLight3D, Node3D, Time};
 use godot::obj::Gd;
-use godot_rust_script::{godot_script_impl, GodotScript};
+use godot_rust_script::{godot_script_impl, GodotScript, Signal};
 
 use crate::util::logger;
 
 #[derive(GodotScript, Debug)]
 #[script(base = Node3D)]
 pub struct SolarSetup {
+    #[signal]
+    pub sun_visible: Signal<bool>,
+
+    #[signal]
+    pub sky_brightness: Signal<f64>,
+
     /// Reference to the sun child node.
     #[export]
     pub sun: Option<Gd<DirectionalLight3D>>,
@@ -29,15 +35,46 @@ pub struct SolarSetup {
     #[export(range(min = 1.0, max = 30_000.0, step = 1.0))]
     pub sky_max_brightness: f32,
 
+    sdfgi_enabled: bool,
+
+    sun_pos: f32,
+    sun_zenit_distance: f32,
+
     base: Gd<Node3D>,
 }
 
 #[godot_script_impl]
 impl SolarSetup {
+    const DUSK_START: f32 = 192.0;
+    const DUSK_END: f32 = 195.0;
+
+    const DAWN_START: f32 = 342.0;
+    const DAWN_END: f32 = 345.0;
+
+    pub fn _ready(&mut self) {
+        let env = self
+            .base
+            .get_world_3d()
+            .expect("solar setup must be part of the scene tree")
+            .get_environment()
+            .expect("there must be an environment");
+
+        self.sdfgi_enabled = env.is_sdfgi_enabled();
+    }
+
     pub fn _physics_process(&mut self, _delta: f64) {
         let time = self.get_time();
         let day_length = self.day_length_ms();
+
         let sun_pos = time as f32 * (360.0 / (day_length * 2) as f32);
+        let sun_visible = sun_pos < 190.0;
+        let sun_zenit_distance = ((sun_pos - 90.0) / 90.0).abs().clamp(0.0, 1.0);
+
+        self.sun_pos = sun_pos;
+        self.sun_zenit_distance = sun_zenit_distance;
+
+        // Reduce the energy of the sky during night time.
+        let sky_brightness = self.sky_brightness();
 
         let Some(ref mut sun) = self.sun else {
             logger::error!("no sun is assigned to solar setup!");
@@ -54,9 +91,6 @@ impl SolarSetup {
 
         self.base
             .set_rotation_degrees(Vector3::new(sun_pos, 0.0, 0.0));
-
-        let sun_visible = sun_pos < 190.0;
-        let sun_zenit_distance = ((sun_pos - 90.0) / 90.0).abs().clamp(0.0, 1.0);
 
         sun.set_param(
             light_3d::Param::ENERGY,
@@ -79,14 +113,15 @@ impl SolarSetup {
             .get_environment()
             .expect("there must be an environment");
 
-        // Reduce the energy of the sky during night time.
         env.set_bg_intensity(
             self.sky_min_brightness
-                .lerp(self.sky_max_brightness, Self::sky_brightness(sun_pos)),
+                .lerp(self.sky_max_brightness, sky_brightness),
         );
 
-        // disable SDFGI during night time. It's causing too much fluctuation in the overall brightness of the scene under low light conditions.
-        env.set_sdfgi_enabled(!(200.0..=360.0).contains(&sun_pos));
+        if self.sdfgi_enabled {
+            // disable SDFGI during night time. It's causing too much fluctuation in the overall brightness of the scene under low light conditions.
+            env.set_sdfgi_enabled(!(Self::DUSK_START..=Self::DAWN_END).contains(&sun_pos));
+        }
 
         moon.set_param(
             light_3d::Param::ENERGY,
@@ -122,16 +157,30 @@ impl SolarSetup {
         self.get_time() as f64 / (self.day_length_ms() as f64 * 2.0 / 24.0)
     }
 
+    pub fn sun_pos(&self) -> f32 {
+        self.sun_pos
+    }
+
+    pub fn sun_zenite_distance(&self) -> f32 {
+        self.sun_zenit_distance
+    }
+
     /// Sky brightness depending on the time of day. Value between 0.0 and 1.0.
-    fn sky_brightness(sun_pos: f32) -> f32 {
-        match sun_pos {
-            0.0..180.0 => 1.0,
+    pub fn sky_brightness(&self) -> f32 {
+        match self.sun_pos {
+            0.0..Self::DUSK_START => 1.0,
 
-            180.0..190.0 => (190.0 - sun_pos) / 10.0,
+            Self::DUSK_START..Self::DUSK_END => {
+                (Self::DUSK_END - self.sun_pos) / (Self::DUSK_END - Self::DUSK_START)
+            }
 
-            190.0..350.0 => 0.0,
+            Self::DUSK_END..Self::DAWN_START => 0.0,
 
-            350.0..=360.0 => 1.0 - (360.0 - sun_pos) / 10.0,
+            Self::DAWN_START..=Self::DAWN_END => {
+                1.0 - (Self::DAWN_END - self.sun_pos) / (Self::DAWN_END - Self::DAWN_START)
+            }
+
+            Self::DAWN_END..=360.0 => 1.0,
 
             _ => unreachable!("sun pos goes from 0.0 to 360.0"),
         }

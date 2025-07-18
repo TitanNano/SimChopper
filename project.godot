@@ -156,6 +156,7 @@ environment/screen_space_reflection/roughness_quality=2
 environment/subsurface_scattering/subsurface_scattering_quality=2
 global_illumination/sdfgi/probe_ray_count=2
 global_illumination/sdfgi/frames_to_converge=4
+global_illumination/sdfgi/frames_to_update_lights=0
 environment/volumetric_fog/volume_size=100
 environment/volumetric_fog/volume_depth=100
 anti_aliasing/quality/use_taa=true

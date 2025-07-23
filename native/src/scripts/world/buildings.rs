@@ -9,7 +9,7 @@ use godot::obj::{Gd, NewAlloc};
 use godot::task;
 use godot::task::TaskHandle;
 use godot_rust_script::{
-    godot_script_impl, CastToScript, Context, GodotScript, RsRef, ScriptSignal, Signal,
+    godot_script_impl, CastToScript, Context, GodotScript, RsRef, ScriptSignal,
 };
 
 use crate::objects::scene_object_registry;
@@ -28,11 +28,11 @@ struct Buildings {
     pub world_constants: Option<Gd<Resource>>,
 
     /// tile_coords, size, altitude
-    #[signal]
-    pub spawn_point_encountered: Signal<(Array<u32>, u8, u32)>,
+    #[signal("coords", "size", "altitude")]
+    pub spawn_point_encountered: ScriptSignal<(Array<u32>, u8, u32)>,
 
-    #[signal]
-    pub loading_progress: Signal<u32>,
+    #[signal("progress")]
+    pub loading_progress: ScriptSignal<u32>,
 
     base: Gd<Node>,
 }

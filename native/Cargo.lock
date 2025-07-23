@@ -284,7 +284,7 @@ dependencies = [
 [[package]]
 name = "godot-rust-script"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=a3e748cfa8c015e9496228b4fb07685af4b4c78f#a3e748cfa8c015e9496228b4fb07685af4b4c78f"
+source = "git+https://github.com/titannano/godot-rust-script?rev=91c13918f13da77393cce2e8e8d07aa355d7cd0e#91c13918f13da77393cce2e8e8d07aa355d7cd0e"
 dependencies = [
  "const-str",
  "godot",
@@ -300,7 +300,7 @@ dependencies = [
 [[package]]
 name = "godot-rust-script-derive"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=a3e748cfa8c015e9496228b4fb07685af4b4c78f#a3e748cfa8c015e9496228b4fb07685af4b4c78f"
+source = "git+https://github.com/titannano/godot-rust-script?rev=91c13918f13da77393cce2e8e8d07aa355d7cd0e#91c13918f13da77393cce2e8e8d07aa355d7cd0e"
 dependencies = [
  "darling",
  "itertools",

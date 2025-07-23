@@ -2,18 +2,18 @@ use godot::builtin::math::FloatExt;
 use godot::builtin::Vector3;
 use godot::classes::{light_3d, DirectionalLight3D, Node3D, Time};
 use godot::obj::Gd;
-use godot_rust_script::{godot_script_impl, GodotScript, Signal};
+use godot_rust_script::{godot_script_impl, GodotScript, ScriptSignal};
 
 use crate::util::logger;
 
 #[derive(GodotScript, Debug)]
 #[script(base = Node3D)]
 pub struct SolarSetup {
-    #[signal]
-    pub sun_visible: Signal<bool>,
+    #[signal("yes")]
+    pub sun_visible: ScriptSignal<bool>,
 
-    #[signal]
-    pub sky_brightness: Signal<f64>,
+    #[signal("brightness")]
+    pub sky_brightness: ScriptSignal<f64>,
 
     /// Reference to the sun child node.
     #[export]

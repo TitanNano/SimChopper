@@ -2,7 +2,7 @@ use anyhow::{bail, Context};
 use godot::builtin::StringName;
 use godot::classes::{GpuParticles3D, Node3D};
 use godot::obj::Gd;
-use godot_rust_script::{godot_script_impl, GodotScript, GodotScriptEnum};
+use godot_rust_script::{godot_script_impl, GodotScript, GodotScriptEnum, OnEditor};
 
 use crate::util::logger;
 
@@ -43,7 +43,7 @@ struct CanonUpgrade {
     pub mode: CanonMode,
 
     #[export]
-    pub water_jet: Option<Gd<GpuParticles3D>>,
+    pub water_jet: OnEditor<Gd<GpuParticles3D>>,
 
     base: Gd<Node3D>,
 }
@@ -61,16 +61,11 @@ impl CanonUpgrade {
             return;
         }
 
-        let Some(water_jet) = self.water_jet.as_mut() else {
-            logger::error!("Water jet node is not available!");
-            return;
-        };
-
-        water_jet.set_emitting(false);
+        self.water_jet.set_emitting(false);
 
         match value {
             CanonMode::Inactive => (),
-            CanonMode::Water => water_jet.set_emitting(true),
+            CanonMode::Water => self.water_jet.set_emitting(true),
             CanonMode::Teargas => (),
         }
     }

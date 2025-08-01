@@ -2,9 +2,7 @@ use godot::builtin::math::FloatExt;
 use godot::builtin::Vector3;
 use godot::classes::{light_3d, DirectionalLight3D, Node3D, Time};
 use godot::obj::Gd;
-use godot_rust_script::{godot_script_impl, GodotScript, ScriptSignal};
-
-use crate::util::logger;
+use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, ScriptSignal};
 
 #[derive(GodotScript, Debug)]
 #[script(base = Node3D)]
@@ -17,15 +15,15 @@ pub struct SolarSetup {
 
     /// Reference to the sun child node.
     #[export]
-    pub sun: Option<Gd<DirectionalLight3D>>,
+    pub sun: OnEditor<Gd<DirectionalLight3D>>,
 
     /// Reference to the moon child node.
     #[export]
-    pub moon: Option<Gd<DirectionalLight3D>>,
+    pub moon: OnEditor<Gd<DirectionalLight3D>>,
 
     /// duration from sun rise to sun set in minutes
     #[export(range(min = 1.0, max = 120.0, step = 1.0))]
-    pub day_length: u64,
+    pub day_length: u32,
 
     /// The minimum brightness of the sky.
     #[export(range(min = 1.0, max = 30_000.0, step = 1.0))]
@@ -76,34 +74,22 @@ impl SolarSetup {
         // Reduce the energy of the sky during night time.
         let sky_brightness = self.sky_brightness();
 
-        let Some(ref mut sun) = self.sun else {
-            logger::error!("no sun is assigned to solar setup!");
-            logger::error!("node path: {}", self.base.get_path());
-
-            return;
-        };
-
-        let Some(ref mut moon) = self.moon else {
-            logger::error!("no moon is assinged to solar setup!");
-            logger::error!("node path: {}", self.base.get_path());
-            return;
-        };
-
         self.base
             .set_rotation_degrees(Vector3::new(sun_pos, 0.0, 0.0));
 
-        sun.set_param(
+        self.sun.set_param(
             light_3d::Param::ENERGY,
             if !sun_visible { 0.0 } else { 1.0 },
         );
-        sun.set_shadow(sun_visible);
+        self.sun.set_shadow(sun_visible);
 
         if sun_visible {
-            sun.set_param(
+            self.sun.set_param(
                 light_3d::Param::INTENSITY,
                 100000.0.lerp(400.0, sun_zenit_distance),
             );
-            sun.set_temperature((5500.0).lerp(1850.0, sun_zenit_distance));
+            self.sun
+                .set_temperature((5500.0).lerp(1850.0, sun_zenit_distance));
         }
 
         let mut env = self
@@ -123,16 +109,16 @@ impl SolarSetup {
             env.set_sdfgi_enabled(!(Self::DUSK_START..=Self::DAWN_END).contains(&sun_pos));
         }
 
-        moon.set_param(
+        self.moon.set_param(
             light_3d::Param::ENERGY,
             if sun_pos > 180.0 { 1.0 } else { 0.0 },
         );
-        moon.set_shadow(sun_pos > 180.0);
+        self.moon.set_shadow(sun_pos > 180.0);
     }
 
     /// Day length (sunrise to sunset) in ms.
     fn day_length_ms(&self) -> u64 {
-        self.day_length * 60 * 1000
+        self.day_length as u64 * 60 * 1000
     }
 
     /// Get the current game time in ms.

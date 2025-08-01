@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use std::{collections::BTreeMap, ops::Not};
 
 use anyhow::Context as _;
@@ -9,7 +10,7 @@ use godot::obj::{Gd, NewAlloc};
 use godot::task;
 use godot::task::TaskHandle;
 use godot_rust_script::{
-    godot_script_impl, CastToScript, Context, GodotScript, RsRef, ScriptSignal,
+    godot_script_impl, CastToScript, Context, GodotScript, OnEditor, RsRef, ScriptSignal,
 };
 
 use crate::objects::scene_object_registry;
@@ -25,7 +26,7 @@ struct Buildings {
     pending_build_tasks: Vec<TaskHandle>,
 
     #[export]
-    pub world_constants: Option<Gd<Resource>>,
+    pub world_constants: OnEditor<Gd<Resource>>,
 
     /// tile_coords, size, altitude
     #[signal("coords", "size", "altitude")]
@@ -55,9 +56,7 @@ impl Buildings {
     }
 
     fn world_constants(&self) -> &Gd<Resource> {
-        self.world_constants
-            .as_ref()
-            .expect("world_constants should be set!")
+        self.world_constants.deref()
     }
 
     pub fn build_async(&mut self, city: Dictionary, mut ctx: Context<Self>) -> Gd<GodotFuture> {

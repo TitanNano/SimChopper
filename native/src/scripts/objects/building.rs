@@ -64,6 +64,16 @@ impl GodotScriptExport for BuildingEventFlags {
     }
 }
 
+impl godot::prelude::Var for BuildingEventFlags {
+    fn get_property(&self) -> Self::Via {
+        self.to_godot()
+    }
+
+    fn set_property(&mut self, value: Self::Via) {
+        Self::from_godot(value);
+    }
+}
+
 #[derive(Debug)]
 struct Features<F: Debug + ?Sized>(Vec<Box<F>>);
 

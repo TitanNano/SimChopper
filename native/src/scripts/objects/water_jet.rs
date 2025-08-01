@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use std::{cmp::Ordering, ops::DerefMut};
 
 use anyhow::{bail, Result};
@@ -12,7 +13,7 @@ use godot::meta::ToGodot;
 use godot::obj::bounds::Declarer;
 use godot::obj::{Bounds, Gd, Inherits, InstanceId};
 use godot::prelude::{GodotClass, NodePath};
-use godot_rust_script::{godot_script_impl, GodotScript};
+use godot_rust_script::{godot_script_impl, GodotScript, OnEditor};
 use itertools::Itertools;
 
 use crate::util::logger;
@@ -31,10 +32,10 @@ struct WaterJet {
     impact_casts: Vec<Gd<ShapeCast3D>>,
 
     #[export]
-    pub impact_area: Option<Gd<Area3D>>,
+    pub impact_area: OnEditor<Gd<Area3D>>,
 
     #[export]
-    pub decal: Option<Gd<Decal>>,
+    pub decal: OnEditor<Gd<Decal>>,
 
     #[export]
     pub debugger: Option<Gd<Node3D>>,
@@ -68,19 +69,11 @@ impl WaterJet {
     }
 
     fn impact_area(&self) -> &Gd<Area3D> {
-        let Some(impact_area) = self.impact_area.as_ref() else {
-            panic!("Missing impact area!");
-        };
-
-        impact_area
+        self.impact_area.deref()
     }
 
     fn decal(&self) -> &Gd<Decal> {
-        let Some(decal) = self.decal.as_ref() else {
-            panic!("Missing decal!");
-        };
-
-        decal
+        self.decal.deref()
     }
 
     fn get_decal_count_at(

@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://k14yev0gxbkc"]
 
 [ext_resource type="PackedScene" uid="uid://drfx6m1pn4ap6" path="res://resources/Meshes/Vehicles/car_station_wagon.gltf" id="1_fohcy"]
-[ext_resource type="Script" path="res://src/Objects/Vehicles/Car.gd" id="2"]
+[ext_resource type="Script" uid="uid://6ik4lllhimtl" path="res://src/Objects/Vehicles/Car.gd" id="2"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_juekg"]
 resource_name = "matcolour-80"

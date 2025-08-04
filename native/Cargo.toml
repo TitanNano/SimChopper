@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = { version = "0.3.2", features = ["experimental-threads", "api-4-3"] }
+godot = { version = "0.3.2", features = ["experimental-threads", "api-4-4"] }
 godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "d0a814cfbd8cefa843029bcdf97084307dbaf0d5" }
 lerp = "0.4.0"
 backtrace = "0.3.64"
@@ -22,6 +22,3 @@ rand = "0.8.5"
 pomsky-macro = "0.11.0"
 regex = "1.10.5"
 kanal = { version = "0.1.1", features = ["async"] }
-
-[lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(before_api, values("4.3"))'] }

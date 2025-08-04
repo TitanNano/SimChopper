@@ -12,6 +12,7 @@ emission_ring_axis = Vector3(2.08165e-12, 1, 2.08165e-12)
 emission_ring_height = 1.0
 emission_ring_radius = 6.0
 emission_ring_inner_radius = 5.0
+emission_ring_cone_angle = 90.0
 angle_min = -90.0
 angle_max = 360.0
 direction = Vector3(0, 1, 0)

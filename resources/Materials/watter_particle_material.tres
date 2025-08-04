@@ -56,8 +56,8 @@ noise = SubResource("FastNoiseLite_1p6sg")
 [resource]
 render_priority = 0
 shader = SubResource("Shader_8lo1q")
+shader_parameter/texture_alpha = ExtResource("1_cypix")
 shader_parameter/roughness = 0.5
 shader_parameter/specular = 0.5
 shader_parameter/refraction = 0.500001
-shader_parameter/texture_alpha = ExtResource("1_cypix")
 shader_parameter/texture_normal = SubResource("NoiseTexture2D_hk72y")

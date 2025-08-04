@@ -2,8 +2,8 @@
 
 [ext_resource type="HelicopterUpgrade" uid="uid://c02c65wkdq1r5" path="res://resources/Items/water_canon_helicopter_upgrade.tres" id="2_0cfwx"]
 [ext_resource type="Material" uid="uid://cjoloelf8ku4k" path="res://resources/Materials/dust_material.tres" id="2_8yiqd"]
-[ext_resource type="Script" path="res://native/src/scripts/particles/dust_particles.rs" id="2_ocmjg"]
-[ext_resource type="Script" path="res://src/Objects/Helicopters/Helicopter.gd" id="3"]
+[ext_resource type="Script" uid="uid://btdtyemgtmocf" path="res://native/src/scripts/particles/dust_particles.rs" id="2_ocmjg"]
+[ext_resource type="Script" uid="uid://cdhopkxkcjpyl" path="res://src/Objects/Helicopters/Helicopter.gd" id="3"]
 [ext_resource type="AnimationNodeStateMachine" uid="uid://xbcrg5mghpup" path="res://resources/Animations/HelicopterRotorSoundStates.tres" id="4_8iee2"]
 [ext_resource type="AnimationLibrary" uid="uid://uec74t4jqdxi" path="res://resources/Animations/Helicopter.tres" id="5_ayahk"]
 

@@ -1,22 +1,22 @@
 [gd_scene load_steps=19 format=3 uid="uid://cvh54xiw8586b"]
 
-[ext_resource type="Script" path="res://src/HUD/HUDController.gd" id="1"]
-[ext_resource type="Script" path="res://src/Objects/World/World.gd" id="3"]
-[ext_resource type="Script" path="res://src/ViewPort.gd" id="3_2c332"]
-[ext_resource type="Script" path="res://src/HUD/LoadingScreen.gd" id="4"]
-[ext_resource type="Script" path="res://src/Objects/World/Backdrop.gd" id="6"]
+[ext_resource type="Script" uid="uid://co6x253l6yxq4" path="res://src/HUD/HUDController.gd" id="1"]
+[ext_resource type="Script" uid="uid://cutba4t77pmav" path="res://src/Objects/World/World.gd" id="3"]
+[ext_resource type="Script" uid="uid://qe2kcevjcps6" path="res://src/ViewPort.gd" id="3_2c332"]
+[ext_resource type="Script" uid="uid://c7idhsoiyopvu" path="res://src/HUD/LoadingScreen.gd" id="4"]
+[ext_resource type="Script" uid="uid://ksr8mwgn8xoq" path="res://src/Objects/World/Backdrop.gd" id="6"]
 [ext_resource type="CameraAttributesPhysical" uid="uid://ckjhc3lehild4" path="res://resources/Environments/camera_attributes_physical.tres" id="7_yho3v"]
 [ext_resource type="Environment" uid="uid://bl607wqoa882d" path="res://resources/Environments/WorldEnv.tres" id="8"]
-[ext_resource type="Script" path="res://native/src/scripts/objects/camera.rs" id="8_qw8ew"]
-[ext_resource type="Script" path="res://src/Objects/Camera/CameraInterpolation.gd" id="10"]
-[ext_resource type="Script" path="res://src/Objects/Terrain/Terrain.gd" id="11"]
+[ext_resource type="Script" uid="uid://jljpgypnojsp" path="res://native/src/scripts/objects/camera.rs" id="8_qw8ew"]
+[ext_resource type="Script" uid="uid://bblluinwmhapb" path="res://src/Objects/Camera/CameraInterpolation.gd" id="10"]
+[ext_resource type="Script" uid="uid://dbmgsvtd552t6" path="res://src/Objects/Terrain/Terrain.gd" id="11"]
 [ext_resource type="Material" uid="uid://d3jryprnnxb6x" path="res://resources/Materials/terrain_material.tres" id="12"]
-[ext_resource type="Script" path="res://native/src/scripts/world/solar_setup.rs" id="12_88vys"]
+[ext_resource type="Script" uid="uid://c0a6eytloytey" path="res://native/src/scripts/world/solar_setup.rs" id="12_88vys"]
 [ext_resource type="Material" uid="uid://bmp5rvu5slnnt" path="res://resources/Materials/ocean_material.tres" id="13"]
-[ext_resource type="Script" path="res://src/Objects/World/Networks.gd" id="14"]
+[ext_resource type="Script" uid="uid://d15feraixcdwm" path="res://src/Objects/World/Networks.gd" id="14"]
 [ext_resource type="RoadNavigationRes" uid="uid://dkfv08m34f2fr" path="res://resources/Data/road_navigation.tres" id="14_x2ouh"]
 [ext_resource type="WorldConstants" uid="uid://dbxp5cngs1a5g" path="res://resources/Data/world_constants.tres" id="15"]
-[ext_resource type="Script" path="res://native/src/scripts/world/buildings.rs" id="15_23gpq"]
+[ext_resource type="Script" uid="uid://bn2ww2ekrihcg" path="res://native/src/scripts/world/buildings.rs" id="15_23gpq"]
 [ext_resource type="PackedScene" uid="uid://cmv7rt4gqew38" path="res://resources/Objects/Helis/schweizer_300.tscn" id="16_e6k8r"]
 
 [node name="HUDController" type="Control"]
@@ -62,6 +62,7 @@ stretch = true
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer" node_paths=PackedStringArray("current_camera_controller")]
 handle_input_locally = false
 use_occlusion_culling = true
+scaling_3d_mode = 2
 audio_listener_enable_3d = true
 size = Vector2i(1152, 648)
 size_2d_override_stretch = true

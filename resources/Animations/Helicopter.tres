@@ -109,10 +109,10 @@ tracks/0/use_blend = true
 
 [resource]
 _data = {
-"rotor_0": SubResource("Animation_875du"),
-"rotor_1": SubResource("Animation_r0hda"),
-"rotor_2": SubResource("Animation_fxti5"),
-"rotor_end": SubResource("Animation_wc54n"),
-"rotor_off": SubResource("Animation_0m301"),
-"rotor_start": SubResource("Animation_m74j3")
+&"rotor_0": SubResource("Animation_875du"),
+&"rotor_1": SubResource("Animation_r0hda"),
+&"rotor_2": SubResource("Animation_fxti5"),
+&"rotor_end": SubResource("Animation_wc54n"),
+&"rotor_off": SubResource("Animation_0m301"),
+&"rotor_start": SubResource("Animation_m74j3")
 }

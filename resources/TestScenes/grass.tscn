@@ -192,6 +192,7 @@ shader_parameter/metallic = 0.0
 shader_parameter/roughness = 1.0
 shader_parameter/rim = 0.01
 shader_parameter/transmission = 0.5
+shader_parameter/texture_wind_noise = SubResource("NoiseTexture2D_jifde")
 shader_parameter/uv_scale = Vector2(1, 1)
 shader_parameter/uv_offset = Vector2(0, 0)
 shader_parameter/wind_noise_scale = 1.0
@@ -210,7 +211,6 @@ shader_parameter/proximity_distance = 1.0
 shader_parameter/displace = false
 shader_parameter/alpha_scissors = 0.9
 shader_parameter/use_normal_map_alpha = false
-shader_parameter/texture_wind_noise = SubResource("NoiseTexture2D_jifde")
 
 [sub_resource type="QuadMesh" id="QuadMesh_qf3nk"]
 material = SubResource("ShaderMaterial_w2ciu")

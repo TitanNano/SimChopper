@@ -2,9 +2,8 @@
 extends AcceptDialog
 
 func _ready() -> void:
-	self.exclusive = true
-	self.visible = true
 	self.confirmed.connect(self._on_invalid_engine_confirmed)
+	self.popup_centered()
 
 
 func _on_invalid_engine_confirmed():

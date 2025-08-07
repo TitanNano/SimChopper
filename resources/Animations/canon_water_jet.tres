@@ -26,6 +26,6 @@ tracks/0/use_blend = true
 
 [resource]
 _data = {
-"RESET": SubResource("Animation_0utdi"),
-"water_jet": SubResource("Animation_pmtyp")
+&"RESET": SubResource("Animation_0utdi"),
+&"water_jet": SubResource("Animation_pmtyp")
 }

@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://5jijewumod80"]
 
 [ext_resource type="Material" uid="uid://dm0vav0ade2gp" path="res://resources/Materials/fire_material.tres" id="1_5pwr1"]
-[ext_resource type="Script" path="res://native/src/scripts/spawner/fire_spawner.rs" id="1_aar5t"]
+[ext_resource type="Script" uid="uid://rv7naiqpa17x" path="res://native/src/scripts/spawner/fire_spawner.rs" id="1_aar5t"]
 [ext_resource type="Material" uid="uid://dbuspcbhwqr7g" path="res://resources/Materials/smoke_material.tres" id="2_4mcgg"]
 [ext_resource type="AnimationLibrary" uid="uid://dtoyo725l55bb" path="res://resources/Animations/fire_spawner.tres" id="4_rhyet"]
 [ext_resource type="AnimationNodeStateMachine" uid="uid://dfjcsgxlys31s" path="res://resources/Animations/fire_spawner_animation_states.tres" id="5_smqef"]

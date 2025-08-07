@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://b5b85d4xvjug1"]
 
-[ext_resource type="Script" path="res://src/Objects/Networks/DirectionalSegment.gd" id="1"]
+[ext_resource type="Script" uid="uid://rjpl4xfg4ri0" path="res://src/Objects/Networks/DirectionalSegment.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://dha3mq381q2wp" path="res://resources/Meshes/Networks/Bridge/top_bottom.glb" id="1_cf12j"]
 
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_jdqbt"]

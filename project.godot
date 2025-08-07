@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Sim Chopper"
 run/main_scene="res://resources/main.tscn"
-config/features=PackedStringArray("4.3")
+config/features=PackedStringArray("4.4")
 
 [debug]
 
@@ -30,14 +30,15 @@ shapes/road_navigation/display_vehicle_target=false
 
 window/size/always_on_top=true
 window/stretch/mode="viewport"
-window/vsync/use_vsync=false
+display_server/driver.linuxbsd="wayland"
 window/size/viewport_width.release=1920
 window/size/viewport_height.release=1080
 window/size/mode.release=3
+window/vsync/use_vsync=true
 
 [editor]
 
-required_version="4.3"
+required_version="4.4.1"
 baking/ambient_occlusion_model_base_path="res://resources/Meshes"
 baking/ambient_occlusion_textures="res://resources/Textures/ambient_occlusion"
 baking/ambient_occlusion_models=PackedStringArray("res://resources/Meshes/Buildings", "res://resources/Meshes/Buildings/Abandoned", "res://resources/Meshes/Buildings/Airport", "res://resources/Meshes/Buildings/Apartments", "res://resources/Meshes/Buildings/Arcology", "res://resources/Meshes/Buildings/Chemical", "res://resources/Meshes/Buildings/Condominiums", "res://resources/Meshes/Buildings/Construction", "res://resources/Meshes/Buildings/Factory", "res://resources/Meshes/Buildings/Hangar", "res://resources/Meshes/Buildings/Home", "res://resources/Meshes/Buildings/Offices", "res://resources/Meshes/Buildings/Powerplant", "res://resources/Meshes/Buildings/Station", "res://resources/Meshes/Buildings/Warehouse")
@@ -133,7 +134,9 @@ limits/debugger_stdout/max_chars_per_second=1000000
 [physics]
 
 common/physics_ticks_per_second=120
+3d/physics_engine="Jolt Physics"
 3d/default_gravity=9.81
+common/physics_interpolation=true
 
 [rendering]
 

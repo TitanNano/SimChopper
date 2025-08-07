@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://bmp5rvu5slnnt"]
 
-[ext_resource type="Shader" path="res://resources/Shaders/ocean_shader.gdshader" id="1_1ltun"]
+[ext_resource type="Shader" uid="uid://b7iel7s3r8acu" path="res://resources/Shaders/ocean_shader.gdshader" id="1_1ltun"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_52xgy"]
 noise_type = 4
@@ -27,11 +27,11 @@ shader = ExtResource("1_1ltun")
 shader_parameter/noise_scale = 0.02
 shader_parameter/Wave_Dir = 0.124
 shader_parameter/speed = 0.1
+shader_parameter/Noise = SubResource("NoiseTexture2D_06ugh")
 shader_parameter/Wave2_Dir = 0.569
 shader_parameter/Wave_Ratio = 0.5
 shader_parameter/wave_height = 5.0
+shader_parameter/Normal_Map = SubResource("NoiseTexture2D_l65p1")
 shader_parameter/Normal_Depth = 1.0
 shader_parameter/water_color = Color(0, 0, 0.113725, 1)
 shader_parameter/water_deep_color = Color(0, 0, 0.113725, 1)
-shader_parameter/Noise = SubResource("NoiseTexture2D_06ugh")
-shader_parameter/Normal_Map = SubResource("NoiseTexture2D_l65p1")

@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://5lcllve4d4s5" path="res://resources/Objects/Buildings/home_middle_class_3.tscn" id="1_daqnl"]
 [ext_resource type="PackedScene" uid="uid://cmv7rt4gqew38" path="res://resources/Objects/Helis/schweizer_300.tscn" id="2_db2rk"]
-[ext_resource type="Script" path="res://src/Objects/Camera/CameraInterpolation.gd" id="3_2f11a"]
+[ext_resource type="Script" uid="uid://bblluinwmhapb" path="res://src/Objects/Camera/CameraInterpolation.gd" id="3_2f11a"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_cep2w"]
 plane = Plane(2.08165e-12, 1, 2.08165e-12, 2.08165e-12)

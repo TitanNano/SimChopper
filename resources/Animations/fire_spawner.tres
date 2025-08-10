@@ -52,7 +52,7 @@ tracks/0/use_blend = true
 
 [resource]
 _data = {
-"RESET": SubResource("Animation_1rjb8"),
-"burning": SubResource("Animation_0dav3"),
-"siren": SubResource("Animation_eecao")
+&"RESET": SubResource("Animation_1rjb8"),
+&"burning": SubResource("Animation_0dav3"),
+&"siren": SubResource("Animation_eecao")
 }

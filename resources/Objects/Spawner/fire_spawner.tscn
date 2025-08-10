@@ -26,7 +26,7 @@ material = ExtResource("2_4mcgg")
 
 [node name="FireAudioPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": ExtResource("4_rhyet")
+&"": ExtResource("4_rhyet")
 }
 blend_times = [&"burning", &"burning", 0.2]
 

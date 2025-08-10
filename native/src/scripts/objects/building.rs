@@ -70,7 +70,7 @@ impl godot::prelude::Var for BuildingEventFlags {
     }
 
     fn set_property(&mut self, value: Self::Via) {
-        Self::from_godot(value);
+        *self = Self::from_godot(value);
     }
 }
 

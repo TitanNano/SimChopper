@@ -1,0 +1,11 @@
+[gd_resource type="NoiseTexture2D" load_steps=2 format=3 uid="uid://ddkn772jpvtht"]
+
+[ext_resource type="FastNoiseLite" uid="uid://rd36gy30hcxi" path="res://resources/Textures/ocean/ocean_noise.tres" id="1_vakfg"]
+
+[resource]
+width = 2048
+height = 2048
+seamless = true
+as_normal_map = true
+bump_strength = 32.0
+noise = ExtResource("1_vakfg")

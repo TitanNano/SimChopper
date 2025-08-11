@@ -1,6 +1,7 @@
-[gd_resource type="ShaderMaterial" load_steps=6 format=3 uid="uid://c26tq15swq4at"]
+[gd_resource type="ShaderMaterial" load_steps=7 format=3 uid="uid://c26tq15swq4at"]
 
 [ext_resource type="Shader" uid="uid://dadtbq4ym2chm" path="res://resources/Shaders/sky.tres" id="1_gixr0"]
+[ext_resource type="Texture2D" uid="uid://4ehe3xiphs06" path="res://resources/Textures/sky/stars.png" id="2_1js4f"]
 
 [sub_resource type="Gradient" id="Gradient_klkl5"]
 offsets = PackedFloat32Array(0.354386, 0.421053, 0.610526)
@@ -22,5 +23,6 @@ gradient = SubResource("Gradient_0sht1")
 [resource]
 shader = ExtResource("1_gixr0")
 shader_parameter/moon_size = 0.06
+shader_parameter/night_sky = ExtResource("2_1js4f")
 shader_parameter/background_color = SubResource("GradientTexture2D_scq8q")
 shader_parameter/sun_rise_gradient = SubResource("GradientTexture1D_lmpjt")

@@ -85,7 +85,7 @@ rotation_order = 0
 script = ExtResource("12_88vys")
 sun = NodePath("Sun")
 moon = NodePath("Moon")
-day_length = 30
+day_length = 10
 sky_min_brightness = 6000.0
 sky_max_brightness = 20000.0
 

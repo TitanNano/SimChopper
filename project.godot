@@ -28,6 +28,8 @@ shapes/road_navigation/display_vehicle_target=false
 
 [display]
 
+window/size/viewport_width=1280
+window/size/viewport_height=720
 window/size/always_on_top=true
 window/stretch/mode="viewport"
 display_server/driver.linuxbsd="wayland"
@@ -150,8 +152,6 @@ global_illumination/voxel_gi/quality=1
 environment/ssao/half_size=false
 environment/ssil/half_size=false
 anti_aliasing/screen_space_roughness_limiter/enabled=false
-scaling_3d/mode=2
-scaling_3d/scale=0.5
 scaling_3d/fsr_sharpness=0.2
 textures/decals/filter=5
 textures/light_projectors/filter=5

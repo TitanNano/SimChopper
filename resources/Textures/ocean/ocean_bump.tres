@@ -1,0 +1,9 @@
+[gd_resource type="NoiseTexture2D" load_steps=2 format=3 uid="uid://dlcr6r41spof7"]
+
+[ext_resource type="FastNoiseLite" uid="uid://rd36gy30hcxi" path="res://resources/Textures/ocean/ocean_noise.tres" id="1_sx12a"]
+
+[resource]
+width = 2048
+height = 2048
+seamless = true
+noise = ExtResource("1_sx12a")

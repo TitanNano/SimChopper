@@ -165,3 +165,42 @@ environment/volumetric_fog/volume_depth=100
 anti_aliasing/quality/use_taa=true
 occlusion_culling/use_occlusion_culling=true
 environment/defaults/default_environment="res://resources/Environments/default_env.tres"
+
+[shader_globals]
+
+ocean_noise_scale={
+"type": "float",
+"value": 0.002
+}
+ocean_wave_dir={
+"type": "float",
+"value": 0.124
+}
+ocean_speed={
+"type": "float",
+"value": 0.03
+}
+ocean_noise={
+"type": "sampler2D",
+"value": "res://resources/Textures/ocean/ocean_bump.tres"
+}
+ocean_wave2_dir={
+"type": "float",
+"value": 0.569
+}
+ocean_wave_ratio={
+"type": "float",
+"value": 0.5
+}
+ocean_normal_map={
+"type": "sampler2D",
+"value": "res://resources/Textures/ocean/ocean_normal.tres"
+}
+ocean_water_color={
+"type": "color",
+"value": Color(0.192157, 0.219608, 0.243137, 1)
+}
+ocean_deep_water_color={
+"type": "color",
+"value": Color(0, 0, 0.113725, 1)
+}

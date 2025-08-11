@@ -23,7 +23,7 @@ struct Camera {
 impl Camera {
     const MID_DAY_EXPOSURE: f32 = 10.0;
     const DAWN_EXPOSURE: f32 = 30.0;
-    const NIGHT_EXPOSURE: f32 = 1000.0;
+    const NIGHT_EXPOSURE: f32 = 400.0;
 
     pub fn _ready(&mut self) {
         Signal::from_object_signal(&**self.solar_setup, "sky_brightness")

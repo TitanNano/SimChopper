@@ -1,4 +1,37 @@
-[gd_resource type="VisualShader" load_steps=77 format=3 uid="uid://dadtbq4ym2chm"]
+[gd_resource type="VisualShader" load_steps=84 format=3 uid="uid://dadtbq4ym2chm"]
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_5nryj"]
+linked_parent_graph_frame = 104
+parameter_name = "night_sky"
+texture_type = 1
+color_default = 1
+texture_filter = 1
+texture_repeat = 1
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_o4fby"]
+linked_parent_graph_frame = 104
+source = 5
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_o2ubx"]
+linked_parent_graph_frame = 104
+input_name = "sky_coords"
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_boxnd"]
+
+[sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_5nryj"]
+size = Vector2(1716, 1341)
+title = "Stars"
+attached_nodes = PackedInt32Array(102, 100, 101, 105, 106)
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_5nryj"]
+default_input_values = [0, Vector2(0, 0), 1, Vector2(0, 0)]
+linked_parent_graph_frame = 104
+op_type = 0
+operator = 2
+
+[sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_o4fby"]
+linked_parent_graph_frame = 104
+constant = 2.0
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_7oou3"]
 expanded_output_ports = [0]
@@ -195,14 +228,14 @@ default_input_values = [0, 0.0, 1, 0.01, 2, 0.99]
 linked_parent_graph_frame = 96
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_1ytle"]
-size = Vector2(5656, 1290)
+size = Vector2(5656, 1603)
 title = "Sun Disc"
 tint_color_enabled = true
 tint_color = Color(1, 0.690196, 0.286275, 0.580392)
 attached_nodes = PackedInt32Array(75, 27, 26, 76, 74, 77)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_uakmd"]
-size = Vector2(4936, 1611)
+size = Vector2(4936, 1891)
 title = "Moon Disc"
 tint_color_enabled = true
 tint_color = Color(0.426979, 0.491676, 0.560547, 0.75)
@@ -210,25 +243,25 @@ attached_nodes = PackedInt32Array(32, 73, 84, 72, 39, 38, 36, 89)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_4xx76"]
 linked_parent_graph_frame = 71
-size = Vector2(1896, 870)
+size = Vector2(1896, 1309)
 title = "Create Disc"
 attached_nodes = PackedInt32Array(35, 34, 63, 28, 29, 31)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_lybwh"]
 linked_parent_graph_frame = 71
-size = Vector2(416, 190)
+size = Vector2(416, 420)
 title = "Disc Blur"
 attached_nodes = PackedInt32Array(30)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_i887l"]
 linked_parent_graph_frame = 70
-size = Vector2(2436, 450)
+size = Vector2(2436, 821)
 title = "Disc Blur from Altitude"
 attached_nodes = PackedInt32Array(21, 67, 68, 82)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_83axu"]
 linked_parent_graph_frame = 70
-size = Vector2(1916, 510)
+size = Vector2(1916, 640)
 title = "Disc Size"
 attached_nodes = PackedInt32Array(20, 22, 19, 17, 13)
 
@@ -241,7 +274,7 @@ attached_nodes = PackedInt32Array(24)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_5wmbu"]
 linked_parent_graph_frame = 70
-size = Vector2(1916, 350)
+size = Vector2(1916, 609)
 title = "Hide beneath Horizon"
 attached_nodes = PackedInt32Array(78, 79, 80, 81)
 
@@ -268,13 +301,13 @@ input_name = "light0_direction"
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_p2cfm"]
 linked_parent_graph_frame = 99
-size = Vector2(1736, 250)
+size = Vector2(1736, 641)
 title = "Sun Altitude"
 attached_nodes = PackedInt32Array(59, 60, 62)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_8nntp"]
 linked_parent_graph_frame = 71
-size = Vector2(1916, 350)
+size = Vector2(1916, 609)
 title = "Hide beneath Horizon"
 attached_nodes = PackedInt32Array(85, 86, 87, 88)
 
@@ -303,7 +336,7 @@ attached_nodes = PackedInt32Array(33)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_wys3p"]
 linked_parent_graph_frame = 97
-size = Vector2(1016, 510)
+size = Vector2(1016, 640)
 title = "Distance to Sun"
 attached_nodes = PackedInt32Array(91, 93, 92)
 
@@ -320,36 +353,37 @@ input_name = "eyedir"
 linked_parent_graph_frame = 90
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_m7koo"]
-size = Vector2(1136, 430)
+size = Vector2(1136, 1001)
 title = "Sample Background Color"
 attached_nodes = PackedInt32Array(4, 6, 5)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_fwewl"]
-size = Vector2(1936, 725)
+size = Vector2(1936, 1303)
 title = "Sample Horizon Color"
 attached_nodes = PackedInt32Array(40, 41, 96)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_4o3wj"]
 linked_parent_graph_frame = 95
-size = Vector2(1376, 230)
+size = Vector2(1376, 487)
 title = "UV from Sun Altitude"
 attached_nodes = PackedInt32Array(47, 69, 46)
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_ck5qm"]
-size = Vector2(3936, 730)
+size = Vector2(3936, 1007)
 title = "Horizon Color Weight"
 attached_nodes = PackedInt32Array(65, 42, 66, 64, 55, 53, 52, 50, 90)
 
 [sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_hejp1"]
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_g0cd7"]
-size = Vector2(2276, 385)
+size = Vector2(2276, 763)
 title = "Sky Brightness"
 attached_nodes = PackedInt32Array(83, 58)
 
 [resource]
 code = "shader_type sky;
 uniform float moon_size : hint_range(0.00999999977648, 0.10000000149012);
+uniform sampler2D night_sky : source_color, hint_default_black, filter_nearest, repeat_enable;
 uniform sampler2D background_color;
 uniform sampler2D sun_rise_gradient : source_color;
 
@@ -512,6 +546,23 @@ void sky() {
 	vec3 n_out98p0 = n_out27p0 + n_out88p0;
 
 
+// Input:102
+	vec2 n_out102p0 = SKY_COORDS;
+
+
+// FloatConstant:106
+	float n_out106p0 = 2.000000;
+
+
+// VectorOp:105
+	vec2 n_out105p0 = n_out102p0 * vec2(n_out106p0);
+
+
+	vec4 n_out101p0;
+// Texture2D:101
+	n_out101p0 = texture(night_sky, n_out105p0);
+
+
 // Input:59
 	vec3 n_out59p0 = LIGHT0_DIRECTION;
 	float n_out59p2 = n_out59p0.g;
@@ -622,8 +673,12 @@ void sky() {
 	vec3 n_out58p0 = vec3(n_out62p0) * n_out49p0;
 
 
+// VectorOp:103
+	vec3 n_out103p0 = vec3(n_out101p0.xyz) + n_out58p0;
+
+
 // VectorOp:23
-	vec3 n_out23p0 = n_out98p0 + n_out58p0;
+	vec3 n_out23p0 = n_out98p0 + n_out103p0;
 
 
 // Clamp:25
@@ -638,6 +693,7 @@ void sky() {
 
 }
 "
+graph_offset = Vector2(-1035.54, -541.435)
 mode = 3
 flags/use_half_res_pass = false
 flags/use_quarter_res_pass = false
@@ -645,11 +701,11 @@ flags/disable_fog = false
 flags/use_debanding = false
 nodes/sky/0/position = Vector2(180, -3200)
 nodes/sky/4/node = SubResource("VisualShaderNodeInput_mtlpv")
-nodes/sky/4/position = Vector2(-5360, -1620)
+nodes/sky/4/position = Vector2(-5440, -420)
 nodes/sky/5/node = SubResource("VisualShaderNodeTexture_8u1pc")
-nodes/sky/5/position = Vector2(-4660, -1520)
+nodes/sky/5/position = Vector2(-4740, -320)
 nodes/sky/6/node = SubResource("VisualShaderNodeTexture2DParameter_y1vp3")
-nodes/sky/6/position = Vector2(-5380, -1380)
+nodes/sky/6/position = Vector2(-5460, -180)
 nodes/sky/13/node = SubResource("VisualShaderNodeInput_7oou3")
 nodes/sky/13/position = Vector2(-8100, -5380)
 nodes/sky/17/node = SubResource("VisualShaderNodeInput_olahb")
@@ -695,47 +751,47 @@ nodes/sky/38/position = Vector2(-3660, -3020)
 nodes/sky/39/node = SubResource("VisualShaderNodeFloatConstant_tjhoh")
 nodes/sky/39/position = Vector2(-4180, -3020)
 nodes/sky/40/node = SubResource("VisualShaderNodeTexture2DParameter_1wxfl")
-nodes/sky/40/position = Vector2(-6100, -20)
+nodes/sky/40/position = Vector2(-6180, 1180)
 nodes/sky/41/node = SubResource("VisualShaderNodeTexture_3ot8f")
-nodes/sky/41/position = Vector2(-4620, -340)
+nodes/sky/41/position = Vector2(-4700, 860)
 nodes/sky/42/node = SubResource("VisualShaderNodeInput_gsfn4")
-nodes/sky/42/position = Vector2(-6980, 1400)
+nodes/sky/42/position = Vector2(-7060, 2600)
 nodes/sky/46/node = SubResource("VisualShaderNodeInput_yncca")
-nodes/sky/46/position = Vector2(-6100, -480)
+nodes/sky/46/position = Vector2(-6180, 720)
 nodes/sky/47/node = SubResource("VisualShaderNodeFloatFunc_kjd80")
-nodes/sky/47/position = Vector2(-5540, -440)
+nodes/sky/47/position = Vector2(-5620, 760)
 nodes/sky/49/node = SubResource("VisualShaderNodeMix_ksvka")
-nodes/sky/49/position = Vector2(-3800, -640)
+nodes/sky/49/position = Vector2(-3880, 560)
 nodes/sky/50/node = SubResource("VisualShaderNodeFloatFunc_rrpxv")
-nodes/sky/50/position = Vector2(-6320, 1420)
+nodes/sky/50/position = Vector2(-6400, 2620)
 nodes/sky/52/node = SubResource("VisualShaderNodeFloatOp_qcrwe")
-nodes/sky/52/position = Vector2(-5080, 1140)
+nodes/sky/52/position = Vector2(-5160, 2340)
 nodes/sky/53/node = SubResource("VisualShaderNodeFloatFunc_ijome")
-nodes/sky/53/position = Vector2(-5960, 1420)
+nodes/sky/53/position = Vector2(-6040, 2620)
 nodes/sky/55/node = SubResource("VisualShaderNodeClamp_3ehvo")
-nodes/sky/55/position = Vector2(-4560, 980)
+nodes/sky/55/position = Vector2(-4640, 2180)
 nodes/sky/58/node = SubResource("VisualShaderNodeVectorOp_qpsrs")
-nodes/sky/58/position = Vector2(-1960, -1440)
+nodes/sky/58/position = Vector2(-2040, -240)
 nodes/sky/59/node = SubResource("VisualShaderNodeInput_rvunu")
-nodes/sky/59/position = Vector2(-3780, -1560)
+nodes/sky/59/position = Vector2(-3860, -360)
 nodes/sky/60/node = SubResource("VisualShaderNodeClamp_jviwe")
-nodes/sky/60/position = Vector2(-3020, -1500)
+nodes/sky/60/position = Vector2(-3100, -300)
 nodes/sky/62/node = SubResource("VisualShaderNodeRemap_yokdh")
-nodes/sky/62/position = Vector2(-2460, -1540)
+nodes/sky/62/position = Vector2(-2540, -340)
 nodes/sky/63/node = SubResource("VisualShaderNodeFloatParameter_8u6di")
 nodes/sky/63/position = Vector2(-7160, -2540)
 nodes/sky/64/node = SubResource("VisualShaderNodeFloatFunc_yik50")
-nodes/sky/64/position = Vector2(-5660, 1020)
+nodes/sky/64/position = Vector2(-5740, 2220)
 nodes/sky/65/node = SubResource("VisualShaderNodeFloatOp_iuupb")
-nodes/sky/65/position = Vector2(-5260, 880)
+nodes/sky/65/position = Vector2(-5340, 2080)
 nodes/sky/66/node = SubResource("VisualShaderNodeFloatOp_cv2mt")
-nodes/sky/66/position = Vector2(-6020, 1080)
+nodes/sky/66/position = Vector2(-6100, 2280)
 nodes/sky/67/node = SubResource("VisualShaderNodeRemap_ayg8v")
 nodes/sky/67/position = Vector2(-6760, -4520)
 nodes/sky/68/node = SubResource("VisualShaderNodeClamp_s53ad")
 nodes/sky/68/position = Vector2(-7280, -4480)
 nodes/sky/69/node = SubResource("VisualShaderNodeClamp_4d38l")
-nodes/sky/69/position = Vector2(-5140, -460)
+nodes/sky/69/position = Vector2(-5220, 740)
 nodes/sky/70/node = SubResource("VisualShaderNodeFrame_1ytle")
 nodes/sky/70/position = Vector2(-8180, -5520)
 nodes/sky/71/node = SubResource("VisualShaderNodeFrame_uakmd")
@@ -763,7 +819,7 @@ nodes/sky/81/position = Vector2(-4480, -5180)
 nodes/sky/82/node = SubResource("VisualShaderNodeInput_rmupx")
 nodes/sky/82/position = Vector2(-8100, -4460)
 nodes/sky/83/node = SubResource("VisualShaderNodeFrame_p2cfm")
-nodes/sky/83/position = Vector2(-3820, -1640)
+nodes/sky/83/position = Vector2(-3900, -440)
 nodes/sky/84/node = SubResource("VisualShaderNodeFrame_8nntp")
 nodes/sky/84/position = Vector2(-4460, -3740)
 nodes/sky/85/node = SubResource("VisualShaderNodeFloatFunc_7cvih")
@@ -777,23 +833,37 @@ nodes/sky/88/position = Vector2(-2920, -3560)
 nodes/sky/89/node = SubResource("VisualShaderNodeFrame_8u6ob")
 nodes/sky/89/position = Vector2(-4940, -2720)
 nodes/sky/90/node = SubResource("VisualShaderNodeFrame_wys3p")
-nodes/sky/90/position = Vector2(-8080, 900)
+nodes/sky/90/position = Vector2(-8160, 2100)
 nodes/sky/91/node = SubResource("VisualShaderNodeInput_7x7gy")
-nodes/sky/91/position = Vector2(-8040, 980)
+nodes/sky/91/position = Vector2(-8120, 2180)
 nodes/sky/92/node = SubResource("VisualShaderNodeInput_nem6w")
-nodes/sky/92/position = Vector2(-8040, 1300)
+nodes/sky/92/position = Vector2(-8120, 2500)
 nodes/sky/93/node = SubResource("VisualShaderNodeVectorDistance_7xobe")
-nodes/sky/93/position = Vector2(-7440, 1200)
+nodes/sky/93/position = Vector2(-7520, 2400)
 nodes/sky/94/node = SubResource("VisualShaderNodeFrame_m7koo")
-nodes/sky/94/position = Vector2(-5420, -1700)
+nodes/sky/94/position = Vector2(-5500, -500)
 nodes/sky/95/node = SubResource("VisualShaderNodeFrame_fwewl")
-nodes/sky/95/position = Vector2(-6180, -640)
+nodes/sky/95/position = Vector2(-6260, 560)
 nodes/sky/96/node = SubResource("VisualShaderNodeFrame_4o3wj")
-nodes/sky/96/position = Vector2(-6140, -560)
+nodes/sky/96/position = Vector2(-6220, 640)
 nodes/sky/97/node = SubResource("VisualShaderNodeFrame_ck5qm")
-nodes/sky/97/position = Vector2(-8120, 800)
+nodes/sky/97/position = Vector2(-8200, 2000)
 nodes/sky/98/node = SubResource("VisualShaderNodeVectorOp_hejp1")
 nodes/sky/98/position = Vector2(-1960, -4300)
 nodes/sky/99/node = SubResource("VisualShaderNodeFrame_g0cd7")
-nodes/sky/99/position = Vector2(-3860, -1700)
-nodes/sky/connections = PackedInt32Array(4, 0, 5, 0, 17, 0, 19, 1, 13, 0, 19, 0, 20, 0, 21, 0, 19, 0, 22, 0, 22, 0, 20, 0, 21, 0, 24, 0, 28, 0, 29, 1, 35, 0, 29, 0, 31, 0, 30, 0, 29, 0, 34, 0, 34, 0, 31, 0, 36, 0, 32, 0, 30, 0, 33, 0, 33, 0, 32, 1, 46, 2, 47, 0, 42, 2, 50, 0, 50, 0, 53, 0, 59, 2, 60, 0, 60, 0, 62, 0, 41, 0, 49, 1, 58, 0, 23, 1, 63, 0, 34, 1, 64, 0, 65, 0, 65, 0, 52, 0, 52, 0, 55, 0, 53, 0, 52, 1, 66, 0, 64, 0, 67, 0, 21, 1, 68, 0, 67, 0, 49, 0, 58, 1, 40, 0, 41, 2, 47, 0, 69, 0, 69, 0, 41, 0, 5, 0, 49, 0, 55, 0, 49, 2, 6, 0, 5, 2, 79, 0, 27, 0, 78, 2, 80, 0, 80, 0, 81, 0, 81, 0, 79, 0, 24, 0, 79, 1, 26, 0, 27, 1, 82, 2, 68, 0, 62, 0, 58, 0, 87, 2, 86, 0, 86, 0, 85, 0, 85, 0, 88, 0, 38, 0, 88, 1, 32, 0, 38, 1, 39, 0, 38, 0, 25, 0, 0, 0, 92, 0, 93, 1, 91, 0, 93, 0, 93, 0, 66, 0, 27, 0, 98, 0, 88, 0, 98, 1, 23, 0, 25, 0, 98, 0, 23, 0)
+nodes/sky/99/position = Vector2(-3940, -520)
+nodes/sky/100/node = SubResource("VisualShaderNodeTexture2DParameter_5nryj")
+nodes/sky/100/position = Vector2(-2980, -1360)
+nodes/sky/101/node = SubResource("VisualShaderNodeTexture_o4fby")
+nodes/sky/101/position = Vector2(-2160, -1280)
+nodes/sky/102/node = SubResource("VisualShaderNodeInput_o2ubx")
+nodes/sky/102/position = Vector2(-3460, -1900)
+nodes/sky/103/node = SubResource("VisualShaderNodeVectorOp_boxnd")
+nodes/sky/103/position = Vector2(-1120, -860)
+nodes/sky/104/node = SubResource("VisualShaderNodeFrame_5nryj")
+nodes/sky/104/position = Vector2(-3020, -1720)
+nodes/sky/105/node = SubResource("VisualShaderNodeVectorOp_5nryj")
+nodes/sky/105/position = Vector2(-2820, -1940)
+nodes/sky/106/node = SubResource("VisualShaderNodeFloatConstant_o4fby")
+nodes/sky/106/position = Vector2(-3400, -1580)
+nodes/sky/connections = PackedInt32Array(4, 0, 5, 0, 17, 0, 19, 1, 13, 0, 19, 0, 20, 0, 21, 0, 19, 0, 22, 0, 22, 0, 20, 0, 21, 0, 24, 0, 28, 0, 29, 1, 35, 0, 29, 0, 31, 0, 30, 0, 29, 0, 34, 0, 34, 0, 31, 0, 36, 0, 32, 0, 30, 0, 33, 0, 33, 0, 32, 1, 46, 2, 47, 0, 42, 2, 50, 0, 50, 0, 53, 0, 59, 2, 60, 0, 60, 0, 62, 0, 41, 0, 49, 1, 63, 0, 34, 1, 64, 0, 65, 0, 65, 0, 52, 0, 52, 0, 55, 0, 53, 0, 52, 1, 66, 0, 64, 0, 67, 0, 21, 1, 68, 0, 67, 0, 49, 0, 58, 1, 40, 0, 41, 2, 47, 0, 69, 0, 69, 0, 41, 0, 5, 0, 49, 0, 55, 0, 49, 2, 6, 0, 5, 2, 79, 0, 27, 0, 78, 2, 80, 0, 80, 0, 81, 0, 81, 0, 79, 0, 24, 0, 79, 1, 26, 0, 27, 1, 82, 2, 68, 0, 62, 0, 58, 0, 87, 2, 86, 0, 86, 0, 85, 0, 85, 0, 88, 0, 38, 0, 88, 1, 32, 0, 38, 1, 39, 0, 38, 0, 25, 0, 0, 0, 92, 0, 93, 1, 91, 0, 93, 0, 93, 0, 66, 0, 27, 0, 98, 0, 88, 0, 98, 1, 23, 0, 25, 0, 98, 0, 23, 0, 100, 0, 101, 2, 103, 0, 23, 1, 58, 0, 103, 1, 101, 0, 103, 0, 102, 0, 105, 0, 105, 0, 101, 0, 106, 0, 105, 1)

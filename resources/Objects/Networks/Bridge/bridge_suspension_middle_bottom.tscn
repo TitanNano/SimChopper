@@ -9,5 +9,12 @@ data = PackedVector3Array(5.9961, 7.9063, -3.7539, 6.4961, 7.9063, -3.7539, 6.24
 [node name="BridgeSuspensionMiddleBottom" instance=ExtResource("1_ie784")]
 script = ExtResource("1")
 
+[node name="Maxis-3d2-mesh-60-BR01" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+
+[node name="OccluderInstance3D" parent="." index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 shape = SubResource("ConcavePolygonShape3D_audka")

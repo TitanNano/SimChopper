@@ -9,6 +9,12 @@ data = PackedVector3Array(-8, 8, -16.25, -8, -8, -8, -8, -8, -16.25, -8, 8, -16.
 [node name="BridgeRaisingTowerTopBottom" instance=ExtResource("1_5jxyg")]
 script = ExtResource("2_jbsoo")
 
+[node name="Maxis-3d2-mesh-67" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, -1.19209e-07, -1, 0, 1, -1.19209e-07, 0, 0.25, 0)
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." index="1"]
-transform = Transform3D(1, 0, 0, 0, -2.38419e-07, -1, 0, 1, -2.38419e-07, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -2.38419e-07, -1, 0, 1, -2.38419e-07, 0, 0.25, 0)
 shape = SubResource("ConcavePolygonShape3D_7y4ua")
+
+[node name="OccluderInstance3D" parent="." index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)

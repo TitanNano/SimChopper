@@ -43,11 +43,8 @@ pub struct SolarSetup {
 
 #[godot_script_impl]
 impl SolarSetup {
-    const DUSK_START: f32 = 192.0;
-    const DUSK_END: f32 = 195.0;
-
-    const DAWN_START: f32 = 342.0;
-    const DAWN_END: f32 = 345.0;
+    const SUN_LUX_MIN: f32 = 400.0;
+    const SUN_LUX_MAX: f32 = 81920.0;
 
     pub fn _ready(&mut self) {
         let env = self
@@ -67,27 +64,22 @@ impl SolarSetup {
         let sun_pos = time as f32 * (360.0 / (day_length * 2) as f32);
         let sun_visible = sun_pos < 190.0;
         let sun_zenit_distance = ((sun_pos - 90.0) / 90.0).abs().clamp(0.0, 1.0);
+        let sun_energy = if !sun_visible { 0.0 } else { 1.0 };
+        let sun_lux = Self::SUN_LUX_MAX.lerp(Self::SUN_LUX_MIN, sun_zenit_distance);
+
+        let moon_energy = if sun_pos > 180.0 { 1.0 } else { 0.0 };
 
         self.sun_pos = sun_pos;
         self.sun_zenit_distance = sun_zenit_distance;
 
-        // Reduce the energy of the sky during night time.
-        let sky_brightness = self.sky_brightness();
-
         self.base
             .set_rotation_degrees(Vector3::new(sun_pos, 0.0, 0.0));
 
-        self.sun.set_param(
-            light_3d::Param::ENERGY,
-            if !sun_visible { 0.0 } else { 1.0 },
-        );
+        self.sun.set_param(light_3d::Param::ENERGY, sun_energy);
         self.sun.set_shadow(sun_visible);
 
         if sun_visible {
-            self.sun.set_param(
-                light_3d::Param::INTENSITY,
-                100000.0.lerp(400.0, sun_zenit_distance),
-            );
+            self.sun.set_param(light_3d::Param::INTENSITY, sun_lux);
             self.sun
                 .set_temperature((5500.0).lerp(1850.0, sun_zenit_distance));
         }
@@ -100,19 +92,16 @@ impl SolarSetup {
             .expect("there must be an environment");
 
         env.set_bg_intensity(
-            self.sky_min_brightness
-                .lerp(self.sky_max_brightness, sky_brightness),
+            (sun_lux * sun_energy + self.moon.get_param(light_3d::Param::INTENSITY) * moon_energy)
+                * 0.2,
         );
 
         if self.sdfgi_enabled {
             // disable SDFGI during night time. It's causing too much fluctuation in the overall brightness of the scene under low light conditions.
-            env.set_sdfgi_enabled(!(Self::DUSK_START..=Self::DAWN_END).contains(&sun_pos));
+            env.set_sdfgi_enabled(sun_pos < 180.0);
         }
 
-        self.moon.set_param(
-            light_3d::Param::ENERGY,
-            if sun_pos > 180.0 { 1.0 } else { 0.0 },
-        );
+        self.moon.set_param(light_3d::Param::ENERGY, moon_energy);
         self.moon.set_shadow(sun_pos > 180.0);
     }
 
@@ -151,24 +140,24 @@ impl SolarSetup {
         self.sun_zenit_distance
     }
 
-    /// Sky brightness depending on the time of day. Value between 0.0 and 1.0.
-    pub fn sky_brightness(&self) -> f32 {
-        match self.sun_pos {
-            0.0..Self::DUSK_START => 1.0,
+    /// Total brigtness of the sky and all visible solar bodys.
+    ///
+    /// This is used to get an aproximation of the overal scene brightness.
+    pub fn environment_brightness(&self) -> f32 {
+        let sun_brightness = self.sun.get_param(light_3d::Param::INTENSITY)
+            * self.sun.get_param(light_3d::Param::ENERGY);
 
-            Self::DUSK_START..Self::DUSK_END => {
-                (Self::DUSK_END - self.sun_pos) / (Self::DUSK_END - Self::DUSK_START)
-            }
+        let moon_brightness = self.moon.get_param(light_3d::Param::INTENSITY)
+            * self.moon.get_param(light_3d::Param::ENERGY);
 
-            Self::DUSK_END..Self::DAWN_START => 0.0,
+        let environment = self
+            .base
+            .get_world_3d()
+            .expect("solar setup must be part of a scene")
+            .get_environment()
+            .expect("scene must have an environment");
+        let sky_brightness = environment.get_bg_intensity();
 
-            Self::DAWN_START..=Self::DAWN_END => {
-                1.0 - (Self::DAWN_END - self.sun_pos) / (Self::DAWN_END - Self::DAWN_START)
-            }
-
-            Self::DAWN_END..=360.0 => 1.0,
-
-            _ => unreachable!("sun pos goes from 0.0 to 360.0"),
-        }
+        sun_brightness + moon_brightness + sky_brightness
     }
 }

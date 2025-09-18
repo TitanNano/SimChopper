@@ -55,7 +55,7 @@ impl DustParticles {
 
         let mut material: Gd<StandardMaterial3D> = material.cast();
 
-        let distance = (100.0 * (1.0 - value)).max(2.0);
+        let distance = (50.0 * (1.0 - value)).max(0.5);
 
         material.set_proximity_fade_distance(distance as f32);
     }

@@ -62,8 +62,7 @@ stretch = true
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer" node_paths=PackedStringArray("current_camera_controller")]
 handle_input_locally = false
 use_occlusion_culling = true
-scaling_3d_mode = 2
-scaling_3d_scale = 1.0
+scaling_3d_mode = 1
 anisotropic_filtering_level = 4
 audio_listener_enable_3d = true
 size = Vector2i(1280, 720)
@@ -101,7 +100,7 @@ directional_shadow_split_1 = 0.05
 directional_shadow_split_2 = 0.3
 directional_shadow_split_3 = 0.4
 directional_shadow_blend_splits = true
-directional_shadow_max_distance = 500.0
+directional_shadow_max_distance = 300.0
 directional_shadow_pancake_size = 40.0
 
 [node name="Moon" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/World/Environment/SolarSetup"]
@@ -115,7 +114,7 @@ directional_shadow_mode = 1
 directional_shadow_split_1 = 0.3
 directional_shadow_blend_splits = true
 directional_shadow_fade_start = 0.6
-directional_shadow_max_distance = 400.0
+directional_shadow_max_distance = 200.0
 
 [node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("solar_setup")]
 transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, -45.4393, 5.66891, 25.269)

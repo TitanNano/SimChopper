@@ -57,7 +57,7 @@ parameters/conditions/spin_up = false
 active = false
 root_node = NodePath("../RotorAudioTree")
 libraries = {
-"": ExtResource("5_ayahk")
+&"": ExtResource("5_ayahk")
 }
 
 [node name="RotorAudioSource" type="AudioStreamPlayer3D" parent="."]

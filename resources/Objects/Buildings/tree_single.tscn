@@ -413,6 +413,7 @@ points = PackedVector3Array(-0.0723405, 4.45722, -1.52833, -0.169589, 4.32756, -
 points = PackedVector3Array(-0.753118, 4.26277, -1.78767, -0.947549, 4.16553, -1.98213, -0.947549, 4.16553, -1.94966, -0.688299, 4.42481, -1.75526, -0.850291, 4.16553, -1.94966)
 
 [node name="TreeSingle" instance=ExtResource("2")]
+visible = false
 
 [node name="tree" parent="." index="0"]
 surface_material_override/0 = ExtResource("3")

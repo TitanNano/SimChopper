@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.4")
 
 [debug]
 
+settings/profiler/max_timestamp_query_elements=500
 gdscript/warnings/unassigned_variable=2
 gdscript/warnings/shadowed_variable=0
 gdscript/warnings/unsafe_property_access=2
@@ -28,8 +29,9 @@ shapes/road_navigation/display_vehicle_target=false
 
 [display]
 
-window/size/viewport_width=1280
-window/size/viewport_height=720
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/mode=4
 window/size/always_on_top=true
 window/stretch/mode="viewport"
 display_server/driver.linuxbsd="wayland"
@@ -162,7 +164,6 @@ global_illumination/sdfgi/frames_to_converge=4
 global_illumination/sdfgi/frames_to_update_lights=0
 environment/volumetric_fog/volume_size=100
 environment/volumetric_fog/volume_depth=100
-anti_aliasing/quality/use_taa=true
 occlusion_culling/use_occlusion_culling=true
 environment/defaults/default_environment="res://resources/Environments/default_env.tres"
 

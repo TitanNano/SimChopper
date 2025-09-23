@@ -7,3 +7,6 @@ build/**
 
 # Maps
 *.sc2
+
+# Blender Backups
+*.blend1

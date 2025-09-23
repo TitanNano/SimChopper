@@ -3,6 +3,3 @@
 [ext_resource type="PackedScene" uid="uid://pf8qvtieheh2" path="res://resources/Meshes/Ground/tarmac.glb" id="1"]
 
 [node name="Tarmac" instance=ExtResource("1")]
-
-[node name="Plane" parent="." index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0211601, -0.0576782, -0.0116024)

@@ -33,22 +33,16 @@ animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
 import_script/path=""
 _subresources={
-"materials": {
-"@MATERIAL:0": {
-"use_external/enabled": true,
-"use_external/path": "res://resources/Materials/tree_leaves_material.tres"
+"nodes": {
+"PATH:Tree": {
+"mesh_instance/visibility_range_end": 300.0,
+"mesh_instance/visibility_range_end_margin": 75.0,
+"mesh_instance/visibility_range_fade_mode": 1
 },
-"@MATERIAL:1": {
-"use_external/enabled": true,
-"use_external/path": "res://resources/Materials/tree_trunk_material.tres"
-},
-"@MATERIAL:2": {
-"use_external/enabled": true,
-"use_external/path": "res://resources/Materials/tree_leaves_material.tres"
-},
-"@MATERIAL:3": {
-"use_external/enabled": true,
-"use_external/path": "res://resources/Materials/tree_trunk_material.tres"
+"PATH:Tree 1": {
+"mesh_instance/visibility_range_end": 300.0,
+"mesh_instance/visibility_range_end_margin": 75.0,
+"mesh_instance/visibility_range_fade_mode": 1
 }
 }
 }

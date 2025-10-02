@@ -1,206 +1,199 @@
 {
-    "asset" : {
-        "generator" : "Khronos glTF Blender I/O v1.7.33",
-        "version" : "2.0"
-    },
-    "scene" : 0,
-    "scenes" : [
-        {
-            "name" : "Scene",
-            "nodes" : [
-                1
-            ]
-        }
-    ],
-    "nodes" : [
-        {
-            "mesh" : 0,
-            "name" : "leaves"
-        },
-        {
-            "children" : [
-                0
-            ],
-            "mesh" : 1,
-            "name" : "tree"
-        }
-    ],
-    "materials" : [
-        {
-            "doubleSided" : true,
-            "name" : "leaves",
-            "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.012569713406264782,
-                    0.09462742507457733,
-                    0.003074431326240301,
-                    1
-                ],
-                "metallicFactor" : 0,
-                "roughnessFactor" : 0.5
-            }
-        },
-        {
-            "doubleSided" : true,
-            "name" : "trunk",
-            "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.10653689503669739,
-                    0.041602037847042084,
-                    0.014512971043586731,
-                    1
-                ],
-                "metallicFactor" : 0,
-                "roughnessFactor" : 0.5
-            }
-        }
-    ],
-    "meshes" : [
-        {
-            "name" : "leaves",
-            "primitives" : [
-                {
-                    "attributes" : {
-                        "POSITION" : 0,
-                        "NORMAL" : 1,
-                        "TEXCOORD_0" : 2
-                    },
-                    "indices" : 3,
-                    "material" : 0
-                }
-            ]
-        },
-        {
-            "name" : "tree.001",
-            "primitives" : [
-                {
-                    "attributes" : {
-                        "POSITION" : 4,
-                        "NORMAL" : 5,
-                        "TEXCOORD_0" : 6
-                    },
-                    "indices" : 7,
-                    "material" : 1
-                }
-            ]
-        }
-    ],
-    "accessors" : [
-        {
-            "bufferView" : 0,
-            "componentType" : 5126,
-            "count" : 29466,
-            "max" : [
-                2.3940441608428955,
-                6.9015703201293945,
-                2.4879605770111084
-            ],
-            "min" : [
-                -2.359520435333252,
-                1.7336927652359009,
-                -2.5273642539978027
-            ],
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 1,
-            "componentType" : 5126,
-            "count" : 29466,
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 2,
-            "componentType" : 5126,
-            "count" : 29466,
-            "type" : "VEC2"
-        },
-        {
-            "bufferView" : 3,
-            "componentType" : 5123,
-            "count" : 29772,
-            "type" : "SCALAR"
-        },
-        {
-            "bufferView" : 4,
-            "componentType" : 5126,
-            "count" : 3213,
-            "max" : [
-                2.098100423812866,
-                6.612894535064697,
-                2.2956323623657227
-            ],
-            "min" : [
-                -2.1956124305725098,
-                0,
-                -2.12803053855896
-            ],
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 5,
-            "componentType" : 5126,
-            "count" : 3213,
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 6,
-            "componentType" : 5126,
-            "count" : 3213,
-            "type" : "VEC2"
-        },
-        {
-            "bufferView" : 7,
-            "componentType" : 5123,
-            "count" : 12384,
-            "type" : "SCALAR"
-        }
-    ],
-    "bufferViews" : [
-        {
-            "buffer" : 0,
-            "byteLength" : 353592,
-            "byteOffset" : 0
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 353592,
-            "byteOffset" : 353592
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 235728,
-            "byteOffset" : 707184
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 59544,
-            "byteOffset" : 942912
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 38556,
-            "byteOffset" : 1002456
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 38556,
-            "byteOffset" : 1041012
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 25704,
-            "byteOffset" : 1079568
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 24768,
-            "byteOffset" : 1105272
-        }
-    ],
-    "buffers" : [
-        {
-            "byteLength" : 1130040,
-            "uri" : "single.bin"
-        }
-    ]
+	"asset":{
+		"generator":"Khronos glTF Blender I/O v4.5.48",
+		"version":"2.0"
+	},
+	"scene":0,
+	"scenes":[
+		{
+			"name":"Scene",
+			"nodes":[
+				0
+			]
+		}
+	],
+	"nodes":[
+		{
+			"mesh":0,
+			"name":"Tree"
+		}
+	],
+	"materials":[
+		{
+			"name":"trunk",
+			"pbrMetallicRoughness":{
+				"baseColorFactor":[
+					0.10247580707073212,
+					0.03456415981054306,
+					0.01603204756975174,
+					1
+				],
+				"metallicFactor":0
+			}
+		},
+		{
+			"name":"leaves",
+			"pbrMetallicRoughness":{
+				"baseColorFactor":[
+					0.038344886153936386,
+					0.07828020304441452,
+					0.024470550939440727,
+					1
+				],
+				"metallicFactor":0,
+				"roughnessFactor":0.800000011920929
+			}
+		}
+	],
+	"meshes":[
+		{
+			"name":"Tree",
+			"primitives":[
+				{
+					"attributes":{
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2
+					},
+					"indices":3,
+					"material":0
+				},
+				{
+					"attributes":{
+						"POSITION":4,
+						"NORMAL":5,
+						"TEXCOORD_0":6
+					},
+					"indices":7,
+					"material":1
+				}
+			]
+		}
+	],
+	"accessors":[
+		{
+			"bufferView":0,
+			"componentType":5126,
+			"count":1638,
+			"max":[
+				0.5857788324356079,
+				7.170166492462158,
+				1.3318369388580322
+			],
+			"min":[
+				-0.8110076189041138,
+				-0.019999999552965164,
+				-1.6695318222045898
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":1,
+			"componentType":5126,
+			"count":1638,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":2,
+			"componentType":5126,
+			"count":1638,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":3,
+			"componentType":5123,
+			"count":3318,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":4,
+			"componentType":5126,
+			"count":611,
+			"max":[
+				4.269142150878906,
+				12.603865623474121,
+				3.9405136108398438
+			],
+			"min":[
+				-4.816141605377197,
+				6.647158622741699,
+				-3.2063064575195312
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":5,
+			"componentType":5126,
+			"count":611,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":6,
+			"componentType":5126,
+			"count":611,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":7,
+			"componentType":5123,
+			"count":1023,
+			"type":"SCALAR"
+		}
+	],
+	"bufferViews":[
+		{
+			"buffer":0,
+			"byteLength":19656,
+			"byteOffset":0,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":19656,
+			"byteOffset":19656,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":13104,
+			"byteOffset":39312,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":6636,
+			"byteOffset":52416,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":7332,
+			"byteOffset":59052,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":7332,
+			"byteOffset":66384,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":4888,
+			"byteOffset":73716,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":2046,
+			"byteOffset":78604,
+			"target":34963
+		}
+	],
+	"buffers":[
+		{
+			"byteLength":80652,
+			"uri":"single.bin"
+		}
+	]
 }

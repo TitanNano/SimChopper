@@ -36,11 +36,33 @@ _subresources={
 "materials": {
 "leaves": {
 "use_external/enabled": true,
-"use_external/path": "res://resources/Materials/tree_leaves_material.tres"
+"use_external/path": "uid://k6dwr0ldw71u"
 },
 "trunk": {
 "use_external/enabled": true,
-"use_external/path": "res://resources/Materials/tree_trunk_material.tres"
+"use_external/path": "uid://d0tv5ed6f8tdp"
+}
+},
+"nodes": {
+"PATH:Maxis-3d3-mesh-104": {
+"mesh_instance/visibility_range_end": 300.0,
+"mesh_instance/visibility_range_end_margin": 75.0,
+"mesh_instance/visibility_range_fade_mode": 1
+},
+"PATH:Tree": {
+"mesh_instance/visibility_range_end": 300.0,
+"mesh_instance/visibility_range_end_margin": 75.0,
+"mesh_instance/visibility_range_fade_mode": 1
+},
+"PATH:Tree_1": {
+"mesh_instance/visibility_range_end": 300.0,
+"mesh_instance/visibility_range_end_margin": 75.0,
+"mesh_instance/visibility_range_fade_mode": 1
+},
+"PATH:Tree_2": {
+"mesh_instance/visibility_range_end": 300.0,
+"mesh_instance/visibility_range_end_margin": 75.0,
+"mesh_instance/visibility_range_fade_mode": 1
 }
 }
 }

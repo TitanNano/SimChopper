@@ -27,6 +27,8 @@ func build_async(city: Dictionary):
 	var sea_level: int = city.simulator_settings["GlobalSeaLevel"]
 
 	self.city_coords_feature = CityCoordsFeature.new(world_constants, sea_level)
+	
+	var road_sections: Array[MapBuilding] = Array([], TYPE_OBJECT, "RefCounted", MapBuilding)
 
 	for key in networks:
 		var value: Dictionary = networks.get(key)
@@ -68,6 +70,9 @@ func build_async(city: Dictionary):
 		elif network_section.building_id() in (range(0x1D, 0x2C) + range(0x51, 0x5E) + range(0x43, 0x45)):
 			road_network.add_child(instance, true)
 			road_navigation.insert_node(network_section.data, instance)
+			
+			if network_section.building_id() in [0x1D, 0x1E, 0x43, 0x44]:
+				road_sections.append(network_section)
 		else:
 			print("network secction doesn't belong to any network, ", network_section)
 
@@ -82,14 +87,21 @@ func build_async(city: Dictionary):
 
 	for _i in range(3):
 		var car_spawner: CarSpawner = (load("res://resources/Objects/Spawner/CarSpawner.tscn") as PackedScene).instantiate()
-		var random_child: Node3D = road_network.get_child(randi() % road_network.get_child_count()) 
-		var transform := random_child.global_transform.origin
-		@warning_ignore("unsafe_property_access")
+		var random_child := road_sections[randi() % road_sections.size()]
+		var tile: Dictionary = tiles[Array(random_child.tile_coords())]
+		var altitude: int = tile.altitude
+		
+		# fully raised terrain needs +1
+		if (tile.terrain & 0x0D) == 0x0D:
+			altitude += 1
+		
+		var location := self.city_coords_feature.get_building_coords(random_child.tile_coords()[0], random_child.tile_coords()[1], altitude, random_child.size())
+
 		car_spawner.road_network_path = road_network.get_path()
-		car_spawner.translate(transform)
-		car_spawner.translate(Vector3.UP * 2)
-		self.get_parent().add_child(car_spawner)
-		@warning_ignore("unsafe_method_access")
+		car_spawner.translate(location)
+		car_spawner.translate(Vector3.UP * 0.05)
+		self.get_parent().add_child(car_spawner, true)
+		car_spawner.owner = self.get_parent()
 		car_spawner.start_auto_spawn()
 
 

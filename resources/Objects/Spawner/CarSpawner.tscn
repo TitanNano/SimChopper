@@ -2,14 +2,13 @@
 
 [ext_resource type="Script" uid="uid://bc552pej2vb8b" path="res://native/src/scripts/spawner/car_spawner.rs" id="1_c5pws"]
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_falwk"]
+top_radius = 10.0
+bottom_radius = 0.2
+height = 200.0
+
 [sub_resource type="StandardMaterial3D" id="1"]
 albedo_color = Color(1, 0, 0, 1)
-
-[sub_resource type="CylinderMesh" id="2"]
-material = SubResource("1")
-top_radius = 10.0
-bottom_radius = 0.1
-height = 200.0
 
 [node name="CarSpawner" type="Marker3D"]
 script = ExtResource("1_c5pws")
@@ -17,4 +16,5 @@ road_network_path = null
 
 [node name="CSGMesh3D" type="CSGMesh3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, 0)
-mesh = SubResource("2")
+mesh = SubResource("CylinderMesh_falwk")
+material = SubResource("1")

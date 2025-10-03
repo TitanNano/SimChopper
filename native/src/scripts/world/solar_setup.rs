@@ -1,8 +1,10 @@
 use godot::builtin::math::FloatExt;
 use godot::builtin::Vector3;
-use godot::classes::{light_3d, DirectionalLight3D, Node3D, Time};
+use godot::classes::{light_3d, DirectionalLight3D, Node3D, Performance, Time};
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, ScriptSignal};
+
+use crate::script_callable;
 
 #[derive(GodotScript, Debug)]
 #[script(base = Node3D)]
@@ -55,6 +57,14 @@ impl SolarSetup {
             .expect("there must be an environment");
 
         self.sdfgi_enabled = env.is_sdfgi_enabled();
+        Performance::singleton().add_custom_monitor(
+            "Game/ClockHour",
+            &script_callable!(self, Self::get_ingame_clock_h),
+        );
+        Performance::singleton().add_custom_monitor(
+            "Game/ClockMinute",
+            &script_callable!(self, Self::get_ingame_clock_m),
+        );
     }
 
     pub fn _physics_process(&mut self, _delta: f64) {
@@ -113,8 +123,10 @@ impl SolarSetup {
     /// Get the current game time in ms.
     pub fn get_time(&self) -> u64 {
         let day_length = self.day_length_ms();
+        // start game at 30% of the day.
+        let base_offset = (day_length / 10) * 3;
 
-        Time::singleton().get_ticks_msec() % (day_length * 2)
+        (base_offset + Time::singleton().get_ticks_msec()) % (day_length * 2)
     }
 
     // get the current in-game time in seconds since sunrise.
@@ -129,7 +141,18 @@ impl SolarSetup {
 
     // get the current in-game time in hours since sunrise.
     pub fn get_ingame_time_h(&self) -> f64 {
-        self.get_time() as f64 / (self.day_length_ms() as f64 * 2.0 / 24.0)
+        (self.get_time() as f64 / (self.day_length_ms() as f64 * 2.0 / 24.0)) % 24.0
+    }
+
+    pub fn get_ingame_clock_h(&self) -> u32 {
+        // sunrise is at 6 am so an in-game time of 0 hours is equal to 6 am.
+        (self.get_ingame_time_h().floor() as u32 + 6) % 24
+    }
+
+    pub fn get_ingame_clock_m(&self) -> u32 {
+        let hours = self.get_ingame_time_h().floor();
+
+        (self.get_ingame_time_m().floor() - hours * 60.0) as u32
     }
 
     pub fn sun_pos(&self) -> f32 {

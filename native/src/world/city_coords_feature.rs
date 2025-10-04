@@ -38,6 +38,7 @@ impl CityCoordsFeature {
 
         let offset = (size * tile_size) as f32 / 2.0;
 
+        // OpenCity2k gets the bottom left corner, we have to correct that.
         let y = y - (size as u32 - 1);
 
         let mut location = self.get_world_coords(x, y, z);

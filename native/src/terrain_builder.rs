@@ -154,6 +154,15 @@ pub struct TerrainBuilder {
 
 #[godot_api]
 impl TerrainBuilder {
+    const GROUND_SURFACE: &str = "ground";
+
+    const WATER_SURFACE: &str = "water";
+
+    #[func]
+    fn ground_surface() -> StringName {
+        Self::GROUND_SURFACE.into()
+    }
+
     #[func]
     fn new(
         tilelist: Dictionary,
@@ -763,6 +772,13 @@ fn generate_chunk_mesh(context: &WorkerThreadContext, chunk: ChunkSurfaces) -> T
         let new_index = mesh.get_surface_count();
 
         mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, &surface_arrays);
+
+        let surface_name = match surface_type {
+            TileSurfaceType::Ground => TerrainBuilder::GROUND_SURFACE,
+            TileSurfaceType::Water => TerrainBuilder::WATER_SURFACE,
+        };
+
+        mesh.surface_set_name(new_index, surface_name);
 
         let surface_material_variant = context.materials.get(surface_type.to_string());
 

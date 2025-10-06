@@ -24,7 +24,7 @@ void fragment() {
 	float grass_contribution = clamp(((world_normal.y - 0.95) / 0.05), 0.0, 1.0);
 	float dirt_contribution = clamp(((1.0 - world_normal.y) / 0.05), 0.0, 1.0);
 
-	if (COLOR != vec4(0, 0, 0, 1)) {
+	if (COLOR.rgb != vec3(0, 0, 0)) {
 		ALBEDO = COLOR.rgb;
 	} else {
 		ALBEDO = (dirt_contribution  * albedo.rgb) + (albedo_grass.rgb * grass_contribution);

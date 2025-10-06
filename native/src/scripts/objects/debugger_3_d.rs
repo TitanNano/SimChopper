@@ -6,14 +6,14 @@ use itertools::Itertools;
 
 #[derive(GodotScript, Debug)]
 #[script(base = Node3D)]
-struct Debugger3D {
+pub struct Debugger3D {
     #[export]
     pub title: GString,
 
     #[export]
     pub text_view: OnEditor<Gd<RichTextLabel>>,
 
-    pub debug_data: Dictionary,
+    debug_data: Dictionary,
 }
 
 #[godot_script_impl]
@@ -28,5 +28,9 @@ impl Debugger3D {
             .join("\n");
 
         self.text_view.set_text(&format!("{}\n\n{}", title, values));
+    }
+
+    pub fn debug_data(&self) -> Dictionary {
+        self.debug_data.clone()
     }
 }

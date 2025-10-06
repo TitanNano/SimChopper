@@ -105,3 +105,11 @@ func _insert_spawn_point(building_coords: Array[int], building_size: int, altitu
 
 	spawn_host.translate(location)
 	self.add_child(spawn_host)
+
+
+func _input(event: InputEvent) -> void:
+	if not OS.has_feature("debug"):
+		return
+
+	if event.is_action_pressed("debug_snapshot", false, true):
+		self._create_snapshot()

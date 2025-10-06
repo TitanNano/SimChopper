@@ -2,7 +2,7 @@ use std::ops::Deref;
 use std::{cmp::Ordering, ops::DerefMut};
 
 use anyhow::{bail, Result};
-use godot::builtin::{Array, Callable, Dictionary, GString, Variant, Vector3};
+use godot::builtin::{Array, Callable, GString, Variant, Vector3};
 use godot::classes::object::ConnectFlags;
 use godot::classes::{
     Area3D, Decal, GpuParticles3D, Node, Node3D, Object, PhysicsRayQueryParameters3D,
@@ -13,9 +13,10 @@ use godot::meta::ToGodot;
 use godot::obj::bounds::Declarer;
 use godot::obj::{Bounds, Gd, Inherits, InstanceId};
 use godot::prelude::{GodotClass, NodePath};
-use godot_rust_script::{godot_script_impl, GodotScript, OnEditor};
+use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
 use itertools::Itertools;
 
+use crate::scripts::objects::debugger_3_d::{Debugger3D, IDebugger3D};
 use crate::util::logger;
 use crate::{
     ext::node_3d::{Node3DExt, Vector3Ext},
@@ -38,7 +39,7 @@ struct WaterJet {
     pub decal: OnEditor<Gd<Decal>>,
 
     #[export]
-    pub debugger: Option<Gd<Node3D>>,
+    pub debugger: OnEditor<RsRef<Debugger3D>>,
 
     /// Maximum number of decals that will be spawned at an impact point.
     #[export(range(min = 1.0, max = 255.0, step = 1.0))]
@@ -120,7 +121,6 @@ impl WaterJet {
             bail!("Failed to create raycast query!");
         };
 
-        query.set_hit_from_inside(true);
         query.set_hit_back_faces(false);
 
         let result = space.intersect_ray(&query);
@@ -142,21 +142,18 @@ impl WaterJet {
     }
 
     pub fn _physics_process(&mut self, delta: f64) {
-        let mut debugger = self
-            .debugger
-            .as_ref()
-            .map(|dbg| dbg.get("debug_data").to())
-            .unwrap_or_else(|| {
-                logger::warn!("Trying to access 3D debugger but none is available!");
-                Dictionary::new()
-            });
+        #[cfg(debug_assertions)]
+        let mut debugger = self.debugger.debug_data();
 
         if !self.base.is_emitting() {
+            #[cfg(debug_assertions)]
             debugger.set("Active", false);
             return;
         }
 
+        #[cfg(debug_assertions)]
         debugger.set("Active", true);
+        #[cfg(debug_assertions)]
         debugger.set(
             "Area",
             self.impact_area().get_overlapping_bodies().len() as u32,
@@ -168,6 +165,7 @@ impl WaterJet {
 
         let decal = self.decal().to_owned();
 
+        #[cfg(debug_assertions)]
         debugger.set("Shape Cast", "N/A");
 
         for shape_cast in self.impact_casts.iter() {
@@ -181,8 +179,11 @@ impl WaterJet {
 
             let mut impact_targets = Array::<GString>::new();
 
+            #[cfg(debug_assertions)]
             debugger.set("Shape Cast", shape_cast.get_name());
+            #[cfg(debug_assertions)]
             debugger.set("Impacting", impact_targets.clone());
+            #[cfg(debug_assertions)]
             debugger.set("Decal Spawned", false);
 
             for index in 0..count {
@@ -271,6 +272,7 @@ impl WaterJet {
                     .flags(ConnectFlags::ONE_SHOT.to_godot() as u32)
                     .done();
 
+                #[cfg(debug_assertions)]
                 debugger.set("Decal Spawned", decal_inst.is_some());
                 break;
             }
@@ -394,6 +396,9 @@ impl WaterJet {
         T: GodotClass + DerefMut<Target = Node> + Inherits<Node>,
         <T as Bounds>::Declarer: Declarer<DerefTarget<T> = T>,
     {
+        #[cfg(debug_assertions)]
+        let mut debugger = self.debugger.clone().debug_data();
+
         let mut decal_inst: Gd<Decal> = template
             .duplicate()
             .expect("Failed to duplicate decal node!")
@@ -432,14 +437,22 @@ impl WaterJet {
 
         decal_inst.set_global_position(point.position);
         decal_inst.align_up(point.normal);
+        #[cfg(debug_assertions)]
+        debugger.set("Decal Normal", point.normal);
         decal_inst.global_rotate(point.normal, deg_to_rad(randf_range(-90.0, 90.0)) as f32);
         decal_inst.translate(offset);
-        decal_inst.set_owner(&*target_node);
 
-        let surface_intersect = self.raycast_to_surface(
-            decal_inst.get_global_position(),
-            point.position - point.normal,
-        );
+        if let Some(scene_root) = target_node
+            .get_tree()
+            .and_then(|tree| tree.get_current_scene())
+        {
+            decal_inst.set_owner(&scene_root);
+        } else {
+            logger::error!("Failed to access scene root! Unable to set decal owner.");
+        }
+
+        let surface_intersect =
+            self.raycast_to_surface(point.position, point.position + point.normal);
 
         let surface_intersect = match surface_intersect {
             Ok(value) => value,
@@ -452,6 +465,8 @@ impl WaterJet {
         if let Some(surface_intersect) = surface_intersect {
             decal_inst.set_global_position(surface_intersect.position);
             decal_inst.align_up(surface_intersect.normal);
+            #[cfg(debug_assertions)]
+            debugger.set("Decal Normal", surface_intersect.normal);
         }
 
         decal_inst

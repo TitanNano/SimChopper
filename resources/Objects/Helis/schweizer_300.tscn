@@ -40,15 +40,15 @@ ao_on_uv2 = true
 subsurf_scatter_strength = 0.3
 
 [sub_resource type="CapsuleShape3D" id="22"]
-radius = 0.63507
-height = 1.27014
+radius = 0.65
+height = 2.1
 
 [sub_resource type="BoxShape3D" id="17"]
 size = Vector3(1.31, 0.42, 2.502)
 
 [sub_resource type="CapsuleShape3D" id="18"]
 radius = 0.15
-height = 4.0
+height = 4.45619
 
 [sub_resource type="CylinderShape3D" id="19"]
 height = 0.08
@@ -99,7 +99,7 @@ surface_material_override/0 = ExtResource("6_y4h4o")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0980453, 1.52714, 4.24386)
 
 [node name="BodyShape" type="CollisionShape3D" parent="." index="6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00923181, 1.07085, -0.367273)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.00923181, 1.07085, -0.601074)
 shape = SubResource("22")
 
 [node name="StandShape" type="CollisionShape3D" parent="." index="7"]
@@ -107,7 +107,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -0.65716)
 shape = SubResource("17")
 
 [node name="TailShape" type="CollisionShape3D" parent="." index="8"]
-transform = Transform3D(1, 0, 0, 0, -0.0842326, 0.996446, 0, -0.996446, -0.0842326, 0, 1.39094, 2.65674)
+transform = Transform3D(1, 0, 0, 0, -0.0842326, 0.996446, 0, -0.996446, -0.0842326, 0, 1.38301, 2.56298)
 shape = SubResource("18")
 
 [node name="RotorShape" type="CollisionShape3D" parent="." index="9"]

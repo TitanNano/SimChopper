@@ -250,6 +250,7 @@ func mount_upgrades():
 
 		object.set_meta("scene_instance_id", scene.get_instance_id())
 
+		# prevent duplicates
 		for child in self.child_upgrade_mount.get_children():
 			if child.get_meta("scene_instance_id") == scene.get_instance_id():
 				duplicate = true
@@ -259,7 +260,23 @@ func mount_upgrades():
 			return
 
 		self.child_upgrade_mount.add_child(object, true)
-		object.owner = self.child_upgrade_mount
+		object.owner = self.get_tree().current_scene
+		
+		# attach collision shapes
+		for child in object.get_children():
+			if not child is CollisionShape3D:
+				continue
+				
+			var coll_child: CollisionShape3D = child
+			# get the local tranform relative to our body node
+			var transform := self.global_transform.inverse() * coll_child.global_transform
+			
+			var owner := self.create_shape_owner(child)
+			self.shape_owner_set_transform(owner, transform)
+			self.shape_owner_set_disabled(owner, coll_child.disabled)
+			self.shape_owner_add_shape(owner, coll_child.shape)
+
+
 		self.upgrade_action_dispatch[upgrade.action] = object
 
 

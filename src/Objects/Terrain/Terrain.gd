@@ -61,14 +61,35 @@ func build_async():
 		
 		translation.y = 0
 		
+		var occluder := create_terrain_occluder(chunk.mesh())
 		var mesh_instance := MeshInstance3D.new()
 
 		mesh_instance.mesh = chunk.mesh()
 		mesh_instance.cast_shadow = MeshInstance3D.SHADOW_CASTING_SETTING_DOUBLE_SIDED
 		mesh_instance.create_trimesh_collision()
-
-		self.add_child(mesh_instance, true)
+		mesh_instance.add_child(occluder, false)
+		
+		self.add_child(mesh_instance, false)
+		
 		mesh_instance.owner = get_tree().current_scene
+		occluder.owner = get_tree().current_scene
+		
 		mesh_instance.translate(translation)
 	
 	prints("generated terain:", self.get_child_count(), "nodes generated")
+
+
+func create_terrain_occluder(mesh: ArrayMesh) -> OccluderInstance3D:
+	var surface_index := mesh.surface_find_by_name(TerrainBuilder.ground_surface())
+	var terrain_surface := mesh.surface_get_arrays(surface_index)
+	var vertecies: PackedVector3Array = terrain_surface[Mesh.ArrayType.ARRAY_VERTEX]
+	var indices: PackedInt32Array = terrain_surface[Mesh.ArrayType.ARRAY_INDEX]
+	
+	var occluder := OccluderInstance3D.new()
+	var occluder_mesh := ArrayOccluder3D.new()
+	
+	occluder_mesh.vertices = vertecies
+	occluder_mesh.indices = indices
+	occluder.occluder = occluder_mesh
+	
+	return occluder

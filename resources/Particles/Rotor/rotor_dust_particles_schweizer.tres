@@ -1,28 +1,41 @@
-[gd_resource type="ParticleProcessMaterial" load_steps=3 format=3 uid="uid://ckkpoyyglqm80"]
+[gd_resource type="ParticleProcessMaterial" load_steps=5 format=3 uid="uid://ckkpoyyglqm80"]
 
-[sub_resource type="Gradient" id="Gradient_c1tqv"]
-colors = PackedColorArray(1, 1, 1, 0.588235, 1, 1, 1, 0)
+[sub_resource type="Curve" id="Curve_iahva"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.25, 1), 0.167333, 0.167333, 0, 0, Vector2(0.75, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.110138, -2.92167, 0, 0]
+point_count = 4
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_jtl1a"]
-gradient = SubResource("Gradient_c1tqv")
+[sub_resource type="CurveTexture" id="CurveTexture_pucxj"]
+curve = SubResource("Curve_iahva")
+
+[sub_resource type="Curve" id="Curve_pucxj"]
+_limits = [0.673416, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 2), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_1h7fw"]
+curve = SubResource("Curve_pucxj")
 
 [resource]
 emission_shape = 6
 emission_ring_axis = Vector3(2.08165e-12, 1, 2.08165e-12)
-emission_ring_height = 1.0
-emission_ring_radius = 6.0
+emission_ring_height = 0.0
+emission_ring_radius = 5.2
 emission_ring_inner_radius = 5.0
 emission_ring_cone_angle = 90.0
-angle_min = -90.0
-angle_max = 360.0
+angle_min = -170.0
+angle_max = 170.0
 direction = Vector3(0, 1, 0)
-initial_velocity_min = 15.0
-initial_velocity_max = 15.0
-angular_velocity_min = 30.0
-angular_velocity_max = 50.0
+spread = 0.0
+initial_velocity_min = 2.0
+initial_velocity_max = 2.0
+radial_velocity_min = 5.99998
+radial_velocity_max = 5.99998
 gravity = Vector3(0, 0, 0)
-radial_accel_min = 15.0
-radial_accel_max = 15.0
-scale_min = 2.0
-scale_max = 6.0
-color_ramp = SubResource("GradientTexture1D_jtl1a")
+scale_min = 4.0
+scale_max = 4.0
+scale_curve = SubResource("CurveTexture_1h7fw")
+alpha_curve = SubResource("CurveTexture_pucxj")
+anim_speed_min = 2.0
+anim_speed_max = 2.0
+anim_offset_min = 0.1
+anim_offset_max = 0.3

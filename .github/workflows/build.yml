@@ -134,7 +134,7 @@ jobs:
           lfs: true
       - uses: hustcer/setup-nu@main
         with:
-          version: "0.101.*"
+          version: "0.107.*"
 
       - name: setup Godot
         shell: nu {0}
@@ -195,19 +195,42 @@ jobs:
           let platform_dir = "${{ matrix.vendor }}-${{ matrix.platform }}"
           let release = ${{inputs.release}}
 
+          let x86_path = $"native/target/x86_64-($platform_dir)"
+          let x86_debug = $"($x86_path)/debug/${{ matrix.lib }}"
+          let x86_release = $"($x86_path)/release/${{ matrix.lib }}"
+
+          let aarch64_path = $"native/target/aarch64-($platform_dir)"
+          let aarch64_debug = $"($aarch64_path)/debug/${{ matrix.lib }}"
+          let aarch64_release = $"($aarch64_path)/release/${{ matrix.lib }}"
+
           mkdir $"native/target/universal-($platform_dir)/debug/"
-          lipo -create $"native/target/x86_64-($platform_dir)/debug/${{ matrix.lib }}" $"native/target/aarch64-($platform_dir)/debug/${{ matrix.lib }}" -output $"native/target/universal-($platform_dir)/debug/${{ matrix.lib }}"
+          lipo -create $x86_debug $aarch64_debug -output $"native/target/universal-($platform_dir)/debug/${{ matrix.lib }}"
 
           if $release {
             mkdir $"native/target/universal-($platform_dir)/release/"
-            lipo -create $"native/target/x86_64-($platform_dir)/release/${{ matrix.lib }}" $"native/target/aarch64-($platform_dir)/release/${{ matrix.lib }}" -output $"native/target/universal-($platform_dir)/release/${{ matrix.lib }}"
+            lipo -create $x86_release $aarch64_release -output $"native/target/universal-($platform_dir)/release/${{ matrix.lib }}"
           }
+
       - name: import godot project
         shell: nu {0}
         run: |
           $env.PATH = $env.PATH | append ("./.godot_bin" | path expand)
 
           godot --headless --verbose --import
+
+      - name: clean up libnative variants
+        if: matrix.platform == 'darwin'
+        shell: nu {0}
+        run: |
+          let platform_dir = "${{ matrix.vendor }}-${{ matrix.platform }}"
+          let release = ${{ inputs.release }}
+          let profile = if $release { "release" } else { "debug" }
+
+          rm -r $"native/target/x86_64-($platform_dir)/($profile)/"
+
+          if $release {
+            rm -r $"native/target/aarch64-($platform_dir)/($profile)/"
+          }
 
       - name: export-debug
         shell: nu {0}
@@ -223,7 +246,7 @@ jobs:
         run: |
           $env.PATH = $env.PATH | append ("./.godot_bin" | path expand)
           mkdir "${{ env.EXPORT_DIR }}"
-          godot --headless --export-release ${{ env.EXPORT_ARGS }}
+          godot --headless --verbose --export-release ${{ env.EXPORT_ARGS }}
           if (ls -a "${{ env.EXPORT_DIR }}" | length) < 1 { exit 1 }
       - name: describe revision
         id: describe

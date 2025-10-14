@@ -63,7 +63,6 @@ jobs:
         cd native/
         rustup target add ${{ env.TARGET_TRIPLET }}
     - name: Build Debug
-      if: ${{ !inputs.release }}
       run: |
         cd native/
         ${{ env.CARGO_BUILD}} ${{ env.TARGET_TRIPLET}}
@@ -72,11 +71,17 @@ jobs:
       run: |
         cd native/
         ${{ env.CARGO_BUILD }} ${{ env.TARGET_TRIPLET}} --release
-    - name: Artifacts
+    - name: Debug Artifacts
       uses: actions/upload-artifact@v4
       with:
-          name: libnative-${{ matrix.platform }}-${{ matrix.arch }}
-          path: native/target/${{ env.TARGET_TRIPLET }}/${{ inputs.release && 'release' || 'debug' }}/${{ matrix.lib }}
+          name: libnative-${{ matrix.platform }}-${{ matrix.arch }}-debug
+          path: native/target/${{ env.TARGET_TRIPLET }}/debug/${{ matrix.lib }}
+    - name: Release Artifacts
+      uses: actions/upload-artifact@v4
+      if: inputs.release
+      with:
+          name: libnative-${{ matrix.platform }}-${{ matrix.arch }}-release
+          path: native/target/${{ env.TARGET_TRIPLET }}/release/${{ matrix.lib }}
 
   godot-export:
     strategy:
@@ -152,49 +157,50 @@ jobs:
           unzip -j Godot_v${{ matrix.version }}-stable_export_templates.tpz
       - name: download host libs
         if: ${{ matrix.platform != 'linux' && startsWith(matrix.os, 'ubuntu') }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
-          name: libnative-linux-x86_64
+          name: libnative-linux-x86_64-debug
           path: native/target/x86_64-unknown-linux-gnu/debug/
-      - name: download x86_64 libs
+  
+      - name: download x86_64 debug libs
         if: matrix.x86_64
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
-          name: libnative-${{ matrix.platform }}-x86_64
+          name: libnative-${{ matrix.platform }}-x86_64-debug
           path: native/target/x86_64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/debug/
-      - name: download aarch64 libs
-        if: matrix.aarch64
-        uses: actions/download-artifact@v4
+      - name: download x86_64 release libs
+        if: ${{ matrix.x86_64 && inputs.release }}
+        uses: actions/download-artifact@v5
         with:
-          name: libnative-${{ matrix.platform }}-aarch64
+          name: libnative-${{ matrix.platform }}-x86_64-release
+          path: native/target/x86_64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/release/
+  
+      - name: download aarch64 debug libs
+        if: matrix.aarch64
+        uses: actions/download-artifact@v5
+        with:
+          name: libnative-${{ matrix.platform }}-aarch64-debug
           path: native/target/aarch64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/debug/
+      - name: download aarch64 release libs
+        if: ${{ matrix.aarch64 && inputs.release }}
+        uses: actions/download-artifact@v5
+        with:
+          name: libnative-${{ matrix.platform }}-aarch64-release
+          path: native/target/aarch64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/release/
+
       - name: create universal libnative
         if: matrix.platform == 'darwin'
-        run: |
-          platform_dir="${{ matrix.vendor }}-${{ matrix.platform }}"
-          mkdir -p native/target/universal-$platform_dir/debug/
-          lipo -create native/target/x86_64-$platform_dir/debug/${{ matrix.lib }} native/target/aarch64-$platform_dir/debug/${{ matrix.lib }} -output native/target/universal-$platform_dir/debug/${{ matrix.lib }}
-      - name: copy libs
         shell: nu {0}
         run: |
-          let platform_dir = "${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}"
-          let x86_64 = $"native/target/x86_64-($platform_dir)"
-          let aarch64 = $"native/target/aarch64-($platform_dir)"
-          let universal = $"native/target/universal-($platform_dir)"
-          
-          if ($"($x86_64)/debug/" | path type) == "dir" {
-            mkdir $"($x86_64)/release/"
-            cp -v ($"($x86_64)/debug/*" | into glob) $"($x86_64)/release/"
-          }
+          let platform_dir = "${{ matrix.vendor }}-${{ matrix.platform }}"
+          let release = ${{inputs.release}}
 
-          if ($"($aarch64)/debug/" | path type) == "dir" {
-            mkdir $"($aarch64)/release/"
-            cp -v ($"($aarch64)/debug/*" | into glob) $"($aarch64)/release/"
-          }
+          mkdir $"native/target/universal-($platform_dir)/debug/"
+          lipo -create $"native/target/x86_64-($platform_dir)/debug/${{ matrix.lib }}" $"native/target/aarch64-($platform_dir)/debug/${{ matrix.lib }}" -output $"native/target/universal-($platform_dir)/debug/${{ matrix.lib }}"
 
-          if ($"($universal)/debug/" | path type) == "dir" {
-            mkdir $"($universal)/release/"
-            cp -v ($"($universal)/debug/*" | into glob) $"($universal)/release/"
+          if $release {
+            mkdir $"native/target/universal-($platform_dir)/release/"
+            lipo -create $"native/target/x86_64-($platform_dir)/release/${{ matrix.lib }}" $"native/target/aarch64-($platform_dir)/release/${{ matrix.lib }}" -output $"native/target/universal-($platform_dir)/release/${{ matrix.lib }}"
           }
       - name: import godot project
         shell: nu {0}

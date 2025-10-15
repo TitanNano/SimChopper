@@ -1,0 +1,60 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://x5a5yugqexn"
+path="res://.godot/imported/scene.gltf-4b4f21eebb185bd76efff61c8b4170eb.scn"
+
+[deps]
+
+source_file="res://resources/Meshes/Blend/police_station/scene.gltf"
+dest_files=["res://.godot/imported/scene.gltf-4b4f21eebb185bd76efff61c8b4170eb.scn"]
+
+[params]
+
+nodes/root_type="StaticBody3D"
+nodes/root_name="Root Node"
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+_subresources={
+"nodes": {
+"PATH:Police Station": {
+"mesh_instance/visibility_range_end": 610.0,
+"mesh_instance/visibility_range_end_margin": 152.5,
+"mesh_instance/visibility_range_fade_mode": 1
+},
+"PATH:Police Station/Barrier": {
+"mesh_instance/visibility_range_end": 305.0,
+"mesh_instance/visibility_range_end_margin": 76.25,
+"mesh_instance/visibility_range_fade_mode": 1
+},
+"PATH:Police Station/Fence": {
+"mesh_instance/visibility_range_end": 305.0,
+"mesh_instance/visibility_range_end_margin": 76.25,
+"mesh_instance/visibility_range_fade_mode": 1
+},
+"PATH:Police Station/Sign": {
+"mesh_instance/visibility_range_end": 305.0,
+"mesh_instance/visibility_range_end_margin": 76.25,
+"mesh_instance/visibility_range_fade_mode": 1
+}
+}
+}
+gltf/naming_version=1
+gltf/embedded_image_handling=1

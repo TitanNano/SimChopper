@@ -174,7 +174,7 @@ impl TerrainBuilder {
             city_size: 0,
             tile_height: 8,
             sea_level: 0,
-            chunk_size: 32,
+            chunk_size: 8,
             rotation,
             tilelist,
             materials,

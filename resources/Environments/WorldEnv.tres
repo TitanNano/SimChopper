@@ -15,6 +15,7 @@ ssr_enabled = true
 ssr_max_steps = 128
 ssr_fade_in = 0.05
 ssr_fade_out = 1.5
+ssr_depth_tolerance = 0.51
 ssao_ao_channel_affect = 1.0
 sdfgi_enabled = true
 sdfgi_cascades = 5

@@ -37,7 +37,7 @@ display_server/driver.linuxbsd="wayland"
 window/size/viewport_width.release=1920
 window/size/viewport_height.release=1080
 window/size/mode.release=3
-window/vsync/use_vsync=true
+window/vsync/use_vsync=false
 
 [editor]
 
@@ -154,6 +154,7 @@ textures/vram_compression/import_etc2_astc=true
 lights_and_shadows/use_physical_light_units=true
 lights_and_shadows/directional_shadow/size=8192
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
+lights_and_shadows/directional_shadow/16_bits=false
 lights_and_shadows/positional_shadow/soft_shadow_filter_quality=3
 global_illumination/voxel_gi/quality=1
 environment/ssao/half_size=false

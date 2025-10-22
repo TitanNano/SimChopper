@@ -10,15 +10,15 @@ varying vec2 vary_world_uv2;
 global uniform float ocean_noise_scale : hint_range(0, 1);
 global uniform float ocean_wave_dir : hint_range(0, 1);
 global uniform float ocean_speed : hint_range(0, 0.5, 0.001);
-global uniform sampler2D ocean_noise : hint_default_black, repeat_enable;
+global uniform sampler2D ocean_noise : hint_default_black, repeat_enable, filter_linear_mipmap;
 global uniform float ocean_wave2_dir : hint_range(0, 1);
 global uniform float ocean_wave_ratio : hint_range(0, 1);
-global uniform sampler2D ocean_normal_map : hint_normal, repeat_enable;
+global uniform sampler2D ocean_normal_map : hint_normal, repeat_enable, filter_linear_mipmap;
 global uniform vec4 ocean_water_color: source_color;
 global uniform vec4 ocean_deep_water_color: source_color;
 uniform float Normal_Depth;
 uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_linear_mipmap;
-uniform sampler2D depth_texture : hint_depth_texture, repeat_disable;
+uniform sampler2D depth_texture : hint_depth_texture, repeat_disable, filter_linear_mipmap;
 uniform float wave_height;
 
 const float WAVE_CONST = 6.28300;
@@ -41,12 +41,6 @@ float depth(vec2 screen_uv, mat4 inv_projection_matrix) {
 	view.xyz /= view.w;
 
 	return -view.z;
-}
-
-float fresnel(float n_dot_l, float fresnel_bias, float fresnel_pow) {
-	float facing = (1.0 - n_dot_l);
-
-	return max(fresnel_bias + (1.0 - fresnel_bias) * pow(facing, fresnel_pow), 0.0);
 }
 
 vec3 sample_wave_noise(sampler2D map) {
@@ -88,31 +82,39 @@ void vertex() {
 
 void fragment() {
 	vec3 normal = sample_wave_noise(ocean_normal_map);
-
-	vec3 refraction_offset = (2.0 * normal.xyz - 1.0) * vec3(0.075, 0.075, 1.0);
+	
+	NORMAL_MAP = normal;
+	NORMAL_MAP_DEPTH = Normal_Depth;
+	ROUGHNESS = 0.2;
 
 	float n_dot_l = max(dot(VIEW, NORMAL), 0);
 	float facing = (1.0 - n_dot_l);
-	float fresnel = fresnel(n_dot_l, 0.2, 5.0);
+	
+	if (facing > 0.999) {
+		ALBEDO = correct_color(ocean_water_color).rgb;
+	} else {
+		float dist_scale = clamp(6.0 / depth(SCREEN_UV, INV_PROJECTION_MATRIX), 0.0, 1.0);
+		vec4 water_deep_albedo = vec4(0, 0, 0, 0);
 
-	float depth_diff = FRAGCOORD.z - texture(depth_texture, SCREEN_UV + refraction_offset.rg).r;
-	float depth_mask = ceil(clamp(depth_diff, 0.0, 1.0));
+		if (dist_scale > 0.0) {
+			vec3 refraction_offset = (2.0 * normal.xyz - 1.0) * vec3(0.075, 0.075, 1.0);
+		
+			float depth_diff = FRAGCOORD.z - texture(depth_texture, SCREEN_UV + refraction_offset.rg).r;
+			float depth_mask = ceil(clamp(depth_diff, 0.0, 1.0));
+		
+			vec4 refraction_a = texture(screen_texture, SCREEN_UV.xy + refraction_offset.xy);
+			vec4 refraction_b = texture(screen_texture, SCREEN_UV.xy);
+			vec4 refraction_value = refraction_b * depth_mask + refraction_a * (1.0 - depth_mask);
 
-	vec4 refraction_a = texture(screen_texture, SCREEN_UV.xy + refraction_offset.xy);
-	vec4 refraction_b = texture(screen_texture, SCREEN_UV.xy);
-	vec4 refraction_value = refraction_b * depth_mask + refraction_a * (1.0 - depth_mask);
-
-	float dist_scale = clamp(6.0 / depth(SCREEN_UV, INV_PROJECTION_MATRIX), 0.0, 1.0);
-
-	vec4 water_deep_albedo = (refraction_value * dist_scale + (1.0 - dist_scale) * correct_color(ocean_deep_water_color));
-
-	// Lerp between water color and deep water color
-  	vec4 water_albedo = (correct_color(ocean_water_color) * facing + water_deep_albedo * (1.0 - facing));
-
-	ROUGHNESS = 0.2;
-	NORMAL_MAP = normal;
-	NORMAL_MAP_DEPTH = Normal_Depth;
-
-	// Refraction output
-	ALBEDO = water_albedo.rgb;
+			water_deep_albedo = (refraction_value * dist_scale + (1.0 - dist_scale) * correct_color(ocean_deep_water_color));
+		} else {
+			water_deep_albedo = correct_color(ocean_deep_water_color);
+		}
+		
+		// Lerp between water color and deep water color
+	  	vec4 water_albedo = (correct_color(ocean_water_color) * facing + water_deep_albedo * (1.0 - facing));
+	
+		// Refraction output
+		ALBEDO = water_albedo.rgb;
+	}
 }

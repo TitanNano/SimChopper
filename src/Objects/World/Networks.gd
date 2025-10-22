@@ -9,16 +9,12 @@ signal loading_progress(value)
 
 @export var is_built := false
 @export var world_constants: WorldConstants
-@export var road_navigation: RoadNavigationRes
+@export var road_navigation: RoadNavigationConfig
 
 var city_coords_feature: CityCoordsFeature
 
 @onready var powerline_network := $Powerlines
 @onready var road_network := $Road
-
-func _ready() -> void:
-	assert(world_constants is WorldConstants, "Networks.world_constants is not of type WorldConstants")
-
 
 func build_async(city: Dictionary):
 	var budget := TimeBudget.new(100)

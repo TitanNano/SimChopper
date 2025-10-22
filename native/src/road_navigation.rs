@@ -1,15 +1,18 @@
+use std::cell::OnceCell;
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
 
 use anyhow::{anyhow, Result};
-use godot::builtin::{Transform3D, Vector3};
+use godot::builtin::{Dictionary, Transform3D, Vector3};
 use godot::classes::Node3D;
 use godot::global::snappedf;
-use godot::obj::Gd;
+use godot::obj::{Gd, OnEditor};
+use godot::prelude::{godot_api, GodotClass};
 use rand::distributions::Uniform;
 use rand::Rng;
 
+use crate::world::city_data::TryFromDictionary;
 use crate::{
     resources::WorldConstants,
     world::city_data::{Building, TileCoords},
@@ -53,10 +56,10 @@ enum Direction {
 impl Direction {
     // Direction degrees in radiants.
     const FORWARD: f64 = 0.0;
-    const BACK: f64 = 180.0 * (std::f64::consts::PI / 180.0);
-    const BACK_NEGATIVE: f64 = -180.0 * (std::f64::consts::PI / 180.0);
-    const LEFT: f64 = 90.0 * (std::f64::consts::PI / 180.0);
-    const RIGHT: f64 = -90.0 * (std::f64::consts::PI / 180.0);
+    const BACK: f64 = 180.0f64.to_radians();
+    const BACK_NEGATIVE: f64 = -180.0f64.to_radians();
+    const LEFT: f64 = 90.0f64.to_radians();
+    const RIGHT: f64 = -90.0f64.to_radians();
 }
 
 impl TryFrom<f64> for Direction {
@@ -138,7 +141,7 @@ impl<'n> NavNodeRef<'n> {
                     | (Direction::Back, Corners::TopLeft)
                     | (Direction::Left, Corners::TopLeft)
                     | (Direction::Forward, Corners::TopRight)
-                    | (Direction::Left, Corners::TopRight) => 3.0,
+                    | (Direction::Left, Corners::TopRight) => 2.75,
                 };
 
                 dir * offset * multiplier
@@ -152,7 +155,7 @@ impl<'n> NavNodeRef<'n> {
         self.node.building.tile_coords
     }
 
-    pub fn has_arrived(&self, location: Vector3, direction: Vector3) -> Result<bool> {
+    pub fn has_arrived(&self, location: Vector3, direction: Vector3) -> bool {
         let target = self.get_global_transform(direction).origin;
 
         // remove Y from all comparisons
@@ -161,7 +164,7 @@ impl<'n> NavNodeRef<'n> {
 
         let distance = location.distance_to(target);
 
-        Ok(distance < 4.0)
+        distance < 4.0
     }
 
     pub fn building(&self) -> &Building {
@@ -402,5 +405,42 @@ impl RoadNavigation {
             node,
             world_constants: &self.world_contstants,
         }
+    }
+}
+
+/// Configuration resource to setup road navigation for vehicles.
+#[derive(GodotClass)]
+#[class(base = Resource, init)]
+pub struct RoadNavigationConfig {
+    /// The world constants to be used by the road navigation.
+    #[export]
+    world_constants: OnEditor<Gd<WorldConstants>>,
+
+    instance: OnceCell<RoadNavigation>,
+}
+
+impl RoadNavigationConfig {
+    pub(crate) fn road_navigation(&self) -> &RoadNavigation {
+        self.instance
+            .get_or_init(|| RoadNavigation::new(self.world_constants.clone()))
+    }
+
+    pub(crate) fn road_navigation_mut(&mut self) -> &mut RoadNavigation {
+        // make sure instance is initialized.
+        self.road_navigation();
+
+        self.instance.get_mut().expect("we just initialized")
+    }
+}
+
+#[godot_api]
+impl RoadNavigationConfig {
+    /// Insert a node into the road navigation graph.
+    #[func]
+    pub fn insert_node(&mut self, building: Dictionary, scene_node: Gd<Node3D>) {
+        let building = Building::try_from_dict(&building)
+            .expect("building dictionary must be a vaild SC2K building.");
+
+        self.road_navigation_mut().insert_node(building, scene_node);
     }
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://c0pat4v54oe86"]
+[gd_scene load_steps=22 format=3 uid="uid://c0pat4v54oe86"]
 
 [ext_resource type="PackedScene" uid="uid://daf3wyyha2hm" path="res://resources/Meshes/Helis/upgrades/cannon.gltf" id="1_54ycj"]
 [ext_resource type="Script" uid="uid://dvqexwe8r1gw7" path="res://native/src/scripts/objects/canon_upgrade.rs" id="2_1jnub"]
@@ -9,10 +9,9 @@
 [ext_resource type="Texture2D" uid="uid://d17vaba581i6" path="res://resources/Textures/Water/water_particle_normal.png" id="5_cxogv"]
 [ext_resource type="Texture2D" uid="uid://b0fqgpuodjpvg" path="res://resources/Textures/Water/red.png" id="6_8vk3t"]
 [ext_resource type="Script" uid="uid://wlx155raqrai" path="res://native/src/scripts/effects/water_decal.rs" id="9_v48py"]
-[ext_resource type="Script" uid="uid://b1dsfsam1klye" path="res://native/src/scripts/objects/debugger_3_d.rs" id="10_7u3rm"]
-[ext_resource type="PackedScene" uid="uid://c36tta374cm54" path="res://resources/HUD/debug/water_jet_debug.tscn" id="10_51x2k"]
 [ext_resource type="AnimationLibrary" uid="uid://ccdoql0ui30qd" path="res://resources/Animations/canon_water_jet.tres" id="10_u6k6a"]
 [ext_resource type="AnimationNodeStateMachine" uid="uid://bhxg4j3d3uxr0" path="res://resources/Animations/canon_water_jet_animation_states.tres" id="11_sjwuo"]
+[ext_resource type="PackedScene" uid="uid://byr7jias4d8hc" path="res://resources/Debug/debugger_3d.tscn" id="12_xx02s"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_wqt7j"]
 material = ExtResource("3_lyjqx")
@@ -36,8 +35,8 @@ radius = 4.0
 [sub_resource type="SphereShape3D" id="SphereShape3D_wrup6"]
 radius = 7.0
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_0mey1"]
-viewport_path = NodePath("WaterJetDebugger/SubViewport")
+[sub_resource type="ViewportTexture" id="ViewportTexture_xx02s"]
+viewport_path = NodePath("SubViewport")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_p6un2"]
 size = Vector3(0.101135, 0.0903931, 0.882935)
@@ -51,7 +50,7 @@ water_jet = NodePath("WaterJet")
 [node name="Maxis-3d2-mesh-143" parent="." index="0"]
 transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="WaterJet" type="GPUParticles3D" parent="." index="1" node_paths=PackedStringArray("impact_area", "decal", "debugger")]
+[node name="WaterJet" type="GPUParticles3D" parent="." index="1" node_paths=PackedStringArray("impact_area", "decal")]
 transform = Transform3D(-1, 3.48787e-16, -8.74228e-08, 3.48787e-16, 1, -3.48787e-16, 8.74228e-08, -3.48787e-16, -1, -5.06016e-15, 0.266152, 2.15765)
 emitting = false
 amount = 2000
@@ -64,7 +63,6 @@ script = ExtResource("4_3ki7x")
 impact_cast_paths = Array[NodePath]([NodePath("ParticleImpactCastA"), NodePath("ParticleImpactCastB"), NodePath("ParticleImpactCastC"), NodePath("ParticleImpactCastD"), NodePath("ParticleImpactCastE"), NodePath("ParticleImpactCastF")])
 impact_area = NodePath("ParticleImpactArea")
 decal = NodePath("WaterDecal")
-debugger = NodePath("../WaterJetDebugger")
 max_decal_count = 10
 max_delay = 1.8
 
@@ -147,24 +145,12 @@ tree_root = ExtResource("11_sjwuo")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AudioPlayer")
 
-[node name="WaterJetDebugger" type="Sprite3D" parent="." index="2" node_paths=PackedStringArray("text_view")]
-process_mode = 4
-transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, -2.98064, 1.59321, 1.60687)
-visible = false
-billboard = 1
-no_depth_test = true
-texture = SubResource("ViewportTexture_0mey1")
-script = ExtResource("10_7u3rm")
+[node name="WaterJetDebugger" parent="." index="2" instance=ExtResource("12_xx02s")]
+transform = Transform3D(1, 4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, -2.98064, 1.59321, 1.60687)
+texture = SubResource("ViewportTexture_xx02s")
 title = "Water Jet Debugger"
-text_view = NodePath("SubViewport/WaterJetDebugControl/MarginContainer/RichTextLabel")
-
-[node name="SubViewport" type="SubViewport" parent="WaterJetDebugger" index="0"]
-disable_3d = true
-transparent_bg = true
-size = Vector2i(300, 500)
-
-[node name="WaterJetDebugControl" parent="WaterJetDebugger/SubViewport" index="0" instance=ExtResource("10_51x2k")]
 
 [node name="CanonShape" type="CollisionShape3D" parent="." index="3"]
+editor_description = "Collision shape that will be attached to the physics body of the helicopter once it's mounted."
 transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, -0.000404409, 0.264907, 1.88774)
 shape = SubResource("BoxShape3D_p6un2")

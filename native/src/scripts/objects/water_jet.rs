@@ -8,7 +8,7 @@ use godot::classes::{
     Area3D, Decal, GpuParticles3D, Node, Node3D, Object, PhysicsRayQueryParameters3D,
     RenderingServer, ShapeCast3D,
 };
-use godot::global::{clampf, deg_to_rad, randf_range};
+use godot::global::{clampf, randf_range};
 use godot::meta::ToGodot;
 use godot::obj::bounds::Declarer;
 use godot::obj::{Bounds, Gd, Inherits, InstanceId};
@@ -16,12 +16,10 @@ use godot::prelude::{GodotClass, NodePath};
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
 use itertools::Itertools;
 
-use crate::scripts::objects::debugger_3_d::{Debugger3D, IDebugger3D};
+use crate::ext::node_3d::{Node3DExt, Vector3Ext};
+use crate::scripts::objects::debugger_3_d::Debugger3D;
 use crate::util::logger;
-use crate::{
-    ext::node_3d::{Node3DExt, Vector3Ext},
-    util,
-};
+use crate::{debug_3d, util};
 
 #[derive(GodotScript, Debug)]
 #[script(base = GpuParticles3D)]
@@ -39,7 +37,7 @@ struct WaterJet {
     pub decal: OnEditor<Gd<Decal>>,
 
     #[export]
-    pub debugger: OnEditor<RsRef<Debugger3D>>,
+    pub debugger: Option<RsRef<Debugger3D>>,
 
     /// Maximum number of decals that will be spawned at an impact point.
     #[export(range(min = 1.0, max = 255.0, step = 1.0))]
@@ -143,21 +141,11 @@ impl WaterJet {
 
     pub fn _physics_process(&mut self, delta: f64) {
         #[cfg(debug_assertions)]
-        let mut debugger = self.debugger.debug_data();
-
-        if !self.base.is_emitting() {
-            #[cfg(debug_assertions)]
-            debugger.set("Active", false);
-            return;
-        }
-
+        let active = self.base.is_emitting();
         #[cfg(debug_assertions)]
-        debugger.set("Active", true);
-        #[cfg(debug_assertions)]
-        debugger.set(
-            "Area",
-            self.impact_area().get_overlapping_bodies().len() as u32,
-        );
+        let area = self.impact_area().get_overlapping_bodies().len() as u32;
+
+        debug_3d!(self.debugger => active, area);
 
         if !self.impact_area().has_overlapping_bodies() {
             return;
@@ -166,7 +154,11 @@ impl WaterJet {
         let decal = self.decal().to_owned();
 
         #[cfg(debug_assertions)]
-        debugger.set("Shape Cast", "N/A");
+        let mut shape_cast_name = "N/A".to_owned();
+        #[cfg(debug_assertions)]
+        let mut impacting = Array::new();
+        #[cfg(debug_assertions)]
+        let mut decal_spawned = false;
 
         for shape_cast in self.impact_casts.iter() {
             shape_cast.clone().force_shapecast_update();
@@ -180,11 +172,10 @@ impl WaterJet {
             let mut impact_targets = Array::<GString>::new();
 
             #[cfg(debug_assertions)]
-            debugger.set("Shape Cast", shape_cast.get_name());
-            #[cfg(debug_assertions)]
-            debugger.set("Impacting", impact_targets.clone());
-            #[cfg(debug_assertions)]
-            debugger.set("Decal Spawned", false);
+            {
+                shape_cast_name = shape_cast.get_name().to_string();
+                impacting = impact_targets.clone();
+            }
 
             for index in 0..count {
                 let Some(target_node) = shape_cast.get_collider(index) else {
@@ -273,10 +264,14 @@ impl WaterJet {
                     .done();
 
                 #[cfg(debug_assertions)]
-                debugger.set("Decal Spawned", decal_inst.is_some());
+                {
+                    decal_spawned = decal_inst.is_some();
+                }
                 break;
             }
         }
+
+        debug_3d!(self.debugger => shape_cast_name, impacting, decal_spawned);
     }
 
     fn vector_local_component(vector: Vector3, axis: Vector3, normal: Vector3) -> Vector3 {
@@ -397,8 +392,7 @@ impl WaterJet {
         <T as Bounds>::Declarer: Declarer<DerefTarget<T> = T>,
     {
         #[cfg(debug_assertions)]
-        let mut debugger = self.debugger.clone().debug_data();
-
+        let mut debugger = self.debugger.clone();
         let mut decal_inst: Gd<Decal> = template
             .duplicate()
             .expect("Failed to duplicate decal node!")
@@ -429,17 +423,18 @@ impl WaterJet {
         };
 
         let decal_size = decal_inst.get_size() * Vector3::new(decal_scale, 1.0, decal_scale);
+        let decal_normal = point.normal;
+
+        debug_3d!(debugger => decal_normal);
 
         decal_inst.set_size(decal_size);
         decal_inst.set("is_active", &true.to_variant());
 
         target_node.add_child(&decal_inst);
 
-        decal_inst.set_global_position(point.position);
-        decal_inst.align_up(point.normal);
-        #[cfg(debug_assertions)]
-        debugger.set("Decal Normal", point.normal);
-        decal_inst.global_rotate(point.normal, deg_to_rad(randf_range(-90.0, 90.0)) as f32);
+        decal_inst.set_global_position(decal_normal);
+        decal_inst.align_up(decal_normal);
+        decal_inst.global_rotate(decal_normal, randf_range(-90.0, 90.0).to_radians() as f32);
         decal_inst.translate(offset);
 
         if let Some(scene_root) = target_node
@@ -463,10 +458,10 @@ impl WaterJet {
         };
 
         if let Some(surface_intersect) = surface_intersect {
+            let decal_normal = surface_intersect.normal;
             decal_inst.set_global_position(surface_intersect.position);
-            decal_inst.align_up(surface_intersect.normal);
-            #[cfg(debug_assertions)]
-            debugger.set("Decal Normal", surface_intersect.normal);
+            decal_inst.align_up(decal_normal);
+            debug_3d!(debugger => decal_normal);
         }
 
         decal_inst

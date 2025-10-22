@@ -3,7 +3,7 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lk3qo"]
 bg_color = Color(1, 0.258824, 0.956863, 0.298039)
 
-[node name="WaterJetDebugControl" type="PanelContainer"]
+[node name="DebugViewControl" type="PanelContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -26,10 +26,8 @@ theme_override_constants/margin_bottom = 19
 [node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer"]
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 25
-text = "Water Jet Debug
+text = "Title
 
-Area: 0
-Shape Cast: N/A
-Impacting: false
-"
+Field: value
+Field: value"
 threaded = true

@@ -70,3 +70,29 @@ pub fn variant_type_default_value(ty: VariantType) -> Variant {
         }
     }
 }
+
+#[macro_export]
+macro_rules! debug_3d {
+    ($debugger: expr => $($variable: tt),+) => {
+        #[cfg(debug_assertions)]
+        if let Some(ref mut debugger) = $debugger {
+            use $crate::scripts::objects::debugger_3_d::IDebugger3D;
+
+            $(
+                $crate::debug_3d!(inner debugger, $variable);
+            )+
+        }
+    };
+
+    (inner $debugger: ident, (float $variable: ident)) => {
+        $debugger.debug_data().set(stringify!($variable), ($variable * 100.0).round() / 100.0);
+    };
+
+    (inner $debugger: ident, (as_deg $variable: ident)) => {
+        $debugger.debug_data().set(stringify!($variable), $variable.to_degrees());
+    };
+
+    (inner $debugger: ident, $variable: ident) => {
+        $debugger.debug_data().set(stringify!($variable), $variable);
+    };
+}

@@ -207,19 +207,19 @@ impl Car {
         let angle_dir = (self.base.get_global_transform().origin * util::vector3::XZ_PLANE)
             .direction_to(target * util::vector3::XZ_PLANE);
         let target_angle = Vector3::FORWARD.signed_angle_to(angle_dir, Vector3::UP);
-        let angle_offset = angular_offset(self.base.get_rotation().y, target_angle);
+        // let angle_offset = angular_offset(self.base.get_rotation().y, target_angle);
 
-        // ban 180° turns
-        if angle_offset.abs() > 100.0f32.to_radians() {
-            logger::debug!(
-                "Car attempted a {}° turn. Finding new target...",
-                angle_offset.to_degrees()
-            );
+        // // ban 180° turns
+        // if angle_offset.abs() > 100.0f32.to_radians() {
+        //     logger::debug!(
+        //         "Car attempted a {}° turn. Finding new target...",
+        //         angle_offset.to_degrees()
+        //     );
 
-            self.set_velocity(Vector3::ZERO);
-            self.choose_target();
-            return;
-        }
+        //     self.set_velocity(Vector3::ZERO);
+        //     self.choose_target();
+        //     return;
+        // }
 
         self.target_angle = target_angle;
         self.set_velocity(current_velocity);

@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 use std::sync::OnceLock;
 
 use anyhow::{anyhow, Result};
+use godot::builtin::math::ApproxEq;
 use godot::builtin::{Dictionary, Transform3D, Vector3};
 use godot::classes::Node3D;
 use godot::global::snappedf;
@@ -151,7 +152,7 @@ impl<'n> NavNodeRef<'n> {
         transform.translated(offset)
     }
 
-    fn tile_coords(&self) -> TileCoords {
+    pub fn tile_coords(&self) -> TileCoords {
         self.node.building.tile_coords
     }
 
@@ -165,10 +166,6 @@ impl<'n> NavNodeRef<'n> {
         let distance = location.distance_to(target);
 
         distance < 4.0
-    }
-
-    pub fn building(&self) -> &Building {
-        &self.node.building
     }
 }
 
@@ -199,10 +196,17 @@ impl RoadNavigation {
         self.rand_distribution = Uniform::new(0, self.network.len());
     }
 
-    pub fn get_node(&self, coords: TileCoords) -> Option<NavNodeRef<'_>> {
+    #[inline]
+    pub fn try_node(&self, coords: TileCoords) -> Option<NavNodeRef<'_>> {
         let node = self.network.get(&coords)?;
 
         Some(NavNodeRef::new(node, &self.world_contstants))
+    }
+
+    #[inline]
+    pub fn node(&self, coords: TileCoords) -> NavNodeRef<'_> {
+        self.try_node(coords)
+            .expect("we are absolutely sure the node")
     }
 
     pub fn get_neighbors(&self, tile_coords: TileCoords) -> Option<&[TileCoords]> {
@@ -252,11 +256,11 @@ impl RoadNavigation {
             };
 
             if distance_low.is_zero_approx() {
-                break self.get_node(*low);
+                break self.try_node(*low);
             }
 
             if distance_high.is_zero_approx() {
-                break self.get_node(*high);
+                break self.try_node(*high);
             }
 
             let (new_low, new_low_node) = {
@@ -281,7 +285,7 @@ impl RoadNavigation {
                 };
 
                 let Some((new, node)) = maybe_node else {
-                    break self.get_node(*high);
+                    break self.try_node(*high);
                 };
 
                 (new, node)
@@ -309,7 +313,7 @@ impl RoadNavigation {
                 };
 
                 let Some((new, node)) = maybe_node else {
-                    break self.get_node(*high);
+                    break self.try_node(*high);
                 };
 
                 (new, node)
@@ -324,7 +328,7 @@ impl RoadNavigation {
             }
 
             if new_low == new_high {
-                break self.get_node(*new_low);
+                break self.try_node(*new_low);
             }
 
             if low == new_low && high == new_high {
@@ -333,11 +337,11 @@ impl RoadNavigation {
                     .total_cmp(&distance_high.length_squared())
                 {
                     Ordering::Less | Ordering::Equal => {
-                        break self.get_node(*low);
+                        break self.try_node(*low);
                     }
 
                     Ordering::Greater => {
-                        break self.get_node(*high);
+                        break self.try_node(*high);
                     }
                 }
             }
@@ -356,6 +360,16 @@ impl RoadNavigation {
         actor_orientation: Vector3,
     ) -> NavNodeRef<'n> {
         let current_location = current.get_global_transform(Vector3::ZERO).origin;
+        let target_location = target.get_global_transform(Vector3::ZERO).origin;
+
+        // current and target might be the same if we arrived at the target node.
+        if current_location
+            .distance_squared_to(target_location)
+            .approx_eq(&0.0)
+        {
+            return target.clone();
+        }
+
         let dir_target =
             current_location.direction_to(target.get_global_transform(Vector3::ZERO).origin);
 
@@ -367,7 +381,7 @@ impl RoadNavigation {
             neighbors
                 .iter()
                 .fold((360.0, current.to_owned()), |(closest, next), coords| {
-                    let Some(neighbor) = self.get_node(*coords) else {
+                    let Some(neighbor) = self.try_node(*coords) else {
                         return (closest, next);
                     };
 
@@ -378,7 +392,7 @@ impl RoadNavigation {
 
                     // multiplying the angle between the target and the neighbor with the
                     // angle between the current actor orientation and the required actor
-                    // orientation, adds so bias towards a neighbor that is in the direction
+                    // orientation, adds bias towards a neighbor that is in the direction
                     // of the actors current orientation.
                     let weight = angle * (angle_actor_orientation / 2.0);
 

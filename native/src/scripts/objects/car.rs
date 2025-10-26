@@ -11,10 +11,54 @@ use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
 
 use crate::debug_3d;
 use crate::project_settings::CustomProjectSettings;
-use crate::road_navigation::RoadNavigationConfig;
+use crate::road_navigation::{NavNodeRef, RoadNavigation, RoadNavigationConfig};
 use crate::scripts::objects::debugger_3_d::Debugger3D;
 use crate::util::{self, logger};
-use crate::world::city_data::Building;
+use crate::world::city_data::TileCoords;
+
+#[derive(Default, Debug, Clone)]
+enum Navigation {
+    #[default]
+    Uninitialized,
+    Located(TileCoords),
+    Targeted(TargetedNavigation),
+    Moving(MovingNavigation),
+}
+
+impl Navigation {
+    fn as_moving(&self) -> &'_ MovingNavigation {
+        let Navigation::Moving(value_ref) = self else {
+            panic!("Navigation is not Moving");
+        };
+
+        value_ref
+    }
+}
+
+impl From<TargetedNavigation> for Navigation {
+    fn from(value: TargetedNavigation) -> Self {
+        Self::Targeted(value)
+    }
+}
+
+impl From<MovingNavigation> for Navigation {
+    fn from(value: MovingNavigation) -> Self {
+        Self::Moving(value)
+    }
+}
+
+#[derive(Debug, Clone)]
+struct TargetedNavigation {
+    current_node: TileCoords,
+    target_node: TileCoords,
+}
+
+#[derive(Debug, Clone)]
+struct MovingNavigation {
+    current_node: TileCoords,
+    target_node: TileCoords,
+    next_node: TileCoords,
+}
 
 #[derive(GodotScript, Debug)]
 #[script(base = RigidBody3D)]
@@ -25,10 +69,8 @@ struct Car {
     on_ground: bool,
     ground_normal: Vector3,
     stuck: f32,
-    new: bool,
     last_transform: Transform3D,
-    target_nav_node: Option<Building>,
-    current_nav_node: Option<Building>,
+    navigation: Navigation,
 
     display_vehicle_target: bool,
 
@@ -56,7 +98,6 @@ impl Car {
     pub fn _init(&mut self) {
         self.velocity = 30.0;
         self.ground_normal = Vector3::DOWN;
-        self.new = true;
         self.display_vehicle_target = ProjectSettings::singleton()
             .get_setting(ProjectSettings::DEBUG_SHAPES_ROAD_NAVIGATION_DISPLAY_VEHICLE_TARGET)
             .to();
@@ -77,23 +118,52 @@ impl Car {
                 });
         }
 
-        self.on_choose_target();
+        self.choose_target();
     }
 
+    /// Godot's physics callback called at the projects physics step.
     pub fn _physics_process(&mut self, delta: f32) {
-        if self.target_nav_node.is_none() {
-            return;
-        }
+        // unit vector that points in the direction of the agents heading.
+        let agent_rot = Vector3::FORWARD.rotated(Vector3::UP, self.base.get_global_rotation().y);
+        let agent_pos = self.base.get_global_transform().origin;
 
-        if self
-            .last_transform
-            .origin
-            .approx_eq(&self.base.get_global_transform().origin)
-        {
-            self.stuck += 1.0 * delta;
+        let navigation = match &self.navigation {
+            Navigation::Uninitialized | Navigation::Located(_) => return,
+            Navigation::Targeted(targeted_navigation) => {
+                let road_network = self.road_network.bind();
+                let road_navigation = road_network.road_navigation();
+
+                let current_node = road_navigation.node(targeted_navigation.current_node);
+                let target_node = road_navigation.node(targeted_navigation.target_node);
+
+                self.navigation = self
+                    .get_next_node(current_node, target_node, agent_rot)
+                    .into();
+                self.navigation.as_moving()
+            }
+            Navigation::Moving(moving_navigation) => {
+                let road_network = self.road_network.bind();
+                let road_navigation = road_network.road_navigation();
+
+                let current_node = road_navigation.node(moving_navigation.next_node);
+                let target_node = road_navigation.node(moving_navigation.target_node);
+
+                if current_node.has_arrived(agent_pos, agent_rot) {
+                    self.navigation = self
+                        .get_next_node(current_node, target_node, agent_rot)
+                        .into();
+                    self.navigation.as_moving()
+                } else {
+                    moving_navigation
+                }
+            }
+        };
+
+        self.stuck = if self.last_transform.origin.approx_eq(&agent_pos) {
+            self.stuck + 1.0 * delta
         } else {
-            self.stuck = 0.0;
-        }
+            0.0
+        };
 
         if self.stuck >= 5.0 {
             logger::info!("despawning stuck car");
@@ -103,11 +173,10 @@ impl Car {
 
         self.last_transform = self.base.get_global_transform();
 
-        if self.is_target_reached() {
+        if self.is_target_reached(navigation) {
             logger::debug!("car navigation finished");
-            self.safe_velocity = Vector3::ZERO;
-            self.new = false;
-            self.on_choose_target();
+            self.set_velocity(Vector3::ZERO);
+            self.choose_target();
             return;
         }
 
@@ -118,7 +187,7 @@ impl Car {
             Vector3::UP
         };
 
-        let target = self.get_next_location();
+        let target = self.get_next_pos(navigation, agent_rot);
 
         // target debugger
         if self.display_vehicle_target && self.debug_target.is_inside_tree() {
@@ -148,8 +217,7 @@ impl Car {
             );
 
             self.set_velocity(Vector3::ZERO);
-            self.current_nav_node = None;
-            self.on_choose_target();
+            self.choose_target();
             return;
         }
 
@@ -161,10 +229,11 @@ impl Car {
         debug_3d!(self.debugger => stuck);
     }
 
+    /// Godot's physics body force callback.
     pub fn _integrate_forces(&mut self, state: Gd<PhysicsDirectBodyState3D>) {
-        if self.target_nav_node.is_none() {
+        let Navigation::Moving(_) = self.navigation else {
             return;
-        }
+        };
 
         let is_colliding = self.ground_detector.is_colliding();
 
@@ -209,92 +278,117 @@ impl Car {
         debug_3d!(self.debugger => is_colliding, (as_deg x_rot));
     }
 
-    fn on_choose_target(&mut self) {
-        let target_translation = self.get_random_street_location();
-
-        if self.current_nav_node.is_none() {
+    /// select a random navigation target on the road network.
+    ///
+    /// Selects a new target node and optionally locates the actor on the road network first.
+    fn choose_target(&mut self) {
+        let navigation = if matches!(self.navigation, Navigation::Uninitialized) {
             let road_network = self.road_network.bind();
             let node = road_network
                 .road_navigation()
                 .get_nearest_node(self.base.get_global_position());
 
-            self.current_nav_node = node.map(|nav_ref| nav_ref.building().clone());
-        }
+            let Some(tile_coords) = node.map(|nav_ref| nav_ref.tile_coords()) else {
+                logger::warn!("Unable to locate car on road network!");
+                return;
+            };
 
-        logger::debug!("car next target: {target_translation}");
+            Navigation::Located(tile_coords)
+        } else {
+            self.navigation.clone()
+        };
+
+        let road_network = self.road_network.bind();
+        let road_navigation = road_network.road_navigation();
+
+        let (current_node, next_target) = match navigation {
+            Navigation::Uninitialized => unreachable!(),
+            Navigation::Located(current_node) => (
+                current_node,
+                Self::get_random_street_location(road_navigation, None),
+            ),
+
+            Navigation::Targeted(TargetedNavigation {
+                current_node,
+                target_node,
+            })
+            | Navigation::Moving(MovingNavigation {
+                current_node,
+                target_node,
+                next_node: _,
+            }) => (
+                current_node,
+                Self::get_random_street_location(road_navigation, Some(target_node)),
+            ),
+        };
+
+        logger::debug!(
+            "car next target: {}",
+            next_target.get_global_transform(Vector3::ZERO).origin
+        );
+
+        self.navigation = TargetedNavigation {
+            current_node,
+            target_node: next_target.tile_coords(),
+        }
+        .into();
     }
 
-    fn get_random_street_location(&mut self) -> Vector3 {
-        let road_network = self.road_network.bind();
-        let node = road_network.road_navigation().get_random_node();
+    /// Returns a random node of the street network.
+    fn get_random_street_location(
+        road_navigation: &RoadNavigation,
+        target_node: Option<TileCoords>,
+    ) -> NavNodeRef<'_> {
+        let node = road_navigation.get_random_node();
 
-        if let Some(ref current_target) = self.target_nav_node {
-            let current = current_target.tile_coords;
-            let next = node.building().tile_coords;
+        if let Some(ref current) = target_node {
+            let next = node.tile_coords();
 
             let dist = Vector2i::new(next.0 as i32, next.1 as i32)
                 - Vector2i::new(current.0 as i32, current.1 as i32);
 
             if dist == Vector2i::ZERO {
-                drop(road_network);
-                return self.get_random_street_location();
+                return Self::get_random_street_location(road_navigation, target_node);
             }
         }
 
-        self.target_nav_node = Some(node.building().clone());
-
-        node.get_global_transform(Vector3::ZERO).origin
+        node
     }
 
-    fn is_target_reached(&self) -> bool {
-        let rotation = self.base.get_global_rotation();
-        let orientation = Vector3::FORWARD.rotated(Vector3::UP, rotation.y);
-
-        let road_network = self.road_network.bind();
-
-        road_network
-            .road_navigation()
-            .get_node(self.target_nav_node.as_ref().unwrap().tile_coords)
-            .unwrap()
-            .has_arrived(self.base.get_global_position(), orientation)
+    /// Check if the selected target has been reached.
+    fn is_target_reached(&self, navigation: &MovingNavigation) -> bool {
+        // The target has been reached when all three node references are equal.
+        navigation.current_node == navigation.next_node
+            && navigation.current_node == navigation.target_node
     }
 
-    fn get_next_location(&mut self) -> Vector3 {
-        let agent_pos = self.base.get_global_transform().origin;
-        let agent_rot = Vector3::FORWARD.rotated(Vector3::UP, self.base.get_global_rotation().y);
-
-        // logger::debug!("agent rotation: {}", self.base.get_global_rotation().y);
-
+    /// Determines the next node on the path to the target node.
+    fn get_next_node(
+        &self,
+        current_node: NavNodeRef<'_>,
+        target_node: NavNodeRef<'_>,
+        agent_rot: Vector3,
+    ) -> MovingNavigation {
         let road_network = self.road_network.bind();
 
-        if road_network
-            .road_navigation()
-            .get_node(self.current_nav_node.as_ref().unwrap().tile_coords)
-            .unwrap()
-            .has_arrived(agent_pos, agent_rot)
-        {
-            let current = road_network
+        let next_node =
+            road_network
                 .road_navigation()
-                .get_node(self.current_nav_node.as_ref().unwrap().tile_coords)
-                .unwrap();
-            let target = road_network
-                .road_navigation()
-                .get_node(self.target_nav_node.as_ref().unwrap().tile_coords)
-                .unwrap();
+                .get_next_node(&current_node, &target_node, agent_rot);
 
-            let next_node = road_network
-                .road_navigation()
-                .get_next_node(&current, &target, agent_rot);
-
-            self.current_nav_node = Some(next_node.building().clone());
+        MovingNavigation {
+            current_node: current_node.tile_coords(),
+            target_node: target_node.tile_coords(),
+            next_node: next_node.tile_coords(),
         }
+    }
 
-        road_network
-            .road_navigation()
-            .get_node(self.current_nav_node.as_ref().unwrap().tile_coords)
-            .unwrap()
-            .get_global_transform(agent_rot)
-            .origin
+    /// Get the world position of the next node on the path to the target.
+    fn get_next_pos(&self, navigation: &MovingNavigation, agent_rot: Vector3) -> Vector3 {
+        let road_network = self.road_network.bind();
+        let next_node = road_network.road_navigation().node(navigation.next_node);
+
+        next_node.get_global_transform(agent_rot).origin
     }
 
     fn set_velocity(&mut self, value: Vector3) {

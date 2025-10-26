@@ -140,12 +140,16 @@ impl WaterJet {
     }
 
     pub fn _physics_process(&mut self, delta: f64) {
-        #[cfg(debug_assertions)]
         let active = self.base.is_emitting();
+        debug_3d!(self.debugger => active);
+
+        if !active {
+            return;
+        }
+
         #[cfg(debug_assertions)]
         let area = self.impact_area().get_overlapping_bodies().len() as u32;
-
-        debug_3d!(self.debugger => active, area);
+        debug_3d!(self.debugger => area);
 
         if !self.impact_area().has_overlapping_bodies() {
             return;
@@ -432,7 +436,7 @@ impl WaterJet {
 
         target_node.add_child(&decal_inst);
 
-        decal_inst.set_global_position(decal_normal);
+        decal_inst.set_global_position(point.position);
         decal_inst.align_up(decal_normal);
         decal_inst.global_rotate(decal_normal, randf_range(-90.0, 90.0).to_radians() as f32);
         decal_inst.translate(offset);

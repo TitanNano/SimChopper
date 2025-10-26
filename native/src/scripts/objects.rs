@@ -1,3 +1,4 @@
+mod agents;
 mod building;
 mod camera;
 mod canon_upgrade;

@@ -18,6 +18,7 @@ pub mod async_support;
 pub mod logger;
 
 /// Create a new ingame one-shot timer in seconds.
+#[inline]
 pub fn timer(tree: &mut Gd<SceneTree>, delay: f64) -> Gd<SceneTreeTimer> {
     tree.create_timer_ex(delay)
         .process_always(false)
@@ -77,6 +78,39 @@ pub fn variant_type_default_value(ty: VariantType) -> Variant {
             unreachable!("variant type is out of defined range")
         }
     }
+}
+
+pub(crate) mod vector3 {
+    use godot::builtin::Vector3;
+
+    #[expect(unused)]
+    pub const XY_PLANE: Vector3 = Vector3 {
+        x: 1.0,
+        y: 1.0,
+        z: 0.0,
+    };
+
+    pub const XZ_PLANE: Vector3 = Vector3 {
+        x: 1.0,
+        y: 0.0,
+        z: 1.0,
+    };
+
+    #[expect(unused)]
+    pub const YZ_PLANE: Vector3 = Vector3 {
+        x: 0.0,
+        y: 1.0,
+        z: 1.0,
+    };
+}
+
+#[inline]
+pub(crate) fn basis_from_normal(normal: Vector3) -> Basis {
+    Basis::from_cols(
+        normal.cross(Basis::IDENTITY.col_c()),
+        normal,
+        Basis::IDENTITY.col_a().cross(normal),
+    )
 }
 
 #[macro_export]

@@ -1,0 +1,6 @@
+[gd_resource type="RoadNavigationConfig" load_steps=2 format=3 uid="uid://dvccb8vdrejqp"]
+
+[ext_resource type="WorldConstants" uid="uid://dbxp5cngs1a5g" path="res://resources/Config/world_constants.tres" id="1_4ww1c"]
+
+[resource]
+world_constants = ExtResource("1_4ww1c")

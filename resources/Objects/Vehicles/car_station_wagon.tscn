@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://k14yev0gxbkc"]
 
 [ext_resource type="PackedScene" uid="uid://drfx6m1pn4ap6" path="res://resources/Meshes/Vehicles/car_station_wagon.gltf" id="1_fohcy"]
-[ext_resource type="Script" uid="uid://c1vkhk15tmny1" path="res://native/src/scripts/objects/agents/car.rs" id="2_uxtlx"]
+[ext_resource type="Script" uid="uid://fglqwp4se6ra" path="res://native/src/scripts/objects/agents/car.rs" id="2_uxtlx"]
 [ext_resource type="RoadNavigationConfig" uid="uid://dvccb8vdrejqp" path="res://resources/Config/road_navigation.tres" id="3_g0ogw"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_juekg"]

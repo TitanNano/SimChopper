@@ -224,6 +224,7 @@ impl Car {
         self.target_angle = target_angle;
         self.set_velocity(current_velocity);
 
+        #[cfg(debug_assertions)]
         let stuck = self.stuck;
 
         debug_3d!(self.debugger => stuck);
@@ -235,11 +236,12 @@ impl Car {
             return;
         };
 
+        #[cfg(debug_assertions)]
         let is_colliding = self.ground_detector.is_colliding();
+        let needs_extra_gravity = self.ground_normal_detector.is_colliding() && !self.on_ground;
 
         // add additional gravity to keep car from jumping
-        if self.ground_normal_detector.is_colliding() && !self.on_ground {
-            logger::debug!("applying extra gravity");
+        if needs_extra_gravity {
             let gravity = self.safe_velocity.length() * 20.0;
             debug_3d!(self.debugger => (float gravity));
             let gravity_force =
@@ -275,7 +277,7 @@ impl Car {
 
         self.base.apply_torque_impulse(torque_impulse);
 
-        debug_3d!(self.debugger => is_colliding, (as_deg x_rot));
+        debug_3d!(self.debugger => is_colliding, (as_deg x_rot), needs_extra_gravity);
     }
 
     /// select a random navigation target on the road network.

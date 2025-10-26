@@ -1,12 +1,18 @@
+#[cfg(debug_assertions)]
 use godot::builtin::{
-    Aabb, Basis, Callable, Color, Dictionary, NodePath, PackedByteArray, PackedColorArray,
+    Aabb, Callable, Color, Dictionary, NodePath, PackedByteArray, PackedColorArray,
     PackedFloat32Array, PackedFloat64Array, PackedInt32Array, PackedInt64Array, PackedStringArray,
     PackedVector2Array, PackedVector3Array, PackedVector4Array, Plane, Projection, Quaternion,
     Rect2, Rect2i, Rid, Signal, StringName, Transform2D, Transform3D, Variant, VariantArray,
-    VariantType, Vector2, Vector2i, Vector3, Vector3i, Vector4, Vector4i,
+    VariantType, Vector2, Vector2i, Vector3i, Vector4, Vector4i,
 };
-use godot::classes::{Object, SceneTree, SceneTreeTimer};
-use godot::obj::{Gd, NewAlloc};
+use godot::builtin::{Basis, Vector3};
+#[cfg(debug_assertions)]
+use godot::classes::Object;
+use godot::classes::{SceneTree, SceneTreeTimer};
+use godot::obj::Gd;
+#[cfg(debug_assertions)]
+use godot::obj::NewAlloc;
 
 pub mod async_support;
 pub mod logger;
@@ -21,6 +27,8 @@ pub fn timer(tree: &mut Gd<SceneTree>, delay: f64) -> Gd<SceneTreeTimer> {
         .unwrap()
 }
 
+#[cfg(debug_assertions)]
+#[inline]
 pub fn variant_type_default_value(ty: VariantType) -> Variant {
     const MAX: i32 = VariantType::MAX.ord;
 

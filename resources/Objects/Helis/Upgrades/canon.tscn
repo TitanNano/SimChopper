@@ -146,7 +146,9 @@ advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AudioPlayer")
 
 [node name="WaterJetDebugger" parent="." index="2" instance=ExtResource("12_xx02s")]
+process_mode = 4
 transform = Transform3D(1, 4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, -2.98064, 1.59321, 1.60687)
+visible = false
 texture = SubResource("ViewportTexture_xx02s")
 title = "Water Jet Debugger"
 

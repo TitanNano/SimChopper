@@ -23,7 +23,7 @@ impl fmt::Display for TileSurfaceType {
             Self::Water => "Water",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -64,7 +64,7 @@ impl TileSurface {
     }
 
     pub fn set_resolution(&mut self, value: u8) {
-        self.resolution = value
+        self.resolution = value;
     }
 
     fn corners(&self) -> &TileCorners {
@@ -72,7 +72,7 @@ impl TileSurface {
     }
 
     pub fn set_corners(&mut self, value: TileCorners) {
-        self.corners = value
+        self.corners = value;
     }
 
     fn kind(&self) -> TileSurfaceType {
@@ -91,6 +91,7 @@ impl TileSurface {
         self.invalid = is_invalid;
     }
 
+    #[expect(clippy::too_many_lines)]
     pub fn apply_slope(&mut self, slope: TerrainSlope, rotation: &TerrainRotation, height: f32) {
         match slope {
             TerrainSlope::None => (),
@@ -142,13 +143,7 @@ impl TileSurface {
             TerrainSlope::NorthWest => {
                 self.corners[rotation.nw()].y += height;
             }
-            TerrainSlope::All => {
-                self.corners[rotation.nw()].y += height;
-                self.corners[rotation.ne()].y += height;
-                self.corners[rotation.sw()].y += height;
-                self.corners[rotation.se()].y += height;
-            }
-            TerrainSlope::VertialCliff => {
+            TerrainSlope::All | TerrainSlope::VertialCliff => {
                 self.corners[rotation.nw()].y += height;
                 self.corners[rotation.ne()].y += height;
                 self.corners[rotation.sw()].y += height;
@@ -273,24 +268,26 @@ impl TileSurface {
                 self.corners[rotation.ne()].y += height;
                 self.corners[rotation.se()].y += height * 2.0;
             }
-        };
+        }
     }
 }
 
 impl From<TileSurface> for Vec<Face> {
+    #[expect(clippy::similar_names)]
     fn from(tile: TileSurface) -> Vec<Face> {
         let mut faces: Vec<Face> = Vec::new();
         let kind = tile.kind();
         let resolution = tile.resolution();
 
         for ix in 0..resolution {
-            let weight_x_start = 1.0 / (resolution as f32) * (ix as f32);
-            let weight_x_end = 1.0 / (resolution as f32) * ((ix as f32) + 1.0);
+            let weight_x_start = 1.0 / f32::from(resolution) * f32::from(ix);
+            let weight_x_end = 1.0 / f32::from(resolution) * (f32::from(ix) + 1.0);
 
             for iy in 0..resolution {
                 let corners = tile.corners();
-                let weight_y_start = 1.0 / (resolution as f32) * (iy as f32);
-                let weight_y_end = 1.0 / (resolution as f32) * ((iy as f32) + 1.0);
+
+                let weight_y_start = 1.0 / f32::from(resolution) * f32::from(iy);
+                let weight_y_end = 1.0 / f32::from(resolution) * (f32::from(iy) + 1.0);
 
                 let x0 = bilerp_xyz(corners, weight_x_start, weight_y_start);
                 let x1 = bilerp_xyz(corners, weight_x_end, weight_y_start);
@@ -308,7 +305,7 @@ impl From<TileSurface> for Vec<Face> {
                         Vertex::from_vector(kind, y1, tile.fixed, tile.invalid),
                         Vertex::from_vector(kind, y0, tile.fixed, tile.invalid),
                     ],
-                ])
+                ]);
             }
         }
 
@@ -317,7 +314,7 @@ impl From<TileSurface> for Vec<Face> {
 }
 
 /// Surface Vertex that is used as an intermediate representation of a mesh vertex
-/// before it is passed to the SurfaceTool.
+/// before it is passed to the [`SurfaceTool`].
 #[derive(Debug)]
 pub(crate) struct Vertex {
     x: f32,
@@ -338,12 +335,12 @@ impl Vertex {
         is_invalid_tile: bool,
     ) -> Self {
         Self {
-            surface,
             x,
             y,
             z,
-            is_invalid_tile,
+            surface,
             fixed,
+            is_invalid_tile,
         }
     }
 

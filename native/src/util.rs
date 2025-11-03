@@ -1,3 +1,7 @@
+pub mod async_support;
+pub mod logger;
+mod numbers;
+
 #[cfg(debug_assertions)]
 use godot::builtin::{
     Aabb, Callable, Color, Dictionary, NodePath, PackedByteArray, PackedColorArray,
@@ -14,8 +18,7 @@ use godot::obj::Gd;
 #[cfg(debug_assertions)]
 use godot::obj::NewAlloc;
 
-pub mod async_support;
-pub mod logger;
+pub use numbers::*;
 
 /// Create a new ingame one-shot timer in seconds.
 #[inline]
@@ -74,7 +77,9 @@ pub fn variant_type_default_value(ty: VariantType) -> Variant {
         VariantType::PACKED_COLOR_ARRAY => Variant::from(PackedColorArray::new()),
         VariantType::PACKED_VECTOR4_ARRAY => Variant::from(PackedVector4Array::new()),
 
-        VariantType { ord: MAX.. } | VariantType { ord: i32::MIN..0 } => {
+        VariantType {
+            ord: MAX..=i32::MAX | i32::MIN..0,
+        } => {
             unreachable!("variant type is out of defined range")
         }
     }

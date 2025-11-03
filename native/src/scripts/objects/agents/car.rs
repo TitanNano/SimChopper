@@ -55,9 +55,9 @@ struct TargetedNavigation {
 
 #[derive(Debug, Clone)]
 struct MovingNavigation {
-    current_node: TileCoords,
-    target_node: TileCoords,
-    next_node: TileCoords,
+    current: TileCoords,
+    target: TileCoords,
+    next: TileCoords,
 }
 
 #[derive(GodotScript, Debug)]
@@ -86,7 +86,7 @@ struct Car {
     #[export]
     pub road_network: OnEditor<Gd<RoadNavigationConfig>>,
 
-    /// Optional Debugger3D to inspect the internal state of the car.
+    /// Optional [`Debugger3D`] to inspect the internal state of the car.
     #[export]
     pub debugger: Option<RsRef<Debugger3D>>,
 
@@ -108,20 +108,21 @@ impl Car {
         if self.display_vehicle_target {
             self.base.remove_child(&*self.debug_target);
             self.debug_target.set_visible(true);
-            self.base
-                .get_parent()
-                .map(|mut parent| {
-                    parent.call_deferred("add_child", &[self.debug_target.to_variant()]);
-                })
-                .unwrap_or_else(|| {
+            self.base.get_parent().map_or_else(
+                || {
                     logger::warn!("Car has no parent! Can't move debug_target.");
-                });
+                },
+                |mut parent| {
+                    parent.call_deferred("add_child", &[self.debug_target.to_variant()]);
+                },
+            );
         }
 
         self.choose_target();
     }
 
     /// Godot's physics callback called at the projects physics step.
+    #[allow(clippy::used_underscore_items)]
     pub fn _physics_process(&mut self, delta: f32) {
         // unit vector that points in the direction of the agents heading.
         let agent_rot = Vector3::FORWARD.rotated(Vector3::UP, self.base.get_global_rotation().y);
@@ -137,7 +138,7 @@ impl Car {
                 let target_node = road_navigation.node(targeted_navigation.target_node);
 
                 self.navigation = self
-                    .get_next_node(current_node, target_node, agent_rot)
+                    .get_next_node(&current_node, &target_node, agent_rot)
                     .into();
                 self.navigation.as_moving()
             }
@@ -145,12 +146,12 @@ impl Car {
                 let road_network = self.road_network.bind();
                 let road_navigation = road_network.road_navigation();
 
-                let current_node = road_navigation.node(moving_navigation.next_node);
-                let target_node = road_navigation.node(moving_navigation.target_node);
+                let current_node = road_navigation.node(moving_navigation.next);
+                let target_node = road_navigation.node(moving_navigation.target);
 
                 if current_node.has_arrived(agent_pos, agent_rot) {
                     self.navigation = self
-                        .get_next_node(current_node, target_node, agent_rot)
+                        .get_next_node(&current_node, &target_node, agent_rot)
                         .into();
                     self.navigation.as_moving()
                 } else {
@@ -173,7 +174,7 @@ impl Car {
 
         self.last_transform = self.base.get_global_transform();
 
-        if self.is_target_reached(navigation) {
+        if Self::is_target_reached(navigation) {
             logger::debug!("car navigation finished");
             self.set_velocity(Vector3::ZERO);
             self.choose_target();
@@ -231,6 +232,7 @@ impl Car {
     }
 
     /// Godot's physics body force callback.
+    #[expect(clippy::needless_pass_by_value)]
     pub fn _integrate_forces(&mut self, state: Gd<PhysicsDirectBodyState3D>) {
         let Navigation::Moving(_) = self.navigation else {
             return;
@@ -247,7 +249,7 @@ impl Car {
             let gravity_force =
                 self.ground_normal * gravity.neg() * state.get_step() * self.base.get_mass();
 
-            self.base.apply_central_force(gravity_force)
+            self.base.apply_central_force(gravity_force);
         }
 
         let applied_velocity = self.safe_velocity - state.get_linear_velocity();
@@ -311,16 +313,16 @@ impl Car {
             ),
 
             Navigation::Targeted(TargetedNavigation {
-                current_node,
-                target_node,
+                current_node: current,
+                target_node: target,
             })
             | Navigation::Moving(MovingNavigation {
-                current_node,
-                target_node,
-                next_node: _,
+                current,
+                target,
+                next: _,
             }) => (
-                current_node,
-                Self::get_random_street_location(road_navigation, Some(target_node)),
+                current,
+                Self::get_random_street_location(road_navigation, Some(target)),
             ),
         };
 
@@ -346,8 +348,19 @@ impl Car {
         if let Some(ref current) = target_node {
             let next = node.tile_coords();
 
-            let dist = Vector2i::new(next.0 as i32, next.1 as i32)
-                - Vector2i::new(current.0 as i32, current.1 as i32);
+            let dist = Vector2i::new(
+                next.0.try_into().expect("tile coords should fit into i32"),
+                next.1.try_into().expect("tile coords should fit into i32"),
+            ) - Vector2i::new(
+                current
+                    .0
+                    .try_into()
+                    .expect("tile coords should fit into i32"),
+                current
+                    .1
+                    .try_into()
+                    .expect("tile coords should fit into i32"),
+            );
 
             if dist == Vector2i::ZERO {
                 return Self::get_random_street_location(road_navigation, target_node);
@@ -358,17 +371,16 @@ impl Car {
     }
 
     /// Check if the selected target has been reached.
-    fn is_target_reached(&self, navigation: &MovingNavigation) -> bool {
+    fn is_target_reached(navigation: &MovingNavigation) -> bool {
         // The target has been reached when all three node references are equal.
-        navigation.current_node == navigation.next_node
-            && navigation.current_node == navigation.target_node
+        navigation.current == navigation.next && navigation.current == navigation.target
     }
 
     /// Determines the next node on the path to the target node.
     fn get_next_node(
         &self,
-        current_node: NavNodeRef<'_>,
-        target_node: NavNodeRef<'_>,
+        current_node: &NavNodeRef<'_>,
+        target_node: &NavNodeRef<'_>,
         agent_rot: Vector3,
     ) -> MovingNavigation {
         let road_network = self.road_network.bind();
@@ -376,19 +388,19 @@ impl Car {
         let next_node =
             road_network
                 .road_navigation()
-                .get_next_node(&current_node, &target_node, agent_rot);
+                .get_next_node(current_node, target_node, agent_rot);
 
         MovingNavigation {
-            current_node: current_node.tile_coords(),
-            target_node: target_node.tile_coords(),
-            next_node: next_node.tile_coords(),
+            current: current_node.tile_coords(),
+            target: target_node.tile_coords(),
+            next: next_node.tile_coords(),
         }
     }
 
     /// Get the world position of the next node on the path to the target.
     fn get_next_pos(&self, navigation: &MovingNavigation, agent_rot: Vector3) -> Vector3 {
         let road_network = self.road_network.bind();
-        let next_node = road_network.road_navigation().node(navigation.next_node);
+        let next_node = road_network.road_navigation().node(navigation.next);
 
         next_node.get_global_transform(agent_rot).origin
     }
@@ -405,7 +417,7 @@ fn angular_offset(from: f32, to: f32) -> f32 {
     // if offset is larger than 180 degrees we should rather rotate
     // in the other direction
     if offset.abs() > 180.0f32.to_radians() {
-        offset = (360.0f32.to_radians() - offset.abs()) * offset.signum() * -1.0
+        offset = (360.0f32.to_radians() - offset.abs()) * offset.signum() * -1.0;
     }
 
     offset

@@ -24,10 +24,10 @@ impl Debugger3D {
         let values = self
             .debug_data
             .iter_shared()
-            .map(|(key, val)| format!("{}: {}", key, val))
+            .map(|(key, val)| format!("{key}: {val}"))
             .join("\n");
 
-        self.text_view.set_text(&format!("{}\n\n{}", title, values));
+        self.text_view.set_text(&format!("{title}\n\n{values}"));
     }
 
     pub fn debug_data(&self) -> Dictionary {

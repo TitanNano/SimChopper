@@ -24,7 +24,7 @@ struct BuildingEventFlags(u8);
 
 impl BuildingEventFlags {
     fn fire(&self) -> bool {
-        self.0 & 0b00000001 == 1
+        self.0 & 0b0000_0001 == 1
     }
 }
 
@@ -91,19 +91,19 @@ impl<F: Debug + ?Sized> Default for Features<F> {
 
 impl<N: Inherits<Node>> BuildingFeature<N> for Features<dyn BuildingFeature<N>> {
     fn process(&mut self, delta: f64, node: &mut Gd<N>) {
-        for item in self.0.iter_mut() {
+        for item in &mut self.0 {
             item.process(delta, node);
         }
     }
 
     fn physics_process(&mut self, delta: f64, node: &mut Gd<N>) {
-        for item in self.0.iter_mut() {
+        for item in &mut self.0 {
             item.physics_process(delta, node);
         }
     }
 
     fn dispatch_notification(&mut self, notification: BuildingNotification) {
-        for item in self.0.iter_mut() {
+        for item in &mut self.0 {
             item.dispatch_notification(notification);
         }
     }

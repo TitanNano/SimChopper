@@ -167,8 +167,9 @@ impl PylonBridge {
             Self::RaisingTowerTopBottom => {
                 "res://resources/Objects/Networks/Bridge/bridge_raising_tower_top_bottom.tscn"
             }
-            Self::BridgeTopA => "res://resources/Objects/Networks/Bridge/bridge_top.tscn",
-            Self::BridgeTopB => "res://resources/Objects/Networks/Bridge/bridge_top.tscn",
+            Self::BridgeTopA | Self::BridgeTopB => {
+                "res://resources/Objects/Networks/Bridge/bridge_top.tscn"
+            }
         }
     }
 }
@@ -323,7 +324,8 @@ pub(crate) enum Buildings {
 }
 
 impl Buildings {
-    fn as_str(&self) -> &'static str {
+    #[expect(clippy::too_many_lines)]
+    fn as_str(self) -> &'static str {
         match self {
             Self::ParkSmall => "res://resources/Objects/Buildings/park_small.tscn",
             Self::TreeSingle => "res://resources/Objects/Buildings/tree_single.tscn",
@@ -375,8 +377,9 @@ impl Buildings {
             Self::HomeUpperClass4 => "res://resources/Objects/Buildings/home_upper_class_4.tscn",
             Self::Tarmac => "res://resources/Objects/Ground/tarmac.tscn",
             Self::TarmacRadar => "res://resources/Objects/Buildings/tarmac_radar.tscn",
-            Self::Construction1 => "res://resources/Objects/Buildings/construction_1-2.tscn",
-            Self::Construction2 => "res://resources/Objects/Buildings/construction_1-2.tscn",
+            Self::Construction1 | Self::Construction2 => {
+                "res://resources/Objects/Buildings/construction_1-2.tscn"
+            }
             Self::Construction3 => "res://resources/Objects/Buildings/construction_3.tscn",
             Self::Construction4 => "res://resources/Objects/Buildings/construction_4.tscn",
             Self::Construction5 => "res://resources/Objects/Buildings/construction_5.tscn",
@@ -493,7 +496,6 @@ impl PartialEq<Buildings> for u8 {
 fn buildings(id: u8) -> Option<&'static str> {
     Buildings::try_from_primitive(id)
         .ok()
-        .as_ref()
         .map(Buildings::as_str)
 }
 

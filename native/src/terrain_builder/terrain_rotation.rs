@@ -20,31 +20,31 @@ impl TerrainRotation {
 }
 
 impl TerrainRotation {
-    fn get_corner(&self, index: u8) -> u8 {
+    fn get_corner(self, index: u8) -> u8 {
         let shifted_index = ((index + self.offset) % 4) as usize;
         let target_value = TERAIN_ROTATION_CORNERS.get(shifted_index).unwrap_or(&0);
 
         target_value.to_owned()
     }
 
-    pub fn nw(&self) -> usize {
+    pub fn nw(self) -> usize {
         self.get_corner(0).into()
     }
 
-    pub fn ne(&self) -> usize {
+    pub fn ne(self) -> usize {
         self.get_corner(1).into()
     }
 
-    pub fn se(&self) -> usize {
+    pub fn se(self) -> usize {
         self.get_corner(2).into()
     }
 
-    pub fn sw(&self) -> usize {
+    pub fn sw(self) -> usize {
         self.get_corner(3).into()
     }
 
     /// Apply one counter-clockwise roation to slope type.
-    pub fn normalize_slope(&self, slope: TerrainSlope) -> TerrainSlope {
+    pub fn normalize_slope(self, slope: TerrainSlope) -> TerrainSlope {
         let offset = self.offset % 4;
         let mut rotated_slope = slope;
 

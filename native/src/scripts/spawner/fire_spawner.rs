@@ -24,7 +24,7 @@ pub struct FireSpawner {
 
     default_light_energy: f32,
 
-    strength: f64,
+    strength: f32,
 }
 
 #[godot_script_impl]
@@ -87,10 +87,10 @@ impl FireSpawner {
                 0.0,
                 light_size.y / 2.0,
                 0.0,
-            )))
+            )));
     }
 
-    pub fn set_fire_strength(&mut self, strenght: f64) {
+    pub fn set_fire_strength(&mut self, strenght: f32) {
         self.strength = strenght;
 
         let mut material: Gd<ShaderMaterial> = self
@@ -103,10 +103,8 @@ impl FireSpawner {
 
         let light_source_energy: f32 = self.default_light_energy;
 
-        self.light_source.set_param(
-            light_3d::Param::ENERGY,
-            light_source_energy * strenght as f32,
-        );
+        self.light_source
+            .set_param(light_3d::Param::ENERGY, light_source_energy * strenght);
     }
 
     pub fn is_dead(&self) -> bool {

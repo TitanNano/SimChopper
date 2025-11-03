@@ -19,7 +19,7 @@ impl GodotFuture {
     fn completed(result: Variant);
 }
 
-/// Creates a new GodotFuture that can be returned from a function which performs an async operation. This works similar to GdFunctionState.
+/// Creates a new [`GodotFuture`] that can be returned from a function which performs an async operation. This works similar to `GdFunctionState`.
 ///
 /// Example:
 /// ```rs

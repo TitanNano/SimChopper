@@ -3,8 +3,10 @@ use godot::builtin::Vector3;
 use godot::classes::{light_3d, DirectionalLight3D, Node3D, Performance, Time};
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, ScriptSignal};
+use num::ToPrimitive;
 
 use crate::script_callable;
+use crate::util::Uf32;
 
 #[derive(GodotScript, Debug)]
 #[script(base = Node3D)]
@@ -25,7 +27,7 @@ pub struct SolarSetup {
 
     /// duration from sun rise to sun set in minutes
     #[export(range(min = 1.0, max = 120.0, step = 1.0))]
-    pub day_length: u32,
+    pub day_length: Uf32,
 
     /// The minimum brightness of the sky.
     #[export(range(min = 1.0, max = 30_000.0, step = 1.0))]
@@ -71,10 +73,10 @@ impl SolarSetup {
         let time = self.get_time();
         let day_length = self.day_length_ms();
 
-        let sun_pos = time as f32 * (360.0 / (day_length * 2) as f32);
+        let sun_pos = time.into_f32() * (360.0 / (day_length.into_f32() * 2.0));
         let sun_visible = sun_pos < 190.0;
         let sun_zenit_distance = ((sun_pos - 90.0) / 90.0).abs().clamp(0.0, 1.0);
-        let sun_energy = if !sun_visible { 0.0 } else { 1.0 };
+        let sun_energy = if sun_visible { 1.0 } else { 0.0 };
         let sun_lux = Self::SUN_LUX_MAX.lerp(Self::SUN_LUX_MIN, sun_zenit_distance);
 
         let moon_energy = if sun_pos > 180.0 { 1.0 } else { 0.0 };
@@ -116,17 +118,24 @@ impl SolarSetup {
     }
 
     /// Day length (sunrise to sunset) in ms.
-    fn day_length_ms(&self) -> u64 {
-        self.day_length as u64 * 60 * 1000
+    fn day_length_ms(&self) -> Uf32 {
+        self.day_length * Uf32::new(60) * Uf32::new(1000)
     }
 
     /// Get the current game time in ms.
-    pub fn get_time(&self) -> u64 {
+    pub fn get_time(&self) -> Uf32 {
         let day_length = self.day_length_ms();
         // start game at 30% of the day.
-        let base_offset = (day_length / 10) * 3;
+        let base_offset = (day_length / Uf32::new(10)) * Uf32::new(3);
 
-        (base_offset + Time::singleton().get_ticks_msec()) % (day_length * 2)
+        (base_offset
+            + Uf32::new(
+                Time::singleton()
+                    .get_ticks_msec()
+                    .try_into()
+                    .expect("lets pray the game ticks fit into u32::MAX"),
+            ))
+            % (day_length * Uf32::new(2))
     }
 
     // get the current in-game time in seconds since sunrise.
@@ -141,18 +150,28 @@ impl SolarSetup {
 
     // get the current in-game time in hours since sunrise.
     pub fn get_ingame_time_h(&self) -> f64 {
-        (self.get_time() as f64 / (self.day_length_ms() as f64 * 2.0 / 24.0)) % 24.0
+        (self.get_time().into_f64() / (self.day_length_ms().into_f64() * 2.0 / 24.0)) % 24.0
     }
 
     pub fn get_ingame_clock_h(&self) -> u32 {
         // sunrise is at 6 am so an in-game time of 0 hours is equal to 6 am.
-        (self.get_ingame_time_h().floor() as u32 + 6) % 24
+        (self
+            .get_ingame_time_h()
+            .floor()
+            .to_u32()
+            .expect("time should alawys be positive and fit")
+            + 6)
+            % 24
     }
 
-    pub fn get_ingame_clock_m(&self) -> u32 {
+    pub fn get_ingame_clock_m(&self) -> Uf32 {
         let hours = self.get_ingame_time_h().floor();
 
-        (self.get_ingame_time_m().floor() - hours * 60.0) as u32
+        Uf32::new(
+            (self.get_ingame_time_m().floor() - hours * 60.0)
+                .to_u32()
+                .expect("time should always be positive and fit"),
+        )
     }
 
     pub fn sun_pos(&self) -> f32 {

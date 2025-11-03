@@ -10,9 +10,11 @@ use godot::classes::Node3D;
 use godot::global::snappedf;
 use godot::obj::{Gd, OnEditor};
 use godot::prelude::{godot_api, GodotClass};
-use rand::distributions::Uniform;
+use num::ToPrimitive;
+use rand::distr::Uniform;
 use rand::Rng;
 
+use crate::world::city_coords_feature::CityCoordsFeature;
 use crate::world::city_data::TryFromDictionary;
 use crate::{
     resources::WorldConstants,
@@ -98,21 +100,31 @@ impl<'n> NavNodeRef<'n> {
     }
 
     pub fn get_global_transform(&self, direction: Vector3) -> Transform3D {
-        const RAD_90_DEG: f64 = 90.0 * (std::f64::consts::PI / 180.0);
+        const RAD_90_DEG: f64 = 90.0f64.to_radians();
+        const TILE_QUARTER: f32 = 4.0;
+        const TILE_EIGTH: f32 = 8.0;
 
         let transform = self.node.object.get_global_transform();
-        let building_id = self.node.building.building_id;
+        let building_id = self.node.building.id;
 
         let width = self.world_constants.bind().tile_size();
         let raw_angle = Vector3::FORWARD.signed_angle_to(direction, Vector3::UP);
-        let angle = snappedf(raw_angle as f64, RAD_90_DEG);
+        let angle = snappedf(f64::from(raw_angle), RAD_90_DEG);
 
         let offset = match (Corners::from_u8(building_id), direction) {
-            (None, _) => (width as f32 / 4.0) * Vector3::RIGHT.rotated(Vector3::UP, angle as f32),
+            (None, _) => {
+                (f32::from(width) / 4.0)
+                    * Vector3::RIGHT.rotated(
+                        Vector3::UP,
+                        angle
+                            .to_f32()
+                            .expect("should be ok to cast from f64 to f32"),
+                    )
+            }
 
             (Some(corner), Vector3::ZERO) => {
                 let dir = corner.direction();
-                let offset = (Vector3::RIGHT + Vector3::BACK) * (width as f32 / 4.0);
+                let offset = (Vector3::RIGHT + Vector3::BACK) * (f32::from(width) / TILE_QUARTER);
 
                 dir * offset
             }
@@ -120,29 +132,21 @@ impl<'n> NavNodeRef<'n> {
             (Some(corner), _) => {
                 let dir = corner.direction();
 
-                let offset = (Vector3::BACK + Vector3::RIGHT) * (width as f32 / 8.0);
+                let offset = (Vector3::BACK + Vector3::RIGHT) * (f32::from(width) / TILE_EIGTH);
 
                 let multiplier = match (
                     Direction::try_from(angle).expect("angle should be properly snapped!"),
                     corner,
                 ) {
-                    (Direction::Forward, Corners::BottomLeft)
-                    | (Direction::Left, Corners::BottomLeft)
-                    | (Direction::Back, Corners::BottomRight)
-                    | (Direction::Left, Corners::BottomRight)
-                    | (Direction::Forward, Corners::TopLeft)
-                    | (Direction::Right, Corners::TopLeft)
-                    | (Direction::Back, Corners::TopRight)
-                    | (Direction::Right, Corners::TopRight) => 1.0,
+                    (Direction::Forward | Direction::Left, Corners::BottomLeft)
+                    | (Direction::Back | Direction::Left, Corners::BottomRight)
+                    | (Direction::Forward | Direction::Right, Corners::TopLeft)
+                    | (Direction::Back | Direction::Right, Corners::TopRight) => 1.0,
 
-                    (Direction::Back, Corners::BottomLeft)
-                    | (Direction::Right, Corners::BottomLeft)
-                    | (Direction::Forward, Corners::BottomRight)
-                    | (Direction::Right, Corners::BottomRight)
-                    | (Direction::Back, Corners::TopLeft)
-                    | (Direction::Left, Corners::TopLeft)
-                    | (Direction::Forward, Corners::TopRight)
-                    | (Direction::Left, Corners::TopRight) => 2.75,
+                    (Direction::Back | Direction::Right, Corners::BottomLeft)
+                    | (Direction::Forward | Direction::Right, Corners::BottomRight)
+                    | (Direction::Back | Direction::Left, Corners::TopLeft)
+                    | (Direction::Forward | Direction::Left, Corners::TopRight) => 2.0,
                 };
 
                 dir * offset * multiplier
@@ -171,16 +175,18 @@ impl<'n> NavNodeRef<'n> {
 
 pub(crate) struct RoadNavigation {
     network: BTreeMap<TileCoords, NavNode>,
-    world_contstants: Gd<WorldConstants>,
+    world_constants: Gd<WorldConstants>,
     rand_distribution: Uniform<usize>,
+    city_coords_feature: CityCoordsFeature,
 }
 
 impl RoadNavigation {
-    pub fn new(world_contstants: Gd<WorldConstants>) -> Self {
+    pub fn new(world_constants: Gd<WorldConstants>) -> Self {
         Self {
             network: BTreeMap::default(),
-            world_contstants,
-            rand_distribution: Uniform::new(0, 1),
+            world_constants: world_constants.clone(),
+            rand_distribution: Uniform::new(0, 1).expect("we have constant bounds"),
+            city_coords_feature: CityCoordsFeature::new(world_constants, 0),
         }
     }
 
@@ -193,14 +199,15 @@ impl RoadNavigation {
         };
 
         self.network.insert(tile_coords, node);
-        self.rand_distribution = Uniform::new(0, self.network.len());
+        self.rand_distribution =
+            Uniform::new(0, self.network.len()).expect("lower bound is always zero");
     }
 
     #[inline]
     pub fn try_node(&self, coords: TileCoords) -> Option<NavNodeRef<'_>> {
         let node = self.network.get(&coords)?;
 
-        Some(NavNodeRef::new(node, &self.world_contstants))
+        Some(NavNodeRef::new(node, &self.world_constants))
     }
 
     #[inline]
@@ -234,13 +241,21 @@ impl RoadNavigation {
     }
 
     pub fn get_nearest_node(&self, global_translation: Vector3) -> Option<NavNodeRef<'_>> {
-        let coord_ratio = self.world_contstants.bind().tile_size();
+        let own_coords = {
+            let (x, y, _altitude) = self
+                .city_coords_feature
+                .tile_coordinates(global_translation);
 
-        let (mut low, low_node) = self.network.first_key_value()?;
-        let (mut high, high_node) = self.network.last_key_value()?;
+            (x, y)
+        };
 
-        let mut low_node = low_node;
-        let mut high_node = high_node;
+        // fas track, pick node at global transform
+        if let Some(node) = self.try_node(own_coords) {
+            return Some(node);
+        }
+
+        let (mut low, mut low_node) = self.network.first_key_value()?;
+        let (mut high, mut high_node) = self.network.last_key_value()?;
 
         loop {
             let distance_low = {
@@ -264,17 +279,11 @@ impl RoadNavigation {
             }
 
             let (new_low, new_low_node) = {
-                let vector = distance_low; // / 2.0;
-                let coords = (
-                    (vector.x / coord_ratio as f32).round() as u32,
-                    (vector.z / coord_ratio as f32).round() as u32,
-                );
-
-                let ordering = low.cmp(&coords);
+                let ordering = low.cmp(&own_coords);
 
                 let range = match ordering {
-                    Ordering::Less | Ordering::Equal => (*low)..=coords,
-                    Ordering::Greater => coords..=*low,
+                    Ordering::Less | Ordering::Equal => (*low)..=own_coords,
+                    Ordering::Greater => own_coords..=*low,
                 };
 
                 let mut node_range = self.network.range(range);
@@ -292,17 +301,11 @@ impl RoadNavigation {
             };
 
             let (new_high, new_high_node) = {
-                let vector = distance_high; // / 2.0;
-                let coords = (
-                    (high.0 as i32 - (vector.x / coord_ratio as f32).round() as i32) as u32,
-                    (high.1 as i32 - (vector.z / coord_ratio as f32).round() as i32) as u32,
-                );
-
-                let ordering = coords.cmp(high);
+                let ordering = own_coords.cmp(high);
 
                 let range = match ordering {
-                    Ordering::Less | Ordering::Equal => coords..=*high,
-                    Ordering::Greater => *high..=coords,
+                    Ordering::Less | Ordering::Equal => own_coords..=*high,
+                    Ordering::Greater => *high..=own_coords,
                 };
 
                 let mut node_range = self.network.range(range);
@@ -407,7 +410,7 @@ impl RoadNavigation {
     }
 
     pub fn get_random_node(&self) -> NavNodeRef<'_> {
-        let index = rand::thread_rng().sample(self.rand_distribution);
+        let index = rand::rng().sample(self.rand_distribution);
 
         let node = self
             .network
@@ -417,7 +420,7 @@ impl RoadNavigation {
 
         NavNodeRef {
             node,
-            world_constants: &self.world_contstants,
+            world_constants: &self.world_constants,
         }
     }
 }
@@ -451,6 +454,7 @@ impl RoadNavigationConfig {
 impl RoadNavigationConfig {
     /// Insert a node into the road navigation graph.
     #[func]
+    #[expect(clippy::needless_pass_by_value)]
     pub fn insert_node(&mut self, building: Dictionary, scene_node: Gd<Node3D>) {
         let building = Building::try_from_dict(&building)
             .expect("building dictionary must be a vaild SC2K building.");

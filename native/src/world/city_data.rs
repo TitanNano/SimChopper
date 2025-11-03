@@ -54,13 +54,13 @@ pub(crate) enum Compass {
 
 fn get_valid_tile_slopes_from_neighbors<'a>(
     tile: &'a Tile,
-    rotation: &'a TerrainRotation,
+    rotation: TerrainRotation,
     tilelist: &'a TileList,
 ) -> impl Iterator<Item = (Compass, &'a Tile, HashSet<&'static TerrainSlope>)> {
     tilelist
         .get_tile_neighbors(tile)
-        .map(|(dir, neighbor_tile)| {
-            let offset = (tile.altitude as i64 - neighbor_tile.altitude as i64)
+        .map(move |(dir, neighbor_tile)| {
+            let offset = (i64::from(tile.altitude) - i64::from(neighbor_tile.altitude))
                 .try_into()
                 .unwrap_or(i8::MIN);
 
@@ -107,12 +107,12 @@ pub(crate) trait TileListExt {
     fn get_tile_neighbors<'a>(&'a self, tile: &Tile) -> impl Iterator<Item = (Compass, &'a Tile)>;
 
     /// Validate the slope of a tile. Returns the number of neighbors that do not fit with this tile.
-    fn validate_tile_slope(&self, tile: &Tile, rotation: &TerrainRotation) -> TileValidationResult;
+    fn validate_tile_slope(&self, tile: &Tile, rotation: TerrainRotation) -> TileValidationResult;
 
     fn valid_slopes(
         &self,
         tile: &Tile,
-        rotation: &TerrainRotation,
+        rotation: TerrainRotation,
     ) -> HashSet<&'static TerrainSlope>;
 }
 
@@ -147,7 +147,7 @@ impl TileListExt for TileList {
         .into_iter()
         .filter_map(|(dir, coords)| self.get(&coords).map(|coords| (dir, coords)))
     }
-    fn validate_tile_slope(&self, tile: &Tile, rotation: &TerrainRotation) -> TileValidationResult {
+    fn validate_tile_slope(&self, tile: &Tile, rotation: TerrainRotation) -> TileValidationResult {
         let neighbors = get_valid_tile_slopes_from_neighbors(tile, rotation, self);
 
         neighbors
@@ -158,7 +158,7 @@ impl TileListExt for TileList {
                 TileValidationResult::default(),
                 |mut result, (_, neighbor_tile, _)| {
                     result.invalid_tiles += 1;
-                    result.empty_invalid_tiles += if neighbor_tile.has_building() { 0 } else { 1 };
+                    result.empty_invalid_tiles += u8::from(!neighbor_tile.has_building());
                     result
                 },
             )
@@ -167,7 +167,7 @@ impl TileListExt for TileList {
     fn valid_slopes(
         &self,
         tile: &Tile,
-        rotation: &TerrainRotation,
+        rotation: TerrainRotation,
     ) -> HashSet<&'static TerrainSlope> {
         let neighbors = get_valid_tile_slopes_from_neighbors(tile, rotation, self);
 
@@ -205,7 +205,7 @@ pub type TileCoords = (u32, u32);
 pub(crate) struct Building {
     pub size: u8,
     pub name: String,
-    pub building_id: u8,
+    pub id: u8,
     pub tile_coords: TileCoords,
 }
 
@@ -214,8 +214,8 @@ impl TryFromDictionary for Building {
         Ok(Self {
             size: get_dict_key(value, "size")?,
             name: get_dict_key(value, "name")?,
-            building_id: get_dict_key(value, "building_id")?,
-            tile_coords: get_dict_key(value, "tile_coords").and_then(array_to_tuple)?,
+            id: get_dict_key(value, "building_id")?,
+            tile_coords: get_dict_key(value, "tile_coords").and_then(|val| array_to_tuple(&val))?,
         })
     }
 }
@@ -281,8 +281,8 @@ impl Tile {
 
     pub fn has_building(&self) -> bool {
         self.building.as_ref().is_some_and(|building| {
-            building.building_id > 0
-                && (building.building_id != Buildings::TreeCouple
+            building.id > 0
+                && (building.id != Buildings::TreeCouple
                     || matches!(self.terrain.slope, TerrainSlope::None | TerrainSlope::All))
         })
     }
@@ -300,7 +300,7 @@ impl TryFromDictionary for Tile {
         Ok(Self {
             altitude: get_dict_key(value, "altitude")?,
             terrain: TileTerrainInfo::from(get_dict_key::<u32>(value, "terrain")?),
-            coordinates: array_to_tuple(get_dict_key(value, "coordinates")?)?,
+            coordinates: array_to_tuple(&get_dict_key(value, "coordinates")?)?,
             building: get_dict_key_optional(value, "building")?
                 .map(|value| Building::try_from_dict(&value))
                 .transpose()?,
@@ -330,10 +330,10 @@ impl<T: TryFromDictionary> TryFromDictionary for BTreeMap<TileCoords, T> {
                     .try_to()
                     .map_err(ErasedConvertError::from)
                     .map_err(TryFromDictError::InvalidKey)
-                    .and_then(array_to_tuple)?;
+                    .and_then(|val| array_to_tuple(&val))?;
 
                 let value: Dictionary = value.try_to().map_err(|err| {
-                    TryFromDictError::InvalidType(format!("{:?}", key).into(), err.into())
+                    TryFromDictError::InvalidType(format!("{key:?}").into(), err.into())
                 })?;
 
                 Ok((key, T::try_from_dict(&value)?))
@@ -369,7 +369,7 @@ fn get_dict_key_optional<T: FromGodot>(
         .map(Some)
 }
 
-fn array_to_tuple(value: VariantArray) -> Result<TileCoords, TryFromDictError> {
+fn array_to_tuple(value: &VariantArray) -> Result<TileCoords, TryFromDictError> {
     Ok((
         value
             .get(0)

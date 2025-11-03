@@ -6,7 +6,6 @@ use godot::classes::{
     window, Button, Control, EditorInterface, HBoxContainer, IPopupPanel, Label, MarginContainer,
     PopupPanel, ProgressBar, VBoxContainer,
 };
-use godot::global::maxf;
 use godot::obj::{Base, Gd, NewAlloc, WithBaseField};
 use godot::prelude::{godot_api, GodotClass};
 
@@ -34,7 +33,7 @@ impl IPopupPanel for ProgressDialog {
 }
 
 impl ProgressDialog {
-    pub fn new(process: ForgroundProcess) -> Gd<Self> {
+    pub fn new(process: &ForgroundProcess) -> Gd<Self> {
         Gd::from_init_fn(|base| {
             let mut main = VBoxContainer::new_alloc();
             let mut cancel_hb = HBoxContainer::new_alloc();
@@ -96,10 +95,7 @@ impl ProgressDialog {
 
     pub fn popup(&mut self) {
         let mut ms = self.main.get_combined_minimum_size();
-        ms.x = maxf(
-            500.0 * EditorInterface::singleton().get_editor_scale() as f64,
-            ms.x.into(),
-        ) as f32;
+        ms.x = (500.0 * EditorInterface::singleton().get_editor_scale()).max(ms.x);
 
         let Some(style) = self
             .main

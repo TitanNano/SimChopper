@@ -72,6 +72,7 @@ impl AoBaker {
         task::spawn(Self::async_bake(tree.clone(), editor_interface.clone()));
     }
 
+    #[expect(clippy::too_many_lines)]
     async fn async_bake(tree: Gd<SceneTree>, editor_interface: Gd<EditorInterface>) {
         use std::io::BufRead;
 
@@ -137,9 +138,14 @@ impl AoBaker {
             .map(|entry| entry.path())
             .collect();
 
-        let mut dialog = ProgressDialog::new(ForgroundProcess {
+        let mut dialog = ProgressDialog::new(&ForgroundProcess {
             title: "Ambient Occlusion Baking",
-            tasks: new_non_zero(model_paths.len() as u32),
+            tasks: new_non_zero(
+                model_paths
+                    .len()
+                    .try_into()
+                    .expect("model_paths should fit into a u32"),
+            ),
             task_title: "Bake Mesh",
             steps: new_non_zero(11),
         });
@@ -214,14 +220,14 @@ impl AoBaker {
             }
 
             if read_buffer.starts_with("Progress|") {
-                let label = read_buffer.split("|").nth(1).unwrap_or_default();
+                let label = read_buffer.split('|').nth(1).unwrap_or_default();
 
                 dialog.bind_mut().push_task_step(label);
                 logger::info!("Blender: {read_buffer}");
             }
 
             if read_buffer.starts_with("File|") {
-                let label = read_buffer.split("|").nth(1).unwrap_or_default();
+                let label = read_buffer.split('|').nth(1).unwrap_or_default();
 
                 dialog.bind_mut().push_task(label);
                 logger::info!("Blender: {read_buffer}");

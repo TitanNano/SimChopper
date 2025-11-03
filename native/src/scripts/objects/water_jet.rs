@@ -1,4 +1,3 @@
-use std::ops::Deref;
 use std::{cmp::Ordering, ops::DerefMut};
 
 use anyhow::{bail, Result};
@@ -8,13 +7,13 @@ use godot::classes::{
     Area3D, Decal, GpuParticles3D, Node, Node3D, Object, PhysicsRayQueryParameters3D,
     RenderingServer, ShapeCast3D,
 };
-use godot::global::{clampf, randf_range};
 use godot::meta::ToGodot;
 use godot::obj::bounds::Declarer;
 use godot::obj::{Bounds, Gd, Inherits, InstanceId};
 use godot::prelude::{GodotClass, NodePath};
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
 use itertools::Itertools;
+use num::ToPrimitive;
 
 use crate::ext::node_3d::{Node3DExt, Vector3Ext};
 use crate::scripts::objects::debugger_3_d::Debugger3D;
@@ -24,7 +23,7 @@ use crate::{debug_3d, util};
 #[derive(GodotScript, Debug)]
 #[script(base = GpuParticles3D)]
 struct WaterJet {
-    /// List of ShapeCast3D nodes to aproximate particle impact.
+    /// List of [`ShapeCast3D`] nodes to aproximate particle impact.
     #[export(node_path = ["ShapeCast3D"])]
     pub impact_cast_paths: Array<NodePath>,
 
@@ -45,11 +44,12 @@ struct WaterJet {
 
     /// Maximum decal spawn delay in seconds.
     #[export(range(min = 0.0, max = 20.0, step = 0.1))]
-    pub max_delay: f64,
+    pub max_delay: f32,
 
     base: Gd<GpuParticles3D>,
 }
 
+#[derive(Clone, Copy)]
 struct Intersection {
     position: Vector3,
     normal: Vector3,
@@ -57,7 +57,7 @@ struct Intersection {
 
 #[godot_script_impl]
 impl WaterJet {
-    const MAX_DISTANCE: f64 = 60.0;
+    const MAX_DISTANCE: f32 = 60.0;
 
     pub fn _ready(&mut self) {
         self.impact_casts = self
@@ -68,11 +68,11 @@ impl WaterJet {
     }
 
     fn impact_area(&self) -> &Gd<Area3D> {
-        self.impact_area.deref()
+        &self.impact_area
     }
 
     fn decal(&self) -> &Gd<Decal> {
-        self.decal.deref()
+        &self.decal
     }
 
     fn get_decal_count_at(
@@ -139,6 +139,7 @@ impl WaterJet {
         }))
     }
 
+    #[expect(clippy::too_many_lines)]
     pub fn _physics_process(&mut self, delta: f64) {
         let active = self.base.is_emitting();
         debug_3d!(self.debugger => active);
@@ -148,7 +149,12 @@ impl WaterJet {
         }
 
         #[cfg(debug_assertions)]
-        let area = self.impact_area().get_overlapping_bodies().len() as u32;
+        let area = self
+            .impact_area()
+            .get_overlapping_bodies()
+            .len()
+            .try_into()
+            .unwrap_or(u32::MAX);
         debug_3d!(self.debugger => area);
 
         if !self.impact_area().has_overlapping_bodies() {
@@ -164,7 +170,7 @@ impl WaterJet {
         #[cfg(debug_assertions)]
         let mut decal_spawned = false;
 
-        for shape_cast in self.impact_casts.iter() {
+        for shape_cast in &self.impact_casts {
             shape_cast.clone().force_shapecast_update();
 
             let count = shape_cast.get_collision_count();
@@ -204,16 +210,13 @@ impl WaterJet {
 
                 let impact_distance = self.base.get_global_position().distance_to(point.position);
                 let target_decal_count = self.max_decal_count;
-                let extent = clampf(
-                    7.0 / Self::MAX_DISTANCE * (impact_distance as f64),
-                    1.0,
-                    7.0,
-                );
-                let decal_scale = (extent * 2.0 / 3.0) as f32;
+                let extent = (7.0 / Self::MAX_DISTANCE * impact_distance).clamp(1.0, 7.0);
+
+                let decal_scale = extent * 2.0 / 3.0;
 
                 let decals_at_point = match self.get_decal_count_at(
                     point.position,
-                    Vector3::splat(extent as f32 * 2.0),
+                    Vector3::splat(extent * 2.0),
                     target_decal_count,
                 ) {
                     Ok(count) => count,
@@ -227,17 +230,18 @@ impl WaterJet {
                     self.spawn_decal(
                         &decal,
                         &decals_at_point,
-                        point,
+                        &point,
                         extent,
                         decal_scale,
                         &mut target_node,
                     )
                 });
 
-                let impact_delay = (self.max_delay / Self::MAX_DISTANCE * (impact_distance as f64))
-                    .min(self.max_delay);
+                let impact_delay =
+                    (self.max_delay / Self::MAX_DISTANCE * (impact_distance)).min(self.max_delay);
 
-                let mut timer = util::timer(&mut self.base.get_tree().unwrap(), impact_delay);
+                let mut timer =
+                    util::timer(&mut self.base.get_tree().unwrap(), impact_delay.into());
                 let id = decal_inst.as_ref().map(Gd::instance_id);
                 let target_id = target_node.instance_id();
 
@@ -264,7 +268,12 @@ impl WaterJet {
                             Ok(Variant::nil())
                         }),
                     )
-                    .flags(ConnectFlags::ONE_SHOT.to_godot() as u32)
+                    .flags(
+                        ConnectFlags::ONE_SHOT
+                            .to_godot()
+                            .to_u32()
+                            .expect("godot constants always fit"),
+                    )
                     .done();
 
                 #[cfg(debug_assertions)]
@@ -386,8 +395,8 @@ impl WaterJet {
         &self,
         template: &Gd<Decal>,
         decals_at_point: &[Vector3],
-        point: Intersection,
-        extent: f64,
+        point: &Intersection,
+        extent: f32,
         decal_scale: f32,
         target_node: &mut Gd<T>,
     ) -> Gd<Decal>
@@ -404,9 +413,9 @@ impl WaterJet {
 
         let offset = if decals_at_point.is_empty() {
             let offset = Vector3::new(
-                randf_range(-extent, extent) as f32,
+                rand::random_range(-extent..extent) as f32,
                 0.0,
-                randf_range(-extent, extent) as f32,
+                rand::random_range(-extent..extent) as f32,
             )
             .align_up(point.normal);
 
@@ -415,7 +424,7 @@ impl WaterJet {
             let shifted = Self::shift_new_point(
                 point.position,
                 decal_scale,
-                extent as f32,
+                extent,
                 point.normal,
                 decals_at_point,
                 new_point,
@@ -438,7 +447,10 @@ impl WaterJet {
 
         decal_inst.set_global_position(point.position);
         decal_inst.align_up(decal_normal);
-        decal_inst.global_rotate(decal_normal, randf_range(-90.0, 90.0).to_radians() as f32);
+        decal_inst.global_rotate(
+            decal_normal,
+            rand::random_range::<f32, _>(-90.0..90.0).to_radians(),
+        );
         decal_inst.translate(offset);
 
         if let Some(scene_root) = target_node

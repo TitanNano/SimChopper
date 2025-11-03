@@ -82,14 +82,14 @@ void vertex() {
 
 void fragment() {
 	vec3 normal = sample_wave_noise(ocean_normal_map);
-	
+
 	NORMAL_MAP = normal;
 	NORMAL_MAP_DEPTH = Normal_Depth;
 	ROUGHNESS = 0.2;
 
 	float n_dot_l = max(dot(VIEW, NORMAL), 0);
 	float facing = (1.0 - n_dot_l);
-	
+
 	if (facing > 0.999) {
 		ALBEDO = correct_color(ocean_water_color).rgb;
 	} else {
@@ -98,10 +98,10 @@ void fragment() {
 
 		if (dist_scale > 0.0) {
 			vec3 refraction_offset = (2.0 * normal.xyz - 1.0) * vec3(0.075, 0.075, 1.0);
-		
+
 			float depth_diff = FRAGCOORD.z - texture(depth_texture, SCREEN_UV + refraction_offset.rg).r;
 			float depth_mask = ceil(clamp(depth_diff, 0.0, 1.0));
-		
+
 			vec4 refraction_a = texture(screen_texture, SCREEN_UV.xy + refraction_offset.xy);
 			vec4 refraction_b = texture(screen_texture, SCREEN_UV.xy);
 			vec4 refraction_value = refraction_b * depth_mask + refraction_a * (1.0 - depth_mask);
@@ -110,10 +110,10 @@ void fragment() {
 		} else {
 			water_deep_albedo = correct_color(ocean_deep_water_color);
 		}
-		
+
 		// Lerp between water color and deep water color
 	  	vec4 water_albedo = (correct_color(ocean_water_color) * facing + water_deep_albedo * (1.0 - facing));
-	
+
 		// Refraction output
 		ALBEDO = water_albedo.rgb;
 	}

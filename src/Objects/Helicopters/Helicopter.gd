@@ -102,10 +102,8 @@ func _update_rotational_velocity(direction: float, delta: float) -> float:
 
 
 func _get_tilt(rotation_velocity: float, delta: float) -> Vector3:
-	var virt_thrust := self.engine_thrust.rotated(Vector3.UP, rotation_velocity * (1 + delta))
-	
-	var tilt_z := MAX_TILT * -virt_thrust.x
-	var tilt_x := MAX_TILT * virt_thrust.z
+	var tilt_z := MAX_TILT * -self.engine_thrust.x
+	var tilt_x := MAX_TILT * self.engine_thrust.z
 	var tilt := Vector3(deg_to_rad(tilt_x), 0, deg_to_rad(tilt_z))
 
 	return tilt
@@ -165,11 +163,12 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 
 	# apply rotational velocity
 	var rotation_velocity := self._update_rotational_velocity(turn_strength, delta)
-	var global_rotation_velocity := self.global_transform.basis.y * rotation_velocity
+	var global_rotation_velocity := Vector3.UP * rotation_velocity
 
 	# calculate thrust
 	var thrust_increase := direction * THRUST_INCREASE * delta
 
+	# the engine thrust automatically decreases when the direction changes due to the drag force
 	if !direction.is_zero_approx() && self.engine_thrust.length() < 1.0:
 		self.engine_thrust += thrust_increase
 

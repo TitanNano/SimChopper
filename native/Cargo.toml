@@ -18,7 +18,11 @@ num_enum = "0.7.1"
 derive-debug = "0.1.2"
 thiserror = "1.0.56"
 anyhow = { version = "1.0.79" }
-rand = "0.8.5"
+rand = "0.9.2"
 pomsky-macro = "0.11.0"
 regex = "1.10.5"
 kanal = { version = "0.1.1", features = ["async"] }
+
+[lints.clippy]
+pedantic = "deny"
+used_underscore_items = { level = "allow", priority = 1 }

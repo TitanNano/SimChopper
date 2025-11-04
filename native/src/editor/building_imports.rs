@@ -73,7 +73,7 @@ impl SetupBuildingImports {
             return;
         };
 
-        let import_config_name = format!("{}.import", file_path);
+        let import_config_name = format!("{file_path}.import");
 
         if !FileAccess::file_exists(&import_config_name) {
             logger::warn!("Resource has never been imported by the editor!");
@@ -88,6 +88,7 @@ impl SetupBuildingImports {
     }
 
     #[func]
+    #[expect(clippy::needless_pass_by_value)]
     fn on_dir_selected(&mut self, root_dir: GString) {
         let Some(editor) = self.editor.as_ref() else {
             logger::error!("Editor is not available!");
@@ -115,7 +116,7 @@ impl SetupBuildingImports {
                     .get_directories()
                     .to_vec()
                     .into_iter()
-                    .map(|dir_name| format!("{}/{}", dir_path, dir_name).into())
+                    .map(|dir_name| format!("{dir_path}/{dir_name}").into())
                     .collect(),
             );
             file_queue.append(
@@ -124,13 +125,13 @@ impl SetupBuildingImports {
                     .to_vec()
                     .into_iter()
                     .filter(|file_name| pattern.is_match(&file_name.to_string()))
-                    .map(|file_name| GString::from(format!("{}/{}", dir_path, file_name)))
+                    .map(|file_name| GString::from(format!("{dir_path}/{file_name}")))
                     .collect(),
             );
         }
 
-        file_queue.iter().for_each(|path| {
-            let import_config_name = format!("{}.import", path);
+        for path in &file_queue {
+            let import_config_name = format!("{path}.import");
 
             logger::info!("Processing import config \"{}\"...", import_config_name);
 
@@ -140,7 +141,7 @@ impl SetupBuildingImports {
             }
 
             Self::update_import_config(&import_config_name);
-        });
+        }
 
         editor
             .get_resource_filesystem()
@@ -193,12 +194,9 @@ impl SetupBuildingImports {
             return;
         };
 
-        let scene: Gd<PackedScene> = match scene.try_cast() {
-            Ok(scene) => scene,
-            Err(_) => {
-                logger::error!("Loaded resouce is not of type PackedScene!");
-                return;
-            }
+        let Ok(scene): Result<Gd<PackedScene>, _> = scene.try_cast() else {
+            logger::error!("Loaded resouce is not of type PackedScene!");
+            return;
         };
 
         let Some(scene_state) = scene.get_state() else {

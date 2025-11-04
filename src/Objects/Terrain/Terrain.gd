@@ -20,7 +20,6 @@ func _forward_progress(count: int):
 
 func init(city: Dictionary):
 	var rotation := TerrainRotation.new()
-	var builder_factory := TerrainBuilderFactory.new()
 	var simulator_settings: Dictionary = city.get("simulator_settings")
 	var compass: int = simulator_settings.get("Compass")
 	var sea_level: int = simulator_settings.get("GlobalSeaLevel")
@@ -36,7 +35,7 @@ func init(city: Dictionary):
 		"Water": ocean_material
 	}
 
-	self.builder = builder_factory.create(tilelist, rotation, materials)
+	self.builder = TerrainBuilderFactory.create(tilelist, rotation, materials)
 
 	self.builder.set_city_size(city_size)
 	self.builder.set_tile_size(self.world_constants.tile_size)

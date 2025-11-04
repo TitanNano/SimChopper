@@ -64,9 +64,8 @@ impl CanonUpgrade {
         self.water_jet.set_emitting(false);
 
         match value {
-            CanonMode::Inactive => (),
             CanonMode::Water => self.water_jet.set_emitting(true),
-            CanonMode::Teargas => (),
+            CanonMode::Teargas | CanonMode::Inactive => (),
         }
     }
 

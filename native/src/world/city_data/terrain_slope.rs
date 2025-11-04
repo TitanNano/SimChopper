@@ -126,7 +126,8 @@ pub(crate) enum TerrainSlope {
 }
 
 impl TerrainSlope {
-    pub const fn valid_north_neighbors(&self) -> &'static [(Self, i8)] {
+    #[expect(clippy::too_many_lines)]
+    pub const fn valid_north_neighbors(self) -> &'static [(Self, i8)] {
         match self {
             // North is not raised at all
             Self::None | Self::South | Self::SouthWest | Self::SouthEast => &[
@@ -199,32 +200,29 @@ impl TerrainSlope {
             ],
 
             Self::South2NorthEast => &[(Self::SouthEast, 0)],
-            Self::East2NorthWest => &[],
-            Self::North2SouthWest => &[],
+            Self::East2NorthWest
+            | Self::North2SouthWest
+            | Self::EastNorthWest2
+            | Self::South2NorthWest
+            | Self::East2SouthWest
+            | Self::North2SouthEast
+            | Self::West2NorthEast
+            | Self::NorthSouthWest2
+            | Self::SouthNorthEast2
+            | Self::SouthWest2NorthWest
+            | Self::SouthEast2West
+            | Self::NorthWest2East
+            | Self::NorthEast2SouthEast
+            | Self::WestNorthEast2
+            | Self::SouthNorthWest2
+            | Self::EastSouthWest2
+            | Self::NorthSouthEast2
+            // verticalL cliff for waterfall
+            | Self::VertialCliff => &[],
+
             Self::West2SouthEast => &[(Self::SouthWest2NorthWest, 0)],
 
-            Self::South2NorthWest => &[],
-            Self::East2SouthWest => &[],
-            Self::North2SouthEast => &[],
-            Self::West2NorthEast => &[],
-
-            Self::SouthNorthEast2 => &[],
-            Self::EastNorthWest2 => &[],
-            Self::NorthSouthWest2 => &[],
             Self::WestSouthEast2 => &[(Self::SouthWest, 0)],
-
-            Self::NorthWest2East => &[],
-            Self::SouthWest2NorthWest => &[],
-            Self::SouthEast2West => &[],
-            Self::NorthEast2SouthEast => &[],
-
-            Self::WestNorthEast2 => &[],
-            Self::SouthNorthWest2 => &[],
-            Self::EastSouthWest2 => &[],
-            Self::NorthSouthEast2 => &[],
-
-            // verticalL cliff for waterfall
-            Self::VertialCliff => &[],
 
             Self::Undetermined => &[
                 (Self::None, 0),
@@ -260,7 +258,8 @@ impl TerrainSlope {
         }
     }
 
-    pub const fn valid_north_west_neighbors(&self) -> &'static [(Self, i8)] {
+    #[expect(clippy::too_many_lines)]
+    pub const fn valid_north_west_neighbors(self) -> &'static [(Self, i8)] {
         match self {
             Self::Undetermined => &[
                 (Self::None, 0),
@@ -382,36 +381,33 @@ impl TerrainSlope {
             ],
 
             Self::South2NorthEast => &[(Self::SouthWest, 0)],
-            Self::East2NorthWest => &[],
-            Self::North2SouthWest => &[],
-            Self::West2SouthEast => &[],
-
-            Self::South2NorthWest => &[],
-            Self::East2SouthWest => &[],
-            Self::North2SouthEast => &[],
-            Self::West2NorthEast => &[],
-
-            Self::SouthNorthEast2 => &[],
-            Self::EastNorthWest2 => &[],
-            Self::NorthSouthWest2 => &[],
+            Self::East2NorthWest
+            | Self::North2SouthWest
+            | Self::West2SouthEast
+            | Self::South2NorthWest
+            | Self::East2SouthWest
+            | Self::North2SouthEast
+            | Self::SouthNorthEast2
+            | Self::SouthEast2West
+            | Self::West2NorthEast
+            | Self::EastNorthWest2
+            | Self::NorthSouthWest2
+            | Self::NorthWest2East
+            | Self::NorthEast2SouthEast
+            | Self::WestNorthEast2
+            | Self::SouthNorthWest2
+            | Self::EastSouthWest2
+            | Self::NorthSouthEast2
+            | Self::VertialCliff => &[],
             Self::WestSouthEast2 => &[(Self::South, 0)],
 
-            Self::NorthWest2East => &[],
             Self::SouthWest2NorthWest => &[(Self::All, 0)],
-            Self::SouthEast2West => &[],
-            Self::NorthEast2SouthEast => &[],
-
-            Self::WestNorthEast2 => &[],
-            Self::SouthNorthWest2 => &[],
-            Self::EastSouthWest2 => &[],
-            Self::NorthSouthEast2 => &[],
-
             // verticalL cliff for waterfall
-            Self::VertialCliff => &[],
         }
     }
 
-    pub const fn valid_north_east_neighbors(&self) -> &'static [(Self, i8)] {
+    #[expect(clippy::too_many_lines)]
+    pub const fn valid_north_east_neighbors(self) -> &'static [(Self, i8)] {
         match self {
             Self::Undetermined => &[
                 (Self::None, 0),
@@ -544,43 +540,40 @@ impl TerrainSlope {
             ],
 
             Self::South2NorthEast => &[(Self::South, 0)],
-            Self::East2NorthWest => &[],
-            Self::North2SouthWest => &[],
+            Self::East2NorthWest
+            | Self::North2SouthWest
+            | Self::South2NorthWest
+            | Self::East2SouthWest
+            | Self::North2SouthEast
+            | Self::West2NorthEast
+            | Self::SouthNorthEast2
+            | Self::EastNorthWest2
+            | Self::NorthSouthWest2
+            | Self::NorthWest2East
+            | Self::SouthEast2West
+            | Self::NorthEast2SouthEast
+            | Self::WestNorthEast2
+            | Self::SouthNorthWest2
+            | Self::EastSouthWest2
+            | Self::NorthSouthEast2
+            | Self::VertialCliff => &[],
             Self::West2SouthEast => &[
                 // Lower Elevation
                 (Self::SouthNorthWest, -1),
             ],
 
-            Self::South2NorthWest => &[],
-            Self::East2SouthWest => &[],
-            Self::North2SouthEast => &[],
-            Self::West2NorthEast => &[],
-
-            Self::SouthNorthEast2 => &[],
-            Self::EastNorthWest2 => &[],
-            Self::NorthSouthWest2 => &[],
             Self::WestSouthEast2 => &[(Self::SouthEast, 0)],
 
-            Self::NorthWest2East => &[],
             Self::SouthWest2NorthWest => &[
                 // Lower Elevation
                 (Self::SouthNorthWest, -1),
                 (Self::West, -1),
             ],
-            Self::SouthEast2West => &[],
-            Self::NorthEast2SouthEast => &[],
-
-            Self::WestNorthEast2 => &[],
-            Self::SouthNorthWest2 => &[],
-            Self::EastSouthWest2 => &[],
-            Self::NorthSouthEast2 => &[],
-
-            // verticalL cliff for waterfall
-            Self::VertialCliff => &[],
         }
     }
 
-    pub const fn valid_south_neighbors(&self) -> &'static [(Self, i8)] {
+    #[expect(clippy::too_many_lines)]
+    pub const fn valid_south_neighbors(self) -> &'static [(Self, i8)] {
         match self {
             // South is not raised at all
             Self::None | Self::North | Self::NorthWest | Self::NorthEast => &[
@@ -655,21 +648,28 @@ impl TerrainSlope {
                 // Higher Elevation
                 (Self::All, 1),
             ],
-            Self::East2NorthWest => &[],
-            Self::North2SouthWest => &[],
+            Self::East2NorthWest
+            | Self::NorthEast2SouthEast
+            | Self::East2SouthWest
+            | Self::North2SouthWest
+            | Self::South2NorthWest
+            | Self::North2SouthEast
+            | Self::West2NorthEast
+            | Self::SouthNorthEast2
+            | Self::EastNorthWest2
+            | Self::NorthSouthWest2
+            | Self::SouthEast2West
+            | Self::SouthNorthWest2
+            | Self::EastSouthWest2
+            | Self::NorthSouthEast2
+            // verticalL cliff for waterfall
+            | Self::VertialCliff => &[],
+
             Self::West2SouthEast => &[
                 //Higher Elevation
                 (Self::West, 1),
             ],
 
-            Self::South2NorthWest => &[],
-            Self::East2SouthWest => &[],
-            Self::North2SouthEast => &[],
-            Self::West2NorthEast => &[],
-
-            Self::SouthNorthEast2 => &[],
-            Self::EastNorthWest2 => &[],
-            Self::NorthSouthWest2 => &[],
             Self::WestSouthEast2 => &[
                 // Higher Elevation
                 (Self::East, 1),
@@ -677,17 +677,7 @@ impl TerrainSlope {
 
             Self::NorthWest2East => &[(Self::SouthWest, 0)],
             Self::SouthWest2NorthWest => &[(Self::West2SouthEast, 0)],
-            Self::SouthEast2West => &[],
-            Self::NorthEast2SouthEast => &[],
-
             Self::WestNorthEast2 => &[(Self::SouthNorthWest, 0)],
-            Self::SouthNorthWest2 => &[],
-            Self::EastSouthWest2 => &[],
-            Self::NorthSouthEast2 => &[],
-
-            // verticalL cliff for waterfall
-            Self::VertialCliff => &[],
-
             Self::Undetermined => &[
                 (Self::None, 0),
                 (Self::North, 0),
@@ -727,7 +717,8 @@ impl TerrainSlope {
         }
     }
 
-    pub const fn valid_south_west_neighbors(&self) -> &'static [(Self, i8)] {
+    #[expect(clippy::too_many_lines)]
+    pub const fn valid_south_west_neighbors(self) -> &'static [(Self, i8)] {
         match self {
             Self::Undetermined => &[
                 (Self::None, 0),
@@ -869,45 +860,45 @@ impl TerrainSlope {
                 // Higher Elevation
                 (Self::East, 1),
             ],
-            Self::East2NorthWest => &[],
-            Self::North2SouthWest => &[],
+
+            Self::East2NorthWest
+            | Self::North2SouthWest
+            | Self::South2NorthWest
+            | Self::East2SouthWest
+            | Self::North2SouthEast
+            | Self::West2NorthEast
+            | Self::SouthNorthEast2
+            | Self::EastNorthWest2
+            | Self::NorthSouthWest2
+            | Self::SouthWest2NorthWest
+            | Self::SouthEast2West
+            | Self::NorthEast2SouthEast
+            | Self::SouthNorthWest2
+            | Self::EastSouthWest2
+            | Self::NorthSouthEast2
+            | Self::VertialCliff => &[],
+
             Self::West2SouthEast => &[
                 // Higher Elevation x2
                 (Self::None, 2),
             ],
 
-            Self::South2NorthWest => &[],
-            Self::East2SouthWest => &[],
-            Self::North2SouthEast => &[],
-            Self::West2NorthEast => &[],
-
-            Self::SouthNorthEast2 => &[],
-            Self::EastNorthWest2 => &[],
-            Self::NorthSouthWest2 => &[],
             Self::WestSouthEast2 => &[
                 // Higher Elevation
                 (Self::None, 1),
             ],
 
             Self::NorthWest2East => &[(Self::SouthNorthWest, 0)],
-            Self::SouthWest2NorthWest => &[],
-            Self::SouthEast2West => &[],
-            Self::NorthEast2SouthEast => &[],
-
             Self::WestNorthEast2 => &[
                 // Higher Elevation
                 (Self::West, 1),
             ],
-            Self::SouthNorthWest2 => &[],
-            Self::EastSouthWest2 => &[],
-            Self::NorthSouthEast2 => &[],
-
             // verticalL cliff for waterfall
-            Self::VertialCliff => &[],
         }
     }
 
-    pub const fn valid_south_east_neighbors(&self) -> &'static [(Self, i8)] {
+    #[expect(clippy::too_many_lines)]
+    pub const fn valid_south_east_neighbors(self) -> &'static [(Self, i8)] {
         match self {
             TerrainSlope::Undetermined => &[
                 (Self::None, 0),
@@ -1036,39 +1027,36 @@ impl TerrainSlope {
                 // Higher Elevation 2x
                 (Self::None, 2),
             ],
-            Self::East2NorthWest => &[],
-            Self::North2SouthWest => &[],
+            Self::East2NorthWest
+            | Self::NorthEast2SouthEast
+            | Self::SouthNorthWest2
+            | Self::North2SouthWest
+            | Self::East2SouthWest
+            | Self::West2NorthEast
+            | Self::South2NorthWest
+            | Self::EastNorthWest2
+            | Self::EastSouthWest2
+            | Self::SouthEast2West
+            | Self::NorthSouthEast2
+            | Self::NorthSouthWest2
+            | Self::North2SouthEast
+            | Self::SouthNorthEast2
+            // verticalL cliff for waterfall
+            | Self::VertialCliff => &[],
             Self::West2SouthEast => &[(Self::SouthNorthWest, 0)],
 
-            Self::South2NorthWest => &[],
-            Self::East2SouthWest => &[],
-            Self::North2SouthEast => &[],
-            Self::West2NorthEast => &[],
-
-            Self::SouthNorthEast2 => &[],
-            Self::EastNorthWest2 => &[],
-            Self::NorthSouthWest2 => &[],
             Self::WestSouthEast2 => &[
                 // Higher Elevation
                 (Self::All, 1),
             ],
 
             Self::NorthWest2East => &[(Self::East, 0)],
-            Self::SouthWest2NorthWest => &[(Self::SouthWest, 0)],
-            Self::SouthEast2West => &[],
-            Self::NorthEast2SouthEast => &[],
-
-            Self::WestNorthEast2 => &[(Self::SouthWest, 0)],
-            Self::SouthNorthWest2 => &[],
-            Self::EastSouthWest2 => &[],
-            Self::NorthSouthEast2 => &[],
-
-            // verticalL cliff for waterfall
-            Self::VertialCliff => &[],
+            Self::SouthWest2NorthWest | Self::WestNorthEast2 => &[(Self::SouthWest, 0)],
         }
     }
 
-    pub const fn valid_west_neighbors(&self) -> &'static [(Self, i8)] {
+    #[expect(clippy::too_many_lines)]
+    pub const fn valid_west_neighbors(self) -> &'static [(Self, i8)] {
         match self {
             // West is not raised at all
             Self::None | Self::East | Self::SouthEast | Self::NorthEast => &[
@@ -1143,39 +1131,36 @@ impl TerrainSlope {
             ],
 
             Self::South2NorthEast => &[(Self::WestSouthEast2, 0)],
-            Self::East2NorthWest => &[],
-            Self::North2SouthWest => &[],
-            Self::West2SouthEast => &[],
 
-            Self::South2NorthWest => &[],
-            Self::East2SouthWest => &[],
-            Self::North2SouthEast => &[],
-            Self::West2NorthEast => &[],
+            Self::East2NorthWest
+            | Self::North2SouthWest
+            | Self::West2SouthEast
+            | Self::South2NorthWest
+            | Self::East2SouthWest
+            | Self::North2SouthEast
+            | Self::West2NorthEast
+            | Self::SouthNorthEast2
+            | Self::EastNorthWest2
+            | Self::NorthSouthWest2
+            | Self::SouthWest2NorthWest
+            | Self::SouthEast2West
+            | Self::SouthNorthWest2
+            | Self::EastSouthWest2
+            | Self::NorthSouthEast2
+            | Self::NorthEast2SouthEast
+            | Self::VertialCliff => &[],
 
-            Self::SouthNorthEast2 => &[],
-            Self::EastNorthWest2 => &[],
-            Self::NorthSouthWest2 => &[],
             Self::WestSouthEast2 => &[
                 // Higher Elevation
                 (Self::None, 1),
             ],
 
             Self::NorthWest2East => &[(Self::WestNorthEast2, 0)],
-            Self::SouthWest2NorthWest => &[],
-            Self::SouthEast2West => &[],
-            Self::NorthEast2SouthEast => &[],
-
             Self::WestNorthEast2 => &[
                 // Higher Elevation
                 (Self::West, 1),
             ],
-            Self::SouthNorthWest2 => &[],
-            Self::EastSouthWest2 => &[],
-            Self::NorthSouthEast2 => &[],
-
             // verticalL cliff for waterfall
-            Self::VertialCliff => &[],
-
             Self::Undetermined => &[
                 (Self::None, 0),
                 (Self::North, 0),
@@ -1210,7 +1195,8 @@ impl TerrainSlope {
         }
     }
 
-    pub const fn valid_east_neighbor(&self) -> &'static [(Self, i8)] {
+    #[expect(clippy::too_many_lines)]
+    pub const fn valid_east_neighbor(self) -> &'static [(Self, i8)] {
         match self {
             // East is not raised at all
             Self::None | Self::West | Self::NorthWest | Self::SouthWest => &[
@@ -1290,18 +1276,24 @@ impl TerrainSlope {
                 // Higher Elevation
                 (Self::South, 1),
             ],
-            Self::East2NorthWest => &[],
-            Self::North2SouthWest => &[],
+            Self::East2NorthWest
+            | Self::NorthEast2SouthEast
+            | Self::NorthSouthWest2
+            | Self::South2NorthWest
+            | Self::North2SouthWest
+            | Self::VertialCliff
+            | Self::East2SouthWest
+            | Self::North2SouthEast
+            | Self::West2NorthEast
+            | Self::SouthNorthEast2
+            | Self::EastNorthWest2
+            | Self::SouthEast2West
+            | Self::SouthNorthWest2
+            | Self::EastSouthWest2
+            | Self::NorthSouthEast2 => &[],
+
             Self::West2SouthEast => &[(Self::SouthWest, 0)],
 
-            Self::South2NorthWest => &[],
-            Self::East2SouthWest => &[],
-            Self::North2SouthEast => &[],
-            Self::West2NorthEast => &[],
-
-            Self::SouthNorthEast2 => &[],
-            Self::EastNorthWest2 => &[],
-            Self::NorthSouthWest2 => &[],
             Self::WestSouthEast2 => &[(Self::South2NorthEast, 0)],
 
             Self::NorthWest2East => &[(Self::NorthWestEast2SouthEast, 0)],
@@ -1309,17 +1301,8 @@ impl TerrainSlope {
                 // Lower Elevation
                 (Self::SouthNorthWest, -1),
             ],
-            Self::SouthEast2West => &[],
-            Self::NorthEast2SouthEast => &[],
-
             Self::WestNorthEast2 => &[(Self::NorthWest2East, 0)],
-            Self::SouthNorthWest2 => &[],
-            Self::EastSouthWest2 => &[],
-            Self::NorthSouthEast2 => &[],
-
             // verticalL cliff for waterfall
-            Self::VertialCliff => &[],
-
             Self::Undetermined => &[
                 (Self::None, 0),
                 (Self::North, 0),

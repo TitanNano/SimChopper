@@ -12,7 +12,7 @@ struct DustParticles {
     /// The strength of the emitted dust.
     #[prop(get = Self::strength, set = Self::set_strength)]
     #[export(range(min = 0.1, max = 1.5, step = 0.05))]
-    strength: f64,
+    strength: f32,
 
     base: Gd<GpuParticles3D>,
 }
@@ -24,11 +24,11 @@ impl DustParticles {
     }
 
     /// get effect strength
-    fn strength(&self) -> f64 {
+    fn strength(&self) -> f32 {
         self.strength
     }
 
-    pub fn set_strength(&mut self, value: f64) {
+    pub fn set_strength(&mut self, value: f32) {
         self.strength = value;
 
         let is_emitting = value > 0.0;
@@ -57,6 +57,6 @@ impl DustParticles {
 
         let distance = (50.0 * (1.0 - value)).max(0.5);
 
-        material.set_proximity_fade_distance(distance as f32);
+        material.set_proximity_fade_distance(distance);
     }
 }

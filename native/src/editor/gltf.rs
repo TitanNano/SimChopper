@@ -1,3 +1,4 @@
+use anyhow::Context;
 use godot::builtin::{Array, Dictionary, GString, Variant, Vector3};
 use godot::classes::decal::DecalTexture;
 use godot::classes::{
@@ -109,11 +110,9 @@ fn fix_ao_uv2(state: &mut Gd<GltfState>) -> Result<(), global::Error> {
         let tex_coord = raw_material
             .get("occlusionTexture")
             .and_then(|occlusion_tex| occlusion_tex.to::<Dictionary>().get("texCoord"))
-            .map(|tex_coord| tex_coord.to::<f64>())
-            .map(|tex_coord| tex_coord as u64)
-            .unwrap_or(0);
+            .map_or(0.0, |tex_coord| tex_coord.to::<f64>());
 
-        if tex_coord > 0 {
+        if tex_coord > 0.0 {
             material
                 .cast::<BaseMaterial3D>()
                 .set_flag(base_material_3d::Flags::AO_ON_UV2, true);
@@ -167,7 +166,13 @@ fn use_gd_node(
 
             let mesh_index = gltf_node.get_mesh();
 
-            let Some(mesh) = state.get_meshes().at(mesh_index as usize).get_mesh() else {
+            let Some(mesh) = state
+                .get_meshes()
+                .at(mesh_index.try_into().context(
+                    "Failed to convert mesh index to usize, it should never be negative",
+                )?)
+                .get_mesh()
+            else {
                 anyhow::bail!("GltfMesh does not have a ImporterMesh !?");
             };
 
@@ -177,7 +182,7 @@ fn use_gd_node(
 
             let material = mesh
                 .get_surface_material(0)
-                .map(|material| material.cast::<BaseMaterial3D>());
+                .map(godot::prelude::Gd::cast::<BaseMaterial3D>);
 
             let Some(material) = material else {
                 anyhow::bail!(

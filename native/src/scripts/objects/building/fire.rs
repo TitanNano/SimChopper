@@ -4,6 +4,7 @@ use godot::meta::ToGodot;
 use godot::obj::{Gd, Inherits};
 use godot::tools::load;
 use godot_rust_script::{CastToScript, RsRef};
+use num::ToPrimitive;
 use rand::Rng;
 
 use crate::scripts::{FireSpawner, IFireSpawner};
@@ -17,16 +18,16 @@ pub(super) struct FireFeature {
     packed_fire_scene: Gd<PackedScene>,
     fire_scene: Option<RsRef<FireSpawner>>,
     last_fire: u64,
-    fire_strength: f64,
-    last_fire_strength: f64,
+    fire_strength: f32,
+    last_fire_strength: f32,
     building_mesh: Gd<MeshInstance3D>,
     tile_coords: TileCoords,
 }
 
 impl FireFeature {
     const FIRE_SPAWNER_SCENE: &'static str = "res://resources/Objects/Spawner/fire_spawner.tscn";
-    const RECOVERY_RATE: f64 = 0.01;
-    const WATER_IMPACT_RATE: f64 = 0.2;
+    const RECOVERY_RATE: f32 = 0.01;
+    const WATER_IMPACT_RATE: f32 = 0.2;
 
     pub fn new(tile_coords: TileCoords, mesh: &Gd<MeshInstance3D>) -> Self {
         let packed = load(Self::FIRE_SPAWNER_SCENE);
@@ -51,7 +52,7 @@ impl FireFeature {
     }
 
     pub fn update_fire_strength(&mut self, fire: &mut RsRef<FireSpawner>) {
-        if self.fire_strength == self.last_fire_strength {
+        if self.fire_strength.approx_eq(&self.last_fire_strength) {
             return;
         }
 
@@ -64,7 +65,9 @@ impl FireFeature {
             return;
         }
 
-        self.fire_strength = (self.fire_strength + Self::RECOVERY_RATE * delta).min(1.0);
+        self.fire_strength = (self.fire_strength
+            + Self::RECOVERY_RATE * delta.to_f32().expect("delta can be truncated"))
+        .min(1.0);
     }
 }
 
@@ -93,8 +96,12 @@ impl<N: Inherits<Node>> BuildingFeature<N> for FireFeature {
         }
 
         let tick_delta = current_ticks - self.last_fire;
-        let tick_damp = (tick_delta as f64 / 10_000.0).min(1.0);
-        let rng = rand::thread_rng().sample::<f64, _>(rand::distributions::OpenClosed01);
+        let tick_damp = (tick_delta
+            .to_f64()
+            .expect("tick delta is expected to fit in f64")
+            / 10_000.0)
+            .min(1.0);
+        let rng = rand::rng().sample::<f64, _>(rand::distr::OpenClosed01);
 
         let chance = rng * tick_damp;
 
@@ -133,8 +140,9 @@ impl<N: Inherits<Node>> BuildingFeature<N> for FireFeature {
     fn dispatch_notification(&mut self, notification: BuildingNotification) {
         match notification {
             BuildingNotification::WaterImpact(delta) => {
-                self.fire_strength =
-                    (self.fire_strength - Self::WATER_IMPACT_RATE * delta).max(0.0);
+                self.fire_strength = (self.fire_strength
+                    - Self::WATER_IMPACT_RATE * delta.to_f32().expect("delta can be truncated"))
+                .max(0.0);
             }
         }
     }

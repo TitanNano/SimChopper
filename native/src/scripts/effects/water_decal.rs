@@ -42,6 +42,6 @@ impl WaterDecal {
             );
 
             tween.tween_callback(&engine_callable!(&base, Node::queue_free));
-        })
+        });
     }
 }

@@ -18,19 +18,15 @@ struct NativeLib;
 unsafe impl ExtensionLibrary for NativeLib {
     fn on_level_init(level: InitLevel) {
         match level {
-            InitLevel::Core => (),
-            InitLevel::Servers => (),
             InitLevel::Scene => godot_rust_script::init!(scripts),
-            InitLevel::Editor => (),
+            InitLevel::Editor | InitLevel::Servers | InitLevel::Core => (),
         }
     }
 
     fn on_level_deinit(level: InitLevel) {
         match level {
-            InitLevel::Editor => (),
             InitLevel::Scene => godot_rust_script::deinit!(),
-            InitLevel::Servers => (),
-            InitLevel::Core => (),
+            InitLevel::Servers | InitLevel::Core | InitLevel::Editor => (),
         }
     }
 }

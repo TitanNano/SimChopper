@@ -1,10 +1,9 @@
-use std::ops::Deref;
 use std::{collections::BTreeMap, ops::Not};
 
 use anyhow::Context as _;
 use derive_debug::Dbg;
 use godot::builtin::{Array, Dictionary};
-use godot::classes::{Marker3D, Node, Node3D, Resource, Time};
+use godot::classes::{Marker3D, Node, Node3D, Time};
 use godot::meta::ToGodot;
 use godot::obj::{Gd, NewAlloc};
 use godot::task;
@@ -14,6 +13,7 @@ use godot_rust_script::{
 };
 
 use crate::objects::scene_object_registry;
+use crate::resources::WorldConstants;
 use crate::util::async_support::{self, GodotFuture};
 use crate::util::logger;
 use crate::world::city_coords_feature::CityCoordsFeature;
@@ -26,9 +26,8 @@ struct Buildings {
     pending_build_tasks: Vec<TaskHandle>,
 
     #[export]
-    pub world_constants: OnEditor<Gd<Resource>>,
+    pub world_constants: OnEditor<Gd<WorldConstants>>,
 
-    /// tile_coords, size, altitude
     #[signal("coords", "size", "altitude")]
     pub spawn_point_encountered: ScriptSignal<(Array<u32>, u8, u32)>,
 
@@ -43,7 +42,8 @@ impl Buildings {
     const TIME_BUDGET: u64 = 50;
 
     pub fn _process(&mut self, _delta: f64) {
-        self.pending_build_tasks.retain(|task| task.is_pending());
+        self.pending_build_tasks
+            .retain(godot::task::TaskHandle::is_pending);
 
         let tasks = self.pending_build_tasks.len();
 
@@ -55,8 +55,8 @@ impl Buildings {
         }
     }
 
-    fn world_constants(&self) -> &Gd<Resource> {
-        self.world_constants.deref()
+    fn world_constants(&self) -> &Gd<WorldConstants> {
+        &self.world_constants
     }
 
     pub fn build_async(&mut self, city: Dictionary, mut ctx: Context<Self>) -> Gd<GodotFuture> {
@@ -64,7 +64,7 @@ impl Buildings {
         let (resolve, godot_future) = async_support::godot_future();
 
         let handle = ctx.reentrant_scope(self, |mut base: Gd<Node>| {
-            let mut slf: RsRef<Self> = base.to_script();
+            let mut script_self_ref: RsRef<Self> = base.to_script();
             let tree = base.get_tree().expect("Node must be part of the tree!");
 
             task::spawn(async move {
@@ -93,7 +93,7 @@ impl Buildings {
 
                 for building in buildings.into_values() {
                     if (time.get_ticks_msec() - start) > Self::TIME_BUDGET {
-                        slf.emit_progress(count);
+                        script_self_ref.emit_progress(count);
                         count = 0;
                         start = time.get_ticks_msec();
 
@@ -102,15 +102,15 @@ impl Buildings {
 
                     count += 1;
 
-                    if building.building_id == 0x00 {
+                    if building.id == 0x00 {
                         logger::info!("{:?}: skipping empty building", building.tile_coords);
                         continue;
                     }
 
-                    Self::insert_building(&mut base, building, &tiles, &city_coords_feature);
+                    Self::insert_building(&mut base, &building, &tiles, &city_coords_feature);
                 }
 
-                slf.emit_progress(count);
+                script_self_ref.emit_progress(count);
 
                 resolve(());
             })
@@ -123,13 +123,13 @@ impl Buildings {
     /// Insert a new building into the world.
     fn insert_building(
         base: &mut Gd<Node>,
-        building: city_data::Building,
+        building: &city_data::Building,
         tiles: &BTreeMap<(u32, u32), city_data::Tile>,
         city_coords_feature: &CityCoordsFeature,
     ) {
         let building_size = building.size;
         let name = building.name.as_str();
-        let building_id = building.building_id;
+        let building_id = building.id;
         let object = scene_object_registry::load_building(building_id);
         let tile_coords = building.tile_coords;
         let Some(tile) = tiles.get(&tile_coords) else {
@@ -145,17 +145,17 @@ impl Buildings {
         };
 
         if building_id == scene_object_registry::Buildings::Tarmac
-            && is_spawn_point(&building, tiles)
+            && is_spawn_point(building, tiles)
         {
             logger::info!("encountered a spawn point: {:?}", building);
             let spawn_building = city_data::Building {
-                building_id: scene_object_registry::Buildings::Hangar2 as u8,
+                id: scene_object_registry::Buildings::Hangar2 as u8,
                 tile_coords,
                 name: "Hangar".into(),
                 size: 2,
             };
 
-            Self::insert_building(base, spawn_building, tiles, city_coords_feature);
+            Self::insert_building(base, &spawn_building, tiles, city_coords_feature);
             CastToScript::<Buildings>::to_script(base).emit_spawn_point_encountered(
                 Array::from(&[tile_coords.0, tile_coords.1]),
                 2,
@@ -189,7 +189,7 @@ impl Buildings {
         // fix z fighting of flat buildings
         location.y += 0.1;
 
-        let (_, insert_time) = with_timing(|| {
+        let ((), insert_time) = with_timing(|| {
             Self::get_sector(base, tile_coords, city_coords_feature)
                 .add_child_ex(&instance)
                 .force_readable_name(true)
@@ -203,7 +203,7 @@ impl Buildings {
             instance.set_owner(&root);
         });
 
-        let (_, translate_time) =
+        let ((), translate_time) =
             with_timing(|| instance.cast::<Node3D>().set_global_position(location));
 
         if instance_time > 100 {
@@ -235,12 +235,11 @@ impl Buildings {
         let sector_name = {
             let (x, y) = sector_coords;
 
-            format!("{}_{}", x, y)
+            format!("{x}_{y}")
         };
 
-        base.get_node_or_null(&sector_name)
-            .map(Gd::cast)
-            .unwrap_or_else(|| {
+        base.get_node_or_null(&sector_name).map_or_else(
+            || {
                 let mut sector: Gd<Node3D> = Marker3D::new_alloc().upcast();
 
                 sector.set_name(&sector_name);
@@ -255,15 +254,17 @@ impl Buildings {
 
                 if let Some(root) = base.get_tree().and_then(|tree| tree.get_current_scene()) {
                     sector.set_owner(&root);
-                };
+                }
 
                 sector
-            })
+            },
+            Gd::cast,
+        )
     }
 
     pub fn emit_spawn_point_encountered(&self, tile_coords: Array<u32>, size: u8, altitide: u32) {
         self.spawn_point_encountered
-            .emit((tile_coords, size, altitide))
+            .emit((tile_coords, size, altitide));
     }
 
     pub fn emit_progress(&self, new_building_count: u32) {
@@ -289,7 +290,7 @@ fn is_spawn_point(
                 return false;
             };
 
-            building.building_id == scene_object_registry::Buildings::Tarmac
+            building.id == scene_object_registry::Buildings::Tarmac
         })
         .not();
 
@@ -307,7 +308,7 @@ fn is_spawn_point(
             return false;
         };
 
-        building.building_id == scene_object_registry::Buildings::Tarmac
+        building.id == scene_object_registry::Buildings::Tarmac
     })
 }
 

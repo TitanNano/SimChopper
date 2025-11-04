@@ -63,7 +63,7 @@ where
     for<'a> &'a V: SetDimensionY,
 {
     fn set_y(self, value: f32) {
-        (*self).set_y(value)
+        (*self).set_y(value);
     }
 }
 

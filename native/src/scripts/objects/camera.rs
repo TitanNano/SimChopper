@@ -1,4 +1,4 @@
-use godot::builtin::math::FloatExt;
+use godot::builtin::math::{ApproxEq, FloatExt};
 use godot::builtin::Signal;
 use godot::classes::{Camera3D, CameraAttributesPhysical};
 use godot::obj::Gd;
@@ -61,7 +61,7 @@ impl Camera {
 
     const MAX_LIGHT_SHUTTER: f32 = 60.0;
     const MAX_LIGHT_FSTOP: f32 = 32.0;
-    const MAX_LIGHT_LUX: f32 = 163840.0;
+    const MAX_LIGHT_LUX: f32 = 163_840.0;
 
     const FSTOPS: [ExposureSetting; 9] = [
         ExposureSetting {
@@ -141,7 +141,9 @@ impl Camera {
         let fstop = closest.fstop.lerp(next.fstop, distance).snapped(0.1);
         let shutter = closest.shutter.lerp(next.shutter, distance).snapped(0.1);
 
-        if attributes.get_aperture() == fstop && attributes.get_shutter_speed() == shutter {
+        if attributes.get_aperture().approx_eq(&fstop)
+            && attributes.get_shutter_speed().approx_eq(&shutter)
+        {
             return;
         }
 

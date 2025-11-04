@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://k14yev0gxbkc"]
+[gd_scene load_steps=10 format=3 uid="uid://k14yev0gxbkc"]
 
 [ext_resource type="PackedScene" uid="uid://drfx6m1pn4ap6" path="res://resources/Meshes/Vehicles/car_station_wagon.gltf" id="1_fohcy"]
-[ext_resource type="Script" uid="uid://6ik4lllhimtl" path="res://src/Objects/Vehicles/Car.gd" id="2"]
+[ext_resource type="Script" uid="uid://fglqwp4se6ra" path="res://native/src/scripts/objects/agents/car.rs" id="2_uxtlx"]
+[ext_resource type="RoadNavigationConfig" uid="uid://dvccb8vdrejqp" path="res://resources/Config/road_navigation.tres" id="3_g0ogw"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_juekg"]
 resource_name = "matcolour-80"
@@ -26,10 +27,14 @@ size = Vector3(1.82907, 0.54, 3.388)
 height = 0.226665
 radius = 0.365409
 
-[node name="car_station_wagon" node_paths=PackedStringArray("debug_target", "ground_detector") instance=ExtResource("1_fohcy")]
-script = ExtResource("2")
+[node name="car_station_wagon" node_paths=PackedStringArray("debug_target", "ground_detector", "ground_normal_detector") instance=ExtResource("1_fohcy")]
+contact_monitor = true
+max_contacts_reported = 7
+script = ExtResource("2_uxtlx")
 debug_target = NodePath("DebugTarget")
 ground_detector = NodePath("GroundDetector")
+ground_normal_detector = NodePath("GroundNormalDetector")
+road_network = ExtResource("3_g0ogw")
 
 [node name="Maxis-3d2-mesh-81-station" parent="." index="0"]
 surface_material_override/0 = SubResource("StandardMaterial3D_juekg")
@@ -87,30 +92,37 @@ cast_shadow = 0
 mesh = SubResource("BoxMesh_483kg")
 
 [node name="GroundDetector" type="RayCast3D" parent="." index="7"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.398, -3.04569)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.398, 0)
+target_position = Vector3(0, -0.5, 0)
 debug_shape_custom_color = Color(0.152941, 1, 0.882353, 1)
 debug_shape_thickness = 5
 
-[node name="CollisionShapeLower" type="CollisionShape3D" parent="." index="8"]
+[node name="GroundNormalDetector" type="RayCast3D" parent="." index="8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.398, -2.6)
+target_position = Vector3(0, -2, 0)
+debug_shape_custom_color = Color(0.152941, 1, 0.882353, 1)
+debug_shape_thickness = 5
+
+[node name="CollisionShapeLower" type="CollisionShape3D" parent="." index="9"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.814, 0.038)
 shape = SubResource("BoxShape3D_6viug")
 
-[node name="CollisionShapeUpper" type="CollisionShape3D" parent="." index="9"]
+[node name="CollisionShapeUpper" type="CollisionShape3D" parent="." index="10"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.01, 1.487, 0.978)
 shape = SubResource("BoxShape3D_agao4")
 
-[node name="CollisionShapeWheelFrontLeft" type="CollisionShape3D" parent="." index="10"]
+[node name="CollisionShapeWheelFrontLeft" type="CollisionShape3D" parent="." index="11"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -0.892745, 0.345847, -1.58433)
 shape = SubResource("CylinderShape3D_eoo2s")
 
-[node name="CollisionShapeWheelBackLeft" type="CollisionShape3D" parent="." index="11"]
+[node name="CollisionShapeWheelBackLeft" type="CollisionShape3D" parent="." index="12"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -0.905135, 0.345847, 1.54605)
 shape = SubResource("CylinderShape3D_eoo2s")
 
-[node name="CollisionShapeWheelFrontRight" type="CollisionShape3D" parent="." index="12"]
+[node name="CollisionShapeWheelFrontRight" type="CollisionShape3D" parent="." index="13"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0.878487, 0.346, -1.584)
 shape = SubResource("CylinderShape3D_eoo2s")
 
-[node name="CollisionShapeWheelBackRight" type="CollisionShape3D" parent="." index="13"]
+[node name="CollisionShapeWheelBackRight" type="CollisionShape3D" parent="." index="14"]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0.880683, 0.346, 1.54256)
 shape = SubResource("CylinderShape3D_eoo2s")

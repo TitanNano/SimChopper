@@ -1,6 +1,0 @@
-[gd_resource type="RoadNavigationRes" load_steps=2 format=3 uid="uid://dkfv08m34f2fr"]
-
-[ext_resource type="WorldConstants" uid="uid://dbxp5cngs1a5g" path="res://resources/Data/world_constants.tres" id="1_xvhvm"]
-
-[resource]
-world_constants = ExtResource("1_xvhvm")

@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashSet};
 use godot::builtin::{Dictionary, VariantArray};
 use godot::global::godot_warn;
 use godot::meta::error::ConvertError;
-use godot::meta::{FromGodot, ToGodot};
+use godot::meta::FromGodot;
 
 use crate::objects::scene_object_registry::Buildings;
 use crate::terrain_builder::TerrainRotation;
@@ -14,10 +14,6 @@ pub(crate) use terrain_slope::*;
 
 pub(crate) trait TryFromDictionary: Sized {
     fn try_from_dict(value: &Dictionary) -> Result<Self, TryFromDictError>;
-}
-
-pub(crate) trait ToDictionary {
-    fn to_dict(&self) -> Dictionary;
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -224,19 +220,6 @@ impl TryFromDictionary for Building {
     }
 }
 
-impl ToDictionary for Building {
-    fn to_dict(&self) -> Dictionary {
-        let mut dict = Dictionary::new();
-
-        dict.set("size", self.size);
-        dict.set("name", self.name.to_godot());
-        dict.set("building_id", self.building_id);
-        dict.set("tile_coords", tuple_to_array(self.tile_coords));
-
-        dict
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TerrainType {
     DryLand,
@@ -399,13 +382,4 @@ fn array_to_tuple(value: VariantArray) -> Result<TileCoords, TryFromDictError> {
             .try_to()
             .map_err(|err| TryFromDictError::InvalidType("(x, _)".into(), err.into()))?,
     ))
-}
-
-fn tuple_to_array(value: TileCoords) -> VariantArray {
-    let mut array = VariantArray::new();
-
-    array.push(&value.0.to_variant());
-    array.push(&value.1.to_variant());
-
-    array
 }

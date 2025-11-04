@@ -2,6 +2,7 @@
 mod editor;
 mod ext;
 mod objects;
+mod project_settings;
 mod resources;
 mod road_navigation;
 mod scripts;

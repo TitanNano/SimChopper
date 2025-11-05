@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Sim Chopper"
+config/version="0.5.0"
 run/main_scene="res://resources/main.tscn"
 config/features=PackedStringArray("4.4")
 boot_splash/bg_color=Color(0, 0, 0, 1)

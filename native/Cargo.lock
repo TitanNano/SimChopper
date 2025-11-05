@@ -461,7 +461,7 @@ checksum = "a846cbc04412cf509efcd8f3694b114fc700a035fb5a37f21517f9fb019f1ebc"
 
 [[package]]
 name = "native"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "backtrace",

@@ -91,7 +91,9 @@ impl EditorExtension {
 impl IEditorPlugin for EditorExtension {
     fn init(base: Base<EditorPlugin>) -> Self {
         Self {
-            setup_building_imports: SetupBuildingImports::new(base.to_gd().get_editor_interface()),
+            setup_building_imports: SetupBuildingImports::new(
+                base.to_init_gd().get_editor_interface(),
+            ),
             gltf_importer: GltfImporter::new_gd(),
             ao_baker: OnReady::manual(),
             base,

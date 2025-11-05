@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, ops::DerefMut};
+use std::cmp::Ordering;
 
 use anyhow::{bail, Result};
 use godot::builtin::{Array, Callable, GString, Variant, Vector3};
@@ -8,8 +8,7 @@ use godot::classes::{
     RenderingServer, ShapeCast3D,
 };
 use godot::meta::ToGodot;
-use godot::obj::bounds::Declarer;
-use godot::obj::{Bounds, Gd, Inherits, InstanceId};
+use godot::obj::{Gd, Inherits, InstanceId};
 use godot::prelude::{GodotClass, NodePath};
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
 use itertools::Itertools;
@@ -401,8 +400,7 @@ impl WaterJet {
         target_node: &mut Gd<T>,
     ) -> Gd<Decal>
     where
-        T: GodotClass + DerefMut<Target = Node> + Inherits<Node>,
-        <T as Bounds>::Declarer: Declarer<DerefTarget<T> = T>,
+        T: GodotClass + Inherits<Node>,
     {
         #[cfg(debug_assertions)]
         let mut debugger = self.debugger.clone();
@@ -443,7 +441,7 @@ impl WaterJet {
         decal_inst.set_size(decal_size);
         decal_inst.set("is_active", &true.to_variant());
 
-        target_node.add_child(&decal_inst);
+        target_node.upcast_mut().add_child(&decal_inst);
 
         decal_inst.set_global_position(point.position);
         decal_inst.align_up(decal_normal);
@@ -454,6 +452,7 @@ impl WaterJet {
         decal_inst.translate(offset);
 
         if let Some(scene_root) = target_node
+            .upcast_ref()
             .get_tree()
             .and_then(|tree| tree.get_current_scene())
         {

@@ -6,7 +6,7 @@ use godot::classes::{
     MeshInstance3D, PhysicsDirectBodyState3D, ProjectSettings, RayCast3D, RigidBody3D,
 };
 use godot::meta::ToGodot;
-use godot::obj::Gd;
+use godot::obj::{Gd, Singleton as _};
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
 
 use crate::debug_3d;

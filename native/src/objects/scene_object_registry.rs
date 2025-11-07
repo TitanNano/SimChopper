@@ -2,7 +2,7 @@
 
 use godot::classes::{PackedScene, ResourceLoader};
 use godot::global::godot_warn;
-use godot::obj::Gd;
+use godot::obj::{Gd, Singleton as _};
 use num_enum::{TryFromPrimitive, TryFromPrimitiveError};
 
 #[derive(TryFromPrimitive)]

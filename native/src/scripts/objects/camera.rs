@@ -1,11 +1,9 @@
 use godot::builtin::math::{ApproxEq, FloatExt};
-use godot::builtin::Signal;
 use godot::classes::{Camera3D, CameraAttributesPhysical};
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
 use itertools::Itertools;
 
-use crate::script_callable;
 use crate::scripts::world::solar_setup::{ISolarSetup, SolarSetup};
 use crate::util::logger;
 
@@ -110,11 +108,6 @@ impl Camera {
             lux: Self::MAX_LIGHT_LUX,
         },
     ];
-
-    pub fn _ready(&mut self) {
-        Signal::from_object_signal(&**self.solar_setup, "sky_brightness")
-            .connect(&script_callable!(self, Self::_ready), 0);
-    }
 
     pub fn _process(&mut self, _delta: f64) {
         let Some(mut attributes): Option<Gd<CameraAttributesPhysical>> = self

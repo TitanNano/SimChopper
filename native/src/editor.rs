@@ -16,7 +16,7 @@ use godot::classes::{
 };
 use godot::global::{self, godot_error, godot_print, PropertyHint};
 use godot::meta::{AsArg, FromGodot};
-use godot::obj::{Base, Gd, NewGd, OnReady, WithBaseField};
+use godot::obj::{Base, Gd, NewGd, OnReady, Singleton as _, WithBaseField};
 use godot::register::{godot_api, GodotClass};
 
 use building_imports::SetupBuildingImports;
@@ -25,7 +25,7 @@ use crate::engine_callable;
 use crate::util::variant_type_default_value;
 
 #[derive(GodotClass)]
-#[class(tool, base=EditorPlugin)]
+#[class(tool, base=EditorPlugin, internal)]
 struct EditorExtension {
     setup_building_imports: Gd<SetupBuildingImports>,
     gltf_importer: Gd<GltfImporter>,

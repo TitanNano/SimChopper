@@ -1,7 +1,7 @@
 use godot::builtin::{math::ApproxEq, Transform3D, Vector3};
 use godot::classes::{MeshInstance3D, Node, Node3D, PackedScene, Time};
 use godot::meta::ToGodot;
-use godot::obj::{Gd, Inherits};
+use godot::obj::{Gd, Inherits, Singleton as _};
 use godot::tools::load;
 use godot_rust_script::{CastToScript, RsRef};
 use num::ToPrimitive;

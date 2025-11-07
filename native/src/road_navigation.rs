@@ -1,3 +1,4 @@
+use godot::obj::Singleton;
 use std::cell::OnceCell;
 use std::cmp::Ordering;
 use std::collections::BTreeMap;

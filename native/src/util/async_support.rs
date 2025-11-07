@@ -12,8 +12,6 @@ pub struct GodotFuture {
 
 #[godot_api]
 impl GodotFuture {
-    /// Returns an object which emits the completed signal once the asynchronus method has finished processing.
-
     /// Is emitted as soon as the async operation of the function has been completed.
     #[signal]
     fn completed(result: Variant);

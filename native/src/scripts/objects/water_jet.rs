@@ -8,11 +8,10 @@ use godot::classes::{
     RenderingServer, ShapeCast3D,
 };
 use godot::meta::ToGodot;
-use godot::obj::{Gd, Inherits, InstanceId};
+use godot::obj::{Gd, Inherits, InstanceId, Singleton as _};
 use godot::prelude::{GodotClass, NodePath};
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
 use itertools::Itertools;
-use num::ToPrimitive;
 
 use crate::ext::node_3d::{Node3DExt, Vector3Ext};
 use crate::scripts::objects::debugger_3_d::Debugger3D;
@@ -244,36 +243,35 @@ impl WaterJet {
                 let id = decal_inst.as_ref().map(Gd::instance_id);
                 let target_id = target_node.instance_id();
 
-                timer
-                    .connect_ex(
-                        "timeout",
-                        &Callable::from_local_fn("timeout", move |_| {
-                            let target: Gd<Node3D> =
-                                Gd::try_from_instance_id(target_id).map_err(|err| {
-                                    logger::error!("Failed to obtain target node ref: {}", err);
-                                })?;
+                timer.connect_flags(
+                    "timeout",
+                    &Callable::from_fn("timeout", move |_| {
+                        let Ok(target): Result<Gd<Node3D>, _> = Gd::try_from_instance_id(target_id)
+                            .map_err(|err| {
+                                logger::error!("Failed to obtain target node ref: {}", err);
+                            })
+                        else {
+                            return Variant::nil();
+                        };
 
-                            if let Some(id) = id {
-                                let decal: Gd<Decal> =
-                                    Gd::try_from_instance_id(id).map_err(|err| {
-                                        logger::error!("Failed to obtain decal node ref: {}", err);
-                                    })?;
+                        if let Some(id) = id {
+                            let Ok(decal): Result<Gd<Decal>, _> = Gd::try_from_instance_id(id)
+                                .map_err(|err| {
+                                    logger::error!("Failed to obtain decal node ref: {}", err);
+                                })
+                            else {
+                                return Variant::nil();
+                            };
 
-                                Self::show_decal(decal);
-                            }
+                            Self::show_decal(decal);
+                        }
 
-                            Self::propagate_impact(target, delta);
+                        Self::propagate_impact(target, delta);
 
-                            Ok(Variant::nil())
-                        }),
-                    )
-                    .flags(
-                        ConnectFlags::ONE_SHOT
-                            .to_godot()
-                            .to_u32()
-                            .expect("godot constants always fit"),
-                    )
-                    .done();
+                        Variant::nil()
+                    }),
+                    ConnectFlags::ONE_SHOT,
+                );
 
                 #[cfg(debug_assertions)]
                 {

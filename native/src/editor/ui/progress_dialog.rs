@@ -6,7 +6,7 @@ use godot::classes::{
     window, Button, Control, EditorInterface, HBoxContainer, IPopupPanel, Label, MarginContainer,
     PopupPanel, ProgressBar, VBoxContainer,
 };
-use godot::obj::{Base, Gd, NewAlloc, WithBaseField};
+use godot::obj::{Base, Gd, NewAlloc, Singleton as _, WithBaseField};
 use godot::prelude::{godot_api, GodotClass};
 
 #[derive(GodotClass)]

@@ -1,5 +1,5 @@
 use godot::{
-    meta::{FromGodot, ToGodot},
+    meta::{ByValue, FromGodot, ToGodot},
     prelude::GodotConvert,
 };
 use godot_rust_script::{GetScriptProperty, GodotScriptExport, SetScriptProperty};
@@ -182,12 +182,9 @@ impl<const UPPER: u32, const LOWER: u32> FromGodot for LInt<LOWER, UPPER> {
 }
 
 impl<const UPPER: u32, const LOWER: u32> ToGodot for LInt<LOWER, UPPER> {
-    type ToVia<'v>
-        = Self::Via
-    where
-        Self: 'v;
+    type Pass = ByValue;
 
-    fn to_godot(&self) -> Self::ToVia<'_> {
+    fn to_godot(&self) -> Self::Via {
         self.into_u32()
     }
 }

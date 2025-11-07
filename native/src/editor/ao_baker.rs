@@ -7,7 +7,7 @@ use godot::{
     builtin::{GString, PackedStringArray, VariantType},
     classes::{EditorInterface, ProjectSettings, RefCounted, SceneTree},
     global::PropertyHint,
-    obj::{Base, Gd},
+    obj::{Base, Gd, Singleton},
     prelude::{godot_api, GodotClass},
     task,
 };

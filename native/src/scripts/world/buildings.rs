@@ -5,7 +5,7 @@ use derive_debug::Dbg;
 use godot::builtin::{Array, Dictionary};
 use godot::classes::{Marker3D, Node, Node3D, Time};
 use godot::meta::ToGodot;
-use godot::obj::{Gd, NewAlloc};
+use godot::obj::{Gd, NewAlloc, Singleton as _};
 use godot::task;
 use godot::task::TaskHandle;
 use godot_rust_script::{

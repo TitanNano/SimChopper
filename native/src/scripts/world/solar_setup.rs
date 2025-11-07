@@ -1,7 +1,7 @@
 use godot::builtin::math::FloatExt;
 use godot::builtin::Vector3;
 use godot::classes::{light_3d, DirectionalLight3D, Node3D, Performance, Time};
-use godot::obj::Gd;
+use godot::obj::{Gd, Singleton as _};
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, ScriptSignal};
 use num::ToPrimitive;
 

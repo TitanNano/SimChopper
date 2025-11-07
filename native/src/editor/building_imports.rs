@@ -8,7 +8,7 @@ use godot::{
     },
     global::Error,
     meta::ToGodot,
-    obj::{Base, Gd, GodotClass, NewAlloc, NewGd, WithBaseField},
+    obj::{Base, Gd, GodotClass, NewAlloc, NewGd, Singleton as _, WithBaseField},
     register::{godot_api, GodotClass},
 };
 use pomsky_macro::pomsky;
@@ -116,7 +116,7 @@ impl SetupBuildingImports {
                     .get_directories()
                     .to_vec()
                     .into_iter()
-                    .map(|dir_name| format!("{dir_path}/{dir_name}").into())
+                    .map(|dir_name| GString::from(&format!("{dir_path}/{dir_name}")))
                     .collect(),
             );
             file_queue.append(
@@ -125,7 +125,7 @@ impl SetupBuildingImports {
                     .to_vec()
                     .into_iter()
                     .filter(|file_name| pattern.is_match(&file_name.to_string()))
-                    .map(|file_name| GString::from(format!("{dir_path}/{file_name}")))
+                    .map(|file_name| GString::from(&format!("{dir_path}/{file_name}")))
                     .collect(),
             );
         }
@@ -186,7 +186,7 @@ impl SetupBuildingImports {
 
         let scene = ResourceLoader::singleton()
             .load_ex(&config_file_name.replace(".import", ""))
-            .type_hint(&PackedScene::class_name().to_gstring())
+            .type_hint(&PackedScene::class_id().to_gstring())
             .done();
 
         let Some(scene) = scene else {
@@ -206,7 +206,7 @@ impl SetupBuildingImports {
 
         (0..scene_state.get_node_count())
             .filter(|index| {
-                scene_state.get_node_type(*index) == MeshInstance3D::class_name().to_string_name()
+                scene_state.get_node_type(*index) == MeshInstance3D::class_id().to_string_name()
             })
             .for_each(|index| {
                 let path = scene_state.get_node_path(index);

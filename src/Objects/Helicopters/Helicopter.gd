@@ -1,7 +1,7 @@
 extends RigidBody3D
 
 const Rotor := preload("res://src/Objects/Helicopters/Rotor.gd")
-const Logger := preload("res://src/util/Logger.gd")
+const Log := preload("res://src/util/Logger.gd")
 
 # pseudo constants
 @export var CRUISE_SPEED := 159.0 # km/h
@@ -149,7 +149,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	if self.engine_speed < 1:
 		if climb > 0:
 			self.engine_speed = min(self.engine_speed + 0.36 * delta, 1)
-			Logger.info(["state: ", sound_state_machine.get_current_node(), "Engine: ", self.engine_speed])
+			Log.info(["state: ", sound_state_machine.get_current_node(), "Engine: ", self.engine_speed])
 		elif self.engine_speed > 0:
 			self.engine_speed = max(self.engine_speed - 0.36 * delta, 0)
 		

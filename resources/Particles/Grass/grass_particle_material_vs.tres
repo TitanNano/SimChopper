@@ -60,8 +60,8 @@ frequency = 1.0
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ewfl6"]
 generate_mipmaps = false
-as_normal_map = true
 noise = SubResource("FastNoiseLite_cvvq0")
+as_normal_map = true
 
 [sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_hvsit"]
 texture = SubResource("NoiseTexture2D_ewfl6")
@@ -325,7 +325,6 @@ void process() {
 }
 
 "
-graph_offset = Vector2(-494.78, 2.40001)
 mode = 2
 flags/collision_use_scale = false
 flags/disable_force = false

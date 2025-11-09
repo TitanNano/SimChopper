@@ -10,14 +10,14 @@ animation = &"siren"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_mka4h"]
 graph_offset = Vector2(-104.64, 27.84)
+nodes/output/position = Vector2(720, 170)
 nodes/Combine/node = SubResource("AnimationNodeAdd2_vrwws")
 nodes/Combine/position = Vector2(340, 114.5)
 nodes/fire/node = SubResource("AnimationNodeAnimation_nyvyh")
 nodes/fire/position = Vector2(60, 100)
-nodes/output/position = Vector2(720, 170)
 nodes/siren/node = SubResource("AnimationNodeAnimation_ya1vk")
 nodes/siren/position = Vector2(70, 230)
-node_connections = [&"Combine", 0, &"fire", &"Combine", 1, &"siren", &"output", 0, &"Combine"]
+node_connections = [&"output", 0, &"Combine", &"Combine", 0, &"fire", &"Combine", 1, &"siren"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_7vuwr"]
 animation = &"siren"

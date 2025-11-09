@@ -13,7 +13,7 @@ func _ready():
 	
 	var window := self.get_window()
 
-	if window.mode == Window.Mode.MODE_WINDOWED:
+	if window.mode == Window.Mode.MODE_WINDOWED && not Engine.is_embedded_in_editor():
 		self.set_window_scale(window)
 
 

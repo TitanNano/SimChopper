@@ -22,10 +22,10 @@ fractal_lacunarity = 6.0
 width = 100
 height = 100
 depth = 100
+noise = SubResource("FastNoiseLite_rbw6l")
+color_ramp = SubResource("Gradient_hkbw6")
 seamless = true
 seamless_blend_skirt = 0.5
-color_ramp = SubResource("Gradient_hkbw6")
-noise = SubResource("FastNoiseLite_rbw6l")
 
 [sub_resource type="Gradient" id="Gradient_hx50x"]
 colors = PackedColorArray(0, 0, 0, 1, 0.74558, 0.74558, 0.74558, 1)
@@ -39,10 +39,10 @@ fractal_octaves = 2
 width = 256
 height = 256
 depth = 256
+noise = SubResource("FastNoiseLite_b0r66")
+color_ramp = SubResource("Gradient_hx50x")
 seamless = true
 seamless_blend_skirt = 0.5
-color_ramp = SubResource("Gradient_hx50x")
-noise = SubResource("FastNoiseLite_b0r66")
 
 [resource]
 shader = ExtResource("1_p6ais")

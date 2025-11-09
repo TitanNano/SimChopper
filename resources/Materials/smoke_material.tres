@@ -14,10 +14,10 @@ fractal_gain = 0.7
 width = 100
 height = 100
 depth = 100
+noise = SubResource("FastNoiseLite_vso3d")
+color_ramp = SubResource("Gradient_tt0nr")
 seamless = true
 seamless_blend_skirt = 0.5
-color_ramp = SubResource("Gradient_tt0nr")
-noise = SubResource("FastNoiseLite_vso3d")
 
 [resource]
 shader = ExtResource("1_hb22f")

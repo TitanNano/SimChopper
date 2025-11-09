@@ -50,8 +50,8 @@ void fragment() {
 fractal_octaves = 2
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_hk72y"]
-as_normal_map = true
 noise = SubResource("FastNoiseLite_1p6sg")
+as_normal_map = true
 
 [resource]
 render_priority = 0

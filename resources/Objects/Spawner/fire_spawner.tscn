@@ -40,7 +40,6 @@ light_temperature = 1850.0
 light_color = Color(0.980392, 0.309804, 0.00392157, 1)
 light_volumetric_fog_energy = 0.0
 light_size = 1.0
-light_bake_mode = 1
 omni_attenuation = 2.0
 
 [node name="AnimationTree" type="AnimationTree" parent="."]

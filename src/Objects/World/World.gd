@@ -13,6 +13,7 @@ signal loading_progress(count)
 signal loading_scale(count)
 
 @export var world_constants: WorldConstants
+@export var gi_probes: GiProbes
 
 @onready var terrain: Terrain = $Terrain
 @onready var networks: Networks = $Networks
@@ -29,6 +30,7 @@ func _ready():
 	self.buildings.spawn_point_encountered.connect(self._on_spawn_point_encountered)
 	self.buildings.loading_progress.connect(self._on_child_progress)
 	self.terrain.build_progress.connect(self._on_child_progress)
+	self.gi_probes.build_progress.connect(self._on_child_progress)
 
 	self._ready_deferred.call_deferred()
 
@@ -58,12 +60,13 @@ func _on_spawn_point_encountered(tile_coords: Array[int], size: int, altitude: i
 	self._insert_spawn_point(tile_coords, size, altitude)
 
 
-func _load_map_async(city: Dictionary):
+func _load_map_async(city: Dictionary):	
+	var city_size: int = city.get("city_size")
+
 	await self.terrain.build_async()
 	await self.networks.build_async(city)
-	await self.buildings.build_async(city).completed
+	await self.buildings.build_async(city).completed	
 	
-	var city_size: int = city.get("city_size")
 
 	self.backdrop.build(
 		city_size,
@@ -72,9 +75,10 @@ func _load_map_async(city: Dictionary):
 	)
 	self._spawn_player()
 
-#	self._create_snapshot()
 	await self.get_tree().process_frame
 	self.loading_progress.emit(1)
+	await self.gi_probes.build_async(city_size, self.sea_level).completed
+
 
 
 func _create_snapshot() -> void:

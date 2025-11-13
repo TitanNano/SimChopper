@@ -136,6 +136,16 @@ debug_snapshot={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"command_or_control_autoremap":true,"alt_pressed":false,"shift_pressed":true,"pressed":false,"keycode":0,"physical_keycode":0,"key_label":83,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
+debug_bake={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"command_or_control_autoremap":true,"alt_pressed":false,"shift_pressed":true,"pressed":false,"keycode":0,"physical_keycode":0,"key_label":66,"unicode":66,"location":0,"echo":false,"script":null)
+]
+}
+debug_toggle_gi={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"command_or_control_autoremap":true,"alt_pressed":false,"shift_pressed":true,"pressed":false,"keycode":0,"physical_keycode":0,"key_label":71,"unicode":103,"location":0,"echo":false,"script":null)
+]
+}
 
 [network]
 
@@ -158,7 +168,6 @@ lights_and_shadows/directional_shadow/size=8192
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
 lights_and_shadows/directional_shadow/16_bits=false
 lights_and_shadows/positional_shadow/soft_shadow_filter_quality=3
-global_illumination/voxel_gi/quality=1
 environment/ssao/half_size=false
 environment/ssil/half_size=false
 anti_aliasing/screen_space_roughness_limiter/enabled=false
@@ -172,8 +181,10 @@ global_illumination/sdfgi/frames_to_converge=4
 global_illumination/sdfgi/frames_to_update_lights=0
 environment/volumetric_fog/volume_size=100
 environment/volumetric_fog/volume_depth=100
+limits/cluster_builder/max_clustered_elements=2048.0
 occlusion_culling/use_occlusion_culling=true
 environment/defaults/default_environment="res://resources/Environments/default_env.tres"
+shading/hdr_2d=false
 
 [shader_globals]
 
@@ -207,9 +218,9 @@ ocean_normal_map={
 }
 ocean_water_color={
 "type": "color",
-"value": Color(0.192157, 0.219608, 0.243137, 1)
+"value": Color(0.23399998, 0.30240002, 0.45, 1)
 }
 ocean_deep_water_color={
 "type": "color",
-"value": Color(0, 0, 0.113725, 1)
+"value": Color(0.108899996, 0.23418999, 0.33, 1)
 }

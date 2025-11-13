@@ -1,0 +1,8 @@
+[gd_resource type="VoxelGIData" format=3 uid="uid://cu5hs3tfbj2xd"]
+
+[resource]
+dynamic_range = 1.0
+energy = 0.6
+bias = 2.0
+normal_bias = 0.5
+propagation = 0.2

@@ -1,3 +1,5 @@
+use std::f32;
+
 use godot::builtin::math::{ApproxEq, FloatExt};
 use godot::classes::{Camera3D, CameraAttributesPhysical};
 use godot::obj::Gd;
@@ -27,7 +29,7 @@ struct ExposureSetting {
 impl Camera {
     const NIGHT_SHUTTER: f32 = 2.0;
     const NIGHT_FSTOP: f32 = 1.4;
-    const NIGHT_LUX: f32 = 2.2;
+    const NIGHT_LUX: f32 = 1.2;
 
     const NIGHT2_SHUTTER: f32 = 2.0;
     const NIGHT2_FSTOP: f32 = 2.0;
@@ -39,7 +41,7 @@ impl Camera {
 
     const NIGHT4_SHUTTER: f32 = 8.0;
     const NIGHT4_FSTOP: f32 = 2.0;
-    const NIGHT4_LUX: f32 = 160.0;
+    const NIGHT4_LUX: f32 = 80.0;
 
     const NIGHT5_SHUTTER: f32 = 15.0;
     const NIGHT5_FSTOP: f32 = 2.0;
@@ -123,16 +125,17 @@ impl Camera {
 
         let (next_index, next) = Self::FSTOPS
             .iter()
-            .find_position(|setting| setting.lux > brightness)
-            .expect("there must always be a next");
+            .enumerate()
+            .find_or_last(|(_, setting)| setting.lux > brightness)
+            .expect("the FSTOPS array is not empty");
+
         let closest = &Self::FSTOPS[next_index - 1];
 
-        let diff = next.lux - closest.lux;
+        let diff = (next.lux / closest.lux).log(f32::consts::E);
+        let distance = ((brightness / closest.lux).log(f32::consts::E) / diff).max(0.0);
 
-        let distance = (brightness - closest.lux).max(0.0) / diff;
-
-        let fstop = closest.fstop.lerp(next.fstop, distance).snapped(0.1);
-        let shutter = closest.shutter.lerp(next.shutter, distance).snapped(0.1);
+        let fstop = exponential_interpolate(closest.fstop, next.fstop, distance).snapped(0.1);
+        let shutter = exponential_interpolate(closest.shutter, next.shutter, distance).snapped(0.1);
 
         if attributes.get_aperture().approx_eq(&fstop)
             && attributes.get_shutter_speed().approx_eq(&shutter)
@@ -143,4 +146,10 @@ impl Camera {
         attributes.set_aperture(fstop);
         attributes.set_shutter_speed(shutter);
     }
+}
+
+// Interpolate values with exponential growth
+#[inline]
+fn exponential_interpolate(from: f32, to: f32, step: f32) -> f32 {
+    from * (to / from).powf((step - 0.0) / 1.0 - 0.0)
 }

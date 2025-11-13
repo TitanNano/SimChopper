@@ -13,6 +13,7 @@ signal loading_progress(count)
 signal loading_scale(count)
 
 @export var world_constants: WorldConstants
+@export var gi_probes: GiProbes
 
 @onready var terrain: Terrain = $Terrain
 @onready var networks: Networks = $Networks
@@ -29,6 +30,7 @@ func _ready():
 	self.buildings.spawn_point_encountered.connect(self._on_spawn_point_encountered)
 	self.buildings.loading_progress.connect(self._on_child_progress)
 	self.terrain.build_progress.connect(self._on_child_progress)
+	self.gi_probes.build_progress.connect(self._on_child_progress)
 
 	self._ready_deferred.call_deferred()
 
@@ -46,7 +48,7 @@ func _ready_deferred():
 	self.city_coords_feature = CityCoordsFeature.new(self.world_constants, self.sea_level)
 	self.terrain.init(city)
 	
-	self.loading_scale.emit(buildings.size() + networks.size() + self.terrain.load_steps() + 1)
+	self.loading_scale.emit(buildings.size() + networks.size() + self.terrain.load_steps() + self.gi_probes.load_steps() + 1)
 	self._load_map_async(city)
 
 
@@ -58,12 +60,13 @@ func _on_spawn_point_encountered(tile_coords: Array[int], size: int, altitude: i
 	self._insert_spawn_point(tile_coords, size, altitude)
 
 
-func _load_map_async(city: Dictionary):
+func _load_map_async(city: Dictionary):	
+	var city_size: int = city.get("city_size")
+
 	await self.terrain.build_async()
 	await self.networks.build_async(city)
-	await self.buildings.build_async(city).completed
+	await self.buildings.build_async(city).completed	
 	
-	var city_size: int = city.get("city_size")
 
 	self.backdrop.build(
 		city_size,
@@ -71,8 +74,10 @@ func _load_map_async(city: Dictionary):
 		self.sea_level * self.world_constants.tile_height
 	)
 	self._spawn_player()
+	
+	# last step: bake VoxelGI probes for global ilumination.
+	await self.gi_probes.build_async(city_size, self.sea_level).completed
 
-#	self._create_snapshot()
 	await self.get_tree().process_frame
 	self.loading_progress.emit(1)
 

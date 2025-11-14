@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cvh54xiw8586b"]
+[gd_scene load_steps=20 format=3 uid="uid://cvh54xiw8586b"]
 
 [ext_resource type="Script" uid="uid://co6x253l6yxq4" path="res://src/HUD/HUDController.gd" id="1"]
 [ext_resource type="Script" uid="uid://cutba4t77pmav" path="res://src/Objects/World/World.gd" id="3"]
@@ -18,6 +18,7 @@
 [ext_resource type="Script" uid="uid://bn2ww2ekrihcg" path="res://native/src/scripts/world/buildings.rs" id="15_23gpq"]
 [ext_resource type="PackedScene" uid="uid://cmv7rt4gqew38" path="res://resources/Objects/Helis/schweizer_300.tscn" id="16_e6k8r"]
 [ext_resource type="RoadNavigationConfig" uid="uid://dvccb8vdrejqp" path="res://resources/Config/road_navigation.tres" id="16_eq860"]
+[ext_resource type="Script" uid="uid://djjvfkec3e3ph" path="res://native/src/scripts/world/gi_probes.rs" id="19_e3ctf"]
 
 [node name="HUDController" type="Control"]
 layout_mode = 3
@@ -71,10 +72,11 @@ render_target_update_mode = 0
 script = ExtResource("3_2c332")
 current_camera_controller = NodePath("World/Schweizer_300/MainCameraAnchor")
 
-[node name="World" type="Node3D" parent="SubViewportContainer/SubViewport"]
+[node name="World" type="Node3D" parent="SubViewportContainer/SubViewport" node_paths=PackedStringArray("gi_probes")]
 process_mode = 4
 script = ExtResource("3")
 world_constants = ExtResource("15")
+gi_probes = NodePath("GiProbes")
 
 [node name="Environment" type="WorldEnvironment" parent="SubViewportContainer/SubViewport/World"]
 environment = ExtResource("8")
@@ -94,7 +96,6 @@ sky_max_brightness = 6000.0
 transform = Transform3D(1, -3.48787e-16, 3.48787e-16, -3.48787e-16, -1, 8.74228e-08, 3.48787e-16, -8.74228e-08, -1, 2.08165e-12, -5.50338e-09, 0.1)
 rotation_order = 0
 light_angular_distance = 0.5
-light_bake_mode = 0
 shadow_enabled = true
 directional_shadow_split_1 = 0.05
 directional_shadow_split_2 = 0.3
@@ -106,7 +107,7 @@ directional_shadow_pancake_size = 40.0
 [node name="Moon" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/World/Environment/SolarSetup"]
 transform = Transform3D(1, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -3.48787e-16, -3.48787e-16, 3.48787e-16, 1, 2.08165e-12, 1.45043e-10, -0.1)
 rotation_order = 0
-light_intensity_lux = 2.0
+light_intensity_lux = 1.5
 light_temperature = 9500.0
 light_angular_distance = 0.5
 shadow_enabled = true
@@ -164,3 +165,14 @@ world_constants = ExtResource("15")
 
 [node name="Backdrop" type="Node" parent="SubViewportContainer/SubViewport/World"]
 script = ExtResource("6")
+
+[node name="GiProbes" type="Node3D" parent="SubViewportContainer/SubViewport/World"]
+script = ExtResource("19_e3ctf")
+world_constants = ExtResource("15")
+camera_attributes = ExtResource("7_yho3v")
+probe_count = 2
+negative_y_offset = 2
+ocean_material = ExtResource("13")
+display_debug = false
+is_built = null
+metadata/_custom_type_script = "uid://djjvfkec3e3ph"

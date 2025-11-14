@@ -27,7 +27,7 @@ struct ExposureSetting {
 impl Camera {
     const NIGHT_SHUTTER: f32 = 2.0;
     const NIGHT_FSTOP: f32 = 1.4;
-    const NIGHT_LUX: f32 = 2.2;
+    const NIGHT_LUX: f32 = 1.2;
 
     const NIGHT2_SHUTTER: f32 = 2.0;
     const NIGHT2_FSTOP: f32 = 2.0;

@@ -561,6 +561,104 @@ def parse_args() -> dict:
 
     return argparser.parse_args(args=args)
 
+def bake_and_export(config: dict):
+    print("Progress|identify export objects...")
+    objects = find_export_objects()
+    print("Objects|" + str(len(objects)))
+
+    for object in objects:
+        if object.type == "EMPTY":
+            continue
+        
+        print("Progress|convert object \"" + object.name + "\" to mesh...")
+        convert_to_mesh(object)
+
+        if config.debug == "convert_mesh":
+            continue
+        
+        print("Progress|apply modifiers for \"" + object.name + "\"...")
+        apply_modifiers(object)
+
+    instantiate_empties(objects)
+
+    if config.debug == "modifiers" or config.debug == "convert_mesh":
+        return
+
+    only_visible_objects = find_visible_objects(objects)
+
+    for object in objects:
+        if object in only_visible_objects:
+            continue
+
+        object.data.materials.clear()
+
+    set_render_visibility(only_visible_objects)
+
+    for object in only_visible_objects:
+        print("Progress|UV unwrap \"" + object.name + "\"...", flush = True)
+        uv_unwrap(object)
+
+        if config.debug == "uv":
+            continue
+
+        print("Progress|bake occlusion texture...", flush = True)
+        occlusion = bake_occlusion_texture(object)
+
+        if config.debug == "bake_occlusion":
+            continue
+        
+        print("Progress|bake roughness texture...", flush = True)
+        roughness = bake_roughness_texture(object)
+        print("Progress|bake diffuse texture...", flush = True)
+        diffuse = bake_diffuse_texture(object)
+
+        if config.debug == "bake_diffuse":
+            continue
+        
+        print("Progress|bake normal texture...", flush = True)
+        normal = bake_normal_texture(object)
+
+        if config.debug == "bake_normal":
+            continue
+        
+        print("Progress|bake emission texture...", flush = True)
+        emission = bake_emission_texture(object)
+
+        if config.debug == "bake_emission":
+            continue
+        
+        print("Progress|bake metallic texture...", flush = True)
+        metallic = bake_metallic_texture(object)
+
+        if config.debug == "bake":
+            continue
+
+        print("Progress|bake ORM texture...", flush = True)
+        clear_materials(object)
+        orm = bake_orm_texture(object, occlusion, roughness, metallic)
+
+        if config.debug == "orm_bake":
+            continue
+
+        print("Progress|create ORM material...", flush = True)
+        clear_materials(object)
+        orm_material = create_orm_material(object, diffuse, orm, normal, emission)
+
+        object.data.materials.append(orm_material)
+
+    if config.debug:
+        return
+
+    delete_objects_except(objects)
+
+    file_path = Path(file)
+    gltf_path = file_path.parent.joinpath(f"./{file_path.stem}/scene.gltf")
+
+    for object in objects:
+        object.hide_viewport = False
+ 
+    export_gltf(gltf_path)
+
 
 def main():
     config = parse_args()
@@ -571,102 +669,34 @@ def main():
         load_blend_file(file)
         window = bpy.context.window_manager.windows[0]
         with bpy.context.temp_override(window=window):
-            print("Progress|identify export objects...")
-            objects = find_export_objects()
-            print("Objects|" + str(len(objects)))
+            bake_and_export(config)
 
-            for object in objects:
-                if object.type == "EMPTY":
-                    continue
-                
-                print("Progress|convert object \"" + object.name + "\" to mesh...")
-                convert_to_mesh(object)
 
-                if config.debug == "convert_mesh":
-                    continue
-                
-                print("Progress|apply modifiers for \"" + object.name + "\"...")
-                apply_modifiers(object)
+class ExportSceneForGodot(bpy.types.Operator):
+    '''Export the current scene to godot'''
+    bl_idname = "gltf_exporter.export_godot"
+    bl_label = "Godot"
+    
+    def execute(self, context):
+        if bpy.data.is_dirty:
+            self.report({ 'ERROR' }, "Can not export unsafed scene!")
+            return {'FINISHED'}
+        
+        self.report({'INFO'}, "Exporting to Godot...")
+        bake_and_export({ "debug": False })
+        self.report({'INFO'}, "Export complete")
+        return {'FINISHED'}
 
-            instantiate_empties(objects)
+            
+def export_menu_extend(self, context):
+    self.layout.operator("gltf_exporter.export_godot")
 
-            if config.debug == "modifiers" or config.debug == "convert_mesh":
-                return
 
-            only_visible_objects = find_visible_objects(objects)
+def register():
+    bpy.utils.register_class(ExportSceneForGodot)
+    bpy.types.TOPBAR_MT_file_export.append(export_menu_extend)
 
-            for object in objects:
-                if object in only_visible_objects:
-                    continue
-
-                object.data.materials.clear()
-
-            set_render_visibility(only_visible_objects)
-
-            for object in only_visible_objects:
-                print("Progress|UV unwrap \"" + object.name + "\"...", flush = True)
-                uv_unwrap(object)
-
-                if config.debug == "uv":
-                    continue
-
-                print("Progress|bake occlusion texture...", flush = True)
-                occlusion = bake_occlusion_texture(object)
-
-                if config.debug == "bake_occlusion":
-                    continue
-                
-                print("Progress|bake roughness texture...", flush = True)
-                roughness = bake_roughness_texture(object)
-                print("Progress|bake diffuse texture...", flush = True)
-                diffuse = bake_diffuse_texture(object)
-
-                if config.debug == "bake_diffuse":
-                    continue
-                
-                print("Progress|bake normal texture...", flush = True)
-                normal = bake_normal_texture(object)
-
-                if config.debug == "bake_normal":
-                    continue
-                
-                print("Progress|bake emission texture...", flush = True)
-                emission = bake_emission_texture(object)
-
-                if config.debug == "bake_emission":
-                    continue
-                
-                print("Progress|bake metallic texture...", flush = True)
-                metallic = bake_metallic_texture(object)
-
-                if config.debug == "bake":
-                    continue
-
-                print("Progress|bake ORM texture...", flush = True)
-                clear_materials(object)
-                orm = bake_orm_texture(object, occlusion, roughness, metallic)
-
-                if config.debug == "orm_bake":
-                    continue
-
-                print("Progress|create ORM material...", flush = True)
-                clear_materials(object)
-                orm_material = create_orm_material(object, diffuse, orm, normal, emission)
-
-                object.data.materials.append(orm_material)
-
-            if config.debug:
-                return
-
-            delete_objects_except(objects)
-
-            file_path = Path(file)
-            gltf_path = file_path.parent.joinpath(f"./{file_path.stem}/scene.gltf")
-
-            for object in objects:
-                object.hide_viewport = False
-
-            export_gltf(gltf_path)
 
 # execute entry point
-main()
+# main()
+register()

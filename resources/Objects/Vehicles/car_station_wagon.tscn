@@ -37,6 +37,7 @@ ground_normal_detector = NodePath("GroundNormalDetector")
 road_network = ExtResource("3_g0ogw")
 
 [node name="Maxis-3d2-mesh-81-station" parent="." index="0"]
+gi_mode = 0
 surface_material_override/0 = SubResource("StandardMaterial3D_juekg")
 surface_material_override/1 = SubResource("StandardMaterial3D_i4xi6")
 

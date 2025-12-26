@@ -8,7 +8,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 godot = { version = "0.4.2", features = ["experimental-threads", "api-4-5", "register-docs"] }
-godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "05d23bc481ec3cd02007d27d0edf952f7af2658e" }
+godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "537f2c3ff52950440c6a5183fb2d13b07bea9901" }
 lerp = "0.4.0"
 backtrace = "0.3.64"
 num = "0.4.0"

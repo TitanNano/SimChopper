@@ -20,6 +20,7 @@ uniform float Normal_Depth;
 uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_linear_mipmap;
 uniform sampler2D depth_texture : hint_depth_texture, repeat_disable, filter_linear_mipmap;
 uniform float wave_height;
+uniform bool invisible;
 
 const float WAVE_CONST = 6.28300;
 
@@ -81,11 +82,17 @@ void vertex() {
 }
 
 void fragment() {
+	if (invisible) {
+		discard;
+	}
+	
 	vec3 normal = sample_wave_noise(ocean_normal_map);
 
 	NORMAL_MAP = normal;
 	NORMAL_MAP_DEPTH = Normal_Depth;
 	ROUGHNESS = 0.2;
+	SPECULAR = 0.2;
+	
 
 	float n_dot_l = max(dot(VIEW, NORMAL), 0);
 	float facing = (1.0 - n_dot_l);

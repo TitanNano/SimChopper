@@ -13,7 +13,6 @@ fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0)
 
 [sub_resource type="Gradient" id="Gradient_0sht1"]
-interpolation_color_space = 1
 offsets = PackedFloat32Array(0.0350877, 0.463158)
 colors = PackedColorArray(1, 0.466667, 0, 1, 0.375132, 0.588795, 0.748625, 1)
 

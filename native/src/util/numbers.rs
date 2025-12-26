@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use godot::{
     meta::{ByValue, FromGodot, ToGodot},
     prelude::GodotConvert,
@@ -85,6 +87,10 @@ impl<const LOWER: u32, const UPPER: u32> LInt<LOWER, UPPER> {
 
     pub const fn into_u64(self) -> u64 {
         self.0 as u64
+    }
+
+    pub const fn into_usize(self) -> usize {
+        self.0 as usize
     }
 }
 
@@ -189,6 +195,12 @@ impl<const UPPER: u32, const LOWER: u32> ToGodot for LInt<LOWER, UPPER> {
     }
 }
 
+impl<const UPPER: u32, const LOWER: u32> Display for LInt<LOWER, UPPER> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
 /// F32 has a mantissa of 23-bits
 const F32_MAX: u32 = 2u32.pow(24);
 
@@ -214,6 +226,24 @@ impl From<Uf32> for f32 {
 impl From<Uf32> for f64 {
     fn from(value: Uf32) -> Self {
         value.into_f64()
+    }
+}
+
+impl From<Uf32> for usize {
+    fn from(value: Uf32) -> Self {
+        value.into_usize()
+    }
+}
+
+impl From<u8> for Uf32 {
+    fn from(value: u8) -> Self {
+        Self::new(value.into())
+    }
+}
+
+impl From<u16> for Uf32 {
+    fn from(value: u16) -> Self {
+        Self::new(value.into())
     }
 }
 

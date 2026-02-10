@@ -1,0 +1,124 @@
+[gd_resource type="AnimationLibrary" load_steps=6 format=3 uid="uid://dtoyo725l55bb"]
+
+[ext_resource type="AudioStream" uid="uid://dpxm4j5adykww" path="res://resources/Sounds/Events/burning_building.ogg" id="1_x5rap"]
+[ext_resource type="AudioStream" uid="uid://dqso6fkx02jcr" path="res://resources/Sounds/Events/fire_alarm.ogg" id="2_xra2c"]
+
+[sub_resource type="Animation" id="Animation_055tn"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SmokeParticles:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("FireLightSource:light_energy")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_0dav3"]
+resource_name = "burning"
+length = 7.88
+loop_mode = 1
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FireAudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("1_x5rap")
+}],
+"times": PackedFloat32Array(0)
+}
+tracks/0/use_blend = true
+tracks/1/type = "audio"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SirenAudioSource")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("2_xra2c")
+}, {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("2_xra2c")
+}],
+"times": PackedFloat32Array(0, 4)
+}
+tracks/1/use_blend = true
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("SmokeParticles:emitting")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.033333335),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_eecao"]
+resource_name = "siren"
+length = 10.0
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SirenAudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("2_xra2c")
+}, {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("2_xra2c")
+}],
+"times": PackedFloat32Array(0, 4)
+}
+tracks/0/use_blend = true
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SmokeParticles:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[resource]
+_data = {
+&"RESET": SubResource("Animation_055tn"),
+&"burning": SubResource("Animation_0dav3"),
+&"siren": SubResource("Animation_eecao")
+}

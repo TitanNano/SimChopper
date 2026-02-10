@@ -1,6 +1,5 @@
 use godot::builtin::{math::ApproxEq, Transform3D, Vector3};
-use godot::classes::{MeshInstance3D, Node, Node3D, PackedScene, Time};
-use godot::meta::ToGodot;
+use godot::classes::{MeshInstance3D, Node, Node3D, PackedScene, Texture2D, Time};
 use godot::obj::{Gd, Inherits, Singleton as _};
 use godot::tools::load;
 use godot_rust_script::{CastToScript, RsRef};
@@ -8,7 +7,7 @@ use num::ToPrimitive;
 use rand::Rng;
 
 use crate::scripts::{FireSpawner, IFireSpawner};
-use crate::util::logger;
+use crate::util::{logger, Uf32};
 use crate::world::city_data::TileCoords;
 
 use super::{BuildingFeature, BuildingNotification};
@@ -22,6 +21,9 @@ pub(super) struct FireFeature {
     last_fire_strength: f32,
     building_mesh: Gd<MeshInstance3D>,
     tile_coords: TileCoords,
+    emission_points: Gd<Texture2D>,
+    emission_point_normals: Gd<Texture2D>,
+    emission_point_count: Uf32,
 }
 
 impl FireFeature {
@@ -29,7 +31,11 @@ impl FireFeature {
     const RECOVERY_RATE: f32 = 0.01;
     const WATER_IMPACT_RATE: f32 = 0.2;
 
-    pub fn new(tile_coords: TileCoords, mesh: &Gd<MeshInstance3D>) -> Self {
+    pub fn new(
+        tile_coords: TileCoords,
+        mesh: &Gd<MeshInstance3D>,
+        config: &super::FireEventConfig,
+    ) -> Self {
         let packed = load(Self::FIRE_SPAWNER_SCENE);
 
         Self {
@@ -39,6 +45,9 @@ impl FireFeature {
             last_fire_strength: 1.0,
             last_fire: 0,
             building_mesh: mesh.to_owned(),
+            emission_points: config.emission_points.clone(),
+            emission_point_normals: config.emission_point_normals.clone(),
+            emission_point_count: config.emission_point_count,
             tile_coords,
         }
     }
@@ -111,7 +120,7 @@ impl<N: Inherits<Node>> BuildingFeature<N> for FireFeature {
 
         logger::debug!("Building will burn! (tick_delta: {tick_delta}, tick_boost: {tick_damp}, rng: {rng}, chance: {chance})");
 
-        let Some(mut scene_instance) = self.packed_fire_scene.try_instantiate_as::<Node3D>() else {
+        let Some(scene_instance) = self.packed_fire_scene.try_instantiate_as::<Node3D>() else {
             logger::error!("Failed to instantiate fire_spawner scene as decendant of Node3D");
             return;
         };
@@ -121,7 +130,12 @@ impl<N: Inherits<Node>> BuildingFeature<N> for FireFeature {
             * aabb.size)
             .abs();
 
-        scene_instance.call_deferred("resize", &[aabb_size.to_variant()]);
+        let mut script: RsRef<FireSpawner> = scene_instance.to_script();
+
+        script.set_emission_points(Some(self.emission_points.clone()));
+        script.set_emission_point_normals(Some(self.emission_point_normals.clone()));
+        script.set_emission_point_count(self.emission_point_count);
+        script.resize(aabb_size);
 
         node.upcast_mut()
             .add_child_ex(&scene_instance)

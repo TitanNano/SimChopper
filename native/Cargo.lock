@@ -72,6 +72,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aca749d3d3f5b87a0d6100509879f9cf486ab510803a4a4e1001da1ff61c2bd6"
 
 [[package]]
+name = "convert_case"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "633458d4ef8c78b72454de2d54fd6ab2e60f9e02be22f3c6104cdc8a4e0fceb9"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "crossbeam-deque"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -298,9 +307,10 @@ dependencies = [
 [[package]]
 name = "godot-rust-script"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=537f2c3ff52950440c6a5183fb2d13b07bea9901#537f2c3ff52950440c6a5183fb2d13b07bea9901"
+source = "git+https://github.com/titannano/godot-rust-script?rev=26f10ece493d9cc8cdbe2799fba60f0420e41f65#26f10ece493d9cc8cdbe2799fba60f0420e41f65"
 dependencies = [
  "const-str",
+ "convert_case",
  "godot",
  "godot-bindings",
  "godot-cell",
@@ -314,7 +324,7 @@ dependencies = [
 [[package]]
 name = "godot-rust-script-derive"
 version = "0.1.0"
-source = "git+https://github.com/titannano/godot-rust-script?rev=537f2c3ff52950440c6a5183fb2d13b07bea9901#537f2c3ff52950440c6a5183fb2d13b07bea9901"
+source = "git+https://github.com/titannano/godot-rust-script?rev=26f10ece493d9cc8cdbe2799fba60f0420e41f65#26f10ece493d9cc8cdbe2799fba60f0420e41f65"
 dependencies = [
  "darling",
  "itertools",
@@ -851,6 +861,12 @@ name = "unicode-ident"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84a22b9f218b40614adcb3f4ff08b703773ad44fa9423e4e0d346d5db86e4ebc"
+
+[[package]]
+name = "unicode-segmentation"
+version = "1.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
 
 [[package]]
 name = "venial"

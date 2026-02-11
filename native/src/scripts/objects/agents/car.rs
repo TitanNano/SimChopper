@@ -103,7 +103,7 @@ impl Car {
             .to();
     }
 
-    /// Original GDScript API
+    /// Original `GDScript` API
     pub fn activate(&mut self) {
         if self.display_vehicle_target {
             self.base.remove_child(&*self.debug_target);
@@ -414,10 +414,10 @@ impl Car {
 fn angular_offset(from: f32, to: f32) -> f32 {
     let mut offset = to - from;
 
-    // if offset is larger than 180 degrees we should rather rotate
+    // If offset is larger than 180 degrees we should rather rotate
     // in the other direction
     if offset.abs() > 180.0f32.to_radians() {
-        offset = (360.0f32.to_radians() - offset.abs()) * offset.signum() * -1.0;
+        offset = -((360.0f32.to_radians() - offset.abs()) * offset.signum());
     }
 
     offset

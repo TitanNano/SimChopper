@@ -8,7 +8,7 @@ use std::ops::DerefMut;
 
 use ao_baker::AoBaker;
 use gltf::GltfImporter;
-use godot::builtin::{Dictionary, GString, StringName, Variant, VariantType};
+use godot::builtin::{GString, StringName, VarDictionary, Variant, VariantType};
 use godot::classes::notify::NodeNotification;
 use godot::classes::{
     ConfigFile, EditorPlugin, EditorSettings, GDExtensionManager, GltfDocument, IEditorPlugin,
@@ -66,7 +66,7 @@ impl EditorExtension {
 
         project_settings.set_initial_value(&name.into(), &default_value);
 
-        let mut property = Dictionary::new();
+        let mut property = VarDictionary::new();
 
         property.set("name", name);
         property.set("type", ty);
@@ -227,7 +227,7 @@ trait EngineSettings {
     fn set_setting(&mut self, name: impl AsArg<GString>, value: &Variant);
     fn has_setting(&mut self, name: impl AsArg<GString>) -> bool;
     fn set_initial_value(&mut self, name: &StringName, value: &Variant);
-    fn add_property_info(&mut self, property_info: &Dictionary);
+    fn add_property_info(&mut self, property_info: &VarDictionary);
 }
 
 impl EngineSettings for Gd<ProjectSettings> {
@@ -244,7 +244,7 @@ impl EngineSettings for Gd<ProjectSettings> {
             .set_initial_value(&GString::from(name), value);
     }
 
-    fn add_property_info(&mut self, property_info: &Dictionary) {
+    fn add_property_info(&mut self, property_info: &VarDictionary) {
         self.deref_mut().add_property_info(property_info);
     }
 }
@@ -262,7 +262,7 @@ impl EngineSettings for Gd<EditorSettings> {
         self.deref_mut().set_initial_value(name, value, false);
     }
 
-    fn add_property_info(&mut self, property_info: &Dictionary) {
+    fn add_property_info(&mut self, property_info: &VarDictionary) {
         self.deref_mut().add_property_info(property_info);
     }
 }

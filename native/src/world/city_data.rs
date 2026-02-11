@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, HashSet};
 
-use godot::builtin::{Dictionary, VariantArray};
+use godot::builtin::{VarArray, VarDictionary};
 use godot::global::godot_warn;
 use godot::meta::error::ConvertError;
 use godot::meta::FromGodot;
@@ -13,7 +13,7 @@ mod terrain_slope;
 pub(crate) use terrain_slope::*;
 
 pub(crate) trait TryFromDictionary: Sized {
-    fn try_from_dict(value: &Dictionary) -> Result<Self, TryFromDictError>;
+    fn try_from_dict(value: &VarDictionary) -> Result<Self, TryFromDictError>;
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -186,7 +186,7 @@ pub(crate) struct City {
 }
 
 impl TryFromDictionary for City {
-    fn try_from_dict(value: &Dictionary) -> Result<Self, TryFromDictError> {
+    fn try_from_dict(value: &VarDictionary) -> Result<Self, TryFromDictError> {
         Ok(Self {
             simulator_settings: get_dict_key(value, "simulator_settings")
                 .and_then(|value| SimulatorSettings::try_from_dict(&value))?,
@@ -210,7 +210,7 @@ pub(crate) struct Building {
 }
 
 impl TryFromDictionary for Building {
-    fn try_from_dict(value: &Dictionary) -> Result<Self, TryFromDictError> {
+    fn try_from_dict(value: &VarDictionary) -> Result<Self, TryFromDictError> {
         Ok(Self {
             size: get_dict_key(value, "size")?,
             name: get_dict_key(value, "name")?,
@@ -296,7 +296,7 @@ impl Tile {
 }
 
 impl TryFromDictionary for Tile {
-    fn try_from_dict(value: &Dictionary) -> Result<Self, TryFromDictError> {
+    fn try_from_dict(value: &VarDictionary) -> Result<Self, TryFromDictError> {
         Ok(Self {
             altitude: get_dict_key(value, "altitude")?,
             terrain: TileTerrainInfo::from(get_dict_key::<u32>(value, "terrain")?),
@@ -314,7 +314,7 @@ pub(crate) struct SimulatorSettings {
 }
 
 impl TryFromDictionary for SimulatorSettings {
-    fn try_from_dict(value: &Dictionary) -> Result<Self, TryFromDictError> {
+    fn try_from_dict(value: &VarDictionary) -> Result<Self, TryFromDictError> {
         Ok(Self {
             sea_level: get_dict_key(value, "GlobalSeaLevel")?,
         })
@@ -322,7 +322,7 @@ impl TryFromDictionary for SimulatorSettings {
 }
 
 impl<T: TryFromDictionary> TryFromDictionary for BTreeMap<TileCoords, T> {
-    fn try_from_dict(value: &Dictionary) -> Result<Self, TryFromDictError> {
+    fn try_from_dict(value: &VarDictionary) -> Result<Self, TryFromDictError> {
         value
             .iter_shared()
             .map(|(key, value)| {
@@ -332,7 +332,7 @@ impl<T: TryFromDictionary> TryFromDictionary for BTreeMap<TileCoords, T> {
                     .map_err(TryFromDictError::InvalidKey)
                     .and_then(|val| array_to_tuple(&val))?;
 
-                let value: Dictionary = value.try_to().map_err(|err| {
+                let value: VarDictionary = value.try_to().map_err(|err| {
                     TryFromDictError::InvalidType(format!("{key:?}").into(), err.into())
                 })?;
 
@@ -343,7 +343,7 @@ impl<T: TryFromDictionary> TryFromDictionary for BTreeMap<TileCoords, T> {
 }
 
 fn get_dict_key<T: FromGodot>(
-    value: &Dictionary,
+    value: &VarDictionary,
     key: &'static str,
 ) -> Result<T, TryFromDictError> {
     value
@@ -354,7 +354,7 @@ fn get_dict_key<T: FromGodot>(
 }
 
 fn get_dict_key_optional<T: FromGodot>(
-    value: &Dictionary,
+    value: &VarDictionary,
     key: &'static str,
 ) -> Result<Option<T>, TryFromDictError> {
     let variant = value.get_or_nil(key);
@@ -369,7 +369,7 @@ fn get_dict_key_optional<T: FromGodot>(
         .map(Some)
 }
 
-fn array_to_tuple(value: &VariantArray) -> Result<TileCoords, TryFromDictError> {
+fn array_to_tuple(value: &VarArray) -> Result<TileCoords, TryFromDictError> {
     Ok((
         value
             .get(0)

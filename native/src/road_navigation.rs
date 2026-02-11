@@ -1,4 +1,3 @@
-use godot::obj::Singleton;
 use std::cell::OnceCell;
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
@@ -6,7 +5,7 @@ use std::sync::OnceLock;
 
 use anyhow::{anyhow, Result};
 use godot::builtin::math::ApproxEq;
-use godot::builtin::{Dictionary, Transform3D, Vector3};
+use godot::builtin::{Transform3D, VarDictionary, Vector3};
 use godot::classes::Node3D;
 use godot::global::snappedf;
 use godot::obj::{Gd, OnEditor};
@@ -456,7 +455,7 @@ impl RoadNavigationConfig {
     /// Insert a node into the road navigation graph.
     #[func]
     #[expect(clippy::needless_pass_by_value)]
-    pub fn insert_node(&mut self, building: Dictionary, scene_node: Gd<Node3D>) {
+    pub fn insert_node(&mut self, building: VarDictionary, scene_node: Gd<Node3D>) {
         let building = Building::try_from_dict(&building)
             .expect("building dictionary must be a vaild SC2K building.");
 

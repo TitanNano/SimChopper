@@ -4,11 +4,11 @@ mod numbers;
 
 #[cfg(debug_assertions)]
 use godot::builtin::{
-    Aabb, Callable, Color, Dictionary, NodePath, PackedByteArray, PackedColorArray,
-    PackedFloat32Array, PackedFloat64Array, PackedInt32Array, PackedInt64Array, PackedStringArray,
-    PackedVector2Array, PackedVector3Array, PackedVector4Array, Plane, Projection, Quaternion,
-    Rect2, Rect2i, Rid, Signal, StringName, Transform2D, Transform3D, Variant, VariantArray,
-    VariantType, Vector2, Vector2i, Vector3i, Vector4, Vector4i,
+    Aabb, Callable, Color, NodePath, PackedByteArray, PackedColorArray, PackedFloat32Array,
+    PackedFloat64Array, PackedInt32Array, PackedInt64Array, PackedStringArray, PackedVector2Array,
+    PackedVector3Array, PackedVector4Array, Plane, Projection, Quaternion, Rect2, Rect2i, Rid,
+    Signal, StringName, Transform2D, Transform3D, VarArray, VarDictionary, Variant, VariantType,
+    Vector2, Vector2i, Vector3i, Vector4, Vector4i,
 };
 use godot::builtin::{Basis, Vector3};
 #[cfg(debug_assertions)]
@@ -64,8 +64,8 @@ pub fn variant_type_default_value(ty: VariantType) -> Variant {
         VariantType::OBJECT => Variant::from(Object::new_alloc()),
         VariantType::CALLABLE => Variant::from(Callable::invalid()),
         VariantType::SIGNAL => Variant::from(Signal::invalid()),
-        VariantType::DICTIONARY => Variant::from(Dictionary::new()),
-        VariantType::ARRAY => Variant::from(VariantArray::new()),
+        VariantType::DICTIONARY => Variant::from(VarDictionary::new()),
+        VariantType::ARRAY => Variant::from(VarArray::new()),
         VariantType::PACKED_BYTE_ARRAY => Variant::from(PackedByteArray::new()),
         VariantType::PACKED_INT32_ARRAY => Variant::from(PackedInt32Array::new()),
         VariantType::PACKED_INT64_ARRAY => Variant::from(PackedInt64Array::new()),

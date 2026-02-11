@@ -1,5 +1,5 @@
 use anyhow::Context;
-use godot::builtin::{Array, Dictionary, GString, Variant, Vector3};
+use godot::builtin::{Array, GString, VarDictionary, Variant, Vector3};
 use godot::classes::decal::DecalTexture;
 use godot::classes::{
     base_material_3d, BaseMaterial3D, Decal, GltfNode, GltfState, IGltfDocumentExtension, Node,
@@ -93,14 +93,14 @@ fn fix_ao_uv2(state: &mut Gd<GltfState>) -> Result<(), global::Error> {
         let raw_material = raw_materials
             .iter_shared()
             .find(|mat| {
-                let Some(name) = mat.to::<Dictionary>().get("name") else {
+                let Some(name) = mat.to::<VarDictionary>().get("name") else {
                     logger::debug!("raw material doesn't have a name!");
                     return false;
                 };
 
                 material.get_name() == name.to()
             })
-            .map(|mat| mat.to::<Dictionary>());
+            .map(|mat| mat.to::<VarDictionary>());
 
         let Some(raw_material) = raw_material else {
             logger::error!("Unable to locate raw material in GLTF model!");
@@ -109,7 +109,7 @@ fn fix_ao_uv2(state: &mut Gd<GltfState>) -> Result<(), global::Error> {
 
         let tex_coord = raw_material
             .get("occlusionTexture")
-            .and_then(|occlusion_tex| occlusion_tex.to::<Dictionary>().get("texCoord"))
+            .and_then(|occlusion_tex| occlusion_tex.to::<VarDictionary>().get("texCoord"))
             .map_or(0.0, |tex_coord| tex_coord.to::<f64>());
 
         if tex_coord > 0.0 {
@@ -141,9 +141,9 @@ fn use_gd_node(
     let extras = gltf_raw_nodes
         .to::<Array<Variant>>()
         .at(index)
-        .to::<Dictionary>()
+        .to::<VarDictionary>()
         .get("extras")
-        .map(|var| var.to::<Dictionary>());
+        .map(|var| var.to::<VarDictionary>());
 
     let Some(extras) = extras else {
         return Ok(None);

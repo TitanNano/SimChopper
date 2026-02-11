@@ -2,7 +2,7 @@ use std::{collections::BTreeMap, ops::Not};
 
 use anyhow::Context as _;
 use derive_debug::Dbg;
-use godot::builtin::{Array, Dictionary};
+use godot::builtin::{Array, VarDictionary};
 use godot::classes::{Marker3D, Node, Node3D, Time};
 use godot::meta::ToGodot;
 use godot::obj::{Gd, NewAlloc, Singleton as _};
@@ -59,7 +59,7 @@ impl Buildings {
         &self.world_constants
     }
 
-    pub fn build_async(&mut self, city: Dictionary, mut ctx: Context<Self>) -> Gd<GodotFuture> {
+    pub fn build_async(&mut self, city: VarDictionary, mut ctx: Context<Self>) -> Gd<GodotFuture> {
         let world_constants = self.world_constants().clone();
         let (resolve, godot_future) = async_support::godot_future();
 

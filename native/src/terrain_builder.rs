@@ -90,7 +90,7 @@ struct CoordinatorThreadContext {
     sea_level: u16,
     chunk_size: u32,
     rotation: TerrainRotation,
-    materials: Shared<Dictionary>,
+    materials: Shared<VarDictionary>,
     debug_render_invalid: bool,
     render_water: bool,
 }
@@ -118,7 +118,7 @@ struct WorkerThreadContext<'a> {
     sea_level: u16,
     rotation: &'a TerrainRotation,
     tilelist: &'a TileList,
-    materials: &'a Shared<Dictionary>,
+    materials: &'a Shared<VarDictionary>,
     debug_render_invalid: bool,
     render_water: bool,
 }
@@ -152,8 +152,8 @@ pub struct TerrainBuilder {
     sea_level: u16,
     chunk_size: u32,
     rotation: Gd<TerrainRotation>,
-    tilelist: Dictionary,
-    materials: Dictionary,
+    tilelist: VarDictionary,
+    materials: VarDictionary,
     debug_render_invalid: bool,
     render_water: bool,
     base: Base<RefCounted>,
@@ -172,9 +172,9 @@ impl TerrainBuilder {
 
     #[func]
     fn new(
-        tilelist: Dictionary,
+        tilelist: VarDictionary,
         rotation: Gd<TerrainRotation>,
-        materials: Dictionary,
+        materials: VarDictionary,
     ) -> Gd<TerrainBuilder> {
         Gd::from_init_fn(|base| TerrainBuilder {
             tile_size: 16,
@@ -224,7 +224,7 @@ impl TerrainBuilder {
     #[signal]
     fn progress(count: u32);
 
-    fn materials(&self) -> Shared<Dictionary> {
+    fn materials(&self) -> Shared<VarDictionary> {
         Shared(self.materials.clone())
     }
 
@@ -449,9 +449,9 @@ struct TerrainBuilderFactory;
 impl TerrainBuilderFactory {
     #[func]
     fn create(
-        tilelist: Dictionary,
+        tilelist: VarDictionary,
         rotation: Gd<TerrainRotation>,
-        materials: Dictionary,
+        materials: VarDictionary,
     ) -> Gd<TerrainBuilder> {
         TerrainBuilder::new(tilelist, rotation, materials)
     }

@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use godot::{
-    builtin::{Dictionary, GString, Vector2i},
+    builtin::{GString, VarDictionary, Vector2i},
     classes::{
         editor_file_dialog, ConfigFile, DirAccess, EditorFileDialog, EditorInterface, FileAccess,
         MeshInstance3D, Object, PackedScene, ResourceLoader,
@@ -163,9 +163,9 @@ impl SetupBuildingImports {
             return;
         }
 
-        let mut subresources: Dictionary = file
+        let mut subresources: VarDictionary = file
             .get_value_ex("params", "_subresources")
-            .default(&Dictionary::new().to_variant())
+            .default(&VarDictionary::new().to_variant())
             .done()
             .try_to()
             .inspect_err(|err| {
@@ -173,7 +173,7 @@ impl SetupBuildingImports {
             })
             .unwrap_or_default();
 
-        let mut nodes: Dictionary = subresources
+        let mut nodes: VarDictionary = subresources
             .get("nodes")
             .map(|value| value.try_to())
             .transpose()
@@ -210,7 +210,7 @@ impl SetupBuildingImports {
             })
             .for_each(|index| {
                 let path = scene_state.get_node_path(index);
-                let mut config: Dictionary = nodes
+                let mut config: VarDictionary = nodes
                     .get(path.clone())
                     .map(|value| value.try_to())
                     .transpose()

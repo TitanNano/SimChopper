@@ -1,4 +1,4 @@
-use godot::builtin::{Dictionary, GString};
+use godot::builtin::{GString, VarDictionary};
 use godot::classes::{Node3D, RichTextLabel};
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor};
@@ -13,7 +13,7 @@ pub struct Debugger3D {
     #[export]
     pub text_view: OnEditor<Gd<RichTextLabel>>,
 
-    debug_data: Dictionary,
+    debug_data: VarDictionary,
 }
 
 #[godot_script_impl]
@@ -30,7 +30,7 @@ impl Debugger3D {
         self.text_view.set_text(&format!("{title}\n\n{values}"));
     }
 
-    pub fn debug_data(&self) -> Dictionary {
+    pub fn debug_data(&self) -> VarDictionary {
         self.debug_data.clone()
     }
 }

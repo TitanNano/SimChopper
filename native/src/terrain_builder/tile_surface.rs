@@ -6,10 +6,10 @@ use crate::util::logger;
 use crate::world::city_data::TerrainSlope;
 
 use super::lerp::bilerp_xyz;
-use super::point::{DimensionX, DimensionY, DimensionZ, FixedPoint, SetDimensionY};
+use super::point::{DimensionX, DimensionZ};
 use super::terrain_rotation::TerrainRotation;
 
-/// the type of terrain surface.
+/// The type of terrain surface.
 #[derive(Copy, Clone, Hash, PartialEq, Eq, Debug)]
 pub enum TileSurfaceType {
     Ground,
@@ -296,14 +296,14 @@ impl From<TileSurface> for Vec<Face> {
 
                 faces.append(&mut vec![
                     [
-                        Vertex::from_vector(kind, x0, tile.fixed, tile.invalid),
-                        Vertex::from_vector(kind, x1, tile.fixed, tile.invalid),
-                        Vertex::from_vector(kind, y1, tile.fixed, tile.invalid),
+                        Vertex::from_vector(kind, x0, tile.invalid),
+                        Vertex::from_vector(kind, x1, tile.invalid),
+                        Vertex::from_vector(kind, y1, tile.invalid),
                     ],
                     [
-                        Vertex::from_vector(kind, x0, tile.fixed, tile.invalid),
-                        Vertex::from_vector(kind, y1, tile.fixed, tile.invalid),
-                        Vertex::from_vector(kind, y0, tile.fixed, tile.invalid),
+                        Vertex::from_vector(kind, x0, tile.invalid),
+                        Vertex::from_vector(kind, y1, tile.invalid),
+                        Vertex::from_vector(kind, y0, tile.invalid),
                     ],
                 ]);
             }
@@ -321,43 +321,22 @@ pub(crate) struct Vertex {
     y: f32,
     z: f32,
     surface: TileSurfaceType,
-    fixed: bool,
     is_invalid_tile: bool,
 }
 
 impl Vertex {
-    fn new(
-        surface: TileSurfaceType,
-        x: f32,
-        y: f32,
-        z: f32,
-        fixed: bool,
-        is_invalid_tile: bool,
-    ) -> Self {
+    fn new(surface: TileSurfaceType, x: f32, y: f32, z: f32, is_invalid_tile: bool) -> Self {
         Self {
             x,
             y,
             z,
             surface,
-            fixed,
             is_invalid_tile,
         }
     }
 
-    fn from_vector(
-        surface: TileSurfaceType,
-        vector: Vector3,
-        fixed: bool,
-        is_invalid_tile: bool,
-    ) -> Self {
-        Self::new(
-            surface,
-            vector.x,
-            vector.y,
-            vector.z,
-            fixed,
-            is_invalid_tile,
-        )
+    fn from_vector(surface: TileSurfaceType, vector: Vector3, is_invalid_tile: bool) -> Self {
+        Self::new(surface, vector.x, vector.y, vector.z, is_invalid_tile)
     }
 
     pub fn is_invalid_tile(&self) -> bool {
@@ -380,30 +359,6 @@ impl DimensionX for Vertex {
 impl DimensionZ for Vertex {
     fn z(&self) -> f32 {
         self.z
-    }
-}
-
-impl DimensionY for Vertex {
-    fn y(&self) -> f32 {
-        self.y
-    }
-}
-
-impl SetDimensionY for &mut Vertex {
-    fn set_y(self, value: f32) {
-        self.y = value;
-    }
-}
-
-impl SetDimensionY for Vertex {
-    fn set_y(mut self, value: f32) {
-        self.y = value;
-    }
-}
-
-impl FixedPoint for Vertex {
-    fn is_fixed(&self) -> bool {
-        self.fixed
     }
 }
 

@@ -291,8 +291,8 @@ impl TerrainBuilder {
     pub fn build_terain_async(&self) -> Gd<GodotFuture> {
         let chunk_size = self.chunk_size;
 
-        // we need to be certain that we have a compatible city size
-        debug_assert!((self.city_size % chunk_size) == 0);
+        // We need to be certain that we have a compatible city size
+        debug_assert!(self.city_size.is_multiple_of(chunk_size));
 
         let chunk_count = self.city_size / chunk_size;
         let rotation = self.rotation().bind().deref().to_owned();

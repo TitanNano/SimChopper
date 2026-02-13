@@ -1,0 +1,45 @@
+[gd_resource type="AnimationNodeStateMachine" load_steps=9 format=3 uid="uid://dfjcsgxlys31s"]
+
+[sub_resource type="AnimationNodeAdd2" id="AnimationNodeAdd2_lypsp"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_0hmwj"]
+animation = &"fire_flicker/Scene"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_5aien"]
+animation = &"burning"
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_0o5jn"]
+graph_offset = Vector2(-64.319954, 114.24002)
+nodes/output/position = Vector2(720, 80)
+nodes/sound/node = SubResource("AnimationNodeAnimation_5aien")
+nodes/sound/position = Vector2(260, 100)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_0hmwj")
+nodes/Animation/position = Vector2(250, 270)
+nodes/Add2/node = SubResource("AnimationNodeAdd2_lypsp")
+nodes/Add2/position = Vector2(480, 160)
+node_connections = [&"output", 0, &"Add2", &"Add2", 0, &"sound", &"Add2", 1, &"Animation"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_7vuwr"]
+animation = &"siren"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_w7g0x"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_xsuvh"]
+switch_mode = 1
+advance_mode = 2
+advance_expression = "is_dead()"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_2emws"]
+switch_mode = 1
+advance_mode = 2
+advance_expression = "!is_dead()"
+
+[resource]
+states/Start/position = Vector2(141.5, 43.5)
+states/burning/node = SubResource("AnimationNodeBlendTree_0o5jn")
+states/burning/position = Vector2(465, 159.5)
+states/siren/node = SubResource("AnimationNodeAnimation_7vuwr")
+states/siren/position = Vector2(754, 10.5)
+transitions = ["Start", "burning", SubResource("AnimationNodeStateMachineTransition_w7g0x"), "burning", "siren", SubResource("AnimationNodeStateMachineTransition_xsuvh"), "siren", "burning", SubResource("AnimationNodeStateMachineTransition_2emws")]
+graph_offset = Vector2(-149.42938, 26.647408)

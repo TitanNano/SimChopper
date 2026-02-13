@@ -1,14 +1,15 @@
 mod fire;
 
-use godot::builtin::Array;
-use godot::classes::{MeshInstance3D, Node};
-use godot::global::PropertyHint;
-use godot::meta::{ByValue, FromGodot, GodotConvert, ToGodot};
-use godot::obj::{Gd, Inherits};
-use godot::prelude::ConvertError;
-use godot_rust_script::{godot_script_impl, GodotScript, GodotScriptExport};
 use std::{any::Any, fmt::Debug};
 
+use godot::builtin::Array;
+use godot::classes::Texture2D;
+use godot::classes::{MeshInstance3D, Node};
+use godot::obj::{Gd, Inherits};
+use godot_rust_script::godot_script_impl;
+use godot_rust_script::{GodotScript, OnEditor, ScriptExportGroup, ScriptExportSubgroup};
+
+use crate::util::Uf32;
 use crate::{util::logger, world::city_data::TileCoords};
 
 use fire::FireFeature;
@@ -17,61 +18,6 @@ trait BuildingFeature<N: Inherits<Node>>: Debug {
     fn process(&mut self, _delta: f64, _node: &mut Gd<N>) {}
     fn physics_process(&mut self, _delta: f64, _node: &mut Gd<N>) {}
     fn dispatch_notification(&mut self, _notification: BuildingNotification) {}
-}
-
-#[derive(Debug, Default)]
-struct BuildingEventFlags(u8);
-
-impl BuildingEventFlags {
-    fn fire(&self) -> bool {
-        self.0 & 0b0000_0001 == 1
-    }
-}
-
-impl GodotConvert for BuildingEventFlags {
-    type Via = u8;
-}
-
-impl FromGodot for BuildingEventFlags {
-    fn try_from_godot(via: Self::Via) -> Result<Self, ConvertError> {
-        Ok(Self(via))
-    }
-}
-
-impl ToGodot for BuildingEventFlags {
-    type Pass = ByValue;
-
-    fn to_godot(&self) -> Self::Via {
-        self.0
-    }
-}
-
-impl GodotScriptExport for BuildingEventFlags {
-    fn hint_string(_custom_hint: Option<PropertyHint>, custom_string: Option<String>) -> String {
-        if let Some(custom_string) = custom_string {
-            return custom_string;
-        }
-
-        String::from("Fire:1")
-    }
-
-    fn hint(custom: Option<PropertyHint>) -> PropertyHint {
-        if let Some(custom) = custom {
-            return custom;
-        }
-
-        PropertyHint::FLAGS
-    }
-}
-
-impl godot::prelude::Var for BuildingEventFlags {
-    fn get_property(&self) -> Self::Via {
-        self.to_godot()
-    }
-
-    fn set_property(&mut self, value: Self::Via) {
-        *self = Self::from_godot(value);
-    }
 }
 
 #[derive(Debug)]
@@ -114,11 +60,28 @@ enum BuildingNotification {
     WaterImpact(f64),
 }
 
+#[derive(ScriptExportGroup, Debug, Default)]
+struct EventsConfig {
+    #[export(flatten)]
+    fire: Option<FireEventConfig>,
+}
+
+#[derive(ScriptExportSubgroup, Default, Debug)]
+#[expect(clippy::struct_field_names)]
+struct FireEventConfig {
+    /// The positions of the emission points.
+    emission_points: OnEditor<Gd<Texture2D>>,
+    /// The normals of the emission points.
+    emission_point_normals: OnEditor<Gd<Texture2D>>,
+    /// The number of emission points inside the emission point texture.
+    emission_point_count: Uf32,
+}
+
 #[derive(GodotScript, Debug)]
 #[script(base = Node)]
 struct Building {
-    #[export]
-    pub events: BuildingEventFlags,
+    #[export(flatten)]
+    pub events: EventsConfig,
 
     #[export]
     pub mesh: Option<Gd<MeshInstance3D>>,
@@ -140,10 +103,10 @@ impl Building {
             self.tile_coords_array.get(1).unwrap_or(0),
         );
 
-        if self.events.fire() {
+        if let Some(config) = &self.events.fire {
             if let Some(ref mesh) = self.mesh {
                 self.features
-                    .push(Box::new(FireFeature::new(self.tile_coords, mesh)));
+                    .push(Box::new(FireFeature::new(self.tile_coords, mesh, config)));
             } else {
                 logger::warn!("Unable to instantiate FireFeature because no mesh has been set.");
             }

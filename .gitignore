@@ -7,3 +7,7 @@ build/**
 
 # Maps
 *.sc2
+
+# Blender
+*.blend1
+fire_simulation_cache

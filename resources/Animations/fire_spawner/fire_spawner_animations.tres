@@ -1,0 +1,163 @@
+[gd_resource type="AnimationLibrary" load_steps=6 format=3 uid="uid://dtoyo725l55bb"]
+
+[ext_resource type="AudioStream" uid="uid://dpxm4j5adykww" path="res://resources/Sounds/Events/burning_building.ogg" id="1_x5rap"]
+[ext_resource type="AudioStream" uid="uid://dqso6fkx02jcr" path="res://resources/Sounds/Events/fire_alarm.ogg" id="2_xra2c"]
+
+[sub_resource type="Animation" id="Animation_055tn"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SmokeParticles:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:light_modulator")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_0dav3"]
+resource_name = "burning"
+length = 7.88
+loop_mode = 1
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("FireAudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("1_x5rap")
+}],
+"times": PackedFloat32Array(0)
+}
+tracks/0/use_blend = true
+tracks/1/type = "audio"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SirenAudioSource")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("2_xra2c")
+}, {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("2_xra2c")
+}],
+"times": PackedFloat32Array(0, 4)
+}
+tracks/1/use_blend = true
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("SmokeParticles:emitting")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.033333335),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:light_modulator")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.041666668, 0.08333333, 0.125, 0.16666666, 0.20833333, 0.24999999, 0.2916667, 0.33333334, 0.375, 0.4166667, 0.45833334, 0.5, 0.5416666, 0.5833333, 0.625, 0.6666666, 0.7083333, 0.75, 0.7916666, 0.8333333, 0.875, 0.9166666, 0.9583333, 0.99999994, 1.0416667, 1.0833334, 1.125, 1.1666667, 1.2083334, 1.25, 1.2916667, 1.3333334, 1.375, 1.4166667, 1.4583334, 1.5, 1.5416667, 1.5833334, 1.625, 1.6666667, 1.7083334, 1.75, 1.7916667, 1.8333334, 1.875, 1.9166667, 1.9583334, 2, 2.0416665, 2.0833333, 2.125, 2.1666665, 2.2083333, 2.25, 2.2916665, 2.3333333, 2.375, 2.4166665, 2.4583333, 2.5, 2.5416665, 2.5833333, 2.625, 2.6666665, 2.7083333, 2.75, 2.7916665, 2.8333333, 2.875, 2.9166665, 2.9583333, 3, 3.0416665, 3.0833333, 3.0916667, 3.125, 3.1666665, 3.2083333, 3.25, 3.2916665, 3.3333333, 3.375, 3.4166665, 3.4583333, 3.5, 3.5416665, 3.5833333, 3.625, 3.6666665, 3.7083333, 3.75, 3.7916665, 3.8333333, 3.875, 3.9166665, 3.9583333, 3.9999998, 4.041667, 4.0833335, 4.125, 4.166667, 4.2083335, 4.25, 4.291667, 4.3333335, 4.375, 4.416667, 4.4583335, 4.5, 4.541667, 4.5833335, 4.625, 4.666667, 4.7083335, 4.75, 4.791667, 4.8333335, 4.875, 4.916667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.8454145, 0.6877192, 0.8289708, 1.0273706, 1.2158005, 1.1901759, 0.9290579, 0.7142419, 0.5776915, 0.7653839, 1.0397986, 1.150888, 1.0319573, 0.97841364, 0.9930177, 0.7297681, 0.61975455, 0.9152582, 1.1103364, 0.90036494, 0.7068894, 0.7702457, 0.92269766, 0.7227049, 0.3681882, 0.3012461, 0.66397154, 0.8683969, 0.7872473, 0.7329093, 1.1614985, 1.6470506, 2.0930836, 2.0343857, 1.3708521, 0.6745645, 0.090931654, 0.22051036, 0.62543726, 0.7946478, 0.71642625, 0.9616601, 1.4704856, 1.587302, 1.4151807, 1.4532629, 1.3941281, 1.2018465, 1.32686, 1.6517568, 1.7930924, 1.4544067, 1.096843, 0.7674316, 0.6375802, 0.7944924, 1.0296884, 1.3677261, 1.2830099, 0.9447511, 0.50018454, 0.33904523, 0.62082297, 0.9157498, 1.1700131, 1.0703824, 1.0005187, 1.147681, 1.4902127, 1.6200182, 1.4600465, 1.3555174, 1.2356915, 0.94524854, 0.5474111, 1.0718998, 0.30426306, 0.37162477, 0.53963226, 0.64416206, 0.76398873, 1.0527334, 1.1766591, 1.0821186, 1.2017881, 1.4801463, 1.6760228, 1.3469293, 0.944813, 0.5137865, 0.39946073, 0.74532074, 1.0922219, 1.3648837, 1.2471912, 1.138384, 1.2137368, 1.4366901, 1.4809151, 1.3485276, 1.3955355, 1.491617, 1.4148971, 1.4909577, 1.7146628, 1.5698013, 1.100471, 0.6335958, 0.74525344, 1.0392839, 1.0506024, 0.7421488, 0.7431172, 1.0487859, 0.9750161, 0.82281595, 1.0549368, 1.4758196, 1.5713103, 1.2373834]
+}
+
+[sub_resource type="Animation" id="Animation_eecao"]
+resource_name = "siren"
+length = 10.0
+tracks/0/type = "audio"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SirenAudioSource")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("2_xra2c")
+}, {
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": ExtResource("2_xra2c")
+}],
+"times": PackedFloat32Array(0, 4)
+}
+tracks/0/use_blend = true
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SmokeParticles:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/2/type = "audio"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("FireAudioSource")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"clips": [{
+"end_offset": 0.0,
+"start_offset": 0.0,
+"stream": null
+}],
+"times": PackedFloat32Array(0)
+}
+tracks/2/use_blend = true
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".:light_modulator")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[resource]
+_data = {
+&"RESET": SubResource("Animation_055tn"),
+&"burning": SubResource("Animation_0dav3"),
+&"siren": SubResource("Animation_eecao")
+}

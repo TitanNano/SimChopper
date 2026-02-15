@@ -1,49 +1,182 @@
-[gd_scene load_steps=6 format=3 uid="uid://5jijewumod80"]
+[gd_scene load_steps=22 format=3 uid="uid://5jijewumod80"]
 
-[ext_resource type="Material" uid="uid://dm0vav0ade2gp" path="res://resources/Materials/fire_material.tres" id="1_5pwr1"]
 [ext_resource type="Script" uid="uid://rv7naiqpa17x" path="res://native/src/scripts/spawner/fire_spawner.rs" id="1_aar5t"]
-[ext_resource type="Material" uid="uid://dbuspcbhwqr7g" path="res://resources/Materials/smoke_material.tres" id="2_4mcgg"]
-[ext_resource type="AnimationLibrary" uid="uid://dtoyo725l55bb" path="res://resources/Animations/fire_spawner.tres" id="4_rhyet"]
-[ext_resource type="AnimationNodeStateMachine" uid="uid://dfjcsgxlys31s" path="res://resources/Animations/fire_spawner_animation_states.tres" id="5_smqef"]
+[ext_resource type="Texture2D" uid="uid://c8edk8pamge2n" path="res://resources/Particles/fire/emitters/example_building.res" id="2_h5f1y"]
+[ext_resource type="Texture2D" uid="uid://dsau4l5yoyua" path="res://resources/Particles/fire/emitters/example_building_normals.res" id="3_cbxbr"]
+[ext_resource type="AnimationLibrary" uid="uid://dtoyo725l55bb" path="res://resources/Animations/fire_spawner/fire_spawner_animations.tres" id="4_rhyet"]
+[ext_resource type="Texture2D" uid="uid://bu6rtf4ke3018" path="res://resources/Particles/fire/flame/flame0094.png" id="5_brmse"]
+[ext_resource type="Texture2D" uid="uid://cn2gsm3yn8eqq" path="res://resources/Particles/fire/flame/flame33_55_68_78.png" id="5_h5f1y"]
+[ext_resource type="AnimationNodeStateMachine" uid="uid://dfjcsgxlys31s" path="res://resources/Animations/fire_spawner/fire_spawner_animation_states.tres" id="5_smqef"]
 
-[node name="FireSpawner" type="Marker3D" node_paths=PackedStringArray("fire", "smoke", "light_source")]
+[sub_resource type="Curve" id="Curve_h5f1y"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.8, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -0.18093553, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_313ch"]
+curve = SubResource("Curve_h5f1y")
+
+[sub_resource type="Gradient" id="Gradient_cbxbr"]
+offsets = PackedFloat32Array(0.2971698, 1)
+colors = PackedColorArray(0.13158211, 0.00081444375, 0, 1, 0.92964816, 0.58721036, 1.92523e-06, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_1qwut"]
+gradient = SubResource("Gradient_cbxbr")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_yg8n7"]
+emission_shape = 5
+emission_point_texture = ExtResource("2_h5f1y")
+emission_normal_texture = ExtResource("3_cbxbr")
+emission_point_count = 1024
+angle_min = -89.99999
+angle_max = 90.000015
+direction = Vector3(0, 0, 0)
+spread = 0.0
+initial_velocity_min = 1.0
+initial_velocity_max = 2.0
+angular_velocity_min = -180.0
+angular_velocity_max = 180.0
+radial_velocity_min = -1.0
+radial_velocity_max = 1.0
+gravity = Vector3(0, 5, 0)
+scale_min = 2.0
+scale_max = 3.0
+color_ramp = SubResource("GradientTexture1D_1qwut")
+alpha_curve = SubResource("CurveTexture_313ch")
+anim_offset_max = 1.0
+turbulence_noise_strength = 0.1
+turbulence_noise_speed_random = 0.1
+turbulence_influence_min = 0.01
+turbulence_influence_max = 0.01
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8nxdj"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+disable_ambient_light = true
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("5_h5f1y")
+albedo_texture_force_srgb = true
+disable_receive_shadows = true
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 2
+particles_anim_v_frames = 2
+particles_anim_loop = false
+proximity_fade_enabled = true
+proximity_fade_distance = 0.7
+
+[sub_resource type="QuadMesh" id="QuadMesh_x60au"]
+material = SubResource("StandardMaterial3D_8nxdj")
+
+[sub_resource type="Curve" id="Curve_6xxxh"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.7, 0), 0.0, 0.0, 0, 0, Vector2(0.8, 0.3), 0.0, 0.0, 0, 0, Vector2(0.9, 0.3), -0.012687812, -0.012687812, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
+
+[sub_resource type="CurveTexture" id="CurveTexture_4mitn"]
+curve = SubResource("Curve_6xxxh")
+
+[sub_resource type="Curve" id="Curve_cbxbr"]
+_limits = [1.0, 2.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.75, 1), 0.09310622, 0.09310622, 0, 0, Vector2(1, 1.5029374), 6.6932516, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_yg8n7"]
+curve = SubResource("Curve_cbxbr")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_lpvev"]
+lifetime_randomness = 0.2
+emission_shape = 5
+emission_point_texture = ExtResource("2_h5f1y")
+emission_normal_texture = ExtResource("3_cbxbr")
+emission_point_count = 1024
+angle_min = -90.0
+angle_max = 90.0
+direction = Vector3(0, 0, 0)
+spread = 0.0
+initial_velocity_min = 1.0
+initial_velocity_max = 2.0
+gravity = Vector3(0, 3, 0)
+scale_min = 2.0
+scale_max = 3.0
+scale_curve = SubResource("CurveTexture_yg8n7")
+alpha_curve = SubResource("CurveTexture_4mitn")
+anim_speed_min = 1.0
+anim_speed_max = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gbsgj"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.57, 0.57, 0.57, 1)
+albedo_texture = ExtResource("5_brmse")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_3kyhn"]
+material = SubResource("StandardMaterial3D_gbsgj")
+size = Vector2(2, 2)
+
+[node name="FireSpawner" type="Marker3D" node_paths=PackedStringArray("fire", "smoke", "light_source", "fire_sound")]
 gizmo_extents = 3.0
 script = ExtResource("1_aar5t")
-fire = NodePath("FireLarge")
-smoke = NodePath("SmokeLarge")
+density = 20
+smoke_density = 4
+emission_points = ExtResource("2_h5f1y")
+emission_point_normals = ExtResource("3_cbxbr")
+emission_point_count = 1024
+fire = NodePath("FireParticles")
+smoke = NodePath("SmokeParticles")
 light_source = NodePath("FireLightSource")
+strength = 1.0
+light_modulator = 1.0
+fire_sound = NodePath("FireAudioSource")
 
-[node name="FireLarge" type="FogVolume" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 26.8181, 0)
-size = Vector3(23, 70, 23)
-material = ExtResource("1_5pwr1")
-
-[node name="SmokeLarge" type="FogVolume" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 83.8467, 0)
-size = Vector3(40, 150, 40)
-shape = 0
-material = ExtResource("2_4mcgg")
-
-[node name="FireAudioPlayer" type="AnimationPlayer" parent="."]
+[node name="FireAnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 &"": ExtResource("4_rhyet")
 }
 blend_times = [&"burning", &"burning", 0.2]
 
+[node name="FireParticles" type="GPUParticles3D" parent="."]
+amount = 20480
+lifetime = 1.6
+fixed_fps = 60
+visibility_aabb = AABB(-12.70414, -1.024021, -12.4423485, 25.11055, 19.095987, 25.172958)
+draw_order = 2
+process_material = SubResource("ParticleProcessMaterial_yg8n7")
+draw_pass_1 = SubResource("QuadMesh_x60au")
+
+[node name="SmokeParticles" type="GPUParticles3D" parent="."]
+sorting_offset = 10.0
+amount = 2048
+lifetime = 4.0
+fixed_fps = 60
+visibility_aabb = AABB(-17.110859, -2.0019226, -16.930372, 34.242424, 41.21342, 33.88436)
+draw_order = 2
+process_material = SubResource("ParticleProcessMaterial_lpvev")
+draw_pass_1 = SubResource("QuadMesh_3kyhn")
+
 [node name="FireAudioSource" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.1948, 0)
+emission_angle_degrees = 10.7
+
+[node name="SirenAudioSource" type="AudioStreamPlayer3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.1948, 0)
 
 [node name="FireLightSource" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.01561, -3.39593)
 light_intensity_lumens = 1300.0
 light_temperature = 1850.0
-light_color = Color(0.980392, 0.309804, 0.00392157, 1)
 light_volumetric_fog_energy = 0.0
-light_size = 1.0
-omni_attenuation = 2.0
+light_bake_mode = 1
+omni_range = 100.0
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
+deterministic = false
+callback_mode_discrete = 1
 tree_root = ExtResource("5_smqef")
 advance_expression_base_node = NodePath("..")
-anim_player = NodePath("../FireAudioPlayer")
-parameters/burning/Combine/add_amount = 1.0
+anim_player = NodePath("../FireAnimationPlayer")

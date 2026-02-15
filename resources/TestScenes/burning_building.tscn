@@ -1,18 +1,47 @@
-[gd_scene load_steps=6 format=3 uid="uid://hyoixndx1seb"]
+[gd_scene load_steps=13 format=3 uid="uid://hyoixndx1seb"]
 
 [ext_resource type="PackedScene" uid="uid://5lcllve4d4s5" path="res://resources/Objects/Buildings/home_middle_class_3.tscn" id="1_daqnl"]
 [ext_resource type="PackedScene" uid="uid://cmv7rt4gqew38" path="res://resources/Objects/Helis/schweizer_300.tscn" id="2_db2rk"]
 [ext_resource type="Script" uid="uid://bblluinwmhapb" path="res://src/Objects/Camera/CameraInterpolation.gd" id="3_2f11a"]
+[ext_resource type="VoxelGIData" uid="uid://cshrbx0sm816d" path="res://resources/TestScenes/burning_building_voxel_gi.res" id="4_hc6pm"]
+[ext_resource type="PackedScene" uid="uid://5jijewumod80" path="res://resources/Objects/Spawner/fire_spawner.tscn" id="4_yinow"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_hc6pm"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_uedbd"]
+sky_material = SubResource("ProceduralSkyMaterial_hc6pm")
+
+[sub_resource type="Environment" id="Environment_5d2se"]
+background_mode = 2
+sky = SubResource("Sky_uedbd")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="CameraAttributesPhysical" id="CameraAttributesPhysical_aj8nn"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_cep2w"]
 plane = Plane(2.08165e-12, 1, 2.08165e-12, 2.08165e-12)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hyl4w"]
+roughness = 0.6
+
 [sub_resource type="PlaneMesh" id="PlaneMesh_jrin0"]
-size = Vector2(5, 5)
+material = SubResource("StandardMaterial3D_hyl4w")
+size = Vector2(40, 100)
 
 [node name="World" type="Node3D"]
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_5d2se")
+camera_attributes = SubResource("CameraAttributesPhysical_aj8nn")
+
 [node name="HomeMiddleClass3" parent="." instance=ExtResource("1_daqnl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.013434887, -4.7683716e-07, 0.0056610107)
+events_fire_emission_points = null
+events_fire_emission_point_normals = null
+events_fire_enable = null
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(-0.830816, 0.200801, -0.519061, 0, 0.932644, 0.360798, 0.556548, 0.299757, -0.774855, -17.8978, 11.3634, -20.2184)
@@ -25,6 +54,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -55.9183)
 shape = SubResource("WorldBoundaryShape3D_cep2w")
 
 [node name="Ground" type="MeshInstance3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 16.574894)
 mesh = SubResource("PlaneMesh_jrin0")
 skeleton = NodePath("../..")
 
@@ -40,3 +70,10 @@ script = ExtResource("3_2f11a")
 snap = true
 track_y_axis = true
 active = true
+
+[node name="VoxelGI" type="VoxelGI" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07067871, 15.574583, -40.032562)
+size = Vector3(43.787354, 32, 106.37543)
+data = ExtResource("4_hc6pm")
+
+[node name="FireSpawner" parent="." instance=ExtResource("4_yinow")]

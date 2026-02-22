@@ -1,13 +1,12 @@
-[gd_scene load_steps=23 format=3 uid="uid://c0pat4v54oe86"]
+[gd_scene load_steps=26 format=3 uid="uid://c0pat4v54oe86"]
 
 [ext_resource type="PackedScene" uid="uid://daf3wyyha2hm" path="res://resources/Meshes/Helis/upgrades/cannon.gltf" id="1_54ycj"]
 [ext_resource type="Script" uid="uid://dvqexwe8r1gw7" path="res://native/src/scripts/objects/canon_upgrade.rs" id="2_1jnub"]
-[ext_resource type="Material" uid="uid://bamhf7as5ev7r" path="res://resources/Particles/water_jet.tres" id="2_nsqv1"]
-[ext_resource type="Material" uid="uid://cdtr7t6dqskao" path="res://resources/Materials/watter_particle_material.tres" id="3_lyjqx"]
+[ext_resource type="Material" uid="uid://bamhf7as5ev7r" path="res://resources/Particles/water_jet/water_jet.tres" id="2_nsqv1"]
+[ext_resource type="Material" uid="uid://cdtr7t6dqskao" path="res://resources/Materials/water_particle_material.tres" id="3_lyjqx"]
 [ext_resource type="Script" uid="uid://clfua0cr30myq" path="res://native/src/scripts/objects/water_jet.rs" id="4_3ki7x"]
-[ext_resource type="Texture2D" uid="uid://cgajeno6v3mbj" path="res://resources/Textures/Water/water_particle_alpha.png" id="4_owba1"]
-[ext_resource type="Texture2D" uid="uid://d17vaba581i6" path="res://resources/Textures/Water/water_particle_normal.png" id="5_cxogv"]
-[ext_resource type="Texture2D" uid="uid://b0fqgpuodjpvg" path="res://resources/Textures/Water/red.png" id="6_8vk3t"]
+[ext_resource type="Texture2D" uid="uid://cgajeno6v3mbj" path="res://resources/Particles/water_jet/water_particle_alpha.png" id="4_owba1"]
+[ext_resource type="Texture2D" uid="uid://d17vaba581i6" path="res://resources/Particles/water_jet/water_particle_normal.png" id="5_cxogv"]
 [ext_resource type="WaterDecalTracker" uid="uid://bvelsm8gt2na8" path="res://resources/Config/water_decal_tracker.tres" id="6_p6un2"]
 [ext_resource type="Script" uid="uid://wlx155raqrai" path="res://native/src/scripts/effects/water_decal.rs" id="9_v48py"]
 [ext_resource type="AnimationLibrary" uid="uid://ccdoql0ui30qd" path="res://resources/Animations/canon_water_jet.tres" id="10_u6k6a"]
@@ -17,6 +16,27 @@
 [sub_resource type="QuadMesh" id="QuadMesh_wqt7j"]
 material = ExtResource("3_lyjqx")
 size = Vector2(0.7, 0.7)
+
+[sub_resource type="Curve" id="Curve_xx02s"]
+bake_resolution = 1
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_p6un2"]
+bake_resolution = 1
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_npq4n"]
+bake_resolution = 1
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_eka6e"]
+width = 32
+curve_x = SubResource("Curve_xx02s")
+curve_y = SubResource("Curve_p6un2")
+curve_z = SubResource("Curve_npq4n")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_aet65"]
 size = Vector3(15.1061, 26.5005, 74.4762)
@@ -34,7 +54,7 @@ radius = 2.0
 radius = 4.0
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_wrup6"]
-radius = 7.0
+radius = 5.0
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_xx02s"]
 viewport_path = NodePath("SubViewport")
@@ -53,10 +73,10 @@ transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, 0, 0, 0
 
 [node name="WaterJet" type="GPUParticles3D" parent="." index="1" node_paths=PackedStringArray("impact_area", "decal")]
 transform = Transform3D(-1, 3.48787e-16, -8.74228e-08, 3.48787e-16, 1, -3.48787e-16, 8.74228e-08, -3.48787e-16, -1, -5.06016e-15, 0.266152, 2.15765)
-emitting = false
 amount = 2000
 lifetime = 2.0
-visibility_aabb = AABB(-2.55386, -1.94139, -5.68435, 5.10773, 3.88278, 6.79545)
+fixed_fps = 60
+visibility_aabb = AABB(-1.900372, -21.624529, -70.57771, 3.7839487, 22.33796, 71.26771)
 draw_order = 1
 process_material = ExtResource("2_nsqv1")
 draw_pass_1 = SubResource("QuadMesh_wqt7j")
@@ -73,7 +93,7 @@ visible = false
 size = Vector3(1, 2, 1)
 texture_albedo = ExtResource("4_owba1")
 texture_normal = ExtResource("5_cxogv")
-texture_orm = ExtResource("6_8vk3t")
+texture_orm = SubResource("CurveXYZTexture_eka6e")
 albedo_mix = 0.0
 upper_fade = 0.8
 lower_fade = 0.8

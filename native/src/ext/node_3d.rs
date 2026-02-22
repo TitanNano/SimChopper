@@ -1,40 +1,9 @@
-use godot::{
-    builtin::{math::FloatExt, Basis, Transform3D, Vector3},
-    classes::Node3D,
-};
+use godot::builtin::math::FloatExt;
+use godot::builtin::Vector3;
+use godot::classes::Node3D;
 
 pub trait Node3DExt {
     fn align_up(&mut self, normal: Vector3);
-}
-
-pub trait Vector3Ext {
-    fn align_up(self, normal: Vector3) -> Vector3;
-}
-
-impl Vector3Ext for Vector3 {
-    fn align_up(self, normal: Vector3) -> Vector3 {
-        let mut basis = Basis::default();
-
-        basis.set_col_b(normal);
-        basis.set_col_a({
-            let z = -basis.col_a().cross(normal);
-            let x = -basis.col_c().cross(normal);
-            if z.length() > x.length() {
-                z
-            } else {
-                x
-            }
-        });
-        basis.set_col_c(basis.col_a().cross(basis.col_b()));
-
-        if !basis.determinant().is_zero_approx() {
-            basis = basis.orthonormalized();
-        }
-
-        let transform = Transform3D::new(basis, Vector3::ZERO);
-
-        transform * self
-    }
 }
 
 impl Node3DExt for Node3D {

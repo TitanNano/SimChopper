@@ -208,10 +208,6 @@ impl WaterJet {
                     target_decal_count,
                 );
 
-                logger::debug!("impact node: {}", target_node.get_name());
-                logger::debug!("impact distance: {impact_distance}");
-                logger::debug!("existing decals near point: {}", decals_at_point.len());
-
                 let mut decal_inst = self
                     .can_spawn_decal(&point, extent, &decals_at_point)
                     .then(|| self.spawn_decal(&decal, &point, decal_scale, &mut target_node));

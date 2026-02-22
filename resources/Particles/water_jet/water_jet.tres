@@ -1,0 +1,27 @@
+[gd_resource type="ParticleProcessMaterial" load_steps=5 format=3 uid="uid://bamhf7as5ev7r"]
+
+[sub_resource type="Curve" id="Curve_kodiw"]
+_data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.9, 0.3), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_qhu81"]
+curve = SubResource("Curve_kodiw")
+
+[sub_resource type="Curve" id="Curve_glm7b"]
+_limits = [0.0, 5.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 5), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_kodiw"]
+curve = SubResource("Curve_glm7b")
+
+[resource]
+particle_flag_align_y = true
+particle_flag_rotate_y = true
+direction = Vector3(2.08165e-12, 2.08165e-12, -1)
+spread = 1.0
+initial_velocity_min = 30.0
+initial_velocity_max = 35.0
+scale_curve = SubResource("CurveTexture_kodiw")
+alpha_curve = SubResource("CurveTexture_qhu81")
+collision_mode = 2

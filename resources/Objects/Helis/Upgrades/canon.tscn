@@ -1,13 +1,13 @@
-[gd_scene load_steps=22 format=3 uid="uid://c0pat4v54oe86"]
+[gd_scene load_steps=26 format=3 uid="uid://c0pat4v54oe86"]
 
 [ext_resource type="PackedScene" uid="uid://daf3wyyha2hm" path="res://resources/Meshes/Helis/upgrades/cannon.gltf" id="1_54ycj"]
 [ext_resource type="Script" uid="uid://dvqexwe8r1gw7" path="res://native/src/scripts/objects/canon_upgrade.rs" id="2_1jnub"]
-[ext_resource type="Material" uid="uid://bamhf7as5ev7r" path="res://resources/Particles/water_jet.tres" id="2_nsqv1"]
-[ext_resource type="Material" uid="uid://cdtr7t6dqskao" path="res://resources/Materials/watter_particle_material.tres" id="3_lyjqx"]
+[ext_resource type="Material" uid="uid://bamhf7as5ev7r" path="res://resources/Particles/water_jet/water_jet.tres" id="2_nsqv1"]
+[ext_resource type="Material" uid="uid://cdtr7t6dqskao" path="res://resources/Materials/water_particle_material.tres" id="3_lyjqx"]
 [ext_resource type="Script" uid="uid://clfua0cr30myq" path="res://native/src/scripts/objects/water_jet.rs" id="4_3ki7x"]
-[ext_resource type="Texture2D" uid="uid://cgajeno6v3mbj" path="res://resources/Textures/Water/water_particle_alpha.png" id="4_owba1"]
-[ext_resource type="Texture2D" uid="uid://d17vaba581i6" path="res://resources/Textures/Water/water_particle_normal.png" id="5_cxogv"]
-[ext_resource type="Texture2D" uid="uid://b0fqgpuodjpvg" path="res://resources/Textures/Water/red.png" id="6_8vk3t"]
+[ext_resource type="Texture2D" uid="uid://cgajeno6v3mbj" path="res://resources/Particles/water_jet/water_particle_alpha.png" id="4_owba1"]
+[ext_resource type="Texture2D" uid="uid://d17vaba581i6" path="res://resources/Particles/water_jet/water_particle_normal.png" id="5_cxogv"]
+[ext_resource type="WaterDecalTracker" uid="uid://bvelsm8gt2na8" path="res://resources/Config/water_decal_tracker.tres" id="6_p6un2"]
 [ext_resource type="Script" uid="uid://wlx155raqrai" path="res://native/src/scripts/effects/water_decal.rs" id="9_v48py"]
 [ext_resource type="AnimationLibrary" uid="uid://ccdoql0ui30qd" path="res://resources/Animations/canon_water_jet.tres" id="10_u6k6a"]
 [ext_resource type="AnimationNodeStateMachine" uid="uid://bhxg4j3d3uxr0" path="res://resources/Animations/canon_water_jet_animation_states.tres" id="11_sjwuo"]
@@ -16,6 +16,27 @@
 [sub_resource type="QuadMesh" id="QuadMesh_wqt7j"]
 material = ExtResource("3_lyjqx")
 size = Vector2(0.7, 0.7)
+
+[sub_resource type="Curve" id="Curve_xx02s"]
+bake_resolution = 1
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_p6un2"]
+bake_resolution = 1
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_npq4n"]
+bake_resolution = 1
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_eka6e"]
+width = 32
+curve_x = SubResource("Curve_xx02s")
+curve_y = SubResource("Curve_p6un2")
+curve_z = SubResource("Curve_npq4n")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_aet65"]
 size = Vector3(15.1061, 26.5005, 74.4762)
@@ -33,7 +54,7 @@ radius = 2.0
 radius = 4.0
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_wrup6"]
-radius = 7.0
+radius = 5.0
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_xx02s"]
 viewport_path = NodePath("SubViewport")
@@ -52,42 +73,46 @@ transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, 0, 0, 0
 
 [node name="WaterJet" type="GPUParticles3D" parent="." index="1" node_paths=PackedStringArray("impact_area", "decal")]
 transform = Transform3D(-1, 3.48787e-16, -8.74228e-08, 3.48787e-16, 1, -3.48787e-16, 8.74228e-08, -3.48787e-16, -1, -5.06016e-15, 0.266152, 2.15765)
-emitting = false
 amount = 2000
 lifetime = 2.0
-visibility_aabb = AABB(-2.55386, -1.94139, -5.68435, 5.10773, 3.88278, 6.79545)
-draw_order = 3
+fixed_fps = 60
+visibility_aabb = AABB(-1.900372, -21.624529, -70.57771, 3.7839487, 22.33796, 71.26771)
+draw_order = 1
 process_material = ExtResource("2_nsqv1")
 draw_pass_1 = SubResource("QuadMesh_wqt7j")
 script = ExtResource("4_3ki7x")
 impact_cast_paths = Array[NodePath]([NodePath("ParticleImpactCastA"), NodePath("ParticleImpactCastB"), NodePath("ParticleImpactCastC"), NodePath("ParticleImpactCastD"), NodePath("ParticleImpactCastE"), NodePath("ParticleImpactCastF")])
 impact_area = NodePath("ParticleImpactArea")
 decal = NodePath("WaterDecal")
-max_decal_count = 10
+decal_tracker = ExtResource("6_p6un2")
+max_decal_count = 5
 max_delay = 1.8
 
 [node name="WaterDecal" type="Decal" parent="WaterJet" index="0" groups=["wet_surface_decal"]]
 visible = false
+size = Vector3(1, 2, 1)
 texture_albedo = ExtResource("4_owba1")
 texture_normal = ExtResource("5_cxogv")
-texture_orm = ExtResource("6_8vk3t")
+texture_orm = SubResource("CurveXYZTexture_eka6e")
 albedo_mix = 0.0
 upper_fade = 0.8
 lower_fade = 0.8
 script = ExtResource("9_v48py")
+decal_tracker = ExtResource("6_p6un2")
 
 [node name="ParticleImpactArea" type="Area3D" parent="WaterJet" index="1"]
 transform = Transform3D(1, -1.47268e-30, 0, -1.47268e-30, 1, 0, 0, 0, 1, 0, 0, 0)
+monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WaterJet/ParticleImpactArea" index="0"]
 transform = Transform3D(1, -1.47268e-30, -9.67219e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, -0.0208936, -12.7502, -37.4488)
 shape = SubResource("BoxShape3D_aet65")
 
 [node name="ParticleImpactCastA" type="ShapeCast3D" parent="WaterJet" index="2"]
-transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 3.94868e-08, -0.0772753, -0.225838)
+transform = Transform3D(1, -1.4726808e-30, 1.5295143e-10, -1.4982821e-30, 1, 0, -9.672192e-10, 0, 1, 0, -0.077, -0.8)
 enabled = false
 shape = SubResource("SphereShape3D_e4rg2")
-target_position = Vector3(2.08165e-12, 2.08165e-12, -5)
+target_position = Vector3(0, 0, -4.4)
 collision_mask = 3
 
 [node name="ParticleImpactCastB" type="ShapeCast3D" parent="WaterJet" index="3"]

@@ -1,19 +1,18 @@
-use std::cmp::Ordering;
+use std::boxed::Box;
 
 use anyhow::{bail, Result};
-use godot::builtin::{Array, Callable, GString, Variant, Vector3};
+use godot::builtin::{Aabb, Array, Callable, GString, Variant, Vector3};
 use godot::classes::object::ConnectFlags;
 use godot::classes::{
-    Area3D, Decal, GpuParticles3D, Node, Node3D, Object, PhysicsRayQueryParameters3D,
-    RenderingServer, ShapeCast3D,
+    Area3D, Decal, GpuParticles3D, Node, Node3D, PhysicsRayQueryParameters3D, ShapeCast3D,
 };
 use godot::meta::ToGodot;
-use godot::obj::{Gd, Inherits, InstanceId, Singleton as _};
+use godot::obj::{Gd, Inherits};
 use godot::prelude::{GodotClass, NodePath};
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
-use itertools::Itertools;
 
-use crate::ext::node_3d::{Node3DExt, Vector3Ext};
+use crate::ext::node_3d::Node3DExt;
+use crate::resources::WaterDecalTracker;
 use crate::scripts::objects::debugger_3_d::Debugger3D;
 use crate::util::logger;
 use crate::{debug_3d, util};
@@ -21,11 +20,9 @@ use crate::{debug_3d, util};
 #[derive(GodotScript, Debug)]
 #[script(base = GpuParticles3D)]
 struct WaterJet {
-    /// List of [`ShapeCast3D`] nodes to aproximate particle impact.
+    /// List of [`ShapeCast3D`] nodes to approximate particle impact.
     #[export(node_path = ["ShapeCast3D"])]
     pub impact_cast_paths: Array<NodePath>,
-
-    impact_casts: Vec<Gd<ShapeCast3D>>,
 
     #[export]
     pub impact_area: OnEditor<Gd<Area3D>>,
@@ -36,6 +33,9 @@ struct WaterJet {
     #[export]
     pub debugger: Option<RsRef<Debugger3D>>,
 
+    #[export]
+    pub decal_tracker: OnEditor<Gd<WaterDecalTracker>>,
+
     /// Maximum number of decals that will be spawned at an impact point.
     #[export(range(min = 1.0, max = 255.0, step = 1.0))]
     pub max_decal_count: u8,
@@ -43,6 +43,8 @@ struct WaterJet {
     /// Maximum decal spawn delay in seconds.
     #[export(range(min = 0.0, max = 20.0, step = 0.1))]
     pub max_delay: f32,
+
+    impact_casts: Vec<Gd<ShapeCast3D>>,
 
     base: Gd<GpuParticles3D>,
 }
@@ -76,32 +78,21 @@ impl WaterJet {
     fn get_decal_count_at(
         &self,
         point: Vector3,
-        extent: Vector3,
+        size: Vector3,
         max: u8,
-    ) -> Result<Box<[Vector3]>> {
-        let Some(physics_world) = self.base.get_world_3d() else {
-            bail!("Failed to obtain physics world!");
+    ) -> Box<[godot::prelude::Vector3]> {
+        let aabb = Aabb {
+            position: point - (size / 2.0),
+            size,
         };
 
-        let results = RenderingServer::singleton()
-            .instances_cull_aabb_ex(godot::builtin::Aabb {
-                position: point - extent / 2.0,
-                size: extent,
-            })
-            .scenario(physics_world.get_scenario())
-            .done();
-
-        Ok(results
-            .as_slice()
+        self.decal_tracker
+            .bind()
+            .get_decals_at_point(aabb)
             .iter()
-            .filter_map(|object_id| {
-                let obj = Gd::<Object>::from_instance_id(InstanceId::from_i64(*object_id));
-
-                obj.try_cast::<Decal>().ok()
-            })
-            .map(|decal| decal.get_global_position())
             .take(max as usize)
-            .collect())
+            .map(|decal| decal.get_global_position())
+            .collect()
     }
 
     fn raycast_to_surface(&self, origin: Vector3, target: Vector3) -> Result<Option<Intersection>> {
@@ -137,7 +128,6 @@ impl WaterJet {
         }))
     }
 
-    #[expect(clippy::too_many_lines)]
     pub fn _physics_process(&mut self, delta: f64) {
         let active = self.base.is_emitting();
         debug_3d!(self.debugger => active);
@@ -201,199 +191,102 @@ impl WaterJet {
 
                 impact_targets.push(target_node.get_name().arg());
 
-                let point = Intersection {
+                let point = self.align_decal_normal(Intersection {
                     position: shape_cast.get_collision_point(index),
                     normal: shape_cast.get_collision_normal(index),
-                };
+                });
 
                 let impact_distance = self.base.get_global_position().distance_to(point.position);
                 let target_decal_count = self.max_decal_count;
-                let extent = (7.0 / Self::MAX_DISTANCE * impact_distance).clamp(1.0, 7.0);
+                let extent = Self::distance_scale(impact_distance, 1.0, 8.0);
 
-                let decal_scale = extent * 2.0 / 3.0;
+                let decal_scale = extent * 2.0;
 
-                let decals_at_point = match self.get_decal_count_at(
+                let decals_at_point = self.get_decal_count_at(
                     point.position,
-                    Vector3::splat(extent * 2.0),
+                    Vector3::splat(decal_scale),
                     target_decal_count,
-                ) {
-                    Ok(count) => count,
-                    Err(err) => {
-                        logger::error!("{:?}", err.context("Failed to get decals at point!"));
-                        return;
-                    }
-                };
+                );
 
-                let decal_inst = (decals_at_point.len() < target_decal_count as usize).then(|| {
-                    self.spawn_decal(
-                        &decal,
-                        &decals_at_point,
-                        &point,
-                        extent,
-                        decal_scale,
-                        &mut target_node,
-                    )
-                });
+                let mut decal_inst = self
+                    .can_spawn_decal(&point, extent, &decals_at_point)
+                    .then(|| self.spawn_decal(&decal, &point, decal_scale, &mut target_node));
 
-                let impact_delay =
-                    (self.max_delay / Self::MAX_DISTANCE * (impact_distance)).min(self.max_delay);
+                if let Some(inst) = &decal_inst {
+                    self.decal_tracker.bind_mut().insert(inst);
+                }
+
+                let impact_delay = Self::distance_scale(impact_distance, 0.0, self.max_delay);
 
                 let mut timer =
                     util::timer(&mut self.base.get_tree().unwrap(), impact_delay.into());
-                let id = decal_inst.as_ref().map(Gd::instance_id);
-                let target_id = target_node.instance_id();
-
-                timer.connect_flags(
-                    "timeout",
-                    &Callable::from_fn("timeout", move |_| {
-                        let Ok(target): Result<Gd<Node3D>, _> = Gd::try_from_instance_id(target_id)
-                            .map_err(|err| {
-                                logger::error!("Failed to obtain target node ref: {}", err);
-                            })
-                        else {
-                            return Variant::nil();
-                        };
-
-                        if let Some(id) = id {
-                            let Ok(decal): Result<Gd<Decal>, _> = Gd::try_from_instance_id(id)
-                                .map_err(|err| {
-                                    logger::error!("Failed to obtain decal node ref: {}", err);
-                                })
-                            else {
-                                return Variant::nil();
-                            };
-
-                            Self::show_decal(decal);
-                        }
-
-                        Self::propagate_impact(target, delta);
-
-                        Variant::nil()
-                    }),
-                    ConnectFlags::ONE_SHOT,
-                );
 
                 #[cfg(debug_assertions)]
                 {
                     decal_spawned = decal_inst.is_some();
                 }
-                break;
+
+                timer.connect_flags(
+                    "timeout",
+                    &Callable::from_fn("timeout", move |_| {
+                        if let Some(decal) = &mut decal_inst {
+                            Self::show_decal(decal);
+                        }
+
+                        Self::propagate_impact(&mut target_node, delta);
+
+                        Variant::nil()
+                    }),
+                    ConnectFlags::ONE_SHOT,
+                );
             }
+
+            break;
         }
 
         debug_3d!(self.debugger => shape_cast_name, impacting, decal_spawned);
     }
 
-    fn vector_local_component(vector: Vector3, axis: Vector3, normal: Vector3) -> Vector3 {
-        axis.align_up(normal) * vector
+    fn distance_scale(distance: f32, min: f32, max: f32) -> f32 {
+        (max / Self::MAX_DISTANCE * distance).clamp(min, max)
     }
 
-    fn shift_new_point(
-        origin: Vector3,
-        bound: f32,
-        radius: f32,
-        normal: Vector3,
-        existing_points: &[Vector3],
-        new_point: Vector3,
-    ) -> Vector3 {
-        let lower_bound_x = {
-            let low_point = origin + Vector3::new(-bound, 0.0, 0.0).align_up(normal);
-            let vector =
-                Self::vector_local_component(new_point, Vector3::RIGHT, normal) - low_point;
+    fn can_spawn_decal(
+        &self,
+        point: &Intersection,
+        extent: f32,
+        decals_at_point: &[Vector3],
+    ) -> bool {
+        if decals_at_point.len() > self.max_decal_count as usize {
+            return false;
+        }
 
-            vector.normalized() * (radius / vector.length_squared())
+        let can_spawn = decals_at_point
+            .iter()
+            .all(|decal| decal.distance_to(point.position) > extent);
+
+        can_spawn
+    }
+
+    fn align_decal_normal(&self, point: Intersection) -> Intersection {
+        let surface_intersect =
+            self.raycast_to_surface(point.position, point.position + point.normal);
+
+        let surface_intersect = match surface_intersect {
+            Ok(value) => value,
+            Err(err) => {
+                logger::error!("{:?}", err.context("Failed to get surface intersection!"));
+                return point;
+            }
         };
 
-        let lower_bound_z = {
-            let low_point = origin + Vector3::new(0.0, 0.0, -bound).align_up(normal);
-            let vector = Self::vector_local_component(new_point, Vector3::BACK, normal) - low_point;
-
-            vector.normalized() * (radius / vector.length_squared())
-        };
-
-        let upper_bound_x = {
-            let high_point = origin + Vector3::new(bound, 0.0, 0.0).align_up(normal);
-            let vector =
-                Self::vector_local_component(new_point, Vector3::RIGHT, normal) - high_point;
-
-            vector.normalized() * (radius / vector.length_squared())
-        };
-
-        let upper_bound_z = {
-            let high_point = origin + Vector3::new(0.0, 0.0, bound).align_up(normal);
-            let vector =
-                Self::vector_local_component(new_point, Vector3::RIGHT, normal) - high_point;
-
-            vector.normalized() * (radius / vector.length_squared())
-        };
-
-        let (positive_push_vectors, negative_push_vectors): (Vec<Vector3>, Vec<Vector3>) =
-            existing_points
-                .iter()
-                .map(|point| {
-                    let vector = new_point - *point;
-                    let unit_vector = vector.normalized();
-                    let length = radius / vector.length_squared();
-                    unit_vector * length
-                })
-                .chain([lower_bound_x, lower_bound_z, upper_bound_x, upper_bound_z])
-                .map(|vector| {
-                    (
-                        Vector3::new(vector.x.max(0.0), vector.y.max(0.0), vector.z.max(0.0)),
-                        Vector3::new(vector.x.min(0.0), vector.y.min(0.0), vector.z.min(0.0)),
-                    )
-                })
-                .unzip();
-
-        let (negative_x, negative_y, negative_z): (Vec<_>, Vec<_>, Vec<_>) = negative_push_vectors
-            .into_iter()
-            .map(|vector| (vector.x, vector.y, vector.z))
-            .multiunzip();
-
-        let negative_push_vector = Vector3::new(
-            negative_x
-                .into_iter()
-                .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Greater))
-                .unwrap_or_default(),
-            negative_y
-                .into_iter()
-                .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Greater))
-                .unwrap_or_default(),
-            negative_z
-                .into_iter()
-                .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Greater))
-                .unwrap_or_default(),
-        );
-
-        let (positive_x, positive_y, positive_z): (Vec<_>, Vec<_>, Vec<_>) = positive_push_vectors
-            .into_iter()
-            .map(|vector| (vector.x, vector.y, vector.z))
-            .multiunzip();
-
-        let positive_push_vector = Vector3::new(
-            positive_x
-                .into_iter()
-                .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Greater))
-                .unwrap_or_default(),
-            positive_y
-                .into_iter()
-                .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Greater))
-                .unwrap_or_default(),
-            positive_z
-                .into_iter()
-                .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Greater))
-                .unwrap_or_default(),
-        );
-
-        new_point + positive_push_vector + negative_push_vector
+        surface_intersect.unwrap_or(point)
     }
 
     fn spawn_decal<T>(
         &self,
         template: &Gd<Decal>,
-        decals_at_point: &[Vector3],
         point: &Intersection,
-        extent: f32,
         decal_scale: f32,
         target_node: &mut Gd<T>,
     ) -> Gd<Decal>
@@ -407,31 +300,8 @@ impl WaterJet {
             .expect("Failed to duplicate decal node!")
             .cast();
 
-        let offset = if decals_at_point.is_empty() {
-            let offset = Vector3::new(
-                rand::random_range(-extent..extent) as f32,
-                0.0,
-                rand::random_range(-extent..extent) as f32,
-            )
-            .align_up(point.normal);
-
-            let new_point = point.position + offset;
-
-            let shifted = Self::shift_new_point(
-                point.position,
-                decal_scale,
-                extent,
-                point.normal,
-                decals_at_point,
-                new_point,
-            );
-
-            shifted - point.position
-        } else {
-            Vector3::ZERO
-        };
-
-        let decal_size = decal_inst.get_size() * Vector3::new(decal_scale, 1.0, decal_scale);
+        let decal_size = Vector3::new(decal_scale, decal_inst.get_size().y, decal_scale);
+        logger::debug!("setting decal size: {decal_size}");
         let decal_normal = point.normal;
 
         debug_3d!(debugger => decal_normal);
@@ -447,7 +317,6 @@ impl WaterJet {
             decal_normal,
             rand::random_range::<f32, _>(-90.0..90.0).to_radians(),
         );
-        decal_inst.translate(offset);
 
         if let Some(scene_root) = target_node
             .upcast_ref()
@@ -459,32 +328,14 @@ impl WaterJet {
             logger::error!("Failed to access scene root! Unable to set decal owner.");
         }
 
-        let surface_intersect =
-            self.raycast_to_surface(point.position, point.position + point.normal);
-
-        let surface_intersect = match surface_intersect {
-            Ok(value) => value,
-            Err(err) => {
-                logger::error!("{:?}", err.context("Failed to get surface intersection!"));
-                return decal_inst;
-            }
-        };
-
-        if let Some(surface_intersect) = surface_intersect {
-            let decal_normal = surface_intersect.normal;
-            decal_inst.set_global_position(surface_intersect.position);
-            decal_inst.align_up(decal_normal);
-            debug_3d!(debugger => decal_normal);
-        }
-
         decal_inst
     }
 
-    fn show_decal(mut decal_inst: Gd<Decal>) {
+    fn show_decal(decal_inst: &mut Gd<Decal>) {
         decal_inst.set_visible(true);
     }
 
-    fn propagate_impact(mut target: Gd<Node3D>, delta: f64) {
+    fn propagate_impact(target: &mut Gd<Node3D>, delta: f64) {
         if !target.has_method("impact_water") {
             return;
         }

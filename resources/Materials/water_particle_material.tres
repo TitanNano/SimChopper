@@ -1,0 +1,21 @@
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://cdtr7t6dqskao"]
+
+[ext_resource type="Texture2D" uid="uid://cgajeno6v3mbj" path="res://resources/Particles/water_jet/water_particle_alpha.png" id="1_86upf"]
+[ext_resource type="Texture2D" uid="uid://0h2dk00tq7t" path="res://resources/Particles/water_jet/normal_map.res" id="2_8s6us"]
+
+[resource]
+transparency = 1
+disable_fog = true
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.66389686, 0.7285601, 0.8597938, 1)
+albedo_texture = ExtResource("1_86upf")
+metallic_specular = 0.0
+roughness = 0.5
+normal_enabled = true
+normal_texture = ExtResource("2_8s6us")
+backlight_enabled = true
+backlight = Color(0.46034712, 0.46034718, 0.460347, 1)
+billboard_mode = 1
+billboard_keep_scale = true
+proximity_fade_enabled = true
+proximity_fade_distance = 0.3

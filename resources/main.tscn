@@ -90,8 +90,6 @@ script = ExtResource("12_88vys")
 sun = NodePath("Sun")
 moon = NodePath("Moon")
 day_length = 10
-sky_min_brightness = 20.0
-sky_max_brightness = 6000.0
 voxel_gi_data = ExtResource("9_nkrdn")
 
 [node name="Sun" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/World/Environment/SolarSetup"]

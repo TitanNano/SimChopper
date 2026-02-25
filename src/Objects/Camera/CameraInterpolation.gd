@@ -64,7 +64,12 @@ func _ready():
 
 
 func _physics_process(_delta: float):
-	if not self.active or Engine.is_editor_hint():
+	if Engine.is_editor_hint():
+		if self.active:
+			self.camera.global_transform = self.global_transform
+		return
+	
+	if not self.active:
 		return
 	
 	var target := self.camera

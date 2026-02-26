@@ -119,7 +119,7 @@ directional_shadow_fade_start = 0.6
 directional_shadow_max_distance = 200.0
 
 [node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("solar_setup")]
-transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, -45.4393, 5.66891, 25.269)
+transform = Transform3D(1, 0, 0, 0, 0.8910063, 0.45399037, 0, -0.45399037, 0.8910063, -45.4393, 4.499999, 25.9155)
 attributes = ExtResource("7_yho3v")
 doppler_tracking = 2
 current = true
@@ -134,7 +134,7 @@ child_debug_camera = NodePath("DebugCameraAnchor")
 
 [node name="MainCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/World/Schweizer_300"]
 process_mode = 3
-transform = Transform3D(1, 0, 0, 0, 0.847724, 0.530437, 0, -0.530437, 0.847724, 0, 5.669, 7.354)
+transform = Transform3D(1, 0, 0, 0, 0.8910063, 0.45399037, 0, -0.45399037, 0.8910063, 0, 4.5, 8)
 script = ExtResource("10")
 snap = true
 track_y_axis = true

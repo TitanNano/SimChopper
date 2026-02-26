@@ -53,6 +53,7 @@ transparency = 1
 blend_mode = 1
 shading_mode = 0
 disable_ambient_light = true
+disable_fog = true
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 albedo_texture = ExtResource("5_h5f1y")
@@ -170,7 +171,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.1948, 0)
 [node name="FireLightSource" type="OmniLight3D" parent="."]
 light_intensity_lumens = 1300.0
 light_temperature = 1850.0
-light_volumetric_fog_energy = 0.0
 light_bake_mode = 1
 omni_range = 100.0
 

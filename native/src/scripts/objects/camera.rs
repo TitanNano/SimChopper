@@ -1,7 +1,7 @@
 use std::f32;
 
 use godot::builtin::math::{ApproxEq, FloatExt};
-use godot::classes::{Camera3D, CameraAttributesPhysical};
+use godot::classes::{Camera3D, CameraAttributesPhysical, Node3D};
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
 use itertools::Itertools;
@@ -14,6 +14,9 @@ use crate::util::logger;
 struct Camera {
     #[export]
     pub solar_setup: OnEditor<RsRef<SolarSetup>>,
+
+    #[export]
+    pub focus_target: Option<Gd<Node3D>>,
 
     base: Gd<Camera3D>,
 }
@@ -122,6 +125,28 @@ impl Camera {
         };
 
         let brightness = self.solar_setup.environment_brightness();
+
+        if let Some(target) = self.focus_target.as_ref() {
+            let distance = target
+                .get_global_position()
+                .distance_to(self.base.get_global_position());
+
+            let attributes = self
+                .base
+                .get_attributes()
+                .unwrap()
+                .cast::<CameraAttributesPhysical>();
+
+            if !attributes.get_focus_distance().approx_eq(&distance) {
+                logger::info!("setting focus distance: {}", distance);
+
+                self.base
+                    .get_attributes()
+                    .unwrap()
+                    .cast::<CameraAttributesPhysical>()
+                    .set_focus_distance(distance);
+            }
+        }
 
         let (next_index, next) = Self::FSTOPS
             .iter()

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c14rvtcmhsbp0"]
 
-[node name="SpawnHost" type="Node3D"]
+[node name="SpawnHost" type="Node3D" unique_id=1371529656]
 
-[node name="Spawn" type="Marker3D" parent="." groups=["spawn"]]
+[node name="Spawn" type="Marker3D" parent="." unique_id=1726737896 groups=["spawn"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.896, 0.01, 23.412)

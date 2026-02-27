@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://blyermwgncstx"]
+[gd_scene format=3 uid="uid://blyermwgncstx"]
 
 [ext_resource type="Script" uid="uid://bc552pej2vb8b" path="res://native/src/scripts/spawner/car_spawner.rs" id="1_c5pws"]
 
@@ -10,11 +10,11 @@ height = 200.0
 [sub_resource type="StandardMaterial3D" id="1"]
 albedo_color = Color(1, 0, 0, 1)
 
-[node name="CarSpawner" type="Marker3D"]
+[node name="CarSpawner" type="Marker3D" unique_id=759203626]
 script = ExtResource("1_c5pws")
 road_network_path = null
 
-[node name="CSGMesh3D" type="CSGMesh3D" parent="."]
+[node name="CSGMesh3D" type="CSGMesh3D" parent="." unique_id=371404746]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, 0)
 mesh = SubResource("CylinderMesh_falwk")
 material = SubResource("1")

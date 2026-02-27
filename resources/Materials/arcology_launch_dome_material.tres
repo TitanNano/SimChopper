@@ -2,7 +2,9 @@
 
 [resource]
 resource_name = "matcolour-19"
-transparency = 4
-albedo_color = Color(1, 1, 1, 0.0588235)
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.11764706)
+metallic = 1.0
+metallic_specular = 1.0
 roughness = 0.0
 refraction_scale = 2.08167e-17

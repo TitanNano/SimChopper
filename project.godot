@@ -13,7 +13,7 @@ config_version=5
 config/name="Sim Chopper"
 config/version="0.5.0"
 run/main_scene="res://resources/main.tscn"
-config/features=PackedStringArray("4.5")
+config/features=PackedStringArray("4.6")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 
 [debug]
@@ -43,7 +43,7 @@ window/size/mode.editor=0
 
 [editor]
 
-required_version="4.5.1"
+required_version="4.6.1"
 baking/ambient_occlusion_model_base_path="res://resources/Meshes"
 baking/ambient_occlusion_textures="res://resources/Textures/ambient_occlusion"
 baking/ambient_occlusion_models=PackedStringArray("res://resources/Meshes/Buildings", "res://resources/Meshes/Buildings/Abandoned", "res://resources/Meshes/Buildings/Airport", "res://resources/Meshes/Buildings/Apartments", "res://resources/Meshes/Buildings/Arcology", "res://resources/Meshes/Buildings/Chemical", "res://resources/Meshes/Buildings/Condominiums", "res://resources/Meshes/Buildings/Construction", "res://resources/Meshes/Buildings/Factory", "res://resources/Meshes/Buildings/Hangar", "res://resources/Meshes/Buildings/Home", "res://resources/Meshes/Buildings/Offices", "res://resources/Meshes/Buildings/Powerplant", "res://resources/Meshes/Buildings/Station", "res://resources/Meshes/Buildings/Warehouse")
@@ -174,7 +174,7 @@ anti_aliasing/screen_space_roughness_limiter/enabled=false
 scaling_3d/fsr_sharpness=0.2
 textures/decals/filter=5
 textures/light_projectors/filter=5
-environment/screen_space_reflection/roughness_quality=2
+environment/screen_space_reflection/half_size=false
 environment/subsurface_scattering/subsurface_scattering_quality=2
 global_illumination/sdfgi/probe_ray_count=2
 global_illumination/sdfgi/frames_to_converge=4
@@ -185,6 +185,7 @@ limits/cluster_builder/max_clustered_elements=2048.0
 occlusion_culling/use_occlusion_culling=true
 environment/defaults/default_environment="res://resources/Environments/default_env.tres"
 shading/hdr_2d=false
+environment/screen_space_reflection/roughness_quality=2
 
 [shader_globals]
 

@@ -87,7 +87,7 @@ jobs:
     strategy:
       matrix:
         profile: ['macOS', 'Windows', 'Linux']
-        version: ['4.5']
+        version: ['4.6']
         include:
           - profile: 'macOS'
             platform: darwin
@@ -238,7 +238,12 @@ jobs:
         run: |
           $env.PATH = $env.PATH | append ("./.godot_bin" | path expand)
           mkdir "${{ env.EXPORT_DIR }}"
-          godot --headless --verbose --export-debug ${{ env.EXPORT_ARGS }}
+          if ("${{ matrix.os }}" | str starts-with "ubuntu") {
+            sudo apt install xwayland-run mesa-vulkan-drivers
+            wlheadless-run -- godot --verbose --export-debug ${{ env.EXPORT_ARGS }}
+          } else {
+            godot --verbose --export-debug ${{ env.EXPORT_ARGS }}
+          }
           if (ls -a "${{ env.EXPORT_DIR }}" | length) < 1 { exit 1 }
       - name: export-release
         shell: nu {0}

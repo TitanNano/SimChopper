@@ -1,4 +1,4 @@
-[gd_resource type="HelicopterUpgrade" load_steps=2 format=3 uid="uid://c02c65wkdq1r5"]
+[gd_resource type="HelicopterUpgrade" format=3 uid="uid://c02c65wkdq1r5"]
 
 [ext_resource type="PackedScene" uid="uid://c0pat4v54oe86" path="res://resources/Objects/Helis/Upgrades/canon.tscn" id="1_p7slu"]
 

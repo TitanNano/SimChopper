@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://bmp5rvu5slnnt"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://bmp5rvu5slnnt"]
 
 [ext_resource type="Shader" uid="uid://b7iel7s3r8acu" path="res://resources/Shaders/ocean_shader.gdshader" id="1_1ltun"]
 
@@ -7,3 +7,4 @@ render_priority = 0
 shader = ExtResource("1_1ltun")
 shader_parameter/Normal_Depth = 1.0
 shader_parameter/wave_height = 5.0
+shader_parameter/invisible = false

@@ -1,4 +1,4 @@
-[gd_resource type="AnimationLibrary" load_steps=12 format=3 uid="uid://uec74t4jqdxi"]
+[gd_resource type="AnimationLibrary" format=3 uid="uid://uec74t4jqdxi"]
 
 [ext_resource type="AudioStream" uid="uid://dhv3rlovpbqai" path="res://resources/Sounds/Helicopter/loop0.wav" id="1_vcbvg"]
 [ext_resource type="AudioStream" uid="uid://cn3jhpp5xy4n8" path="res://resources/Sounds/Helicopter/loop2.wav" id="2_cuv6p"]

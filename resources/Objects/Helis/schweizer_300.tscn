@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cmv7rt4gqew38"]
+[gd_scene format=3 uid="uid://cmv7rt4gqew38"]
 
 [ext_resource type="PackedScene" uid="uid://dl34exjsm3sq4" path="res://resources/Objects/Helis/Helicopter.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://cfek2a6eg86vo" path="res://resources/Meshes/Helis/schweizer_300/main.gltf" id="2"]
@@ -53,43 +53,43 @@ height = 4.45619
 height = 0.08
 radius = 4.35
 
-[node name="Helicopter" node_paths=PackedStringArray("child_body_mesh", "child_rotor") instance=ExtResource("1")]
+[node name="Helicopter" unique_id=642778457 node_paths=PackedStringArray("child_body_mesh", "child_rotor") instance=ExtResource("1")]
 child_body_mesh = NodePath("main/Maxis-3d2-mesh-106")
 child_rotor = NodePath("rotor")
 
-[node name="main" parent="." index="3" instance=ExtResource("2")]
+[node name="main" parent="." index="3" unique_id=592311694 instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.00369608)
 
-[node name="Maxis-3d2-mesh-106" parent="main" index="0"]
+[node name="Maxis-3d2-mesh-106" parent="main" index="0" unique_id=527432398]
 surface_material_override/0 = SubResource("StandardMaterial3D_5whq0")
 surface_material_override/1 = SubResource("StandardMaterial3D_tyxvo")
 surface_material_override/2 = SubResource("StandardMaterial3D_kuryk")
 
-[node name="rotor" parent="." index="4" instance=ExtResource("3")]
+[node name="rotor" parent="." index="4" unique_id=960416041 instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.04184)
 script = ExtResource("7")
 power = 0.0
 
-[node name="Maxis-3d2-mesh-108-rot-schwz" parent="rotor" index="0"]
+[node name="Maxis-3d2-mesh-108-rot-schwz" parent="rotor" index="0" unique_id=323856639]
 transform = Transform3D(0.999573, 0, 0, 0, -4.36927e-08, -1, 0, 0.999573, -4.37114e-08, 0, 0, 0)
 surface_material_override/0 = ExtResource("6_y4h4o")
 
-[node name="tail_rotor" parent="." index="5" instance=ExtResource("4")]
+[node name="tail_rotor" parent="." index="5" unique_id=739820200 instance=ExtResource("4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0980453, 1.52714, 4.24386)
 
-[node name="BodyShape" type="CollisionShape3D" parent="." index="6"]
+[node name="BodyShape" type="CollisionShape3D" parent="." index="6" unique_id=576852885]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.00923181, 1.07085, -0.601074)
 shape = SubResource("22")
 
-[node name="StandShape" type="CollisionShape3D" parent="." index="7"]
+[node name="StandShape" type="CollisionShape3D" parent="." index="7" unique_id=1809147086]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, -0.65716)
 shape = SubResource("17")
 
-[node name="TailShape" type="CollisionShape3D" parent="." index="8"]
+[node name="TailShape" type="CollisionShape3D" parent="." index="8" unique_id=21229919]
 transform = Transform3D(1, 0, 0, 0, -0.0842326, 0.996446, 0, -0.996446, -0.0842326, 0, 1.38301, 2.56298)
 shape = SubResource("18")
 
-[node name="RotorShape" type="CollisionShape3D" parent="." index="9"]
+[node name="RotorShape" type="CollisionShape3D" parent="." index="9" unique_id=710629296]
 process_mode = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.30173, -0.010928)
 shape = SubResource("19")

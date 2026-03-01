@@ -1,7 +1,7 @@
 // Inspired by: https://developer.nvidia.com/gpugems/gpugems2/part-ii-shading-lighting-and-shadows/chapter-19-generic-refraction-simulation
 
 shader_type spatial;
-render_mode cull_back, specular_schlick_ggx;
+render_mode cull_back, specular_schlick_ggx, depth_prepass_alpha;
 
 // Varyings
 varying vec2 vary_world_uv;
@@ -91,7 +91,7 @@ void fragment() {
 	NORMAL_MAP = normal;
 	NORMAL_MAP_DEPTH = Normal_Depth;
 	ROUGHNESS = 0.2;
-	SPECULAR = 0.2;
+	SPECULAR = 0.5;
 	
 
 	float n_dot_l = max(dot(VIEW, NORMAL), 0);

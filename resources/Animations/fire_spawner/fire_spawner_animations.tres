@@ -1,4 +1,4 @@
-[gd_resource type="AnimationLibrary" load_steps=6 format=3 uid="uid://dtoyo725l55bb"]
+[gd_resource type="AnimationLibrary" format=3 uid="uid://dtoyo725l55bb"]
 
 [ext_resource type="AudioStream" uid="uid://dpxm4j5adykww" path="res://resources/Sounds/Events/burning_building.ogg" id="1_x5rap"]
 [ext_resource type="AudioStream" uid="uid://dqso6fkx02jcr" path="res://resources/Sounds/Events/fire_alarm.ogg" id="2_xra2c"]

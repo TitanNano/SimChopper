@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cvh54xiw8586b"]
+[gd_scene format=3 uid="uid://cvh54xiw8586b"]
 
 [ext_resource type="Script" uid="uid://co6x253l6yxq4" path="res://src/HUD/HUDController.gd" id="1"]
 [ext_resource type="Script" uid="uid://cutba4t77pmav" path="res://src/Objects/World/World.gd" id="3"]
@@ -21,7 +21,7 @@
 [ext_resource type="RoadNavigationConfig" uid="uid://dvccb8vdrejqp" path="res://resources/Config/road_navigation.tres" id="16_eq860"]
 [ext_resource type="Script" uid="uid://djjvfkec3e3ph" path="res://native/src/scripts/world/gi_probes.rs" id="19_e3ctf"]
 
-[node name="HUDController" type="Control"]
+[node name="HUDController" type="Control" unique_id=748958734]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,18 +32,18 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1")
 
-[node name="LoadingScreen" type="Control" parent="."]
+[node name="LoadingScreen" type="Control" parent="." unique_id=156033294]
 anchors_preset = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("4")
 
-[node name="Panel" type="Panel" parent="LoadingScreen"]
+[node name="Panel" type="Panel" parent="LoadingScreen" unique_id=1226941648]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="ProgressBar" type="ProgressBar" parent="LoadingScreen"]
+[node name="ProgressBar" type="ProgressBar" parent="LoadingScreen" unique_id=1471680305]
 layout_mode = 0
 anchor_top = 0.5
 anchor_right = 1.0
@@ -54,14 +54,14 @@ offset_right = -20.0
 offset_bottom = 23.0
 step = 1.0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1582860659]
 visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" node_paths=PackedStringArray("current_camera_controller")]
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=439495612 node_paths=PackedStringArray("current_camera_controller")]
 handle_input_locally = false
 use_occlusion_culling = true
 scaling_3d_mode = 1
@@ -73,17 +73,17 @@ render_target_update_mode = 0
 script = ExtResource("3_2c332")
 current_camera_controller = NodePath("World/Schweizer_300/MainCameraAnchor")
 
-[node name="World" type="Node3D" parent="SubViewportContainer/SubViewport" node_paths=PackedStringArray("gi_probes")]
+[node name="World" type="Node3D" parent="SubViewportContainer/SubViewport" unique_id=45608285 node_paths=PackedStringArray("gi_probes")]
 process_mode = 4
 script = ExtResource("3")
 world_constants = ExtResource("15")
 gi_probes = NodePath("GiProbes")
 
-[node name="Environment" type="WorldEnvironment" parent="SubViewportContainer/SubViewport/World"]
+[node name="Environment" type="WorldEnvironment" parent="SubViewportContainer/SubViewport/World" unique_id=707586411]
 environment = ExtResource("8")
 camera_attributes = ExtResource("7_yho3v")
 
-[node name="SolarSetup" type="Node3D" parent="SubViewportContainer/SubViewport/World/Environment" node_paths=PackedStringArray("sun", "moon")]
+[node name="SolarSetup" type="Node3D" parent="SubViewportContainer/SubViewport/World/Environment" unique_id=850312298 node_paths=PackedStringArray("sun", "moon")]
 transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0)
 rotation_order = 0
 script = ExtResource("12_88vys")
@@ -92,7 +92,7 @@ moon = NodePath("Moon")
 day_length = 10
 voxel_gi_data = ExtResource("9_nkrdn")
 
-[node name="Sun" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/World/Environment/SolarSetup"]
+[node name="Sun" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/World/Environment/SolarSetup" unique_id=898696932]
 transform = Transform3D(1, -3.48787e-16, 3.48787e-16, -3.48787e-16, -1, 8.74228e-08, 3.48787e-16, -8.74228e-08, -1, 2.08165e-12, -5.50338e-09, 0.1)
 rotation_order = 0
 light_angular_distance = 0.5
@@ -104,7 +104,7 @@ directional_shadow_blend_splits = true
 directional_shadow_max_distance = 300.0
 directional_shadow_pancake_size = 40.0
 
-[node name="Moon" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/World/Environment/SolarSetup"]
+[node name="Moon" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/World/Environment/SolarSetup" unique_id=2132439267]
 transform = Transform3D(1, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -3.48787e-16, -3.48787e-16, 3.48787e-16, 1, 2.08165e-12, 1.45043e-10, -0.1)
 rotation_order = 0
 light_intensity_lux = 1.5
@@ -118,7 +118,7 @@ directional_shadow_blend_splits = true
 directional_shadow_fade_start = 0.6
 directional_shadow_max_distance = 200.0
 
-[node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("solar_setup")]
+[node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport/World" unique_id=2064854527 node_paths=PackedStringArray("solar_setup")]
 transform = Transform3D(1, 0, 0, 0, 0.8910063, 0.45399037, 0, -0.45399037, 0.8910063, -45.4393, 4.499999, 25.9155)
 attributes = ExtResource("7_yho3v")
 doppler_tracking = 2
@@ -126,13 +126,13 @@ current = true
 script = ExtResource("8_qw8ew")
 solar_setup = NodePath("../Environment/SolarSetup")
 
-[node name="Schweizer_300" parent="SubViewportContainer/SubViewport/World" node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
+[node name="Schweizer_300" parent="SubViewportContainer/SubViewport/World" unique_id=1998635440 node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)
 child_camera = NodePath("MainCameraAnchor")
 child_main_camera = NodePath("MainCameraAnchor")
 child_debug_camera = NodePath("DebugCameraAnchor")
 
-[node name="MainCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/World/Schweizer_300"]
+[node name="MainCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/World/Schweizer_300" unique_id=1167802789]
 process_mode = 3
 transform = Transform3D(1, 0, 0, 0, 0.8910063, 0.45399037, 0, -0.45399037, 0.8910063, 0, 4.5, 8)
 script = ExtResource("10")
@@ -140,34 +140,34 @@ snap = true
 track_y_axis = true
 active = true
 
-[node name="DebugCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/World/Schweizer_300"]
+[node name="DebugCameraAnchor" type="Marker3D" parent="SubViewportContainer/SubViewport/World/Schweizer_300" unique_id=191358236]
 process_mode = 3
 transform = Transform3D(-0.0697565, 0.65051, -0.756287, 2.64427e-16, 0.758134, 0.652098, 0.997564, 0.0454881, -0.0528848, -34.7616, 32.649, -0.770037)
 script = ExtResource("10")
 
-[node name="Terrain" type="Node3D" parent="SubViewportContainer/SubViewport/World"]
+[node name="Terrain" type="Node3D" parent="SubViewportContainer/SubViewport/World" unique_id=1963246833]
 script = ExtResource("11")
 terrain_material = ExtResource("12")
 ocean_material = ExtResource("13")
 world_constants = ExtResource("15")
 
-[node name="Networks" type="Node" parent="SubViewportContainer/SubViewport/World"]
+[node name="Networks" type="Node" parent="SubViewportContainer/SubViewport/World" unique_id=751241556]
 script = ExtResource("14")
 world_constants = ExtResource("15")
 road_navigation = ExtResource("16_eq860")
 
-[node name="Powerlines" type="Node" parent="SubViewportContainer/SubViewport/World/Networks"]
+[node name="Powerlines" type="Node" parent="SubViewportContainer/SubViewport/World/Networks" unique_id=1471096915]
 
-[node name="Road" type="Node3D" parent="SubViewportContainer/SubViewport/World/Networks" groups=["road-network"]]
+[node name="Road" type="Node3D" parent="SubViewportContainer/SubViewport/World/Networks" unique_id=392084148 groups=["road-network"]]
 
-[node name="Buildings" type="Node" parent="SubViewportContainer/SubViewport/World"]
+[node name="Buildings" type="Node" parent="SubViewportContainer/SubViewport/World" unique_id=730073247]
 script = ExtResource("15_23gpq")
 world_constants = ExtResource("15")
 
-[node name="Backdrop" type="Node" parent="SubViewportContainer/SubViewport/World"]
+[node name="Backdrop" type="Node" parent="SubViewportContainer/SubViewport/World" unique_id=1333752962]
 script = ExtResource("6")
 
-[node name="GiProbes" type="Node3D" parent="SubViewportContainer/SubViewport/World"]
+[node name="GiProbes" type="Node3D" parent="SubViewportContainer/SubViewport/World" unique_id=67311610]
 script = ExtResource("19_e3ctf")
 world_constants = ExtResource("15")
 camera_attributes = ExtResource("7_yho3v")

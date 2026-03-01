@@ -1,4 +1,4 @@
-[gd_resource type="AnimationNodeStateMachine" load_steps=12 format=3 uid="uid://xbcrg5mghpup"]
+[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://xbcrg5mghpup"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_cnoa4"]
 animation = &"rotor_off"

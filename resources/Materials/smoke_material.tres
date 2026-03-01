@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://dbuspcbhwqr7g"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dbuspcbhwqr7g"]
 
 [ext_resource type="Shader" uid="uid://dwmxlfa00u2l7" path="res://resources/Shaders/smoke_shader.tres" id="1_hb22f"]
 

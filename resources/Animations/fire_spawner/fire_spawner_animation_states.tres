@@ -1,4 +1,4 @@
-[gd_resource type="AnimationNodeStateMachine" load_steps=6 format=3 uid="uid://dfjcsgxlys31s"]
+[gd_resource type="AnimationNodeStateMachine" format=3 uid="uid://dfjcsgxlys31s"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_lwmqh"]
 animation = &"burning"

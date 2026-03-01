@@ -1,9 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://c36tta374cm54"]
+[gd_scene format=3 uid="uid://c36tta374cm54"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lk3qo"]
 bg_color = Color(1, 0.258824, 0.956863, 0.298039)
 
-[node name="DebugViewControl" type="PanelContainer"]
+[node name="DebugViewControl" type="PanelContainer" unique_id=1691348408]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -12,18 +12,18 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="Panel" parent="." unique_id=553639481]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_lk3qo")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=951455581]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 19
 
-[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer"]
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer" unique_id=304679375]
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 25
 text = "Title

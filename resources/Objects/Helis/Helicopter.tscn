@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dl34exjsm3sq4"]
+[gd_scene format=3 uid="uid://dl34exjsm3sq4"]
 
 [ext_resource type="HelicopterUpgrade" uid="uid://c02c65wkdq1r5" path="res://resources/Items/water_canon_helicopter_upgrade.tres" id="2_0cfwx"]
 [ext_resource type="Material" uid="uid://cjoloelf8ku4k" path="res://resources/Materials/dust_material.tres" id="2_8yiqd"]
@@ -15,7 +15,7 @@ bounce = 0.7
 [sub_resource type="QuadMesh" id="QuadMesh_e0n42"]
 material = ExtResource("2_8yiqd")
 
-[node name="Helicopter" type="RigidBody3D" node_paths=PackedStringArray("child_engine_sound_tree", "child_dust_particles", "child_upgrade_mount")]
+[node name="Helicopter" type="RigidBody3D" unique_id=103877958 node_paths=PackedStringArray("child_engine_sound_tree", "child_dust_particles", "child_upgrade_mount")]
 mass = 929.8
 physics_material_override = SubResource("20")
 sleeping = true
@@ -28,12 +28,12 @@ child_upgrade_mount = NodePath("UpgradeMount")
 upgrades_available = Array[HelicopterUpgrade]([ExtResource("2_0cfwx")])
 upgrades_owned = Array[HelicopterUpgrade]([ExtResource("2_0cfwx")])
 
-[node name="RayCast3D" type="RayCast3D" parent="."]
+[node name="RayCast3D" type="RayCast3D" parent="." unique_id=2112091407]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.61416)
 debug_shape_custom_color = Color(0.721569, 0.145098, 0.145098, 1)
 debug_shape_thickness = 5
 
-[node name="Dust" type="GPUParticles3D" parent="."]
+[node name="Dust" type="GPUParticles3D" parent="." unique_id=76779407]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.691696)
 cast_shadow = 0
 amount = 50
@@ -44,7 +44,7 @@ draw_pass_1 = SubResource("QuadMesh_e0n42")
 script = ExtResource("2_ocmjg")
 strength = 0.1
 
-[node name="RotorAudioTree" type="AnimationTree" parent="."]
+[node name="RotorAudioTree" type="AnimationTree" parent="." unique_id=372229881]
 root_node = NodePath(".")
 tree_root = ExtResource("4_8iee2")
 advance_expression_base_node = NodePath("")
@@ -54,15 +54,13 @@ parameters/conditions/lift_off = false
 parameters/conditions/spin_down = false
 parameters/conditions/spin_up = false
 
-[node name="RotorAudioPlayer" type="AnimationPlayer" parent="."]
+[node name="RotorAudioPlayer" type="AnimationPlayer" parent="." unique_id=1477431041]
 active = false
 root_node = NodePath("../RotorAudioTree")
-libraries = {
-&"": ExtResource("5_ayahk")
-}
+libraries/ = ExtResource("5_ayahk")
 
-[node name="RotorAudioSource" type="AudioStreamPlayer3D" parent="."]
+[node name="RotorAudioSource" type="AudioStreamPlayer3D" parent="." unique_id=1946091250]
 unit_size = 5.0
 doppler_tracking = 2
 
-[node name="UpgradeMount" type="Node3D" parent="."]
+[node name="UpgradeMount" type="Node3D" parent="." unique_id=7081907]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=4 uid="uid://djrh870bg3ckr"]
+[gd_scene format=4 uid="uid://djrh870bg3ckr"]
 
 [ext_resource type="Material" uid="uid://bmp5rvu5slnnt" path="res://resources/Materials/ocean_material.tres" id="1_4qrcu"]
 [ext_resource type="Material" uid="uid://7h8w8gb1xjbk" path="res://resources/Materials/ocean_backdrop.tres" id="2_en16t"]
@@ -54,80 +54,80 @@ bias = 2.0
 normal_bias = 1.0
 propagation = 0.2
 
-[node name="ocean" type="Node3D"]
+[node name="ocean" type="Node3D" unique_id=803965909]
 
-[node name="Plane" type="MeshInstance3D" parent="."]
+[node name="Plane" type="MeshInstance3D" parent="." unique_id=1576821796]
 transform = Transform3D(1, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -3.48787e-16, -3.48787e-16, 3.48787e-16, 1, 0, 32.505, 0)
 mesh = SubResource("1")
 surface_material_override/0 = ExtResource("1_4qrcu")
 
-[node name="Camera3D" type="Camera3D" parent="Plane"]
+[node name="Camera3D" type="Camera3D" parent="Plane" unique_id=1589140958]
 transform = Transform3D(1, 1.44283e-16, 3.62448e-16, -3.62448e-16, 0.687252, 0.726419, -1.44283e-16, -0.726419, 0.687252, -1.40621e-14, 59.6592, 99.9748)
 
-[node name="Plane2" type="MeshInstance3D" parent="."]
+[node name="Plane2" type="MeshInstance3D" parent="." unique_id=451968532]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 30.5047, -512)
 mesh = SubResource("1")
 surface_material_override/0 = ExtResource("2_en16t")
 
-[node name="Plane3" type="MeshInstance3D" parent="."]
+[node name="Plane3" type="MeshInstance3D" parent="." unique_id=1689789688]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -512, 30.5047, 2.08165e-12)
 mesh = SubResource("1")
 surface_material_override/0 = ExtResource("2_en16t")
 
-[node name="Plane9" type="MeshInstance3D" parent="."]
+[node name="Plane9" type="MeshInstance3D" parent="." unique_id=2044086099]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -512, 30.5047, -512)
 mesh = SubResource("1")
 surface_material_override/0 = ExtResource("2_en16t")
 
-[node name="Plane4" type="MeshInstance3D" parent="."]
+[node name="Plane4" type="MeshInstance3D" parent="." unique_id=679768245]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 512, 30.5047, 2.08165e-12)
 mesh = SubResource("1")
 surface_material_override/0 = ExtResource("2_en16t")
 
-[node name="Plane8" type="MeshInstance3D" parent="."]
+[node name="Plane8" type="MeshInstance3D" parent="." unique_id=1642447820]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 512, 30.5047, -512)
 mesh = SubResource("1")
 surface_material_override/0 = ExtResource("2_en16t")
 
-[node name="Plane6" type="MeshInstance3D" parent="."]
+[node name="Plane6" type="MeshInstance3D" parent="." unique_id=1846742173]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 512, 30.5047, 512)
 mesh = SubResource("1")
 surface_material_override/0 = ExtResource("2_en16t")
 
-[node name="Plane7" type="MeshInstance3D" parent="."]
+[node name="Plane7" type="MeshInstance3D" parent="." unique_id=738660800]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -512, 30.5047, 512)
 mesh = SubResource("1")
 surface_material_override/0 = ExtResource("2_en16t")
 
-[node name="Plane5" type="MeshInstance3D" parent="."]
+[node name="Plane5" type="MeshInstance3D" parent="." unique_id=1329168617]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 30.5047, 512)
 mesh = SubResource("1")
 surface_material_override/0 = ExtResource("2_en16t")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=212676239]
 transform = Transform3D(1, 0, 0, 0, 0.928894, 0.370347, 0, -0.370347, 0.928894, 75.3364, 57.7523, 0)
 shadow_enabled = true
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=582318315]
 environment = SubResource("5")
 camera_attributes = SubResource("CameraAttributesPhysical_qsywh")
 
-[node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="." unique_id=1541726698]
 
-[node name="CSGMesh3D" type="CSGMesh3D" parent="CSGCombiner3D"]
+[node name="CSGMesh3D" type="CSGMesh3D" parent="CSGCombiner3D" unique_id=780553864]
 mesh = SubResource("PlaneMesh_2q6u6")
 material = SubResource("StandardMaterial3D_nmg70")
 
-[node name="CSGSphere3D" type="CSGSphere3D" parent="CSGCombiner3D"]
+[node name="CSGSphere3D" type="CSGSphere3D" parent="CSGCombiner3D" unique_id=500751682]
 radius = 50.0
 radial_segments = 10
 rings = 13
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=968273550]
 transform = Transform3D(1, 0, 0, 0, 0.695662, -0.718369, 0, 0.718369, 0.695662, 95.3972, 85.9205, 80.0978)
 mesh = SubResource("SphereMesh_jhktw")
 
-[node name="VoxelGI" type="VoxelGI" parent="."]
+[node name="VoxelGI" type="VoxelGI" parent="." unique_id=736733516]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 126.54674, 0)
 size = Vector3(1700, 278.79953, 1700)
 camera_attributes = SubResource("CameraAttributesPhysical_qsywh")

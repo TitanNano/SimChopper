@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://byr7jias4d8hc"]
+[gd_scene format=3 uid="uid://byr7jias4d8hc"]
 
 [ext_resource type="Script" uid="uid://b1dsfsam1klye" path="res://native/src/scripts/objects/debugger_3_d.rs" id="1_fagxb"]
 [ext_resource type="PackedScene" uid="uid://c36tta374cm54" path="res://resources/HUD/debug/debug_3d.tscn" id="2_bq2lw"]
@@ -6,7 +6,7 @@
 [sub_resource type="ViewportTexture" id="ViewportTexture_0mey1"]
 viewport_path = NodePath("SubViewport")
 
-[node name="Debugger3D" type="Sprite3D" node_paths=PackedStringArray("text_view")]
+[node name="Debugger3D" type="Sprite3D" unique_id=1743808890 node_paths=PackedStringArray("text_view")]
 transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, 0, 0, 0)
 billboard = 1
 no_depth_test = true
@@ -15,9 +15,9 @@ script = ExtResource("1_fagxb")
 title = "Un-named Debugger"
 text_view = NodePath("SubViewport/DebugViewControl/MarginContainer/RichTextLabel")
 
-[node name="SubViewport" type="SubViewport" parent="."]
+[node name="SubViewport" type="SubViewport" parent="." unique_id=1621535335]
 disable_3d = true
 transparent_bg = true
 size = Vector2i(300, 500)
 
-[node name="DebugViewControl" parent="SubViewport" instance=ExtResource("2_bq2lw")]
+[node name="DebugViewControl" parent="SubViewport" unique_id=992921651 instance=ExtResource("2_bq2lw")]

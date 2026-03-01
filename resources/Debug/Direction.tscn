@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://3bo40rtnlh27"]
+[gd_scene format=3 uid="uid://3bo40rtnlh27"]
 
 [ext_resource type="Script" uid="uid://cdf0eab4xotxq" path="res://src/Debug/Direction.gd" id="1"]
 
@@ -11,19 +11,19 @@ size = Vector3(1.5, 1.5, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_etmxk"]
 albedo_color = Color(0.396078, 0.113725, 0.113725, 1)
 
-[node name="Direction" type="Marker3D"]
+[node name="Direction" type="Marker3D" unique_id=809361373]
 script = ExtResource("1")
 color = Color(0.396078, 0.113725, 0.113725, 1)
 vector = Vector3(0, 1, 0)
 
-[node name="Length" type="CSGCylinder3D" parent="."]
+[node name="Length" type="CSGCylinder3D" parent="." unique_id=1871312042]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 radius = 0.4
 height = 1.0
 sides = 10
 material = SubResource("StandardMaterial3D_2u7cg")
 
-[node name="Head" type="CSGMesh3D" parent="."]
+[node name="Head" type="CSGMesh3D" parent="." unique_id=338111898]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
 mesh = SubResource("2")
 material = SubResource("StandardMaterial3D_etmxk")

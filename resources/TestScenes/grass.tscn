@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dew3sqhftdel1"]
+[gd_scene format=3 uid="uid://dew3sqhftdel1"]
 
 [ext_resource type="Material" uid="uid://cra7dybo4pfnt" path="res://resources/Particles/Grass/grass_particle_material_vs.tres" id="1_tpat7"]
 
@@ -217,20 +217,20 @@ material = SubResource("ShaderMaterial_w2ciu")
 size = Vector2(0.03, 0.2)
 subdivide_depth = 4
 
-[node name="Node3D" type="Node3D"]
+[node name="Node3D" type="Node3D" unique_id=1391527140]
 
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=83855820]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=309978854]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.738752, 0)
 mesh = SubResource("PlaneMesh_pfbub")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=993882230]
 shape = SubResource("2")
 
-[node name="Particles" type="GPUParticles3D" parent="StaticBody3D"]
+[node name="Particles" type="GPUParticles3D" parent="StaticBody3D" unique_id=195760779]
 amount = 40000
-lifetime = 1e+10
+lifetime = 10000000000.0
 preprocess = 100.0
 explosiveness = 1.0
 collision_base_size = 0.0
@@ -238,14 +238,14 @@ visibility_aabb = AABB(-5, -5, -5, 10, 10, 10)
 process_material = ExtResource("1_tpat7")
 draw_pass_1 = SubResource("QuadMesh_qf3nk")
 
-[node name="GPUParticlesCollisionHeightField3D" type="GPUParticlesCollisionHeightField3D" parent="StaticBody3D"]
+[node name="GPUParticlesCollisionHeightField3D" type="GPUParticlesCollisionHeightField3D" parent="StaticBody3D" unique_id=1904804701]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.800956, 0)
 size = Vector3(12, 2, 12)
 
-[node name="GPUParticlesAttractorSphere3D" type="GPUParticlesAttractorSphere3D" parent="StaticBody3D"]
+[node name="GPUParticlesAttractorSphere3D" type="GPUParticlesAttractorSphere3D" parent="StaticBody3D" unique_id=301318832]
 transform = Transform3D(0.99994, 0.0109779, 0, -0.0109779, 0.99994, 0, 0, 0, 1, -1.95662, -0.609413, 4.75119)
 strength = -6.0
 directionality = 1.0
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=270833319]
 transform = Transform3D(-0.913298, 0.195277, -0.357427, 0, 0.877568, 0.479451, 0.407292, 0.437882, -0.801482, -4.2223, 5.66378, -9.46794)

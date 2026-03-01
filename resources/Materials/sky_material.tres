@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=7 format=3 uid="uid://c26tq15swq4at"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c26tq15swq4at"]
 
 [ext_resource type="Shader" uid="uid://dadtbq4ym2chm" path="res://resources/Shaders/sky.tres" id="1_gixr0"]
 [ext_resource type="Texture2D" uid="uid://4ehe3xiphs06" path="res://resources/Textures/sky/stars.png" id="2_1js4f"]

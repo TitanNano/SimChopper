@@ -1,4 +1,4 @@
-[gd_resource type="Environment" load_steps=3 format=3 uid="uid://bl607wqoa882d"]
+[gd_resource type="Environment" format=3 uid="uid://bl607wqoa882d"]
 
 [ext_resource type="Material" uid="uid://c26tq15swq4at" path="res://resources/Materials/sky_material.tres" id="1_inrw2"]
 
@@ -14,9 +14,7 @@ ambient_light_source = 3
 reflected_light_source = 2
 tonemap_mode = 3
 ssr_enabled = true
-ssr_fade_in = 0.05
-ssr_fade_out = 1.5
-ssr_depth_tolerance = 0.51
+ssr_depth_tolerance = 5.01
 ssao_ao_channel_affect = 1.0
 glow_enabled = true
 glow_levels/1 = 1.0
@@ -25,12 +23,11 @@ glow_levels/4 = 1.0
 glow_levels/6 = 1.0
 glow_levels/7 = 1.0
 glow_intensity = 0.5
-glow_blend_mode = 1
 fog_light_color = Color(0.3911107, 0.4246285, 0.47677815, 1)
 fog_sun_scatter = 0.5
 fog_density = 0.001
 fog_aerial_perspective = 0.8
 volumetric_fog_enabled = true
-volumetric_fog_density = 0.001
+volumetric_fog_density = 0.0005
 volumetric_fog_length = 300.0
 volumetric_fog_temporal_reprojection_enabled = false

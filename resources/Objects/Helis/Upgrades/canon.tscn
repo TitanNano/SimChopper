@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://c0pat4v54oe86"]
+[gd_scene format=3 uid="uid://c0pat4v54oe86"]
 
 [ext_resource type="PackedScene" uid="uid://daf3wyyha2hm" path="res://resources/Meshes/Helis/upgrades/cannon.gltf" id="1_54ycj"]
 [ext_resource type="Script" uid="uid://dvqexwe8r1gw7" path="res://native/src/scripts/objects/canon_upgrade.rs" id="2_1jnub"]
@@ -62,16 +62,16 @@ viewport_path = NodePath("SubViewport")
 [sub_resource type="BoxShape3D" id="BoxShape3D_p6un2"]
 size = Vector3(0.101135, 0.0903931, 0.882935)
 
-[node name="Canon" node_paths=PackedStringArray("water_jet") instance=ExtResource("1_54ycj")]
+[node name="Canon" unique_id=1278094518 node_paths=PackedStringArray("water_jet") instance=ExtResource("1_54ycj")]
 transform = Transform3D(-1, 3.48787e-16, -8.74228e-08, 3.48787e-16, 1, -3.48787e-16, 8.74228e-08, -3.48787e-16, -1, 0, 0, 0)
 script = ExtResource("2_1jnub")
 mode = 0
 water_jet = NodePath("WaterJet")
 
-[node name="Maxis-3d2-mesh-143" parent="." index="0"]
+[node name="Maxis-3d2-mesh-143" parent="." index="0" unique_id=1444079110]
 transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="WaterJet" type="GPUParticles3D" parent="." index="1" node_paths=PackedStringArray("impact_area", "decal")]
+[node name="WaterJet" type="GPUParticles3D" parent="." index="1" unique_id=1088305207 node_paths=PackedStringArray("impact_area", "decal")]
 transform = Transform3D(-1, 3.48787e-16, -8.74228e-08, 3.48787e-16, 1, -3.48787e-16, 8.74228e-08, -3.48787e-16, -1, -5.06016e-15, 0.266152, 2.15765)
 amount = 2000
 lifetime = 2.0
@@ -88,7 +88,7 @@ decal_tracker = ExtResource("6_p6un2")
 max_decal_count = 5
 max_delay = 1.8
 
-[node name="WaterDecal" type="Decal" parent="WaterJet" index="0" groups=["wet_surface_decal"]]
+[node name="WaterDecal" type="Decal" parent="WaterJet" index="0" unique_id=1767177581 groups=["wet_surface_decal"]]
 visible = false
 size = Vector3(1, 2, 1)
 texture_albedo = ExtResource("4_owba1")
@@ -100,84 +100,82 @@ lower_fade = 0.8
 script = ExtResource("9_v48py")
 decal_tracker = ExtResource("6_p6un2")
 
-[node name="ParticleImpactArea" type="Area3D" parent="WaterJet" index="1"]
+[node name="ParticleImpactArea" type="Area3D" parent="WaterJet" index="1" unique_id=810760920]
 transform = Transform3D(1, -1.47268e-30, 0, -1.47268e-30, 1, 0, 0, 0, 1, 0, 0, 0)
 monitorable = false
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="WaterJet/ParticleImpactArea" index="0"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WaterJet/ParticleImpactArea" index="0" unique_id=1173845961]
 transform = Transform3D(1, -1.47268e-30, -9.67219e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, -0.0208936, -12.7502, -37.4488)
 shape = SubResource("BoxShape3D_aet65")
 
-[node name="ParticleImpactCastA" type="ShapeCast3D" parent="WaterJet" index="2"]
+[node name="ParticleImpactCastA" type="ShapeCast3D" parent="WaterJet" index="2" unique_id=1546994786]
 transform = Transform3D(1, -1.4726808e-30, 1.5295143e-10, -1.4982821e-30, 1, 0, -9.672192e-10, 0, 1, 0, -0.077, -0.8)
 enabled = false
 shape = SubResource("SphereShape3D_e4rg2")
 target_position = Vector3(0, 0, -4.4)
 collision_mask = 3
 
-[node name="ParticleImpactCastB" type="ShapeCast3D" parent="WaterJet" index="3"]
+[node name="ParticleImpactCastB" type="ShapeCast3D" parent="WaterJet" index="3" unique_id=585619911]
 transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 4.38711e-08, 0, -5.2439)
 enabled = false
 shape = SubResource("SphereShape3D_e4rg2")
 target_position = Vector3(2.08165e-12, -0.5, -6)
 collision_mask = 3
 
-[node name="ParticleImpactCastC" type="ShapeCast3D" parent="WaterJet" index="4"]
+[node name="ParticleImpactCastC" type="ShapeCast3D" parent="WaterJet" index="4" unique_id=1833811445]
 transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 4.32584e-08, -0.483, -11.2524)
 enabled = false
 shape = SubResource("SphereShape3D_b52ix")
 target_position = Vector3(2.08165e-12, -1, -6)
 collision_mask = 3
 
-[node name="ParticleImpactCastD" type="ShapeCast3D" parent="WaterJet" index="5"]
+[node name="ParticleImpactCastD" type="ShapeCast3D" parent="WaterJet" index="5" unique_id=988261948]
 transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 3.00757e-08, -1.454, -17.258)
 enabled = false
 shape = SubResource("SphereShape3D_ujlq7")
 target_position = Vector3(2.08165e-12, -2, -10.5)
 collision_mask = 3
 
-[node name="ParticleImpactCastE" type="ShapeCast3D" parent="WaterJet" index="6"]
+[node name="ParticleImpactCastE" type="ShapeCast3D" parent="WaterJet" index="6" unique_id=1500126232]
 transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 3.5019e-08, -3.643, -27.7673)
 enabled = false
 shape = SubResource("SphereShape3D_y6xdm")
 target_position = Vector3(2.08165e-12, -7, -20)
 collision_mask = 3
 
-[node name="ParticleImpactCastF" type="ShapeCast3D" parent="WaterJet" index="7"]
+[node name="ParticleImpactCastF" type="ShapeCast3D" parent="WaterJet" index="7" unique_id=641677795]
 transform = Transform3D(1, -1.47268e-30, 1.52951e-10, -1.49828e-30, 1, 0, -9.67219e-10, 0, 1, 5.93257e-08, -10.871, -47.7673)
 enabled = false
 shape = SubResource("SphereShape3D_wrup6")
 target_position = Vector3(2.08165e-12, -8, -18)
 collision_mask = 3
 
-[node name="ParticleCollision" type="GPUParticlesCollisionHeightField3D" parent="WaterJet" index="8"]
+[node name="ParticleCollision" type="GPUParticlesCollisionHeightField3D" parent="WaterJet" index="8" unique_id=1770617955]
 transform = Transform3D(1, -1.47268e-30, 1.19942e-09, -1.44093e-30, 1, 0, 1.19942e-09, 0, 1, 0.425537, -22.2146, -56.759)
 size = Vector3(219.237, 52.5883, 113.093)
 
-[node name="AudioSource" type="AudioStreamPlayer3D" parent="WaterJet" index="9"]
+[node name="AudioSource" type="AudioStreamPlayer3D" parent="WaterJet" index="9" unique_id=868825244]
 transform = Transform3D(1, 1.68276e-30, 0, -1.47268e-30, 1, -4.73317e-30, 0, 0, 1, 0.121209, -0.140246, -2.91244)
 volume_db = 15.0
 unit_size = 2.0
 max_db = 6.0
 
-[node name="AudioPlayer" type="AnimationPlayer" parent="WaterJet" index="10"]
-libraries = {
-&"": ExtResource("10_u6k6a")
-}
+[node name="AudioPlayer" type="AnimationPlayer" parent="WaterJet" index="10" unique_id=824203540]
+libraries/ = ExtResource("10_u6k6a")
 
-[node name="AnimationTree" type="AnimationTree" parent="WaterJet" index="11"]
+[node name="AnimationTree" type="AnimationTree" parent="WaterJet" index="11" unique_id=171666803]
 tree_root = ExtResource("11_sjwuo")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AudioPlayer")
 
-[node name="WaterJetDebugger" parent="." index="2" instance=ExtResource("12_xx02s")]
+[node name="WaterJetDebugger" parent="." index="2" unique_id=2023873577 instance=ExtResource("12_xx02s")]
 process_mode = 4
 transform = Transform3D(1, 4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, -2.98064, 1.59321, 1.60687)
 visible = false
 texture = SubResource("ViewportTexture_xx02s")
 title = "Water Jet Debugger"
 
-[node name="CanonShape" type="CollisionShape3D" parent="." index="3"]
+[node name="CanonShape" type="CollisionShape3D" parent="." index="3" unique_id=1601207473]
 editor_description = "Collision shape that will be attached to the physics body of the helicopter once it's mounted."
 transform = Transform3D(1, -4.02216e-24, 0, -4.02216e-24, 1, 0, 0, 0, 1, -0.000404409, 0.264907, 1.88774)
 shape = SubResource("BoxShape3D_p6un2")

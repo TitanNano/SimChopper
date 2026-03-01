@@ -1,6 +1,6 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://ckwvw4rptthjv"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://ckwvw4rptthjv"]
 
-[ext_resource type="Shader" path="res://resources/Shaders/rotor.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://dkpxcjpx6ytee" path="res://resources/Shaders/rotor.gdshader" id="1"]
 
 [resource]
 render_priority = 10

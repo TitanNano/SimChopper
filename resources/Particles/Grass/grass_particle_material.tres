@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://cnqnblu4bimql"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cnqnblu4bimql"]
 
 [sub_resource type="Shader" id="Shader_cw7v4"]
 code = "shader_type particles;
@@ -39,8 +39,8 @@ void process() {
 frequency = 1.0
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_nts14"]
-as_normal_map = true
 noise = SubResource("FastNoiseLite_1ke6u")
+as_normal_map = true
 
 [resource]
 shader = SubResource("Shader_cw7v4")

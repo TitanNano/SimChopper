@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=4 uid="uid://bs28qpxkeihu6"]
+[gd_scene format=4 uid="uid://bs28qpxkeihu6"]
 
 [ext_resource type="Texture2D" uid="uid://b2hjdtr47u4b7" path="res://resources/HDR/dry_hay_field_1k.hdr" id="1_s0k71"]
 [ext_resource type="CameraAttributesPhysical" uid="uid://ckjhc3lehild4" path="res://resources/Environments/camera_attributes_physical.tres" id="2_3rk8q"]
@@ -16,28 +16,6 @@ albedo_color = Color(1, 0.46, 0.46, 1)
 [sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_lses4"]
 
 [sub_resource type="VisualShader" id="VisualShader_cwe5g"]
-code = "shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
-
-
-
-
-void fragment() {
-// FloatConstant:3
-	float n_out3p0 = 0.000000;
-
-
-// FloatConstant:2
-	float n_out2p0 = 0.000000;
-
-
-// Output:0
-	METALLIC = n_out3p0;
-	ROUGHNESS = n_out2p0;
-
-
-}
-"
 nodes/fragment/2/node = SubResource("VisualShaderNodeFloatConstant_j2eca")
 nodes/fragment/2/position = Vector2(-151.36, 354.32)
 nodes/fragment/3/node = SubResource("VisualShaderNodeFloatConstant_lses4")
@@ -390,50 +368,50 @@ roughness = 0.0
 material = SubResource("StandardMaterial3D_piqoe")
 size = Vector2(10, 5)
 
-[node name="Node3D" type="Node3D"]
+[node name="Node3D" type="Node3D" unique_id=1475275598]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=671297310]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000953317, -0.00198269, 0.00210881)
 mesh = SubResource("1")
 surface_material_override/0 = SubResource("StandardMaterial3D_fk0qd")
 
-[node name="MeshInstance2" type="MeshInstance3D" parent="."]
+[node name="MeshInstance2" type="MeshInstance3D" parent="." unique_id=183928158]
 transform = Transform3D(0.942513, -0.234649, 0.237927, 0.329782, 0.538136, -0.775663, 0.0539718, 0.809537, 0.584583, -0.21212, 1.85238, -0.14339)
 gi_mode = 2
 mesh = SubResource("3")
 surface_material_override/0 = SubResource("ShaderMaterial_pxwfp")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=79205878]
 environment = SubResource("9")
 camera_attributes = ExtResource("2_3rk8q")
 
-[node name="MeshInstance3" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3" type="MeshInstance3D" parent="." unique_id=794518379]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00390148, 0.57566, 0.286739)
 mesh = SubResource("10")
 surface_material_override/0 = SubResource("StandardMaterial3D_qdtqf")
 
-[node name="MeshInstance5" type="MeshInstance3D" parent="."]
+[node name="MeshInstance5" type="MeshInstance3D" parent="." unique_id=1086587148]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00390148, 0.57566, 1.2819)
 mesh = SubResource("10")
 surface_material_override/0 = SubResource("ShaderMaterial_5476g")
 
-[node name="MeshInstance4" type="MeshInstance3D" parent="."]
+[node name="MeshInstance4" type="MeshInstance3D" parent="." unique_id=669470517]
 transform = Transform3D(1, 0, 0, 0, 0.845877, -0.533378, 0, 0.533378, 0.845877, 0, 1.01881, -1.36894)
 mesh = SubResource("12")
 surface_material_override/0 = SubResource("StandardMaterial3D_iiqfx")
 
-[node name="ReflectionProbe" type="ReflectionProbe" parent="."]
+[node name="ReflectionProbe" type="ReflectionProbe" parent="." unique_id=1504148296]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.43324, 0)
 visible = false
 size = Vector3(9.80144, 5.50026, 9.9398)
 enable_shadows = true
 
-[node name="VoxelGI" type="VoxelGI" parent="."]
+[node name="VoxelGI" type="VoxelGI" parent="." unique_id=1546089462]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.149755, 1.78873, 0)
 size = Vector3(10, 5, 10)
 data = SubResource("VoxelGIData_3rk8q")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1682700377]
 transform = Transform3D(1, -6.97574e-16, -1.5246e-23, -1.5246e-23, -4.37114e-08, 1, -6.97574e-16, -1, -4.37114e-08, -0.508014, 1.31457, 2.90132)
 gi_lightmap_texel_scale = 8.0
 mesh = SubResource("PlaneMesh_hs6hs")

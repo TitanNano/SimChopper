@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://5jijewumod80"]
+[gd_scene format=3 uid="uid://5jijewumod80"]
 
 [ext_resource type="Script" uid="uid://rv7naiqpa17x" path="res://native/src/scripts/spawner/fire_spawner.rs" id="1_aar5t"]
 [ext_resource type="Texture2D" uid="uid://c8edk8pamge2n" path="res://resources/Particles/fire/emitters/example_building.res" id="2_h5f1y"]
@@ -121,7 +121,7 @@ particles_anim_loop = false
 material = SubResource("StandardMaterial3D_gbsgj")
 size = Vector2(2, 2)
 
-[node name="FireSpawner" type="Marker3D" node_paths=PackedStringArray("fire", "smoke", "light_source", "fire_sound")]
+[node name="FireSpawner" type="Marker3D" unique_id=721010039 node_paths=PackedStringArray("fire", "smoke", "light_source", "fire_sound")]
 gizmo_extents = 3.0
 script = ExtResource("1_aar5t")
 density = 20
@@ -136,13 +136,11 @@ strength = 1.0
 light_modulator = 1.0
 fire_sound = NodePath("FireAudioSource")
 
-[node name="FireAnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": ExtResource("4_rhyet")
-}
+[node name="FireAnimationPlayer" type="AnimationPlayer" parent="." unique_id=1686978269]
+libraries/ = ExtResource("4_rhyet")
 blend_times = [&"burning", &"burning", 0.2]
 
-[node name="FireParticles" type="GPUParticles3D" parent="."]
+[node name="FireParticles" type="GPUParticles3D" parent="." unique_id=1997064409]
 amount = 20480
 lifetime = 1.6
 fixed_fps = 60
@@ -151,7 +149,7 @@ draw_order = 2
 process_material = SubResource("ParticleProcessMaterial_yg8n7")
 draw_pass_1 = SubResource("QuadMesh_x60au")
 
-[node name="SmokeParticles" type="GPUParticles3D" parent="."]
+[node name="SmokeParticles" type="GPUParticles3D" parent="." unique_id=1592006156]
 sorting_offset = 10.0
 amount = 2048
 lifetime = 4.0
@@ -161,20 +159,20 @@ draw_order = 2
 process_material = SubResource("ParticleProcessMaterial_lpvev")
 draw_pass_1 = SubResource("QuadMesh_3kyhn")
 
-[node name="FireAudioSource" type="AudioStreamPlayer3D" parent="."]
+[node name="FireAudioSource" type="AudioStreamPlayer3D" parent="." unique_id=2003377516]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.1948, 0)
 emission_angle_degrees = 10.7
 
-[node name="SirenAudioSource" type="AudioStreamPlayer3D" parent="."]
+[node name="SirenAudioSource" type="AudioStreamPlayer3D" parent="." unique_id=4337968]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.1948, 0)
 
-[node name="FireLightSource" type="OmniLight3D" parent="."]
+[node name="FireLightSource" type="OmniLight3D" parent="." unique_id=1085697902]
 light_intensity_lumens = 1300.0
 light_temperature = 1850.0
 light_bake_mode = 1
 omni_range = 100.0
 
-[node name="AnimationTree" type="AnimationTree" parent="."]
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1146069885]
 deterministic = false
 callback_mode_discrete = 1
 tree_root = ExtResource("5_smqef")

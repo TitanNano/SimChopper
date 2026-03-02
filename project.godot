@@ -161,6 +161,7 @@ jolt_physics_3d/simulation/areas_detect_static_bodies=true
 
 [rendering]
 
+rendering_device/driver.macos="vulkan"
 textures/vram_compression/import_s3tc_bptc=true
 textures/vram_compression/import_etc2_astc=true
 lights_and_shadows/use_physical_light_units=true

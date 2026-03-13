@@ -23,17 +23,17 @@ struct GiProbes {
     #[export]
     pub world_constants: OnEditor<Gd<WorldConstants>>,
 
-    // camera attribues that are used by the scene.
+    /// Camera attributes that are used by the scene.
     #[export]
     pub camera_attributes: OnEditor<Gd<CameraAttributes>>,
 
-    // Number of probes that will be used to cover the world with VoxelGI.
-    //
-    // The probe_count will be squared.
+    /// Number of probes that will be used to cover the world with `VoxelGI`.
+    ///
+    /// The `probe_count` will be squared.
     #[export(range(min = 0.0, max = 20.0, suffix = "²"))]
     pub probe_count: Uf32,
 
-    // Negative offset of the GI probes in number of tiles.
+    /// Negative offset of the GI probes in number of tiles.
     #[export(range(min = 0.0, max = 200.0, suffix = "Tiles"))]
     pub negative_y_offset: Uf32,
 
@@ -72,9 +72,8 @@ impl GiProbes {
                 return;
             }
 
-            // wait for one frame to clear the borrow of self.
+            // Wait for one frame to clear the borrow of self.
             base.get_tree()
-                .unwrap()
                 .signals()
                 .process_frame()
                 .into_future()
@@ -92,7 +91,7 @@ impl GiProbes {
                 .flat_map(|x| (0..probe_count.into_u32()).map(move |y| (x, y)));
 
             let world_root = base.get_parent_node_3d().unwrap();
-            let scene_tree = base.get_tree().unwrap();
+            let scene_tree = base.get_tree();
             let mut script: RsRef<Self> = base.to_script();
 
             let probes = probe_coordinates
@@ -126,7 +125,7 @@ impl GiProbes {
                 script.emit_build_progess(LOAD_STEP_MULTIPLIER);
                 generated_probe_count += 1;
 
-                // render one frame to update progress bar.
+                // Render one frame to update progress bar.
                 scene_tree.signals().process_frame().into_future().await;
             }
 
@@ -168,7 +167,7 @@ impl ProbeDimensions {
         let size = (Uf32::from(tile_size) * tile_count).into_f32();
         let extent = size / 2.0;
 
-        // probes get an extra margin of 2 tiles on each side so they overlap and blend together.
+        // Probes get an extra margin of 2 tiles on each side so they overlap and blend together.
         let margin = Uf32::from(tile_size).into_f32() * MARGIN_TILES * MARGIN_SIDES;
 
         Self {
@@ -188,10 +187,7 @@ fn create_voxel_gi_probe(
     height_offset: f32,
 ) -> Gd<VoxelGi> {
     let mut probe = VoxelGi::new_alloc();
-    let probe_data: Gd<VoxelGiData> = data
-        .duplicate()
-        .expect("Should be possible to duplicate VoxelGIData")
-        .cast();
+    let probe_data: Gd<VoxelGiData> = data.duplicate_resource();
 
     probe.set_size(Vector3::splat(dimensions.size + dimensions.margin));
     probe.set_subdiv(Subdiv::SUBDIV_64);
@@ -204,18 +200,18 @@ fn create_voxel_gi_probe(
 
     let translate_x = dimensions.size
                     * Uf32::new(xy.0).into_f32()
-                    // the initial offset is one probe extend / half the probe size
+                    // The initial offset is one probe extend / half the probe size
                     + dimensions.extent;
 
     let translate_y = dimensions.size
                     * Uf32::new(xy.1).into_f32()
-                    // the initial offset is one probe extend / half the probe size
+                    // The initial offset is one probe extend / half the probe size
                     + dimensions.extent;
 
     let translate_z = height_offset + dimensions.extent;
 
     probe.set_global_position(Vector3::new(translate_x, translate_z, translate_y));
-    probe.set_owner(&node.get_tree().unwrap().get_current_scene().unwrap());
+    probe.set_owner(&node.get_tree().get_current_scene().unwrap());
     probe
 }
 

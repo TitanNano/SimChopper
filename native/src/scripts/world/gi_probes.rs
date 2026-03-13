@@ -82,7 +82,7 @@ impl GiProbes {
                 return;
             }
 
-            let mut tree = base.get_tree().unwrap();
+            let tree = base.get_tree();
 
             // Wait for one frame to clear the borrow of self.
             tree.signals().process_frame().into_future().await;
@@ -117,7 +117,7 @@ impl GiProbes {
                 .flat_map(|x| (0..probe_count.into_u32()).map(move |y| (x, y)));
 
             let world_root = base.get_parent_node_3d().unwrap();
-            let scene_tree = base.get_tree().unwrap();
+            let scene_tree = base.get_tree();
             let mut script: RsRef<Self> = base.to_script();
 
             let probes = probe_coordinates
@@ -218,10 +218,7 @@ fn create_voxel_gi_probe(
     height_offset: f32,
 ) -> Gd<VoxelGi> {
     let mut probe = VoxelGi::new_alloc();
-    let probe_data: Gd<VoxelGiData> = data
-        .duplicate()
-        .expect("Should be possible to duplicate VoxelGIData")
-        .cast();
+    let probe_data: Gd<VoxelGiData> = data.duplicate_resource();
 
     probe.set_size(Vector3::splat(dimensions.size + dimensions.margin));
     probe.set_subdiv(Subdiv::SUBDIV_64);
@@ -245,7 +242,7 @@ fn create_voxel_gi_probe(
     let translate_z = height_offset + dimensions.extent;
 
     probe.set_global_position(Vector3::new(translate_x, translate_z, translate_y));
-    probe.set_owner(&node.get_tree().unwrap().get_current_scene().unwrap());
+    probe.set_owner(&node.get_tree().get_current_scene().unwrap());
     probe
 }
 

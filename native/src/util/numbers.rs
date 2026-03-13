@@ -174,6 +174,10 @@ impl<const UPPER: u32, const LOWER: u32> GodotScriptExport for LInt<LOWER, UPPER
 
 impl<const UPPER: u32, const LOWER: u32> GodotConvert for LInt<LOWER, UPPER> {
     type Via = u32;
+
+    fn godot_shape() -> godot::meta::GodotShape {
+        u32::godot_shape()
+    }
 }
 
 impl<const UPPER: u32, const LOWER: u32> SetScriptProperty for LInt<LOWER, UPPER> {
@@ -208,7 +212,7 @@ impl<const UPPER: u32, const LOWER: u32> Display for LInt<LOWER, UPPER> {
     }
 }
 
-/// F32 has a mantissa of 23-bits
+/// `f32` has a mantissa of 23-bits
 const F32_MAX: u32 = 2u32.pow(24);
 
 pub type Uf32 = LInt<0, F32_MAX>;

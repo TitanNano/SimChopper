@@ -34,7 +34,7 @@ impl WaterDecal {
             return;
         }
 
-        util::timer(&mut self.base.get_tree().unwrap(), Self::LIFETIME)
+        util::timer(&mut self.base.get_tree(), Self::LIFETIME)
             .connect("timeout", &script_callable!(self, Self::on_timeout));
     }
 

@@ -125,7 +125,7 @@ fn fix_ao_uv2(state: &mut Gd<GltfState>) -> Result<(), global::Error> {
                     return false;
                 };
 
-                material.get_name() == name.to()
+                material.get_name() == name.to::<GString>()
             })
             .map(|mat| mat.to::<VarDictionary>());
 

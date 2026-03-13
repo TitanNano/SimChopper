@@ -17,23 +17,24 @@ mod terrain_builder;
 mod util;
 mod world;
 
-use godot::prelude::{gdextension, ExtensionLibrary, InitLevel};
+use godot::{
+    init::InitStage,
+    prelude::{gdextension, ExtensionLibrary},
+};
 
 struct NativeLib;
 
 #[gdextension]
 unsafe impl ExtensionLibrary for NativeLib {
-    fn on_level_init(level: InitLevel) {
-        match level {
-            InitLevel::Scene => godot_rust_script::init!(scripts),
-            InitLevel::Editor | InitLevel::Servers | InitLevel::Core => (),
+    fn on_stage_init(level: InitStage) {
+        if level == InitStage::Scene {
+            godot_rust_script::init!(scripts);
         }
     }
 
-    fn on_level_deinit(level: InitLevel) {
-        match level {
-            InitLevel::Scene => godot_rust_script::deinit!(),
-            InitLevel::Servers | InitLevel::Core | InitLevel::Editor => (),
+    fn on_stage_deinit(level: InitStage) {
+        if level == InitStage::Scene {
+            godot_rust_script::deinit!();
         }
     }
 }

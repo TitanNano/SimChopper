@@ -8,7 +8,7 @@
 use std::boxed::Box;
 
 use anyhow::{bail, Result};
-use godot::builtin::{Aabb, Array, Callable, GString, Variant, Vector3};
+use godot::builtin::{Aabb, Array, Callable, StringName, Variant, Vector3};
 use godot::classes::object::ConnectFlags;
 use godot::classes::{
     Area3D, Decal, GpuParticles3D, Node, Node3D, PhysicsRayQueryParameters3D, ShapeCast3D,
@@ -103,7 +103,7 @@ impl WaterJet {
     }
 
     fn raycast_to_surface(&self, origin: Vector3, target: Vector3) -> Result<Option<Intersection>> {
-        let Some(mut physics_world) = self.base.get_world_3d() else {
+        let Some(physics_world) = self.base.get_world_3d() else {
             bail!("Failed to acquire physics world!");
         };
 
@@ -174,7 +174,7 @@ impl WaterJet {
                 continue;
             }
 
-            let mut impact_targets = Array::<GString>::new();
+            let mut impact_targets = Array::<StringName>::new();
 
             #[cfg(debug_assertions)]
             {
@@ -196,7 +196,7 @@ impl WaterJet {
                     }
                 };
 
-                impact_targets.push(target_node.get_name().arg());
+                impact_targets.push(&target_node.get_name());
 
                 let point = self.align_decal_normal(Intersection {
                     position: shape_cast.get_collision_point(index),
@@ -225,8 +225,7 @@ impl WaterJet {
 
                 let impact_delay = Self::distance_scale(impact_distance, 0.0, self.max_delay);
 
-                let mut timer =
-                    util::timer(&mut self.base.get_tree().unwrap(), impact_delay.into());
+                let mut timer = util::timer(&mut self.base.get_tree(), impact_delay.into());
 
                 #[cfg(debug_assertions)]
                 {
@@ -251,7 +250,7 @@ impl WaterJet {
             break;
         }
 
-        debug_3d!(self.debugger => shape_cast_name, impacting, decal_spawned);
+        debug_3d!(self.debugger => shape_cast_name, (ref impacting), decal_spawned);
     }
 
     fn distance_scale(distance: f32, min: f32, max: f32) -> f32 {
@@ -302,10 +301,7 @@ impl WaterJet {
     {
         #[cfg(debug_assertions)]
         let mut debugger = self.debugger.clone();
-        let mut decal_inst: Gd<Decal> = template
-            .duplicate()
-            .expect("Failed to duplicate decal node!")
-            .cast();
+        let mut decal_inst: Gd<Decal> = template.duplicate_node();
 
         let decal_size = Vector3::new(decal_scale, decal_inst.get_size().y, decal_scale);
         logger::debug!("setting decal size: {decal_size}");
@@ -325,11 +321,7 @@ impl WaterJet {
             rand::random_range::<f32, _>(-90.0..90.0).to_radians(),
         );
 
-        if let Some(scene_root) = target_node
-            .upcast_ref()
-            .get_tree()
-            .and_then(|tree| tree.get_current_scene())
-        {
+        if let Some(scene_root) = target_node.upcast_ref().get_tree().get_current_scene() {
             decal_inst.set_owner(&scene_root);
         } else {
             logger::error!("Failed to access scene root! Unable to set decal owner.");

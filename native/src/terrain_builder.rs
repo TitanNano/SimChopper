@@ -9,7 +9,8 @@ use std::time::Instant;
 
 use godot::classes::mesh::PrimitiveType;
 use godot::classes::{ArrayMesh, Material, SurfaceTool};
-use godot::meta::GodotType;
+use godot::meta::{owned_into_arg, Element, GodotType};
+use godot::obj::Unique;
 use godot::{prelude::*, task};
 use itertools::Itertools;
 use kanal::{ReceiveError, Receiver};
@@ -737,7 +738,7 @@ fn generate_chunk_vertices(context: &WorkerThreadContext, chunk: ChunkConfig) ->
 /// Generate an [`ArrayMesh`] from a list of surface vertecies.
 fn generate_chunk_mesh(context: &WorkerThreadContext, chunk: ChunkSurfaces) -> TerrainChunk {
     let mut generator = SurfaceTool::new_gd();
-    let mut mesh = ArrayMesh::new_gd();
+    let mut mesh = Unique::<Gd<ArrayMesh>>::new_gd();
     let mut vertex_count = 0;
 
     for (surface_type, surface) in chunk.surfaces {
@@ -789,28 +790,41 @@ fn generate_chunk_mesh(context: &WorkerThreadContext, chunk: ChunkSurfaces) -> T
         generator.generate_normals();
         generator.generate_tangents();
 
-        let surface_arrays = generator.commit_to_arrays();
-        let new_index = mesh.get_surface_count();
+        let gen_surface_arrays = generator.commit_to_arrays();
+        let mut surface_arrays = Unique::<Array<Variant>>::new();
 
-        mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, &surface_arrays);
-
-        let surface_name = match surface_type {
-            TileSurfaceType::Ground => TerrainBuilder::GROUND_SURFACE,
-            TileSurfaceType::Water => TerrainBuilder::WATER_SURFACE,
-        };
-
-        mesh.surface_set_name(new_index, surface_name);
-
-        let surface_material_variant = context.materials.get(surface_type.to_string());
-
-        let surface_material: Option<Gd<Material>> =
-            surface_material_variant.map(|material| material.to());
-
-        if let Some(material) = surface_material {
-            mesh.surface_set_material(new_index, &material);
-        } else {
-            logger::error!("no material for surface type {}", surface_type);
+        for item in gen_surface_arrays.iter_shared() {
+            if let Ok(vector_array) = item.try_to::<Array<Vector3>>() {
+                let vector_array = vector_array.to_unique();
+                surface_arrays.apply(|array| {
+                    array.push(vector_array);
+                });
+            }
         }
+
+        mesh.apply_gd(|mesh| {
+            let new_index = mesh.get_surface_count();
+
+            mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, surface_arrays);
+
+            let surface_name = match surface_type {
+                TileSurfaceType::Ground => TerrainBuilder::GROUND_SURFACE,
+                TileSurfaceType::Water => TerrainBuilder::WATER_SURFACE,
+            };
+
+            mesh.surface_set_name(new_index, surface_name);
+
+            let surface_material_variant = context.materials.get(surface_type.to_string());
+
+            let surface_material: Option<Gd<Material>> =
+                surface_material_variant.map(|material| material.to());
+
+            if let Some(material) = surface_material {
+                mesh.surface_set_material(new_index, &material);
+            } else {
+                logger::error!("no material for surface type {}", surface_type);
+            }
+        });
     }
 
     logger::info!("generated {} vertices for terain", vertex_count);

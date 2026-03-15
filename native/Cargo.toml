@@ -28,6 +28,6 @@ pedantic = "deny"
 used_underscore_items = { level = "allow", priority = 1 }
 
 [patch.crates-io]
-godot = { git = "https://github.com/godot-rust/gdext" }
-godot-cell = { git = "https://github.com/godot-rust/gdext" }
-godot-bindings= { git = "https://github.com/godot-rust/gdext" }
+godot = { git = "https://github.com/godot-rust/gdext", rev = "967028a29fc6503763824bff1c9a5ea69794e288" }
+godot-cell = { git = "https://github.com/godot-rust/gdext", rev = "967028a29fc6503763824bff1c9a5ea69794e288"}
+godot-bindings= { git = "https://github.com/godot-rust/gdext", rev = "967028a29fc6503763824bff1c9a5ea69794e288" }

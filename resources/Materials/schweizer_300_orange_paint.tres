@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://m6cr6gd6bycq"]
+
+[ext_resource type="Texture2D" uid="uid://cyg3hcw00h4bo" path="res://resources/Textures/ambient_occlusion/Helis/schweizer_300/main.png" id="1_ay0mq"]
+
+[resource]
+resource_name = "matcolour-16"
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.774056, 0.277847, 0.150005, 1)
+clearcoat_enabled = true
+clearcoat_roughness = 0.7
+ao_enabled = true
+ao_texture = ExtResource("1_ay0mq")
+ao_on_uv2 = true

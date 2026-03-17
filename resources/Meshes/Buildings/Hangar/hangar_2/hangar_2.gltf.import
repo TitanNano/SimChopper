@@ -1,0 +1,65 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://cltk5bfqpuydh"
+path="res://.godot/imported/hangar_2.gltf-edbf04a2fddd7c38784421d1d616e878.scn"
+
+[deps]
+
+source_file="res://resources/Meshes/Buildings/Hangar/hangar_2/hangar_2.gltf"
+dest_files=["res://.godot/imported/hangar_2.gltf-edbf04a2fddd7c38784421d1d616e878.scn"]
+
+[params]
+
+nodes/root_type="StaticBody3D"
+nodes/root_name=""
+nodes/root_script=null
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+materials/extract=1
+materials/extract_format=0
+materials/extract_path="res://resources/Meshes/Buildings/Hangar/hangar_2/materials"
+_subresources={
+"materials": {
+"@MATERIAL:3": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://resources/Meshes/Buildings/Hangar/hangar_2/materials/@MATERIAL_3.tres",
+"use_external/path": "res://resources/Meshes/Buildings/Hangar/hangar_2/materials/@MATERIAL_3.tres"
+},
+"Building": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://resources/Meshes/Buildings/Hangar/hangar_2/materials/Building.tres",
+"use_external/path": "uid://c6gn14u0a5vyd"
+},
+"Ground": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://resources/Meshes/Buildings/Hangar/hangar_2/materials/Ground.tres",
+"use_external/path": "uid://6il7lmkm1bm1"
+},
+"Indoor Ground": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://resources/Meshes/Buildings/Hangar/hangar_2/materials/Indoor Ground.tres",
+"use_external/path": "uid://iok4t24eiket"
+}
+}
+}
+gltf/naming_version=2
+gltf/embedded_image_handling=1

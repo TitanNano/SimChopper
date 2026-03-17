@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://du7uqddbtefxw"]
+
+[ext_resource type="PackedScene" uid="uid://dygoyytoswssy" path="res://resources/Meshes/Buildings/Hangar/hangar_2/tube_lights.gltf" id="1_5jx1s"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_qsvjb"]
+points = PackedVector3Array(0.072000004, 0.021031417, 0.76, -0.072000004, 0.021031417, 0.76, 0.072000004, -0.021035533, 0.7570243, 0.072000004, 0.021031417, -0.76, -0.072000004, -0.021035533, 0.7570243, -0.072000004, 0.021031417, -0.76, 0.072000004, -0.021035533, -0.75717306, -0.072000004, -0.021035533, -0.75717306)
+
+[node name="tube_lights" unique_id=917261590 instance=ExtResource("1_5jx1s")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." index="0" unique_id=1895880862]
+shape = SubResource("ConvexPolygonShape3D_qsvjb")

@@ -17,17 +17,93 @@
 #
 # License: Apache License 2.0
 ###
+import faulthandler
+import sys
+from argparse import ArgumentParser, Namespace
+from pathlib import Path
+from typing import Self
 
 import bpy
-import sys
-from pathlib import Path
-from argparse import ArgumentParser
-import io_scene_gltf2
-
+import io_scene_gltf2  # ty: ignore[unresolved-import]
 
 TEXTURE_BASE_SIZE = 1024
 EXPORT_PROPERTY = "gltf_export"
 SOURCE_PROPERTY = "source"
+
+
+class ExportProgress:
+
+    def __init__(self):
+        self.value = 0
+        self.label = ""
+        self.render_fn = None
+        self.original_render_fn = None
+        self.groups = {}
+        self.steps = []
+        self.total_steps = 0
+    
+    def __enter__(self) -> Self:
+        # render somehow gets cached by blender and when __enter__ is exectuted a second time the render function still captures the old
+        # outer scope? With a global we can get arround this.
+        global active_export_progress
+        
+        def render(statusbar: bpy.types.Header, context):
+            if active_export_progress is None:
+                print("[ERROR] missing export progress")
+                return
+
+            progress = active_export_progress
+            total_steps = progress.total_steps
+
+            if total_steps == 0:
+                total_steps = 1
+
+            print(f"rendering export progress: {progress.value/total_steps} {progress}", flush=True)
+
+            statusbar.layout.separator_spacer()
+            row = statusbar.layout.row()
+            row.progress(text=progress.label, factor=progress.value/total_steps, type='BAR')
+            row.scale_x = 3
+            row.alignment = 'CENTER'
+            statusbar.layout.separator_spacer()
+
+        self.render_fn = render
+        self.original_render_fn = bpy.types.STATUSBAR_HT_header.draw
+
+        active_export_progress = self
+
+        bpy.types.STATUSBAR_HT_header.draw = self.render_fn
+        print(f"entered export progress {self.render_fn}")
+
+        return self
+
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self.original_render_fn is not None :
+            bpy.types.STATUSBAR_HT_header.draw = self.original_render_fn
+        
+        print("exiting export progress")
+
+
+    def group(self, name: str, count: int):
+        self.groups[name] = count
+
+
+    def step(self, label: str, group='default') -> int:
+        self.steps.append({ 'label': label, 'group': group })
+        self.total_steps += self.groups.get(group, 1)
+
+        return len(self.steps) - 1
+
+
+    def update(self, step: int):
+        self.value += 1
+        self.label = self.steps[step]['label']
+
+        bpy.context.workspace.status_text_set(None)
+        bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=1)
+
+active_export_progress: ExportProgress | None = None
 
 # Find all objects in the scene that are marked for export.
 def find_export_objects() -> list[bpy.types.Object]:
@@ -507,7 +583,7 @@ def export_gltf(file_path: Path):
         export_keep_originals=False,
         export_extras=True,
         use_mesh_edges=True,
-        export_texture_dir="./",
+        export_texture_dir="./textures",
         export_image_quality=0,
         export_image_format="AUTO"
     )
@@ -525,7 +601,7 @@ def instantiate_empties(objects: list[bpy.types.Object]):
             continue
 
         name = object.name
-        gd_node = object['gd_node'] if 'gd_node' in object else None
+        gd_node = object.get('gd_node', None)
         source = object[SOURCE_PROPERTY]
         location = object.location
         rotation = object.rotation_euler
@@ -549,7 +625,7 @@ def instantiate_empties(objects: list[bpy.types.Object]):
         objects[index] = new_object
 
 
-def parse_args() -> dict:
+def parse_args() -> Namespace:
     args = []
 
     if "--" in sys.argv:
@@ -561,30 +637,48 @@ def parse_args() -> dict:
 
     return argparser.parse_args(args=args)
 
-def bake_and_export(config: dict):
-    print("Progress|identify export objects...")
+def bake_and_export(config: Namespace, progress: ExportProgress):
     objects = find_export_objects()
-    print("Objects|" + str(len(objects)))
+    only_visible_objects = find_visible_objects(objects)
+
+    progress.group("all", len(objects))
+    progress.group("visible", len(only_visible_objects))
+
+    step_identify = progress.step("Identify export objects...")
+    step_to_mesh = progress.step("Convert object to mesh...", "all")
+    step_apply_modifiers = progress.step("Apply modifiers...", "all")
+    step_uv_unwrap = progress.step("UV Unwrap...", "visible")
+    step_bake_occlusion = progress.step("Bake occlusion texture...", "visible")
+    step_bake_roughness = progress.step("Bake roughness texture...", "visible")
+    step_bake_diffuse = progress.step("Bake diffuse texture...", "visible")
+    step_bake_normal = progress.step("Bake normal texture...", "visible")
+    step_bake_emission = progress.step("Bake emission texture...", "visible")
+    step_bake_metallic = progress.step("Bake metallic texture...", "visible")
+    step_bake_orm = progress.step( "Bake ORM texture...", "visible")
+    step_orm_material = progress.step("Create ORM material...", "visible")
+    step_cleanup = progress.step("Cleaning Up...")
+    step_export = progress.step("Saving GLTF...")
+
+    progress.update(step_identify)
 
     for object in objects:
         if object.type == "EMPTY":
             continue
         
-        print("Progress|convert object \"" + object.name + "\" to mesh...")
+        progress.update(step_to_mesh)
         convert_to_mesh(object)
 
         if config.debug == "convert_mesh":
             continue
         
-        print("Progress|apply modifiers for \"" + object.name + "\"...")
+        progress.update(step_apply_modifiers)
         apply_modifiers(object)
 
     instantiate_empties(objects)
 
-    if config.debug == "modifiers" or config.debug == "convert_mesh":
+    if config.debug in {"modifiers", "convert_mesh"}:
         return
 
-    only_visible_objects = find_visible_objects(objects)
 
     for object in objects:
         if object in only_visible_objects:
@@ -595,52 +689,52 @@ def bake_and_export(config: dict):
     set_render_visibility(only_visible_objects)
 
     for object in only_visible_objects:
-        print("Progress|UV unwrap \"" + object.name + "\"...", flush = True)
+        progress.update(step_uv_unwrap)
         uv_unwrap(object)
 
         if config.debug == "uv":
             continue
 
-        print("Progress|bake occlusion texture...", flush = True)
+        progress.update(step_bake_occlusion)
         occlusion = bake_occlusion_texture(object)
 
         if config.debug == "bake_occlusion":
             continue
         
-        print("Progress|bake roughness texture...", flush = True)
+        progress.update(step_bake_roughness)
         roughness = bake_roughness_texture(object)
-        print("Progress|bake diffuse texture...", flush = True)
+        progress.update( step_bake_diffuse)
         diffuse = bake_diffuse_texture(object)
 
         if config.debug == "bake_diffuse":
             continue
         
-        print("Progress|bake normal texture...", flush = True)
+        progress.update(step_bake_normal)
         normal = bake_normal_texture(object)
 
         if config.debug == "bake_normal":
             continue
         
-        print("Progress|bake emission texture...", flush = True)
+        progress.update(step_bake_emission)
         emission = bake_emission_texture(object)
 
         if config.debug == "bake_emission":
             continue
         
-        print("Progress|bake metallic texture...", flush = True)
+        progress.update(step_bake_metallic)
         metallic = bake_metallic_texture(object)
 
         if config.debug == "bake":
             continue
 
-        print("Progress|bake ORM texture...", flush = True)
+        progress.update(step_bake_orm)
         clear_materials(object)
         orm = bake_orm_texture(object, occlusion, roughness, metallic)
 
         if config.debug == "orm_bake":
             continue
 
-        print("Progress|create ORM material...", flush = True)
+        progress.update(step_orm_material)
         clear_materials(object)
         orm_material = create_orm_material(object, diffuse, orm, normal, emission)
 
@@ -649,10 +743,12 @@ def bake_and_export(config: dict):
     if config.debug:
         return
 
+    progress.update(step_cleanup)
     delete_objects_except(objects)
 
-    file_path = Path(file)
-    gltf_path = file_path.parent.joinpath(f"./{file_path.stem}/scene.gltf")
+    progress.update(step_export)
+    file_path = Path(bpy.data.filepath)
+    gltf_path = file_path.parent.joinpath(f"./{file_path.stem}.gltf")
 
     for object in objects:
         object.hide_viewport = False
@@ -660,34 +756,26 @@ def bake_and_export(config: dict):
     export_gltf(gltf_path)
 
 
-def main():
-    config = parse_args()
-
-    for file in config.file:
-        print("File|" + file, flush=True)
-
-        load_blend_file(file)
-        window = bpy.context.window_manager.windows[0]
-        with bpy.context.temp_override(window=window):
-            bake_and_export(config)
-
-
 class ExportSceneForGodot(bpy.types.Operator):
     '''Export the current scene to godot'''
     bl_idname = "gltf_exporter.export_godot"
-    bl_label = "Godot"
+    bl_label = "Godot (.gltf)"
+    bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
         if bpy.data.is_dirty:
             self.report({ 'ERROR' }, "Can not export unsafed scene!")
-            return {'FINISHED'}
-        
-        self.report({'INFO'}, "Exporting to Godot...")
-        bake_and_export({ "debug": False })
+            return {'CANCELLED'}
+
+        with ExportProgress() as progress:
+            bake_and_export(Namespace(debug=False), progress)
+
         self.report({'INFO'}, "Export complete")
+        bpy.app.timers.register(lambda: bpy.ops.ed.undo() and None,first_interval=0.1)
+
         return {'FINISHED'}
 
-            
+
 def export_menu_extend(self, context):
     self.layout.operator("gltf_exporter.export_godot")
 
@@ -697,6 +785,11 @@ def register():
     bpy.types.TOPBAR_MT_file_export.append(export_menu_extend)
 
 
-# execute entry point
-# main()
+def unregister():
+    bpy.utils.unregister_class(ExportSceneForGodot)
+    bpy.types.TOPBAR_MT_file_export.remove(export_menu_extend)
+
+
+# execute registration
+faulthandler.enable()
 register()

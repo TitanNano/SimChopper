@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ijhy7d8dgx8e"]
 
-[ext_resource type="PackedScene" uid="uid://x5a5yugqexn" path="res://resources/Meshes/Blend/police_station/scene.gltf" id="1_t1rx4"]
+[ext_resource type="PackedScene" uid="uid://x5a5yugqexn" path="res://resources/Meshes/Buildings/Station/police/police_station.gltf" id="1"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_vkwci"]
 points = PackedVector3Array(-13.1678, -0.716176, -0.196076, 13.5662, 0.210294, 0.200982, 13.5662, -0.18692, 0.200982, -13.5662, 0.210294, 0.200982, 13.5662, 0.210294, -0.196076, 13.1678, -0.716176, 0.200982, -13.5662, 0.210294, -0.196076, 13.1678, -0.716176, -0.196076, -13.1678, -0.716176, 0.200982, -13.5662, -0.18692, 0.200982, 13.5662, -0.18692, -0.196076, -13.5662, -0.18692, -0.196076)
@@ -17,25 +17,24 @@ points = PackedVector3Array(3.54463, 0.10439, 6.5119, 3.16207, -2.19132, -10.713
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_kthc1"]
 points = PackedVector3Array(-3.72467, -1.80838, -11.479, 3.54444, 1.25237, -10.7137, 3.92647, 0.869438, -10.7137, 3.54444, 0.869438, -12.2442, 3.92647, -2.19132, -11.8616, -3.34263, 0.869438, -12.2442, 3.92647, -2.19132, -10.7137, -3.34263, 1.25237, -11.0966, -3.34263, -2.19132, -12.2442, 3.54444, -2.19132, -12.2442, 3.54444, 1.25237, -11.8616, 3.16091, -2.19132, -10.7137, -3.34263, 1.25237, -11.8616, -3.34263, -2.19132, -11.479, -3.34263, 0.486844, -11.0966, 3.92647, 0.869438, -11.8616, -3.72467, 0.103913, -11.8616, 2.77813, 1.25237, -10.7137, -3.72467, 0.103913, -11.479, -3.72467, -1.80838, -11.8616, 2.77813, 0.486844, -10.7137)
 
-[node name="StationPolice" unique_id=1517524222 instance=ExtResource("1")]
+[node name="StationPolice" unique_id=2032406557 instance=ExtResource("1")]
 
-[node name="CollisionShapeBarrier" type="CollisionShape3D" parent="." index="2"]
+[node name="CollisionShapeBarrier" type="CollisionShape3D" parent="." index="2" unique_id=1162577067]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.61449, 0.667513, 16.0923)
 shape = SubResource("ConvexPolygonShape3D_vkwci")
 
-[node name="CollisionShapeFence4" type="CollisionShape3D" parent="." index="3"]
+[node name="CollisionShapeFence4" type="CollisionShape3D" parent="." index="3" unique_id=1122483752]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4239, 2, -9.72188)
 shape = SubResource("ConvexPolygonShape3D_w630m")
 
-[node name="CollisionShapeFence3" type="CollisionShape3D" parent="." index="4"]
+[node name="CollisionShapeFence3" type="CollisionShape3D" parent="." index="4" unique_id=2129524260]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4239, 2, -9.72188)
 shape = SubResource("ConvexPolygonShape3D_agays")
 
-[node name="CollisionShapeFence2" type="CollisionShape3D" parent="." index="5"]
+[node name="CollisionShapeFence2" type="CollisionShape3D" parent="." index="5" unique_id=1286139756]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4239, 2, -9.72188)
 shape = SubResource("ConvexPolygonShape3D_rfb0l")
 
-[node name="CollisionShapeFence" type="CollisionShape3D" parent="." index="6"]
+[node name="CollisionShapeFence" type="CollisionShape3D" parent="." index="6" unique_id=395296100]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4239, 2, -9.72188)
 shape = SubResource("ConvexPolygonShape3D_kthc1")
->>>>>>> 1ec7b61 (Police Station Asset)

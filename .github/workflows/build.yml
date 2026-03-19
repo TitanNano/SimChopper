@@ -239,6 +239,7 @@ jobs:
           $env.PATH = $env.PATH | append ("./.godot_bin" | path expand)
           mkdir "${{ env.EXPORT_DIR }}"
           if ("${{ matrix.os }}" | str starts-with "ubuntu") {
+            sudo apt update
             sudo apt install xwayland-run mesa-vulkan-drivers
             wlheadless-run -- godot --verbose --export-debug ${{ env.EXPORT_ARGS }}
           } else {

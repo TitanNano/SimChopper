@@ -1,0 +1,6 @@
+[project]
+name = "blender_scripts"
+requires-python = "==3.11"
+
+[tool.ty.environment]
+extra-paths = ["/Applications/Blender.app/Contents/Resources/5.0/scripts/modules"]

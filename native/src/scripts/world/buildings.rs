@@ -65,7 +65,7 @@ impl Buildings {
 
         let handle = ctx.reentrant_scope(self, |mut base: Gd<Node>| {
             let mut script_self_ref: RsRef<Self> = base.to_script();
-            let tree = base.get_tree().expect("Node must be part of the tree!");
+            let tree = base.get_tree();
 
             task::spawn(async move {
                 let next_tick = tree.signals().process_frame();
@@ -171,7 +171,7 @@ impl Buildings {
         };
 
         if !instance.get("tile_coords_array").is_nil() {
-            let mut array = Array::new();
+            let mut array = Array::<u32>::new();
 
             array.push(tile_coords.0);
             array.push(tile_coords.1);
@@ -186,7 +186,7 @@ impl Buildings {
             building_size,
         );
 
-        // fix z fighting of flat buildings
+        // Fix z fighting of flat buildings
         location.y += 0.1;
 
         let ((), insert_time) = with_timing(|| {
@@ -195,7 +195,7 @@ impl Buildings {
                 .force_readable_name(true)
                 .done();
 
-            let Some(root) = base.get_tree().and_then(|tree| tree.get_current_scene()) else {
+            let Some(root) = base.get_tree().get_current_scene() else {
                 logger::warn!("there is no active scene!");
                 return;
             };
@@ -219,7 +219,7 @@ impl Buildings {
         }
     }
 
-    /// sector coordinates are expected to align with a step of 10
+    /// Sector coordinates are expected to align with a step of 10
     fn get_sector(
         base: &mut <Self as GodotScript>::Base,
         tile_coords: (u32, u32),
@@ -252,7 +252,7 @@ impl Buildings {
                     0,
                 ));
 
-                if let Some(root) = base.get_tree().and_then(|tree| tree.get_current_scene()) {
+                if let Some(root) = base.get_tree().get_current_scene() {
                     sector.set_owner(&root);
                 }
 

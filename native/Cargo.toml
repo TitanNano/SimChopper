@@ -7,8 +7,8 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = { version = "0.4.5", features = ["experimental-threads", "api-4-5", "register-docs"] }
-godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "26f10ece493d9cc8cdbe2799fba60f0420e41f65" }
+godot = { version = "=0.4.4", features = ["experimental-threads", "api-4-5", "register-docs"] }
+godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "8236e6366c2940978565b9ba2cb2def4deb60eee" }
 lerp = "0.4.0"
 backtrace = "0.3.64"
 num = "0.4.0"
@@ -26,3 +26,8 @@ kanal = { version = "0.1.1", features = ["async"] }
 [lints.clippy]
 pedantic = "deny"
 used_underscore_items = { level = "allow", priority = 1 }
+
+[patch.crates-io]
+godot = { git = "https://github.com/godot-rust/gdext" }
+godot-cell = { git = "https://github.com/godot-rust/gdext" }
+godot-bindings= { git = "https://github.com/godot-rust/gdext" }

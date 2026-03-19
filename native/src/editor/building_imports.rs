@@ -106,7 +106,7 @@ impl SetupBuildingImports {
 
         while let Some(dir_path) = dir_queue.pop_front() {
             logger::info!("Traversing dir \"{}\"...", dir_path);
-            let Some(mut dir) = DirAccess::open(&dir_path) else {
+            let Some(dir) = DirAccess::open(&dir_path) else {
                 logger::error!("Directory not accessible: {}", root_dir);
                 return;
             };
@@ -211,7 +211,7 @@ impl SetupBuildingImports {
             .for_each(|index| {
                 let path = scene_state.get_node_path(index);
                 let mut config: VarDictionary = nodes
-                    .get(path.clone())
+                    .get(&path)
                     .map(|value| value.try_to())
                     .transpose()
                     .inspect_err(|err| {
@@ -228,11 +228,11 @@ impl SetupBuildingImports {
 
                 nodes.set(
                     format!("PATH:{}", path.to_string().trim_start_matches("./")),
-                    config,
+                    &config,
                 );
             });
 
-        subresources.set("nodes", nodes);
+        subresources.set("nodes", &nodes);
 
         file.set_value("params", "_subresources", &subresources.to_variant());
 

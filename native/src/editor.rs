@@ -126,11 +126,7 @@ impl IEditorPlugin for EditorExtension {
         let ao_baker = {
             let base = self.base();
 
-            AoBaker::new(
-                editor_interface.clone(),
-                base.get_tree()
-                    .expect("SceneTree should be available after entering the tree"),
-            )
+            AoBaker::new(editor_interface.clone(), base.get_tree())
         };
 
         self.ao_baker.init(ao_baker);

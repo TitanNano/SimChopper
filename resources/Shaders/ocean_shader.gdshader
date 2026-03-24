@@ -1,7 +1,7 @@
 // Inspired by: https://developer.nvidia.com/gpugems/gpugems2/part-ii-shading-lighting-and-shadows/chapter-19-generic-refraction-simulation
 
 shader_type spatial;
-render_mode cull_back, specular_schlick_ggx, depth_prepass_alpha;
+render_mode cull_back, specular_schlick_ggx;
 
 // Varyings
 varying vec2 vary_world_uv;
@@ -20,7 +20,6 @@ uniform float Normal_Depth;
 uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_linear_mipmap;
 uniform sampler2D depth_texture : hint_depth_texture, repeat_disable, filter_linear_mipmap;
 uniform float wave_height;
-uniform bool invisible;
 
 const float WAVE_CONST = 6.28300;
 
@@ -82,10 +81,6 @@ void vertex() {
 }
 
 void fragment() {
-	if (invisible) {
-		discard;
-	}
-	
 	vec3 normal = sample_wave_noise(ocean_normal_map);
 
 	NORMAL_MAP = normal;

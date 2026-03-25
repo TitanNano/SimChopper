@@ -1,4 +1,9 @@
 ###
+# Copyright (c) SimChopper; Jovan Gerodetti and contributors.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+###
 # Blender GLTF ORM exporter.
 #
 # This export script prepares blender objects to be exported to GLTF using ORM materials.
@@ -14,9 +19,8 @@
 # Render Visibility:
 # The render visibility of an object is used to determine if the materials should be baked into an ORM material or not.
 # Objects that are hidden from rendering will be exported without their materials.
-#
-# License: Apache License 2.0
 ###
+
 import faulthandler
 import sys
 from argparse import ArgumentParser, Namespace

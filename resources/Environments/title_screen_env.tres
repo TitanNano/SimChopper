@@ -4,7 +4,7 @@
 background_energy_multiplier = 0.0
 background_intensity = 20000.0
 reflected_light_source = 2
-tonemap_mode = 3
+tonemap_mode = 4
 ssr_enabled = true
 ssr_depth_tolerance = 5.01
 ssao_ao_channel_affect = 1.0

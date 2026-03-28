@@ -198,7 +198,7 @@ impl ProbeDimensions {
         let size = (Uf32::from(tile_size) * tile_count).into_f32();
         let extent = size / 2.0;
 
-        // probes get an extra margin of 2 tiles on each side so they overlap and blend together.
+        // Probes get an extra margin of 2 tiles on each side so they overlap and blend together.
         let margin = Uf32::from(tile_size).into_f32() * MARGIN_TILES * MARGIN_SIDES;
 
         Self {
@@ -234,12 +234,12 @@ fn create_voxel_gi_probe(
 
     let translate_x = dimensions.size
                     * Uf32::new(xy.0).into_f32()
-                    // the initial offset is one probe extend / half the probe size
+                    // The initial offset is one probe extend / half the probe size
                     + dimensions.extent;
 
     let translate_y = dimensions.size
                     * Uf32::new(xy.1).into_f32()
-                    // the initial offset is one probe extend / half the probe size
+                    // The initial offset is one probe extend / half the probe size
                     + dimensions.extent;
 
     let translate_z = height_offset + dimensions.extent;

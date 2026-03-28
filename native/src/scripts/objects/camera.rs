@@ -121,6 +121,27 @@ impl Camera {
         },
     ];
 
+    #[cfg(debug_assertions)]
+    fn debug_monitors(&self) {
+        use godot::{classes::Performance, obj::Singleton as _};
+
+        use crate::script_callable;
+
+        let mut performance = Performance::singleton();
+
+        performance.add_custom_monitor("Camera/fstop", &script_callable!(self, Self::get_fstop));
+
+        performance.add_custom_monitor(
+            "Camera/shutter_speed",
+            &script_callable!(self, Self::get_shutter_speed),
+        );
+    }
+
+    pub fn _ready(&self) {
+        #[cfg(debug_assertions)]
+        self.debug_monitors();
+    }
+
     pub fn _process(&mut self, _delta: f64) {
         let Some(mut attributes): Option<Gd<CameraAttributesPhysical>> = self
             .base
@@ -161,6 +182,24 @@ impl Camera {
             .find_or_last(|(_, setting)| setting.lux > brightness)
             .expect("the FSTOPS array is not empty");
 
+        if next_index == 0 {
+            let ExposureSetting {
+                fstop,
+                shutter,
+                lux: _,
+            } = Self::FSTOPS[next_index];
+
+            if attributes.get_aperture().approx_eq(&fstop)
+                && attributes.get_shutter_speed().approx_eq(&shutter)
+            {
+                return;
+            }
+
+            attributes.set_aperture(fstop);
+            attributes.set_shutter_speed(shutter);
+            return;
+        }
+
         let closest = &Self::FSTOPS[next_index - 1];
 
         let diff = (next.lux / closest.lux).log(f32::consts::E);
@@ -177,6 +216,22 @@ impl Camera {
 
         attributes.set_aperture(fstop);
         attributes.set_shutter_speed(shutter);
+    }
+
+    pub fn get_fstop(&self) -> f32 {
+        self.base
+            .get_attributes()
+            .and_then(|attributes| attributes.try_cast::<CameraAttributesPhysical>().ok())
+            .map(|attributes| attributes.get_aperture())
+            .unwrap_or_default()
+    }
+
+    pub fn get_shutter_speed(&self) -> f32 {
+        self.base
+            .get_attributes()
+            .and_then(|attributes| attributes.try_cast::<CameraAttributesPhysical>().ok())
+            .map(|attributes| attributes.get_shutter_speed())
+            .unwrap_or_default()
     }
 }
 

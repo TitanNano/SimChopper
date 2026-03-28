@@ -9,6 +9,7 @@ mod effects;
 mod objects;
 mod particles;
 mod spawner;
+mod ui;
 mod world;
 
 pub use spawner::*;

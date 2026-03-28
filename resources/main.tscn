@@ -20,6 +20,10 @@
 [ext_resource type="PackedScene" uid="uid://cmv7rt4gqew38" path="res://resources/Objects/Helis/schweizer_300.tscn" id="16_e6k8r"]
 [ext_resource type="RoadNavigationConfig" uid="uid://dvccb8vdrejqp" path="res://resources/Config/road_navigation.tres" id="16_eq860"]
 [ext_resource type="Script" uid="uid://djjvfkec3e3ph" path="res://native/src/scripts/world/gi_probes.rs" id="19_e3ctf"]
+[ext_resource type="AnimationLibrary" uid="uid://bc7h3e5qkdula" path="res://resources/Animations/title_screen_ui.tres" id="21_hlc2k"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nkrdn"]
+bg_color = Color(0, 0, 0, 1)
 
 [node name="HUDController" type="Control" unique_id=748958734]
 layout_mode = 3
@@ -53,6 +57,15 @@ offset_top = -7.0
 offset_right = -20.0
 offset_bottom = 23.0
 step = 1.0
+
+[node name="Black Cover" type="Panel" parent="." unique_id=1504103830]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_nkrdn")
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1582860659]
 visible = false
@@ -176,3 +189,7 @@ negative_y_offset = 2
 voxel_gi_data = ExtResource("9_nkrdn")
 is_built = null
 metadata/_custom_type_script = "uid://djjvfkec3e3ph"
+
+[node name="Scene Transition Player" type="AnimationPlayer" parent="." unique_id=1724791256]
+libraries/title_screen_ui = ExtResource("21_hlc2k")
+autoplay = &"title_screen_ui/fade_in"

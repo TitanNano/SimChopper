@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://iok4t24eiket"]
+
+[ext_resource type="Texture2D" uid="uid://1ad3udl0tgjo" path="res://resources/Meshes/Buildings/Hangar/hangar_2/textures/indoor_ground_diffuse.png" id="1_xwgow"]
+[ext_resource type="Texture2D" uid="uid://c8gd84lxx8mma" path="res://resources/Meshes/Buildings/Hangar/hangar_2/textures/indoor_ground_orm.png" id="2_m1p15"]
+[ext_resource type="Texture2D" uid="uid://bnfsolxbqvg4q" path="res://resources/Meshes/Buildings/Hangar/hangar_2/textures/indoor_ground_normal.png" id="3_nk33r"]
+
+[resource]
+resource_name = "Indoor Ground"
+specular_mode = 2
+albedo_texture = ExtResource("1_xwgow")
+metallic = 1.0
+metallic_texture = ExtResource("2_m1p15")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("2_m1p15")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_texture = ExtResource("3_nk33r")
+ao_enabled = true
+ao_texture = ExtResource("2_m1p15")
+ao_on_uv2 = true

@@ -1,0 +1,18 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://6il7lmkm1bm1"]
+
+[ext_resource type="Texture2D" uid="uid://uflx6rm6ygt3" path="res://resources/Meshes/Buildings/Hangar/hangar_2/textures/ground_diffuse.png" id="1_j0mw8"]
+[ext_resource type="Texture2D" uid="uid://34748poqifjs" path="res://resources/Meshes/Buildings/Hangar/hangar_2/textures/ground_orm.png" id="2_uj0ap"]
+[ext_resource type="Texture2D" uid="uid://qo11xi4v8ycj" path="res://resources/Meshes/Buildings/Hangar/hangar_2/textures/ground_normal.png" id="3_3ob1p"]
+
+[resource]
+resource_name = "Ground"
+albedo_texture = ExtResource("1_j0mw8")
+metallic = 1.0
+metallic_texture = ExtResource("2_uj0ap")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("2_uj0ap")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_texture = ExtResource("3_3ob1p")
+ao_enabled = true
+ao_texture = ExtResource("2_uj0ap")

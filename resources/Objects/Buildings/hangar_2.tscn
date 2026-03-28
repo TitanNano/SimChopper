@@ -1,12 +1,239 @@
 [gd_scene format=3 uid="uid://csuvlu656dwm4"]
 
-[ext_resource type="PackedScene" uid="uid://c8vc84r2fcjqp" path="res://resources/Meshes/Buildings/Hangar/hangar_2.gltf" id="1"]
+[ext_resource type="PackedScene" uid="uid://cltk5bfqpuydh" path="res://resources/Meshes/Buildings/Hangar/hangar_2/hangar_2.gltf" id="1_dvrmq"]
+[ext_resource type="PackedScene" uid="uid://du7uqddbtefxw" path="res://resources/Objects/Buildings/hangar_2/tube_lights.tscn" id="2_fnxbs"]
+[ext_resource type="Material" uid="uid://c6gn14u0a5vyd" path="res://resources/Meshes/Buildings/Hangar/hangar_2/materials/Building.tres" id="3_jr424"]
 
-[sub_resource type="ConcavePolygonShape3D" id="1"]
-data = PackedVector3Array(-3.9432, 13.5964, -8.1728, -9.9296, -13.2826, -5.2163, -3.9432, -13.2826, -8.1728, -3.9432, 13.5964, -8.1728, -9.9296, 13.5964, -5.2163, -9.9296, -13.2826, -5.2163, -0.7599, 13.5964, -11.099, -3.9801, -13.2826, -9.8313, -0.7599, -13.2826, -11.099, -0.7599, 13.5964, -11.099, -3.9801, 13.5964, -9.8313, -3.9801, -13.2826, -9.8313, 9.1933, 13.5964, -5.4151, -0.7599, -13.2826, -11.099, 9.1933, -13.2826, -5.4151, 9.1933, 13.5964, -5.4151, -0.7599, 13.5964, -11.099, -0.7599, -13.2826, -11.099, -3.9801, 13.5964, -9.8313, -3.9432, -13.2826, -8.1728, -3.9801, -13.2826, -9.8313, -3.9801, 13.5964, -9.8313, -3.9432, 13.5964, -8.1728, -3.9432, -13.2826, -8.1728, 6.8208, 13.5964, -5.2261, -7.1827, 13.5964, -0.0001, -7.1827, 13.5964, -5.2261, 6.8208, 13.5964, -5.2261, 6.8208, 13.5964, -0.0001, -7.1827, 13.5964, -0.0001, 6.8208, 13.5964, -5.2261, -0.7599, 13.5964, -11.099, 9.1933, 13.5964, -5.4151, -0.7599, 13.5964, -11.099, -3.9432, 13.5964, -8.1728, -3.9801, 13.5964, -9.8313, -0.7599, 13.5964, -11.099, 6.8208, 13.5964, -5.2261, -3.9432, 13.5964, -8.1728, -9.9296, 13.5964, -5.2163, -7.1827, 13.5964, -0.0001, -9.9182, 13.5964, -0.0001, -9.9296, 13.5964, -5.2163, -7.1827, 13.5964, -5.2261, -7.1827, 13.5964, -0.0001, 9.1667, 13.5964, 0, 6.8208, 13.5964, -0.0001, 9.1933, 13.5964, -5.4151, -7.1827, 13.5964, -5.2261, -3.9432, 13.5964, -8.1728, 6.8208, 13.5964, -5.2261, -7.1827, 13.5964, -5.2261, -9.9296, 13.5964, -5.2163, -3.9432, 13.5964, -8.1728, 9.1933, 13.5964, -5.4151, 6.8208, 13.5964, -0.0001, 6.8208, 13.5964, -5.2261, -9.9296, -13.2826, -5.2163, 9.1933, -13.2826, -5.4151, -3.9432, -13.2826, -8.1728, 9.1933, -13.2826, -5.4151, -9.9182, -13.2826, -0.0001, 9.1667, -13.2826, 0, 9.1933, -13.2826, -5.4151, -9.9296, -13.2826, -5.2163, -9.9182, -13.2826, -0.0001, -3.9801, -13.2826, -9.8313, 9.1933, -13.2826, -5.4151, -0.7599, -13.2826, -11.099, -3.9801, -13.2826, -9.8313, -3.9432, -13.2826, -8.1728, 9.1933, -13.2826, -5.4151, -9.9296, 13.5964, -5.2163, -9.9182, -13.2826, -0.0001, -9.9296, -13.2826, -5.2163, -9.9296, 13.5964, -5.2163, -9.9182, 13.5964, -0.0001, -9.9182, -13.2826, -0.0001, 9.1667, 13.5964, 0, 9.1933, -13.2826, -5.4151, 9.1667, -13.2826, 0, 9.1667, 13.5964, 0, 9.1933, 13.5964, -5.4151, 9.1933, -13.2826, -5.4151)
+[node name="hangar_2" unique_id=1321286550 instance=ExtResource("1_dvrmq")]
 
-[node name="Hangar" unique_id=627936103 instance=ExtResource("1")]
+[node name="Light Track Left" type="Node3D" parent="." index="3" unique_id=1978584672]
+transform = Transform3D(9.535499e-08, 0.34202012, 0.9396926, -1.4188964e-07, -0.9396926, 0.34202012, 1, -1.6594598e-07, -4.1075268e-08, -5.859967, 7.669233, 10.00715)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." index="1" unique_id=702497524]
-transform = Transform3D(1, 0, 0, 0, -1.19209e-07, -1, 0, 1, -1.19209e-07, 0, 0, 0)
-shape = SubResource("1")
+[node name="tube_lights" parent="Light Track Left" index="0" unique_id=813832276 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Left" index="1" unique_id=451786667 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Left" index="2" unique_id=1706005757 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Left" index="3" unique_id=167322145 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Left 2" type="Node3D" parent="." index="4" unique_id=522442618]
+transform = Transform3D(9.535499e-08, 0.34202012, 0.9396926, -1.4188964e-07, -0.9396926, 0.34202012, 1, -1.6594598e-07, -4.1075268e-08, -5.8599677, 7.669234, 5.969054)
+
+[node name="tube_lights" parent="Light Track Left 2" index="0" unique_id=938034627 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Left 2" index="1" unique_id=389579126 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Left 2" index="2" unique_id=106112549 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Left 2" index="3" unique_id=967468443 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Left 3" type="Node3D" parent="." index="5" unique_id=404892037]
+transform = Transform3D(9.535499e-08, 0.34202012, 0.9396926, -1.4188964e-07, -0.9396926, 0.34202012, 1, -1.6594598e-07, -4.1075268e-08, -5.859968, 7.6692343, 1.9187808)
+
+[node name="tube_lights" parent="Light Track Left 3" index="0" unique_id=1481885219 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Left 3" index="1" unique_id=561840548 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Left 3" index="2" unique_id=1548497207 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Left 3" index="3" unique_id=1214149839 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Left 4" type="Node3D" parent="." index="6" unique_id=310696638]
+transform = Transform3D(9.535499e-08, 0.34202012, 0.9396926, -1.4188964e-07, -0.9396926, 0.34202012, 1, -1.6594598e-07, -4.1075268e-08, -5.8599687, 7.6692348, -2.0778065)
+
+[node name="tube_lights" parent="Light Track Left 4" index="0" unique_id=1636679679 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Left 4" index="1" unique_id=1426359070 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Left 4" index="2" unique_id=772072727 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Left 4" index="3" unique_id=1576223946 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Left 5" type="Node3D" parent="." index="7" unique_id=497913032]
+transform = Transform3D(9.535499e-08, 0.34202012, 0.9396926, -1.4188964e-07, -0.9396926, 0.34202012, 1, -1.6594598e-07, -4.1075268e-08, -5.859969, 7.669235, -6.106756)
+
+[node name="tube_lights" parent="Light Track Left 5" index="0" unique_id=1652349928 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Left 5" index="1" unique_id=1498079276 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Left 5" index="2" unique_id=1347808566 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Left 5" index="3" unique_id=1852822982 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Left 6" type="Node3D" parent="." index="8" unique_id=1788481374]
+transform = Transform3D(9.535499e-08, 0.34202012, 0.9396926, -1.4188964e-07, -0.9396926, 0.34202012, 1, -1.6594598e-07, -4.1075268e-08, -5.8599696, 7.6692357, -10.094002)
+
+[node name="tube_lights" parent="Light Track Left 6" index="0" unique_id=1686859686 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Left 6" index="1" unique_id=337617432 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Left 6" index="2" unique_id=1292544956 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Left 6" index="3" unique_id=219522468 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Right" type="Node3D" parent="." index="9" unique_id=1309723180]
+transform = Transform3D(7.361174e-08, -0.3420201, 0.93969256, 8.2150535e-08, -0.93969256, -0.3420201, 1, 1.02372944e-07, -4.1075264e-08, 5.86, 7.669, 10.007)
+
+[node name="tube_lights" parent="Light Track Right" index="0" unique_id=1974628559 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Right" index="1" unique_id=1846153696 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Right" index="2" unique_id=1258172307 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Right" index="3" unique_id=2090629456 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Right 2" type="Node3D" parent="." index="10" unique_id=935759350]
+transform = Transform3D(-7.932215e-09, -0.3420201, 0.93969256, -1.4188964e-07, -0.93969256, -0.3420201, 1, -1.3604561e-07, -4.1075264e-08, 5.86, 7.669234, 5.969054)
+
+[node name="tube_lights" parent="Light Track Right 2" index="0" unique_id=735242865 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Right 2" index="1" unique_id=347104525 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Right 2" index="2" unique_id=157224117 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Right 2" index="3" unique_id=1292146989 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Right 3" type="Node3D" parent="." index="11" unique_id=858623805]
+transform = Transform3D(-7.932215e-09, -0.3420201, 0.93969256, -1.4188964e-07, -0.93969256, -0.3420201, 1, -1.3604561e-07, -4.1075264e-08, 5.86, 7.6692343, 1.9187808)
+
+[node name="tube_lights" parent="Light Track Right 3" index="0" unique_id=646751801 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Right 3" index="1" unique_id=2011858509 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Right 3" index="2" unique_id=393719924 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Right 3" index="3" unique_id=1803343782 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Right 4" type="Node3D" parent="." index="12" unique_id=1832581696]
+transform = Transform3D(-7.932215e-09, -0.3420201, 0.93969256, -1.4188964e-07, -0.93969256, -0.3420201, 1, -1.3604561e-07, -4.1075264e-08, 5.86, 7.6692348, -2.0778065)
+
+[node name="tube_lights" parent="Light Track Right 4" index="0" unique_id=1525687508 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Right 4" index="1" unique_id=1719272415 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Right 4" index="2" unique_id=1044944074 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Right 4" index="3" unique_id=841582717 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Right 5" type="Node3D" parent="." index="13" unique_id=183082794]
+transform = Transform3D(-7.932215e-09, -0.3420201, 0.93969256, -1.4188964e-07, -0.93969256, -0.3420201, 1, -1.3604561e-07, -4.1075264e-08, 5.86, 7.669235, -6.106756)
+
+[node name="tube_lights" parent="Light Track Right 5" index="0" unique_id=248699388 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Right 5" index="1" unique_id=1360921683 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Right 5" index="2" unique_id=925323479 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Right 5" index="3" unique_id=904281434 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light Track Right 6" type="Node3D" parent="." index="14" unique_id=1133466923]
+transform = Transform3D(-7.932215e-09, -0.3420201, 0.93969256, -1.4188964e-07, -0.93969256, -0.3420201, 1, -1.3604561e-07, -4.1075264e-08, 5.86, 7.6692357, -10.094002)
+
+[node name="tube_lights" parent="Light Track Right 6" index="0" unique_id=1965253009 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316017, 4.419795)
+
+[node name="tube_lights2" parent="Light Track Right 6" index="1" unique_id=954970798 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316019, 1.4102787)
+
+[node name="tube_lights3" parent="Light Track Right 6" index="2" unique_id=2006438914 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030801, -0.07316016, -1.6610591)
+
+[node name="tube_lights4" parent="Light Track Right 6" index="3" unique_id=960079137 instance=ExtResource("2_fnxbs")]
+transform = Transform3D(1, 6.357303e-08, 1.4210855e-14, -6.357303e-08, 1, 6.8162753e-15, 0, 4.204997e-15, 1, -0.015030809, -0.07316017, -4.488252)
+
+[node name="Light A" type="OmniLight3D" parent="." index="15" unique_id=1123137260]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.717, 3.735, 5.9)
+light_intensity_lumens = 3000.0
+light_temperature = 4000.0
+light_energy = 6.0
+light_indirect_energy = 6.0
+light_bake_mode = 1
+shadow_enabled = true
+distance_fade_enabled = true
+omni_range = 15.0
+omni_attenuation = 0.5
+
+[node name="Light B" type="OmniLight3D" parent="." index="16" unique_id=745981896]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, 3.7, -5.9)
+light_intensity_lumens = 3000.0
+light_temperature = 4000.0
+light_energy = 6.0
+light_indirect_energy = 6.0
+light_bake_mode = 1
+shadow_enabled = true
+distance_fade_enabled = true
+omni_range = 15.0
+omni_attenuation = 0.5
+
+[node name="Light C" type="OmniLight3D" parent="." index="17" unique_id=1627533097]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 3.735, 5.9)
+light_intensity_lumens = 3000.0
+light_temperature = 4000.0
+light_energy = 6.0
+light_indirect_energy = 6.0
+light_bake_mode = 1
+shadow_enabled = true
+distance_fade_enabled = true
+omni_range = 15.0
+omni_attenuation = 0.5
+
+[node name="Light D" type="OmniLight3D" parent="." index="18" unique_id=1995652949]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 3.7, -5.9)
+light_intensity_lumens = 3000.0
+light_temperature = 4000.0
+light_energy = 6.0
+light_indirect_energy = 6.0
+light_bake_mode = 1
+shadow_enabled = true
+distance_fade_enabled = true
+omni_range = 15.0
+omni_attenuation = 0.5
+
+[node name="Light Occluder" parent="." index="21" unique_id=731240431 groups=["light_occluder"]]
+visible = false
+surface_material_override/0 = ExtResource("3_jr424")

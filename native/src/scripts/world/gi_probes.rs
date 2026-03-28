@@ -10,8 +10,10 @@ use std::future::IntoFuture;
 use godot::builtin::Vector3;
 use godot::classes::node::{ProcessMode, ProcessThreadGroup};
 use godot::classes::voxel_gi::Subdiv;
-use godot::classes::{CameraAttributes, Node3D, VoxelGi, VoxelGiData};
-use godot::obj::{Gd, NewAlloc};
+use godot::classes::{
+    CameraAttributes, CameraAttributesPractical, MeshInstance3D, Node3D, VoxelGi, VoxelGiData,
+};
+use godot::obj::{Gd, NewAlloc, NewGd};
 use godot_rust_script::{
     godot_script_impl, CastToScript, GodotScript, OnEditor, RsRef, ScriptSignal,
 };
@@ -30,17 +32,17 @@ struct GiProbes {
     #[export]
     pub world_constants: OnEditor<Gd<WorldConstants>>,
 
-    // camera attribues that are used by the scene.
+    /// Camera attributes that are used by the scene.
     #[export]
     pub camera_attributes: OnEditor<Gd<CameraAttributes>>,
 
-    // Number of probes that will be used to cover the world with VoxelGI.
-    //
-    // The probe_count will be squared.
+    /// Number of probes that will be used to cover the world with `VoxelGI`.
+    ///
+    /// The `probe_count` will be squared.
     #[export(range(min = 0.0, max = 20.0, suffix = "²"))]
     pub probe_count: Uf32,
 
-    // Negative offset of the GI probes in number of tiles.
+    /// Negative offset of the GI probes in number of tiles.
     #[export(range(min = 0.0, max = 200.0, suffix = "Tiles"))]
     pub negative_y_offset: Uf32,
 
@@ -69,6 +71,7 @@ impl GiProbes {
         let probe_count = self.probe_count;
         let negative_y_offset = self.negative_y_offset;
         let camera_attributes = self.camera_attributes.clone();
+        let bake_camera_attributes = CameraAttributesPractical::new_gd().upcast();
         let voxel_gi_data = self.voxel_gi_data.clone();
         let tile_size = world_constants.bind().tile_size();
         let mut base = self.base.clone();
@@ -79,13 +82,28 @@ impl GiProbes {
                 return;
             }
 
-            // wait for one frame to clear the borrow of self.
-            base.get_tree()
-                .unwrap()
-                .signals()
-                .process_frame()
-                .into_future()
-                .await;
+            let mut tree = base.get_tree().unwrap();
+
+            // Wait for one frame to clear the borrow of self.
+            tree.signals().process_frame().into_future().await;
+
+            // set up light occluders
+            let occluders = tree.get_nodes_in_group("light_occluder");
+
+            for occluder in occluders.iter_shared() {
+                let mut occluder_mesh: Gd<MeshInstance3D> = match occluder.try_cast() {
+                    Ok(mesh) => mesh,
+                    Err(err) => {
+                        logger::warn!(
+                            "light_occluder node group contains non MeshInstance3D node! {}",
+                            err
+                        );
+                        continue;
+                    }
+                };
+
+                occluder_mesh.set_visible(true);
+            }
 
             let tiles_per_probe = city_size / probe_count;
 
@@ -108,7 +126,7 @@ impl GiProbes {
                         &mut base,
                         &probe_dimensions,
                         &voxel_gi_data,
-                        &camera_attributes,
+                        &bake_camera_attributes,
                         xy,
                         probe_vertical_offset(
                             sea_level,
@@ -130,14 +148,19 @@ impl GiProbes {
                     probe_count.into_usize().pow(2)
                 );
 
+                probe.set_camera_attributes(&camera_attributes);
                 script.emit_build_progess(LOAD_STEP_MULTIPLIER);
                 generated_probe_count += 1;
 
-                // render one frame to update progress bar.
+                // Render one frame to update progress bar.
                 scene_tree.signals().process_frame().into_future().await;
             }
 
             debug_assert_eq!(generated_probe_count, probe_count.into_usize().pow(2));
+
+            for mut occluder in occluders.iter_shared() {
+                occluder.queue_free();
+            }
 
             script.set_built(true);
             resolve(());
@@ -175,7 +198,7 @@ impl ProbeDimensions {
         let size = (Uf32::from(tile_size) * tile_count).into_f32();
         let extent = size / 2.0;
 
-        // probes get an extra margin of 2 tiles on each side so they overlap and blend together.
+        // Probes get an extra margin of 2 tiles on each side so they overlap and blend together.
         let margin = Uf32::from(tile_size).into_f32() * MARGIN_TILES * MARGIN_SIDES;
 
         Self {
@@ -211,12 +234,12 @@ fn create_voxel_gi_probe(
 
     let translate_x = dimensions.size
                     * Uf32::new(xy.0).into_f32()
-                    // the initial offset is one probe extend / half the probe size
+                    // The initial offset is one probe extend / half the probe size
                     + dimensions.extent;
 
     let translate_y = dimensions.size
                     * Uf32::new(xy.1).into_f32()
-                    // the initial offset is one probe extend / half the probe size
+                    // The initial offset is one probe extend / half the probe size
                     + dimensions.extent;
 
     let translate_z = height_offset + dimensions.extent;

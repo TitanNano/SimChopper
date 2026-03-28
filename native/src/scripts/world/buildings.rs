@@ -24,7 +24,7 @@ use crate::resources::WorldConstants;
 use crate::util::async_support::{self, GodotFuture};
 use crate::util::logger;
 use crate::world::city_coords_feature::CityCoordsFeature;
-use crate::world::city_data::{self, TryFromDictionary};
+use crate::world::city_data::{self, TileCoords, TryFromDictionary};
 
 #[derive(GodotScript, Dbg)]
 #[script(base = Node)]
@@ -97,6 +97,7 @@ impl Buildings {
 
                 let mut count = 0;
                 let mut start = time.get_ticks_msec();
+                let mut spawn_point: Option<[TileCoords; 4]> = None;
 
                 for building in buildings.into_values() {
                     if (time.get_ticks_msec() - start) > Self::TIME_BUDGET {
@@ -110,7 +111,51 @@ impl Buildings {
                     count += 1;
 
                     if building.id == 0x00 {
-                        logger::info!("{:?}: skipping empty building", building.tile_coords);
+                        // Zero building means tile is occupied by a building that starts on an other tile.
+                        continue;
+                    }
+
+                    // Check if tarmac tile is the spawn point.
+                    if building.id == scene_object_registry::Buildings::Tarmac
+                        && is_spawn_point(&building, &tiles)
+                    {
+                        let building_origin = (building.tile_coords.0, building.tile_coords.1 + 1);
+
+                        spawn_point = Some([
+                            building.tile_coords,
+                            (building.tile_coords.0 + 1, building.tile_coords.1),
+                            building_origin,
+                            (building.tile_coords.0 + 1, building.tile_coords.1 + 1),
+                        ]);
+
+                        logger::info!("encountered a spawn point: {:?}", building);
+                        let spawn_building = city_data::Building {
+                            id: scene_object_registry::Buildings::Hangar2 as u8,
+                            tile_coords: building_origin,
+                            name: "Hangar".into(),
+                            size: 2,
+                        };
+
+                        let Some(spawn_tile) = tiles.get(&building_origin) else {
+                            logger::error!("missing tile at {:?}", building_origin);
+                            continue;
+                        };
+
+                        Self::insert_building(
+                            &mut base,
+                            &spawn_building,
+                            &tiles,
+                            &city_coords_feature,
+                        );
+
+                        CastToScript::<Buildings>::to_script(&base).emit_spawn_point_encountered(
+                            Array::from(&[building_origin.0, building_origin.1]),
+                            2,
+                            spawn_tile.altitude,
+                        );
+                    }
+
+                    if spawn_point.is_some_and(|tiles| tiles.contains(&building.tile_coords)) {
                         continue;
                     }
 
@@ -151,25 +196,6 @@ impl Buildings {
             return;
         };
 
-        if building_id == scene_object_registry::Buildings::Tarmac
-            && is_spawn_point(building, tiles)
-        {
-            logger::info!("encountered a spawn point: {:?}", building);
-            let spawn_building = city_data::Building {
-                id: scene_object_registry::Buildings::Hangar2 as u8,
-                tile_coords,
-                name: "Hangar".into(),
-                size: 2,
-            };
-
-            Self::insert_building(base, &spawn_building, tiles, city_coords_feature);
-            CastToScript::<Buildings>::to_script(base).emit_spawn_point_encountered(
-                Array::from(&[tile_coords.0, tile_coords.1]),
-                2,
-                altitude,
-            );
-        }
-
         let (Some(mut instance), instance_time) =
             with_timing(|| object.try_instantiate_as::<Node3D>())
         else {
@@ -193,7 +219,7 @@ impl Buildings {
             building_size,
         );
 
-        // fix z fighting of flat buildings
+        // Fix z fighting of flat buildings
         location.y += 0.01;
 
         let ((), insert_time) = with_timing(|| {
@@ -285,7 +311,7 @@ fn is_spawn_point(
 ) -> bool {
     let (x, y) = building.tile_coords;
 
-    let x_miss = (x - 1..x + 3)
+    let x_miss = (x - 1..=(x + 2))
         .all(|index| {
             let Some(tile) = tiles.get(&(index, y)) else {
                 logger::error!("unable to get tile at: x = {}, y = {}", index, y);
@@ -293,7 +319,6 @@ fn is_spawn_point(
             };
 
             let Some(building) = tile.building.as_ref() else {
-                logger::warn!("tile has no building!");
                 return false;
             };
 
@@ -305,7 +330,7 @@ fn is_spawn_point(
         return false;
     }
 
-    (y - 1..y + 3).all(|index| {
+    (y - 1..=(y + 2)).all(|index| {
         let Some(tile) = tiles.get(&(x, index)) else {
             logger::error!("unable to get tile at: x = {}, y = {}", x, index);
             return false;

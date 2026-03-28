@@ -1,0 +1,56 @@
+[gd_resource type="Theme" format=3 uid="uid://rumvfyg8qyrj"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hk5p3"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skxmj"]
+bg_color = Color(0.82, 0.82, 0.82, 0.19607843)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_skxmj"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qcj5l"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hk5p3"]
+bg_color = Color(0.31, 0.31, 0.31, 0.19607843)
+
+[sub_resource type="Gradient" id="Gradient_hk5p3"]
+offsets = PackedFloat32Array(0, 0.9981413)
+colors = PackedColorArray(0.5481, 0.66613007, 0.87, 0.4627451, 0.2, 0.2, 0.2, 0.43529412)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_hk5p3"]
+noise_type = 5
+frequency = 0.0226
+fractal_octaves = 3
+fractal_lacunarity = 0.5
+fractal_gain = 1.0
+domain_warp_enabled = true
+domain_warp_type = 2
+domain_warp_amplitude = 50.0
+domain_warp_frequency = 0.06
+domain_warp_fractal_octaves = 3
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_skxmj"]
+noise = SubResource("FastNoiseLite_hk5p3")
+color_ramp = SubResource("Gradient_hk5p3")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vhryd"]
+texture = SubResource("NoiseTexture2D_skxmj")
+axis_stretch_horizontal = 1
+
+[resource]
+Button/colors/font_disabled_color = Color(0.796243, 0.796243, 0.796243, 0.45490196)
+Button/constants/h_separation = 0
+Button/font_sizes/font_size = 28
+Button/styles/disabled = SubResource("StyleBoxEmpty_hk5p3")
+Button/styles/focus = SubResource("StyleBoxFlat_skxmj")
+Button/styles/hover = SubResource("StyleBoxEmpty_skxmj")
+Button/styles/normal = SubResource("StyleBoxEmpty_qcj5l")
+Button/styles/pressed = SubResource("StyleBoxFlat_hk5p3")
+Panel/styles/panel = SubResource("StyleBoxTexture_vhryd")

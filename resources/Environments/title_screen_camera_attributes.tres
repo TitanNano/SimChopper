@@ -1,0 +1,8 @@
+[gd_resource type="CameraAttributesPhysical" format=3 uid="uid://dxi45jwp3asnw"]
+
+[resource]
+frustum_focus_distance = 4.4
+frustum_focal_length = 20.0
+exposure_aperture = 2.0
+exposure_shutter_speed = 60.0
+auto_exposure_min_exposure_value = -1.0

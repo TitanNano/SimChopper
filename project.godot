@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Sim Chopper"
 config/version="0.5.0"
-run/main_scene="res://resources/main.tscn"
+run/main_scene="uid://b0l6ccv01wtnb"
 config/features=PackedStringArray("4.6")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 
@@ -55,6 +55,10 @@ enabled=PackedStringArray("res://addons/customization/plugin.cfg")
 [filesystem]
 
 import/blender/enabled=false
+
+[global_group]
+
+light_occluder="MeshInstances to block out light during VoxelGI baking"
 
 [importer_defaults]
 

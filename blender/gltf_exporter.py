@@ -174,7 +174,7 @@ def select_object(object: bpy.types.Object):
 
 def texture_size(object: bpy.types.Object) -> int:
     if "texture_size" in object:
-        return TEXTURE_BASE_SIZE * object["texture_size"]
+        return int(TEXTURE_BASE_SIZE * object["texture_size"])
     else:
         return TEXTURE_BASE_SIZE
 
@@ -187,7 +187,7 @@ def create_orm_material(
     normal_image: bpy.types.Image,
     emission_image: bpy.types.Image,
 ) -> bpy.types.Material:
-    material = bpy.data.materials.new(name = "ORM Material")
+    material = bpy.data.materials.new(name = object.name)
     material.use_backface_culling = True
     material.use_backface_culling_shadow = True
     material.use_backface_culling_lightprobe_volume = True

@@ -5,13 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-use anyhow::{bail, Context};
-use godot::builtin::StringName;
 use godot::classes::{GpuParticles3D, Node3D};
 use godot::obj::Gd;
 use godot_rust_script::{godot_script_impl, GodotScript, GodotScriptEnum, OnEditor};
-
-use crate::util::logger;
 
 #[derive(Debug, Default, GodotScriptEnum, Clone, Copy)]
 #[script_enum(export)]
@@ -20,26 +16,6 @@ pub enum CanonMode {
     Inactive,
     Water,
     Teargas,
-}
-
-#[derive(Debug)]
-enum CanonAction {
-    FirePrimary,
-    FireSecondary,
-}
-
-impl TryFrom<StringName> for CanonAction {
-    type Error = anyhow::Error;
-
-    fn try_from(value: StringName) -> Result<Self, Self::Error> {
-        let action = match value.to_string().as_str() {
-            "fire_primary" => Self::FirePrimary,
-            "fire_secondary" => Self::FireSecondary,
-            _ => bail!("Invalid canon action: {}", value),
-        };
-
-        Ok(action)
-    }
 }
 
 #[derive(GodotScript, Debug)]
@@ -76,44 +52,13 @@ impl CanonUpgrade {
         }
     }
 
-    pub fn action_start(&mut self, action: StringName) {
-        let action = match CanonAction::try_from(action).context("Failed to parse action string") {
-            Ok(action) => action,
-            Err(err) => {
-                logger::error!("{:?}", err);
-                return;
-            }
-        };
-
-        let current_mode = self.mode;
-
-        match (action, current_mode) {
-            (CanonAction::FirePrimary, CanonMode::Inactive) => {
+    pub fn action(&mut self, pressed: bool) {
+        match (pressed, self.mode) {
+            (true, CanonMode::Inactive) => {
                 self.set_mode(CanonMode::Water);
             }
 
-            (CanonAction::FireSecondary, CanonMode::Inactive) => {
-                self.set_mode(CanonMode::Teargas);
-            }
-
-            _ => (),
-        }
-    }
-
-    pub fn action_end(&mut self, action: StringName) {
-        let action = match CanonAction::try_from(action).context("Failed to parse action string") {
-            Ok(action) => action,
-            Err(err) => {
-                logger::error!("{:?}", err);
-                return;
-            }
-        };
-
-        let current_mode: CanonMode = self.mode;
-
-        match (action, current_mode) {
-            (CanonAction::FireSecondary, CanonMode::Teargas)
-            | (CanonAction::FirePrimary, CanonMode::Water) => {
+            (false, CanonMode::Water) => {
                 self.set_mode(CanonMode::Inactive);
             }
 

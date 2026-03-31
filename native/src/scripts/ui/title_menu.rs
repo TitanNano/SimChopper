@@ -1,9 +1,10 @@
 use godot::builtin::math::ApproxEq;
 use godot::builtin::{GString, Vector2, Vector2i};
+use godot::classes::input::MouseMode;
 use godot::classes::resource_loader::ThreadLoadStatus;
 use godot::classes::{
-    window, Animation, AnimationPlayer, BaseButton, Button, Control, DisplayServer, Engine, Node3D,
-    PackedScene, ResourceLoader,
+    window, Animation, AnimationPlayer, BaseButton, Button, Control, DisplayServer, Engine,
+    InputEvent, Node3D, PackedScene, ResourceLoader,
 };
 use godot::global;
 use godot::meta::ObjectToOwned;
@@ -11,6 +12,7 @@ use godot::obj::{EngineEnum, Gd, Singleton as _};
 use godot_rust_script::{godot_script_impl, Context, GodotScript, OnEditor, ScriptExportGroup};
 use num::ToPrimitive;
 
+use crate::resources::InputDevice;
 use crate::script_callable;
 use crate::util::logger;
 
@@ -41,13 +43,26 @@ struct TitleMenu {
     #[export(flatten)]
     pub animations: AnimationsGroup,
 
+    #[export]
+    pub input_device: OnEditor<Gd<InputDevice>>,
+
+    ready: bool,
+
     base: Gd<Node3D>,
 }
 
 #[godot_script_impl]
 impl TitleMenu {
-    pub fn _ready(&mut self) {
+    pub fn _ready(&mut self, mut context: Context<'_, Self>) {
         self.apply_ui_scale();
+
+        let mut start_game = self.start_game.clone();
+
+        // Grab the focus of the first menu entry.
+        context.reentrant_scope(self, |_base| {
+            start_game.grab_focus();
+        });
+
         logger::debug!("connecting button signals!");
 
         self.quit_game
@@ -61,6 +76,11 @@ impl TitleMenu {
             .pressed()
             .to_untyped()
             .connect(&script_callable!(self, Self::on_start_game));
+
+        self.ready = true;
+        self.input_device
+            .bind_mut()
+            .set_mouse_mode(MouseMode::VISIBLE);
     }
 
     pub fn on_start_game(&mut self) {
@@ -154,6 +174,10 @@ impl TitleMenu {
     }
 
     fn play_ui_sound(&mut self, animation: &Gd<Animation>) {
+        if !self.ready {
+            return;
+        }
+
         let animation = animation.get_name();
 
         if !self.ui_sounds.has_animation(animation.arg()) {
@@ -205,6 +229,10 @@ impl TitleMenu {
             ));
             window.set_position(window_position - window_size / 2);
         }
+    }
+
+    fn _unhandled_input(&mut self, event: Gd<InputEvent>) {
+        self.input_device.bind_mut().capture(event);
     }
 }
 

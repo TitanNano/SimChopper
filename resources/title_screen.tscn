@@ -5,6 +5,7 @@
 [ext_resource type="Environment" uid="uid://x8xcxt7ri4pi" path="res://resources/Environments/title_screen_env.tres" id="2_scex8"]
 [ext_resource type="CameraAttributesPhysical" uid="uid://dxi45jwp3asnw" path="res://resources/Environments/title_screen_camera_attributes.tres" id="3_gbrg3"]
 [ext_resource type="PackedScene" uid="uid://cfek2a6eg86vo" path="res://resources/Meshes/Helis/schweizer_300/main.gltf" id="3_qcj5l"]
+[ext_resource type="InputDevice" uid="uid://bky2vkjjwnd0p" path="res://resources/Config/primary_input_device.tres" id="4_5mv2j"]
 [ext_resource type="Material" uid="uid://d22y3mrstykx1" path="res://resources/Materials/schweizer_300_green_paint.tres" id="4_scex8"]
 [ext_resource type="Material" uid="uid://m6cr6gd6bycq" path="res://resources/Materials/schweizer_300_orange_paint.tres" id="5_gbrg3"]
 [ext_resource type="Material" uid="uid://pugv3tibcyst" path="res://resources/Materials/schweizer_300_windows.tres" id="6_4ijke"]
@@ -204,6 +205,7 @@ main_scene = "uid://cvh54xiw8586b"
 ui_sounds = NodePath("UISoundPlayer")
 animations_ui_select = SubResource("Animation_1w7u6")
 animations_ui_activate = SubResource("Animation_m8ej5")
+input_device = ExtResource("4_5mv2j")
 
 [node name="GridContainer" type="GridContainer" parent="." unique_id=25898047]
 anchors_preset = 15

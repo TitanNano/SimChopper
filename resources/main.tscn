@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://dbmgsvtd552t6" path="res://src/Objects/Terrain/Terrain.gd" id="11"]
 [ext_resource type="Material" uid="uid://d3jryprnnxb6x" path="res://resources/Materials/terrain_material.tres" id="12"]
 [ext_resource type="Script" uid="uid://c0a6eytloytey" path="res://native/src/scripts/world/solar_setup.rs" id="12_88vys"]
+[ext_resource type="InputDevice" uid="uid://bky2vkjjwnd0p" path="res://resources/Config/primary_input_device.tres" id="12_hd7nr"]
 [ext_resource type="Material" uid="uid://bmp5rvu5slnnt" path="res://resources/Materials/ocean_material.tres" id="13"]
 [ext_resource type="Script" uid="uid://d15feraixcdwm" path="res://src/Objects/World/Networks.gd" id="14"]
 [ext_resource type="WorldConstants" uid="uid://dbxp5cngs1a5g" path="res://resources/Config/world_constants.tres" id="15"]
@@ -141,6 +142,7 @@ solar_setup = NodePath("../Environment/SolarSetup")
 
 [node name="Schweizer_300" parent="SubViewportContainer/SubViewport/World" unique_id=1998635440 node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)
+input_device = ExtResource("12_hd7nr")
 child_camera = NodePath("MainCameraAnchor")
 child_main_camera = NodePath("MainCameraAnchor")
 child_debug_camera = NodePath("DebugCameraAnchor")

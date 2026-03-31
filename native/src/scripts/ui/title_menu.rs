@@ -1,12 +1,15 @@
-use godot::builtin::GString;
+use godot::builtin::math::ApproxEq;
+use godot::builtin::{GString, Vector2, Vector2i};
 use godot::classes::resource_loader::ThreadLoadStatus;
 use godot::classes::{
-    Animation, AnimationPlayer, BaseButton, Button, Control, Node3D, PackedScene, ResourceLoader,
+    window, Animation, AnimationPlayer, BaseButton, Button, Control, DisplayServer, Engine, Node3D,
+    PackedScene, ResourceLoader,
 };
 use godot::global;
 use godot::meta::ObjectToOwned;
 use godot::obj::{EngineEnum, Gd, Singleton as _};
 use godot_rust_script::{godot_script_impl, Context, GodotScript, OnEditor, ScriptExportGroup};
+use num::ToPrimitive;
 
 use crate::script_callable;
 use crate::util::logger;
@@ -44,6 +47,7 @@ struct TitleMenu {
 #[godot_script_impl]
 impl TitleMenu {
     pub fn _ready(&mut self) {
+        self.apply_ui_scale();
         logger::debug!("connecting button signals!");
 
         self.quit_game
@@ -162,6 +166,45 @@ impl TitleMenu {
         }
 
         self.ui_sounds.play_ex().name(animation.arg()).done();
+    }
+
+    fn apply_ui_scale(&self) {
+        let mut window = self
+            .base
+            .get_window()
+            .expect("tile menu must be attached to a window!");
+
+        if window.get_mode() == window::Mode::WINDOWED
+            && !Engine::singleton().is_embedded_in_editor()
+        {
+            let scale = DisplayServer::singleton()
+                .screen_get_scale_ex()
+                .screen(DisplayServer::SCREEN_OF_MAIN_WINDOW)
+                .done();
+
+            if scale.approx_eq(&1.0) {
+                return;
+            }
+
+            let window_size = window.get_size();
+            let scaled_window_size = Vector2::new(
+                window_size.x.to_f32().unwrap(),
+                window_size.y.to_f32().unwrap(),
+            ) * scale;
+            let window_position = window.get_position();
+
+            logger::debug!(
+                "content size: {}, window size: {}",
+                window.get_content_scale_size(),
+                window_size
+            );
+
+            window.set_size(Vector2i::new(
+                scaled_window_size.x.to_i32().unwrap(),
+                scaled_window_size.y.to_i32().unwrap(),
+            ));
+            window.set_position(window_position - window_size / 2);
+        }
     }
 }
 

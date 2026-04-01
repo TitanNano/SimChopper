@@ -17,18 +17,6 @@ const LoadingScreen := preload("res://src/HUD/LoadingScreen.gd")
 func _ready():
 	world.loading_scale.connect(self._on_loading_scale)
 	world.loading_progress.connect(self._on_loading_progress)
-	
-	var window := self.get_window()
-
-	if window.mode == Window.Mode.MODE_WINDOWED && not Engine.is_embedded_in_editor():
-		self.set_window_scale(window)
-
-
-func set_window_scale(window: Window):
-	var scale := DisplayServer.screen_get_scale(DisplayServer.SCREEN_OF_MAIN_WINDOW)
-
-	window.size *= scale
-	window.position -= Vector2i(self.get_window().size / scale / 2)
 
 
 func game_ready() -> void:

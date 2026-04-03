@@ -5,11 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-use godot_rust_script::godot::classes::{GpuParticles3D, PrimitiveMesh, StandardMaterial3D};
-use godot_rust_script::{
-    godot::prelude::{godot_error, Gd},
-    godot_script_impl, GodotScript,
-};
+use godot::classes::{GpuParticles3D, PrimitiveMesh, ShaderMaterial};
+use godot::meta::ToGodot;
+use godot::prelude::{godot_error, Gd};
+use godot_rust_script::{godot_script_impl, GodotScript};
 
 /// Dust Particle behavior for a particle system.
 /// This is used for the rotor effects
@@ -60,10 +59,10 @@ impl DustParticles {
             return;
         };
 
-        let mut material: Gd<StandardMaterial3D> = material.cast();
+        let mut material: Gd<ShaderMaterial> = material.cast();
 
         let distance = (50.0 * (1.0 - value)).max(0.5);
 
-        material.set_proximity_fade_distance(distance);
+        material.set_shader_parameter("proximity_fade_distance", &distance.to_variant());
     }
 }

@@ -15,6 +15,8 @@ const Log := preload("res://src/util/Logger.gd")
 @export var RATE_OF_CLIMB := 3.8 # m/s
 @export var RATE_OF_ROTATION := 1 # degrees / s
 
+@export var input_device: InputDevice
+
 @export_group("Slots", "child_")
 
 @export var child_engine_sound_tree: AnimationTree
@@ -61,6 +63,7 @@ var upgrade_action_dispatch: Dictionary = {}
 func _ready():
 	self.rotor.power = 0
 	self.mount_upgrades()
+	self.input_device.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 
 func _get_top_speed(delta: float) -> float:
@@ -140,15 +143,15 @@ func _physics_process(_delta: float) -> void:
 
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var delta := state.step
-	var land_strength := Input.get_action_strength("land")
-	var climb_strength := Input.get_axis("land", "rise")
-	var climb := (RATE_OF_CLIMB) * (climb_strength if climb_strength > land_strength else land_strength * -1)
+	var climb_strength := self.input_device.climb_strength()
+	var climb := (RATE_OF_CLIMB) * climb_strength
 
-	var movement_strength := Input.get_axis("forward", "back")
-	var strafe_strength := Input.get_axis("strafe_right", "strafe_left")
-	var turn_strength := Input.get_axis("turn_right", "turn_left") if strafe_strength == 0.0 else 0.0
-	var direction := Vector3(-strafe_strength, 0, movement_strength).normalized()
+	var movement_strength := self.input_device.movement_strength()
+	var strafe_strength := self.input_device.strafe_strength()
+	var turn_strength := self.input_device.turn_strength() if strafe_strength == 0.0 else 0.0
+	var direction := Vector3(strafe_strength, 0, movement_strength).normalized()
 	var sound_state_machine := anim_state_machine(self.child_engine_sound_tree)
+	var thrust_strength := maxf(absf(movement_strength), absf(strafe_strength))
 
 	if climb < 0 && self.is_on_ground && self.engine_speed == 1:
 		self.engine_speed -= 0.001
@@ -173,10 +176,10 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var global_rotation_velocity := Vector3.UP * rotation_velocity
 
 	# calculate thrust
-	var thrust_increase := direction * THRUST_INCREASE * delta
+	var thrust_increase := direction * thrust_strength * THRUST_INCREASE * delta
 
 	# the engine thrust automatically decreases when the direction changes due to the drag force
-	if !direction.is_zero_approx() && self.engine_thrust.length() < 1.0:
+	if !direction.is_zero_approx() && (self.engine_thrust.length() < 1.0 || !self.engine_thrust.is_equal_approx(direction)):
 		self.engine_thrust += thrust_increase
 
 		if self.engine_thrust.length() > 1.0:
@@ -235,7 +238,9 @@ func switch_debug_camera():
 		self.main_camera.active = true
 
 
-func _unhandled_key_input(event: InputEvent):
+func _unhandled_input(event: InputEvent):
+	self.input_device.capture(event)
+	
 	for action: StringName in upgrade_action_dispatch:
 		var target: Node3D = upgrade_action_dispatch[action]
 
@@ -281,8 +286,7 @@ func mount_upgrades():
 			self.shape_owner_set_disabled(owner, coll_child.disabled)
 			self.shape_owner_add_shape(owner, coll_child.shape)
 
-
-		self.upgrade_action_dispatch[upgrade.action] = object
+		self.input_device.subscribe(upgrade.action, Callable.create(object, "action"))
 
 
 func drag_force(velocity: Vector3, area: float) -> Vector3:

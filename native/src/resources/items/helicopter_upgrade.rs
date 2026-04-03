@@ -23,6 +23,7 @@ struct HelicopterUpgrade {
 
     /// The input action which will enable or disable the game object of this upgrade.
     #[export]
+    #[var(hint = INPUT_NAME)]
     action: StringName,
 
     /// The price of this upgrade.

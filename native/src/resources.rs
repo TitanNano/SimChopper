@@ -5,9 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+mod input_device;
 mod items;
 mod water_decal_tracker;
 mod world_constants;
 
+pub(crate) use input_device::InputDevice;
 pub use water_decal_tracker::WaterDecalTracker;
 pub use world_constants::*;

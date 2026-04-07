@@ -10,22 +10,16 @@ use std::{
     process::{Command, Stdio},
 };
 
-use godot::{
-    builtin::{GString, PackedStringArray, VariantType},
-    classes::{EditorInterface, ProjectSettings, RefCounted, SceneTree},
-    global::PropertyHint,
-    obj::{Base, Gd, Singleton},
-    prelude::{godot_api, GodotClass},
-    task,
-};
+use godot::builtin::{GString, PackedStringArray, VariantType};
+use godot::classes::{EditorInterface, ProjectSettings, RefCounted, SceneTree};
+use godot::obj::{Base, Gd, Singleton};
+use godot::prelude::{godot_api, GodotClass};
+use godot::register::info::PropertyHint;
+use godot::task;
 
-use crate::{
-    editor::{
-        new_non_zero,
-        ui::{ForgroundProcess, ProgressDialog},
-    },
-    util::logger,
-};
+use crate::editor::new_non_zero;
+use crate::editor::ui::{ForgroundProcess, ProgressDialog};
+use crate::util::logger;
 
 #[derive(GodotClass)]
 #[class(base = RefCounted, no_init)]

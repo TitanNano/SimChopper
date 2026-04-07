@@ -17,10 +17,8 @@ mod terrain_builder;
 mod util;
 mod world;
 
-use godot::{
-    init::InitStage,
-    prelude::{gdextension, ExtensionLibrary},
-};
+use godot::init::InitStage;
+use godot::prelude::{gdextension, ExtensionLibrary};
 
 struct NativeLib;
 

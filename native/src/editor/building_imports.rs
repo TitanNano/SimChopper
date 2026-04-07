@@ -7,17 +7,15 @@
 
 use std::collections::VecDeque;
 
-use godot::{
-    builtin::{GString, VarDictionary, Vector2i},
-    classes::{
-        editor_file_dialog, ConfigFile, DirAccess, EditorFileDialog, EditorInterface, FileAccess,
-        MeshInstance3D, Object, PackedScene, ResourceLoader,
-    },
-    global::Error,
-    meta::ToGodot,
-    obj::{Base, Gd, GodotClass, NewAlloc, NewGd, Singleton as _, WithBaseField},
-    register::{godot_api, GodotClass},
+use godot::builtin::{GString, VarDictionary, Vector2i};
+use godot::classes::{
+    editor_file_dialog, ConfigFile, DirAccess, EditorFileDialog, EditorInterface, FileAccess,
+    MeshInstance3D, Object, PackedScene, ResourceLoader,
 };
+use godot::global::Error;
+use godot::meta::ToGodot;
+use godot::obj::{Base, Gd, GodotClass, NewAlloc, NewGd, Singleton as _, WithBaseField};
+use godot::register::{godot_api, GodotClass};
 use pomsky_macro::pomsky;
 use regex::Regex;
 

@@ -220,7 +220,7 @@ impl Buildings {
         );
 
         // Fix z fighting of flat buildings
-        location.y += 0.1;
+        location.y += 0.01;
 
         let ((), insert_time) = with_timing(|| {
             Self::get_sector(base, tile_coords, city_coords_feature)

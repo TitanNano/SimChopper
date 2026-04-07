@@ -21,9 +21,10 @@ use godot::classes::{
     ConfigFile, EditorPlugin, EditorSettings, GDExtensionManager, GltfDocument, IEditorPlugin,
     ProjectSettings,
 };
-use godot::global::{self, godot_error, godot_print, PropertyHint};
+use godot::global::{self, godot_error, godot_print};
 use godot::meta::{AsArg, FromGodot};
 use godot::obj::{Base, Gd, NewGd, OnReady, Singleton as _, WithBaseField};
+use godot::register::info::PropertyHint;
 use godot::register::{godot_api, GodotClass};
 
 use building_imports::SetupBuildingImports;

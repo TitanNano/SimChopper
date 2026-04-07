@@ -7,7 +7,8 @@
 
 use anyhow::Context;
 use godot::builtin::{
-    Array, GString, PackedInt32Array, PackedVector3Array, VarDictionary, Variant, Vector3,
+    Array, GString, PackedInt32Array, PackedVector3Array, StringName, VarDictionary, Variant,
+    Vector3,
 };
 use godot::classes::decal::DecalTexture;
 use godot::classes::mesh::ArrayType;
@@ -208,7 +209,7 @@ fn use_gd_node(
     };
 
     Ok(node?.map(|mut node| {
-        node.set_name(gltf_node.get_name().arg());
+        node.set_name(&StringName::from(&gltf_node.get_name()));
         node
     }))
 }

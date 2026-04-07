@@ -7,10 +7,9 @@
 
 use std::fmt::Display;
 
-use godot::{
-    meta::{ByValue, FromGodot, ToGodot},
-    prelude::GodotConvert,
-};
+use godot::meta::conv::ByValue;
+use godot::meta::{FromGodot, ToGodot};
+use godot::prelude::GodotConvert;
 use godot_rust_script::{GetScriptProperty, GodotScriptExport, SetScriptProperty};
 
 #[derive(Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Debug)]
@@ -161,13 +160,15 @@ impl<const UPPER: u32, const LOWER: u32> From<LInt<LOWER, UPPER>> for u64 {
 
 impl<const UPPER: u32, const LOWER: u32> GodotScriptExport for LInt<LOWER, UPPER> {
     fn hint_string(
-        custom_hint: Option<godot::global::PropertyHint>,
+        custom_hint: Option<godot::register::info::PropertyHint>,
         custom_string: Option<String>,
     ) -> String {
         <u32 as GodotScriptExport>::hint_string(custom_hint, custom_string)
     }
 
-    fn hint(custom: Option<godot::global::PropertyHint>) -> godot::global::PropertyHint {
+    fn hint(
+        custom: Option<godot::register::info::PropertyHint>,
+    ) -> godot::register::info::PropertyHint {
         u32::hint(custom)
     }
 }
@@ -175,8 +176,8 @@ impl<const UPPER: u32, const LOWER: u32> GodotScriptExport for LInt<LOWER, UPPER
 impl<const UPPER: u32, const LOWER: u32> GodotConvert for LInt<LOWER, UPPER> {
     type Via = u32;
 
-    fn godot_shape() -> godot::meta::GodotShape {
-        u32::godot_shape()
+    fn godot_shape() -> godot::meta::shape::GodotShape {
+        Self::Via::godot_shape()
     }
 }
 

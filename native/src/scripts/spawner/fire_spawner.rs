@@ -132,11 +132,11 @@ impl FireSpawner {
         logger::debug!("Init Fire spawner...");
 
         if is_editor
-            && (self.fire.get_property().is_none()
-                || self.smoke.get_property().is_none()
-                || self.emission_points.get_property().is_none()
-                || self.emission_point_normals.get_property().is_none()
-                || self.fire_sound.get_property().is_none())
+            && (OnEditor::var_get(&self.fire).is_none()
+                || OnEditor::var_get(&self.smoke).is_none()
+                || OnEditor::var_get(&self.emission_points).is_none()
+                || OnEditor::var_get(&self.emission_point_normals).is_none()
+                || OnEditor::var_get(&self.fire_sound).is_none())
         {
             self.base.update_configuration_warnings();
             return;
@@ -159,13 +159,11 @@ impl FireSpawner {
             .expect("emission point count should be in range");
 
         let mut fire_process_material = org_fire_process_material
-            .duplicate()
-            .expect("Duplicating shouldn't fail!")
+            .duplicate_resource()
             .cast::<ParticleProcessMaterial>();
 
         let mut smoke_process_material = org_smoke_process_material
-            .duplicate()
-            .expect("Duplicating should work!")
+            .duplicate_resource()
             .cast::<ParticleProcessMaterial>();
 
         fire_process_material.set_emission_point_count(emission_point_count);
@@ -303,16 +301,14 @@ impl FireSpawner {
 
     /// Indicates whether the current node is instanced in an other scene or not.
     fn is_instance(&self) -> bool {
-        let root_scene_path = self
-            .base
-            .get_tree()
-            .and_then(|tree| {
-                if Engine::singleton().is_editor_hint() {
-                    tree.get_edited_scene_root()
-                } else {
-                    tree.get_current_scene()
-                }
-            })
+        let tree = self.base.get_tree();
+        let root_scene = if Engine::singleton().is_editor_hint() {
+            tree.get_edited_scene_root()
+        } else {
+            tree.get_current_scene()
+        };
+
+        let root_scene_path = root_scene
             .map(|node| node.get_scene_file_path())
             .unwrap_or_default();
 
@@ -330,7 +326,7 @@ impl FireSpawner {
     }
 
     pub fn set_emission_point_normals(&mut self, value: Option<Gd<Texture2D>>) {
-        self.emission_point_normals.set_property(value);
+        OnEditor::var_set(&mut self.emission_point_normals, value);
 
         if Engine::singleton().is_editor_hint() && self.base.is_node_ready() {
             script_callable!(self, Self::_ready).call_deferred(&[]);
@@ -338,7 +334,7 @@ impl FireSpawner {
     }
 
     pub fn set_emission_points(&mut self, value: Option<Gd<Texture2D>>) {
-        self.emission_points.set_property(value);
+        OnEditor::var_set(&mut self.emission_points, value);
 
         if Engine::singleton().is_editor_hint() && self.base.is_node_ready() {
             script_callable!(self, Self::_ready).call_deferred(&[]);
@@ -354,7 +350,7 @@ impl FireSpawner {
     }
 
     fn set_fire(&mut self, value: Option<Gd<GpuParticles3D>>) {
-        self.fire.set_property(value);
+        OnEditor::var_set(&mut self.fire, value);
 
         if Engine::singleton().is_editor_hint() && self.base.is_node_ready() {
             script_callable!(self, Self::_ready).call_deferred(&[]);
@@ -362,7 +358,7 @@ impl FireSpawner {
     }
 
     fn set_smoke(&mut self, value: Option<Gd<GpuParticles3D>>) {
-        self.smoke.set_property(value);
+        OnEditor::var_set(&mut self.smoke, value);
 
         if Engine::singleton().is_editor_hint() && self.base.is_node_ready() {
             script_callable!(self, Self::_ready).call_deferred(&[]);
@@ -378,7 +374,7 @@ impl FireSpawner {
     }
 
     fn set_light_source(&mut self, value: Option<Gd<OmniLight3D>>) {
-        self.light_source.set_property(value);
+        OnEditor::var_set(&mut self.light_source, value);
 
         if Engine::singleton().is_editor_hint() && self.base.is_node_ready() {
             script_callable!(self, Self::_ready).call_deferred(&[]);
@@ -386,7 +382,7 @@ impl FireSpawner {
     }
 
     fn set_fire_sound(&mut self, value: Option<Gd<AudioStreamPlayer3D>>) {
-        self.fire_sound.set_property(value);
+        OnEditor::var_set(&mut self.fire_sound, value);
 
         if Engine::singleton().is_editor_hint() && self.base.is_node_ready() {
             script_callable!(self, Self::_ready).call_deferred(&[]);
@@ -412,27 +408,27 @@ impl FireSpawner {
     pub fn _get_configuration_warnings(&self) -> Array<GString> {
         let mut warnings = Array::new();
 
-        if self.fire.get_property().is_none() {
+        if OnEditor::var_get(&self.fire).is_none() {
             warnings.push("Requires a GpuParticles3D node for the fire vfx");
         }
 
-        if self.smoke.get_property().is_none() {
+        if OnEditor::var_get(&self.smoke).is_none() {
             warnings.push("Requires a GpuParticles3D node for the smoke vfx");
         }
 
-        if self.light_source.get_property().is_none() {
+        if OnEditor::var_get(&self.light_source).is_none() {
             warnings.push("A light source must be assigned");
         }
 
-        if self.emission_points.get_property().is_none() {
+        if OnEditor::var_get(&self.emission_points).is_none() {
             warnings.push("Emission points texture must be assinged");
         }
 
-        if self.emission_point_normals.get_property().is_none() {
+        if OnEditor::var_get(&self.emission_point_normals).is_none() {
             warnings.push("Emission point normals texture must be assinged");
         }
 
-        if self.fire_sound.get_property().is_none() {
+        if OnEditor::var_get(&self.fire_sound).is_none() {
             warnings.push("Fire audio source must be assigned");
         }
 

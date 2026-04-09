@@ -1,5 +1,5 @@
 use godot::builtin::math::ApproxEq;
-use godot::builtin::{GString, Vector2, Vector2i};
+use godot::builtin::{GString, StringName, Vector2, Vector2i};
 use godot::classes::input::MouseMode;
 use godot::classes::resource_loader::ThreadLoadStatus;
 use godot::classes::{
@@ -7,7 +7,7 @@ use godot::classes::{
     InputEvent, Node3D, PackedScene, ResourceLoader,
 };
 use godot::global;
-use godot::meta::ObjectToOwned;
+use godot::meta::conv::ObjectToOwned;
 use godot::obj::{EngineEnum, Gd, Singleton as _};
 use godot_rust_script::{godot_script_impl, Context, GodotScript, OnEditor, ScriptExportGroup};
 use num::ToPrimitive;
@@ -98,7 +98,7 @@ impl TitleMenu {
         }
 
         let scene_path = self.main_scene.clone();
-        let mut tree = self.base.get_tree().unwrap();
+        let mut tree = self.base.get_tree();
         let animation_player = self.scene_transitions.clone();
 
         godot::task::spawn(async move {
@@ -144,7 +144,7 @@ impl TitleMenu {
     }
 
     pub fn on_quit(&mut self) {
-        let mut tree = self.base.get_tree().unwrap();
+        let mut tree = self.base.get_tree();
 
         tree.quit();
     }
@@ -180,7 +180,7 @@ impl TitleMenu {
 
         let animation = animation.get_name();
 
-        if !self.ui_sounds.has_animation(animation.arg()) {
+        if !self.ui_sounds.has_animation(&StringName::from(&animation)) {
             logger::error!(
                 "Animation {} does not belong to Animation Player {}",
                 animation,
@@ -189,7 +189,10 @@ impl TitleMenu {
             return;
         }
 
-        self.ui_sounds.play_ex().name(animation.arg()).done();
+        self.ui_sounds
+            .play_ex()
+            .name(&StringName::from(&animation))
+            .done();
     }
 
     fn apply_ui_scale(&self) {

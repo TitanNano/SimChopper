@@ -4,9 +4,11 @@ use godot::classes::{
     match_class, Engine, IResource, Input, InputEvent, InputEventJoypadButton,
     InputEventJoypadMotion, Resource,
 };
-use godot::meta::{FromGodot, GodotConvert};
+use godot::meta::conv::ByValue;
+use godot::meta::{FromGodot, GodotConvert, ToGodot};
 use godot::obj::{Base, Gd, Singleton, WithUserSignals};
-use godot::prelude::{godot_api, ConvertError, GodotClass, Var};
+use godot::prelude::{godot_api, ConvertError, GodotClass};
+use godot::register::property::SimpleVar;
 
 macro_rules! input_axis {
     ($event:ident, $field:expr, $neg:expr, $pos:expr) => {
@@ -255,19 +257,18 @@ impl AxisAction {
 
 impl GodotConvert for AxisAction {
     type Via = StringName;
+
+    fn godot_shape() -> godot::meta::shape::GodotShape {
+        Self::Via::godot_shape()
+    }
 }
 
-impl Var for AxisAction {
-    fn get_property(&self) -> Self::Via {
-        self.as_str().into()
-    }
+impl SimpleVar for AxisAction {}
+impl ToGodot for AxisAction {
+    type Pass = ByValue;
 
-    fn set_property(&mut self, value: Self::Via) {
-        let Ok(parsed) = AxisAction::try_from_godot(value.clone()) else {
-            panic!("unknown action type {value}");
-        };
-
-        *self = parsed;
+    fn to_godot(&self) -> godot::meta::ToArg<'_, Self::Via, Self::Pass> {
+        StringName::from(self.as_str())
     }
 }
 
@@ -307,6 +308,10 @@ impl ButtonAction {
 
 impl GodotConvert for ButtonAction {
     type Via = StringName;
+
+    fn godot_shape() -> godot::meta::shape::GodotShape {
+        Self::Via::godot_shape()
+    }
 }
 
 impl FromGodot for ButtonAction {

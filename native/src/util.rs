@@ -27,7 +27,7 @@ use godot::obj::NewAlloc;
 
 pub use numbers::*;
 
-/// Create a new ingame one-shot timer in seconds.
+/// Create a new in game one-shot timer in seconds.
 #[inline]
 pub fn timer(tree: &mut Gd<SceneTree>, delay: f64) -> Gd<SceneTreeTimer> {
     tree.create_timer_ex(delay)
@@ -144,6 +144,10 @@ macro_rules! debug_3d {
 
     (inner $debugger: ident, (as_deg $variable: ident)) => {
         $debugger.debug_data().set(stringify!($variable), $variable.to_degrees());
+    };
+
+    (inner $debugger: ident, (ref $variable: ident)) => {
+        $debugger.debug_data().set(stringify!($variable), &$variable);
     };
 
     (inner $debugger: ident, $variable: ident) => {

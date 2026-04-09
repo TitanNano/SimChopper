@@ -21,9 +21,10 @@ use godot::classes::{
     ConfigFile, EditorPlugin, EditorSettings, GDExtensionManager, GltfDocument, IEditorPlugin,
     ProjectSettings,
 };
-use godot::global::{self, godot_error, godot_print, PropertyHint};
+use godot::global::{self, godot_error, godot_print};
 use godot::meta::{AsArg, FromGodot};
 use godot::obj::{Base, Gd, NewGd, OnReady, Singleton as _, WithBaseField};
+use godot::register::info::PropertyHint;
 use godot::register::{godot_api, GodotClass};
 
 use building_imports::SetupBuildingImports;
@@ -133,11 +134,7 @@ impl IEditorPlugin for EditorExtension {
         let ao_baker = {
             let base = self.base();
 
-            AoBaker::new(
-                editor_interface.clone(),
-                base.get_tree()
-                    .expect("SceneTree should be available after entering the tree"),
-            )
+            AoBaker::new(editor_interface.clone(), base.get_tree())
         };
 
         self.ao_baker.init(ao_baker);

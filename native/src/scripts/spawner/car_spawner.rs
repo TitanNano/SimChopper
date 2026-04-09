@@ -58,11 +58,7 @@ impl CarSpawner {
             .force_readable_name(true)
             .done();
 
-        let Some(current_scene) = self
-            .base
-            .get_tree()
-            .and_then(|tree| tree.get_current_scene())
-        else {
+        let Some(current_scene) = self.base.get_tree().get_current_scene() else {
             godot_error!("there is no active scene!");
             return;
         };

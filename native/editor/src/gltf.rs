@@ -13,15 +13,13 @@ use godot::builtin::{
 use godot::classes::decal::DecalTexture;
 use godot::classes::mesh::ArrayType;
 use godot::classes::{
-    base_material_3d, ArrayOccluder3D, BaseMaterial3D, CollisionShape3D, ConcavePolygonShape3D,
-    Decal, GltfNode, GltfState, IGltfDocumentExtension, Node, Node3D, OccluderInstance3D,
+    ArrayOccluder3D, BaseMaterial3D, CollisionShape3D, ConcavePolygonShape3D, Decal, GltfNode,
+    GltfState, IGltfDocumentExtension, Node, Node3D, OccluderInstance3D, base_material_3d,
 };
-use godot::global;
+use godot::global::{self, godot_error, godot_print, godot_warn};
 use godot::obj::{EngineEnum, Gd, NewAlloc, NewGd};
-use godot::prelude::{godot_api, GodotClass};
+use godot::prelude::{GodotClass, godot_api};
 use itertools::Itertools;
-
-use crate::util::logger;
 
 #[derive(GodotClass)]
 #[class(base = GltfDocumentExtension, tool, init)]
@@ -80,19 +78,19 @@ impl IGltfDocumentExtension for GltfImporter {
         _parent: Option<Gd<Node>>,
     ) -> Option<Gd<Node3D>> {
         let Some(mut state) = state else {
-            logger::error!("generate_scene_node called with null GltfState!");
+            godot_error!("generate_scene_node called with null GltfState!");
             return None;
         };
 
         let Some(mut gltf_node) = gltf_node else {
-            logger::error!("generate_scene_node called with null GltfNode!");
+            godot_error!("generate_scene_node called with null GltfNode!");
             return None;
         };
 
         match use_gd_node(&mut gltf_node, &mut state) {
             Ok(node) => node,
             Err(err) => {
-                logger::error!("Failed to generate GD Node: {:?}", err);
+                godot_error!("Failed to generate GD Node: {:?}", err);
                 None
             }
         }
@@ -103,12 +101,12 @@ fn fix_ao_uv2(state: &mut Gd<GltfState>) -> Result<(), global::Error> {
     let materials = state.get_materials();
 
     if materials.is_empty() {
-        logger::info!("GLTF model does not contain materials!");
+        godot_print!("GLTF model does not contain materials!");
         return Ok(());
     }
 
     let Some(raw_materials) = state.get_json().get("materials") else {
-        logger::error!(
+        godot_error!(
             "GLTF model does not contain a materials array, but materials have been imported!"
         );
 
@@ -122,7 +120,7 @@ fn fix_ao_uv2(state: &mut Gd<GltfState>) -> Result<(), global::Error> {
             .iter_shared()
             .find(|mat| {
                 let Some(name) = mat.to::<VarDictionary>().get("name") else {
-                    logger::debug!("raw material doesn't have a name!");
+                    godot_print!("raw material doesn't have a name!");
                     return false;
                 };
 
@@ -131,7 +129,7 @@ fn fix_ao_uv2(state: &mut Gd<GltfState>) -> Result<(), global::Error> {
             .map(|mat| mat.to::<VarDictionary>());
 
         let Some(raw_material) = raw_material else {
-            logger::error!("Unable to locate raw material in GLTF model!");
+            godot_error!("Unable to locate raw material in GLTF model!");
             return;
         };
 
@@ -153,7 +151,7 @@ fn fix_ao_uv2(state: &mut Gd<GltfState>) -> Result<(), global::Error> {
 fn fix_emissive_materials(state: &mut Gd<GltfState>) {
     state.get_materials().iter_shared().for_each(|material| {
         let Ok(mut base_material) = material.try_cast::<BaseMaterial3D>() else {
-            logger::warn!("GLTF material is not being imported as BaseMaterial3D");
+            godot_warn!("GLTF material is not being imported as BaseMaterial3D");
             return;
         };
 

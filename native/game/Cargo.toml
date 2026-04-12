@@ -1,0 +1,27 @@
+[package]
+name = "native"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+godot.workspace = true
+godot-rust-script.workspace = true
+lerp.workspace = true
+backtrace.workspace = true
+num.workspace = true
+rayon.workspace = true
+itertools.workspace = true
+num_enum.workspace = true
+derive-debug.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+rand.workspace = true
+pomsky-macro.workspace = true
+regex.workspace = true
+kanal.workspace = true
+
+[lints]
+workspace = true

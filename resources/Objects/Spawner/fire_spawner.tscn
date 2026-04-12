@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://5jijewumod80"]
 
-[ext_resource type="Script" uid="uid://rv7naiqpa17x" path="res://native/src/scripts/spawner/fire_spawner.rs" id="1_aar5t"]
+[ext_resource type="Script" uid="uid://rv7naiqpa17x" path="res://native/game/src/scripts/spawner/fire_spawner.rs" id="1_aar5t"]
 [ext_resource type="Texture2D" uid="uid://c8edk8pamge2n" path="res://resources/Particles/fire/emitters/example_building.res" id="2_h5f1y"]
 [ext_resource type="Texture2D" uid="uid://dsau4l5yoyua" path="res://resources/Particles/fire/emitters/example_building_normals.res" id="3_cbxbr"]
 [ext_resource type="AnimationLibrary" uid="uid://dtoyo725l55bb" path="res://resources/Animations/fire_spawner/fire_spawner_animations.tres" id="4_rhyet"]

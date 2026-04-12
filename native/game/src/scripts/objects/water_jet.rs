@@ -7,7 +7,7 @@
 
 use std::boxed::Box;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use godot::builtin::{Aabb, Array, Callable, StringName, Variant, Vector3};
 use godot::classes::object::ConnectFlags;
 use godot::classes::{
@@ -16,7 +16,7 @@ use godot::classes::{
 use godot::meta::ToGodot;
 use godot::obj::{Gd, Inherits};
 use godot::prelude::{GodotClass, NodePath};
-use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
+use godot_rust_script::{GodotScript, OnEditor, RsRef, godot_script_impl};
 
 use crate::ext::node_3d::Node3DExt;
 use crate::resources::WaterDecalTracker;
@@ -267,11 +267,9 @@ impl WaterJet {
             return false;
         }
 
-        let can_spawn = decals_at_point
+        decals_at_point
             .iter()
-            .all(|decal| decal.distance_to(point.position) > extent);
-
-        can_spawn
+            .all(|decal| decal.distance_to(point.position) > extent)
     }
 
     fn align_decal_normal(&self, point: Intersection) -> Intersection {

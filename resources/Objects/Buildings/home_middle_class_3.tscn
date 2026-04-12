@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://5lcllve4d4s5"]
 
 [ext_resource type="PackedScene" uid="uid://h1n7d1h23vcn" path="res://resources/Meshes/Buildings/Home/middle_class_3.gltf" id="1"]
-[ext_resource type="Script" uid="uid://c50j0d6f8phpx" path="res://native/src/scripts/objects/building.rs" id="2_dq8cm"]
+[ext_resource type="Script" uid="uid://c50j0d6f8phpx" path="res://native/game/src/scripts/objects/building.rs" id="2_dq8cm"]
 [ext_resource type="Texture2D" uid="uid://bmihrxkgvh4nm" path="res://resources/Particles/fire/emitters/home_middle_class_3.res" id="3_c8e1x"]
 [ext_resource type="Texture2D" uid="uid://b8p7nili11nkk" path="res://resources/Particles/fire/emitters/home_middle_class_3_normals.res" id="4_huvg1"]
 

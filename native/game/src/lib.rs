@@ -5,8 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#[cfg(debug_assertions)]
-mod editor;
 mod ext;
 mod objects;
 mod project_settings;
@@ -18,7 +16,7 @@ mod util;
 mod world;
 
 use godot::init::InitStage;
-use godot::prelude::{gdextension, ExtensionLibrary};
+use godot::prelude::{ExtensionLibrary, gdextension};
 
 struct NativeLib;
 

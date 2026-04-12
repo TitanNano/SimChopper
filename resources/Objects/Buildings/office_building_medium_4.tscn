@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b0uxnw5wje6y4"]
 
 [ext_resource type="PackedScene" uid="uid://dpq3c588herdb" path="res://resources/Meshes/Buildings/Offices/medium_4.gltf" id="1"]
-[ext_resource type="Script" uid="uid://c50j0d6f8phpx" path="res://native/src/scripts/objects/building.rs" id="2_67wch"]
+[ext_resource type="Script" uid="uid://c50j0d6f8phpx" path="res://native/game/src/scripts/objects/building.rs" id="2_67wch"]
 [ext_resource type="Texture2D" uid="uid://bkvm0hs3ou6ud" path="res://resources/Particles/fire/emitters/office_building_medium_4.res" id="3_uich8"]
 [ext_resource type="Texture2D" uid="uid://cqsayw0rbdfne" path="res://resources/Particles/fire/emitters/office_building_medium_4_normals.res" id="4_uich8"]
 

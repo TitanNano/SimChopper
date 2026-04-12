@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://byr7jias4d8hc"]
 
-[ext_resource type="Script" uid="uid://b1dsfsam1klye" path="res://native/src/scripts/objects/debugger_3_d.rs" id="1_fagxb"]
+[ext_resource type="Script" uid="uid://b1dsfsam1klye" path="res://native/game/src/scripts/objects/debugger_3_d.rs" id="1_fagxb"]
 [ext_resource type="PackedScene" uid="uid://c36tta374cm54" path="res://resources/HUD/debug/debug_3d.tscn" id="2_bq2lw"]
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_0mey1"]

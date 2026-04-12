@@ -7,14 +7,17 @@
 
 use std::f32;
 
-use godot::builtin::math::FloatExt;
 use godot::builtin::Vector3;
+use godot::builtin::math::FloatExt;
+#[cfg(debug_assertions)]
+use godot::classes::Performance;
 use godot::classes::class_macros::private::virtuals::Xrvrs::math::ApproxEq;
-use godot::classes::{light_3d, DirectionalLight3D, Node3D, Performance, Time, VoxelGiData};
+use godot::classes::{DirectionalLight3D, Node3D, Time, VoxelGiData, light_3d};
 use godot::obj::{Gd, Singleton as _};
-use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, ScriptSignal};
+use godot_rust_script::{GodotScript, OnEditor, ScriptSignal, godot_script_impl};
 use num::ToPrimitive;
 
+#[cfg(debug_assertions)]
 use crate::script_callable;
 use crate::util::Uf32;
 
@@ -66,7 +69,7 @@ impl SolarSetup {
     }
 
     #[cfg(debug_assertions)]
-    pub fn debug_monitors(&self) {
+    fn debug_monitors(&self) {
         let mut performance = Performance::singleton();
 
         performance.add_custom_monitor(

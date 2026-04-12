@@ -10,16 +10,16 @@ use std::cmp::Ordering;
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use godot::builtin::math::ApproxEq;
 use godot::builtin::{Transform3D, VarDictionary, Vector3};
 use godot::classes::Node3D;
 use godot::global::snappedf;
 use godot::obj::{Gd, OnEditor};
-use godot::prelude::{godot_api, GodotClass};
+use godot::prelude::{GodotClass, godot_api};
 use num::ToPrimitive;
-use rand::distr::Uniform;
 use rand::Rng;
+use rand::distr::Uniform;
 
 use crate::world::city_coords_feature::CityCoordsFeature;
 use crate::world::city_data::TryFromDictionary;
@@ -64,7 +64,7 @@ enum Direction {
 }
 
 impl Direction {
-    // Direction degrees in radiants.
+    // Direction degrees in radians.
     const FORWARD: f64 = 0.0;
     const BACK: f64 = 180.0f64.to_radians();
     const BACK_NEGATIVE: f64 = -180.0f64.to_radians();
@@ -229,7 +229,7 @@ impl RoadNavigation {
         let neighbors = cache.get_or_init(|| {
             let (x, y) = tile_coords;
 
-            let neighbors = [
+            [
                 y.checked_sub(1).map(|y| (x, y)),
                 x.checked_sub(1).map(|x| (x, y)),
                 Some((x + 1, y)),
@@ -239,9 +239,7 @@ impl RoadNavigation {
             .flatten()
             .filter_map(|tile_coords| self.network.get(&tile_coords))
             .map(|node| node.building.tile_coords)
-            .collect();
-
-            neighbors
+            .collect()
         });
 
         Some(neighbors)
@@ -256,7 +254,7 @@ impl RoadNavigation {
             (x, y)
         };
 
-        // fas track, pick node at global transform
+        // fast track, pick node at global transform
         if let Some(node) = self.try_node(own_coords) {
             return Some(node);
         }
@@ -372,7 +370,7 @@ impl RoadNavigation {
         let current_location = current.get_global_transform(Vector3::ZERO).origin;
         let target_location = target.get_global_transform(Vector3::ZERO).origin;
 
-        // current and target might be the same if we arrived at the target node.
+        // Current and target might be the same if we arrived at the target node.
         if current_location
             .distance_squared_to(target_location)
             .approx_eq(&0.0)
@@ -400,7 +398,7 @@ impl RoadNavigation {
                     let angle_actor_orientation = dir.angle_to(actor_orientation);
                     let angle = dir.angle_to(dir_target);
 
-                    // multiplying the angle between the target and the neighbor with the
+                    // Multiplying the angle between the target and the neighbor with the
                     // angle between the current actor orientation and the required actor
                     // orientation, adds bias towards a neighbor that is in the direction
                     // of the actors current orientation.
@@ -432,7 +430,7 @@ impl RoadNavigation {
     }
 }
 
-/// Configuration resource to setup road navigation for vehicles.
+/// Configuration resource to set up road navigation for vehicles.
 #[derive(GodotClass)]
 #[class(base = Resource, init)]
 pub struct RoadNavigationConfig {
@@ -450,7 +448,7 @@ impl RoadNavigationConfig {
     }
 
     pub(crate) fn road_navigation_mut(&mut self) -> &mut RoadNavigation {
-        // make sure instance is initialized.
+        // Make sure instance is initialized.
         self.road_navigation();
 
         self.instance.get_mut().expect("we just initialized")

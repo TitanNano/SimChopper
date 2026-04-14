@@ -40,23 +40,23 @@ materials/extract_path=""
 _subresources={
 "nodes": {
 "PATH:Police Station": {
-"mesh_instance/visibility_range_end": 610.0,
-"mesh_instance/visibility_range_end_margin": 152.5,
+"mesh_instance/visibility_range_end": 800.0,
+"mesh_instance/visibility_range_end_margin": 200.0,
 "mesh_instance/visibility_range_fade_mode": 1
 },
 "PATH:Police Station/Barrier": {
-"mesh_instance/visibility_range_end": 305.0,
-"mesh_instance/visibility_range_end_margin": 76.25,
+"mesh_instance/visibility_range_end": 800.0,
+"mesh_instance/visibility_range_end_margin": 200.0,
 "mesh_instance/visibility_range_fade_mode": 1
 },
 "PATH:Police Station/Fence": {
-"mesh_instance/visibility_range_end": 305.0,
-"mesh_instance/visibility_range_end_margin": 76.25,
+"mesh_instance/visibility_range_end": 800.0,
+"mesh_instance/visibility_range_end_margin": 200.0,
 "mesh_instance/visibility_range_fade_mode": 1
 },
 "PATH:Police Station/Sign": {
-"mesh_instance/visibility_range_end": 305.0,
-"mesh_instance/visibility_range_end_margin": 76.25,
+"mesh_instance/visibility_range_end": 800.0,
+"mesh_instance/visibility_range_end_margin": 200.0,
 "mesh_instance/visibility_range_fade_mode": 1
 }
 }

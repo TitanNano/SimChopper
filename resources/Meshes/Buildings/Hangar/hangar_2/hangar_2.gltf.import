@@ -59,6 +59,23 @@ _subresources={
 "use_external/fallback_path": "res://resources/Meshes/Buildings/Hangar/hangar_2/materials/Indoor Ground.tres",
 "use_external/path": "uid://iok4t24eiket"
 }
+},
+"nodes": {
+"PATH:Building": {
+"mesh_instance/visibility_range_end": 800.0,
+"mesh_instance/visibility_range_end_margin": 200.0,
+"mesh_instance/visibility_range_fade_mode": 1
+},
+"PATH:Ground": {
+"mesh_instance/visibility_range_end": 800.0,
+"mesh_instance/visibility_range_end_margin": 200.0,
+"mesh_instance/visibility_range_fade_mode": 1
+},
+"PATH:Indoor Ground": {
+"mesh_instance/visibility_range_end": 800.0,
+"mesh_instance/visibility_range_end_margin": 200.0,
+"mesh_instance/visibility_range_fade_mode": 1
+}
 }
 }
 gltf/naming_version=2

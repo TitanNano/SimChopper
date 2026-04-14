@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://du7uqddbtefxw" path="res://resources/Objects/Buildings/hangar_2/tube_lights.tscn" id="2_fnxbs"]
 [ext_resource type="Material" uid="uid://c6gn14u0a5vyd" path="res://resources/Meshes/Buildings/Hangar/hangar_2/materials/Building.tres" id="3_jr424"]
 
-[node name="hangar_2" unique_id=1321286550 instance=ExtResource("1_dvrmq")]
+[node name="hangar_2" unique_id=1035202761 instance=ExtResource("1_dvrmq")]
 
 [node name="Light Track Left" type="Node3D" parent="." index="3" unique_id=1978584672]
 transform = Transform3D(9.535499e-08, 0.34202012, 0.9396926, -1.4188964e-07, -0.9396926, 0.34202012, 1, -1.6594598e-07, -4.1075268e-08, -5.859967, 7.669233, 10.00715)
@@ -234,6 +234,6 @@ distance_fade_enabled = true
 omni_range = 15.0
 omni_attenuation = 0.5
 
-[node name="Light Occluder" parent="." index="21" unique_id=731240431 groups=["light_occluder"]]
+[node name="Light Occluder" parent="." index="21" unique_id=2039494598 groups=["light_occluder"]]
 visible = false
 surface_material_override/0 = ExtResource("3_jr424")

@@ -18,3 +18,5 @@
 *.mp3 -text
 *.blend -text
 *.bin -text
+*.res -text diff=bin
+*.scn -text 

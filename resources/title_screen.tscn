@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b0l6ccv01wtnb"]
 
-[ext_resource type="Script" uid="uid://cshfde6s4ex66" path="res://native/src/scripts/ui/title_menu.rs" id="1_4ijke"]
+[ext_resource type="Script" uid="uid://cshfde6s4ex66" path="res://native/game/src/scripts/ui/title_menu.rs" id="1_4ijke"]
 [ext_resource type="PackedScene" uid="uid://csuvlu656dwm4" path="res://resources/Objects/Buildings/hangar_2.tscn" id="1_lejt8"]
 [ext_resource type="Environment" uid="uid://x8xcxt7ri4pi" path="res://resources/Environments/title_screen_env.tres" id="2_scex8"]
 [ext_resource type="CameraAttributesPhysical" uid="uid://dxi45jwp3asnw" path="res://resources/Environments/title_screen_camera_attributes.tres" id="3_gbrg3"]

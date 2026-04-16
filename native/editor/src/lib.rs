@@ -8,7 +8,8 @@
 mod ao_baker;
 mod building_imports;
 mod gltf;
-pub mod ui;
+mod ui;
+mod util;
 
 use std::num::NonZero;
 use std::ops::DerefMut;
@@ -22,15 +23,20 @@ use godot::classes::{
     ProjectSettings,
 };
 use godot::global::{self, godot_error, godot_print};
+use godot::init::{ExtensionLibrary, gdextension};
 use godot::meta::{AsArg, FromGodot};
 use godot::obj::{Base, Gd, NewGd, OnReady, Singleton as _, WithBaseField};
 use godot::register::info::PropertyHint;
-use godot::register::{godot_api, GodotClass};
+use godot::register::{GodotClass, godot_api};
 
 use building_imports::SetupBuildingImports;
 
-use crate::engine_callable;
 use crate::util::variant_type_default_value;
+
+struct GDExtensionEntry;
+
+#[gdextension]
+unsafe impl ExtensionLibrary for GDExtensionEntry {}
 
 #[derive(GodotClass)]
 #[class(tool, base=EditorPlugin, internal)]
@@ -269,4 +275,17 @@ impl EngineSettings for Gd<EditorSettings> {
     fn add_property_info(&mut self, property_info: &VarDictionary) {
         self.deref_mut().add_property_info(property_info);
     }
+}
+
+#[macro_export]
+macro_rules! engine_callable {
+    ($instance:expr, $host:ident::$fn:ident) => {{
+        fn __typecheck<T: ::godot::obj::Inherits<$host>>(instance: &Gd<T>) -> &Gd<T> {
+            instance
+        }
+
+        let _fn_ptr = $host::$fn;
+
+        __typecheck($instance).callable(stringify!($fn))
+    }};
 }

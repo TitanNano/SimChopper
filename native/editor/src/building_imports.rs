@@ -9,17 +9,15 @@ use std::collections::VecDeque;
 
 use godot::builtin::{GString, VarDictionary, Vector2i};
 use godot::classes::{
-    editor_file_dialog, ConfigFile, DirAccess, EditorFileDialog, EditorInterface, FileAccess,
-    MeshInstance3D, Object, PackedScene, ResourceLoader,
+    ConfigFile, DirAccess, EditorFileDialog, EditorInterface, FileAccess, MeshInstance3D, Object,
+    PackedScene, ResourceLoader, editor_file_dialog,
 };
-use godot::global::Error;
+use godot::global::{Error, godot_error, godot_print, godot_warn};
 use godot::meta::ToGodot;
-use godot::obj::{Base, Gd, GodotClass, NewAlloc, NewGd, Singleton as _, WithBaseField};
-use godot::register::{godot_api, GodotClass};
+use godot::obj::{Base, Gd, GodotClass, NewAlloc, NewGd, Singleton as _};
+use godot::register::{GodotClass, godot_api};
 use pomsky_macro::pomsky;
 use regex::Regex;
-
-use crate::{class_callable, util::logger};
 
 #[derive(GodotClass)]
 #[class(base = Object, init, tool)]
@@ -38,7 +36,7 @@ impl SetupBuildingImports {
     #[func]
     pub fn start(&mut self) {
         let Some(editor) = self.editor.as_ref() else {
-            logger::error!("Editor is unavailable!");
+            godot_error!("Editor is unavailable!");
             return;
         };
 
@@ -49,18 +47,18 @@ impl SetupBuildingImports {
         dialog.set_access(editor_file_dialog::Access::RESOURCES);
         dialog.set_hide_on_ok(true);
 
-        dialog.connect(
-            "file_selected",
-            &class_callable!(self, Self::on_file_selected),
-        );
+        dialog
+            .signals()
+            .file_selected()
+            .connect_other(self, Self::on_file_selected);
 
-        dialog.connect(
-            "dir_selected",
-            &class_callable!(self, Self::on_dir_selected),
-        );
+        dialog
+            .signals()
+            .dir_selected()
+            .connect_other(self, Self::on_dir_selected);
 
         let Some(ui) = editor.get_base_control() else {
-            logger::error!("Editor UI is missing!");
+            godot_error!("Editor UI is missing!");
             return;
         };
 
@@ -74,14 +72,14 @@ impl SetupBuildingImports {
     #[func]
     fn on_file_selected(&mut self, file_path: GString) {
         let Some(editor) = self.editor.as_ref() else {
-            logger::error!("Editor is not available!");
+            godot_error!("Editor is not available!");
             return;
         };
 
         let import_config_name = format!("{file_path}.import");
 
         if !FileAccess::file_exists(&import_config_name) {
-            logger::warn!("Resource has never been imported by the editor!");
+            godot_warn!("Resource has never been imported by the editor!");
             return;
         }
 
@@ -96,12 +94,12 @@ impl SetupBuildingImports {
     #[expect(clippy::needless_pass_by_value)]
     fn on_dir_selected(&mut self, root_dir: GString) {
         let Some(editor) = self.editor.as_ref() else {
-            logger::error!("Editor is not available!");
+            godot_error!("Editor is not available!");
             return;
         };
 
         if root_dir.is_empty() {
-            logger::error!("Directory path is empty!");
+            godot_error!("Directory path is empty!");
             return;
         }
 
@@ -110,9 +108,9 @@ impl SetupBuildingImports {
         let pattern = Regex::new(pomsky! { "." ("gltf" | "glb")$ }).expect("unable to fail");
 
         while let Some(dir_path) = dir_queue.pop_front() {
-            logger::info!("Traversing dir \"{}\"...", dir_path);
+            godot_print!("Traversing dir \"{}\"...", dir_path);
             let Some(dir) = DirAccess::open(&dir_path) else {
-                logger::error!("Directory not accessible: {}", root_dir);
+                godot_error!("Directory not accessible: {}", root_dir);
                 return;
             };
 
@@ -138,10 +136,10 @@ impl SetupBuildingImports {
         for path in &file_queue {
             let import_config_name = format!("{path}.import");
 
-            logger::info!("Processing import config \"{}\"...", import_config_name);
+            godot_print!("Processing import config \"{}\"...", import_config_name);
 
             if !FileAccess::file_exists(&import_config_name) {
-                logger::warn!("Resource has never been imported by the editor!");
+                godot_print!("Resource has never been imported by the editor!");
                 return;
             }
 
@@ -160,7 +158,7 @@ impl SetupBuildingImports {
         let error = file.load(config_file_name);
 
         if error != Error::OK {
-            logger::error!(
+            godot_error!(
                 "Failed to read config file {:?}: {}",
                 error,
                 config_file_name
@@ -174,7 +172,7 @@ impl SetupBuildingImports {
             .done()
             .try_to()
             .inspect_err(|err| {
-                logger::error!("Failed to read subresources as dictionary: {}", err);
+                godot_error!("Failed to read subresources as dictionary: {}", err);
             })
             .unwrap_or_default();
 
@@ -183,7 +181,7 @@ impl SetupBuildingImports {
             .map(|value| value.try_to())
             .transpose()
             .inspect_err(|err| {
-                logger::error!("Failed to read nodes as dictionary: {}", err);
+                godot_error!("Failed to read nodes as dictionary: {}", err);
             })
             .ok()
             .flatten()
@@ -195,17 +193,17 @@ impl SetupBuildingImports {
             .done();
 
         let Some(scene) = scene else {
-            logger::error!("Failed to load resource!");
+            godot_error!("Failed to load resource!");
             return;
         };
 
         let Ok(scene): Result<Gd<PackedScene>, _> = scene.try_cast() else {
-            logger::error!("Loaded resouce is not of type PackedScene!");
+            godot_error!("Loaded resouce is not of type PackedScene!");
             return;
         };
 
         let Some(scene_state) = scene.get_state() else {
-            logger::error!("Failed to read scene state!");
+            godot_error!("Failed to read scene state!");
             return;
         };
 
@@ -220,7 +218,7 @@ impl SetupBuildingImports {
                     .map(|value| value.try_to())
                     .transpose()
                     .inspect_err(|err| {
-                        logger::error!("Failed to read node config as dictionary: {}", err);
+                        godot_error!("Failed to read node config as dictionary: {}", err);
                     })
                     .ok()
                     .flatten()
@@ -244,7 +242,7 @@ impl SetupBuildingImports {
         let error = file.save(config_file_name);
 
         if error != Error::OK {
-            logger::error!(
+            godot_error!(
                 "Failed to write import config file {:?}: {}",
                 error,
                 config_file_name

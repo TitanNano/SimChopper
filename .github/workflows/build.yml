@@ -33,15 +33,18 @@ jobs:
             vendor: unknown
             env: -gnu
             lib: libnative.so
+            editor_lib: libeditor.so
           - platform: windows
             os: windows-2025
             vendor: pc
             env: '-msvc'
             lib: native.dll
+            editor_lib: editor.dll
           - platform: darwin
             os: macos-14
             vendor: apple
             lib: libnative.dylib
+            editor_lib: libeditor.dylib
         exclude:
           - platform: linux
             arch: aarch64
@@ -78,12 +81,20 @@ jobs:
       run: |
         cd native/
         ${{ env.CARGO_BUILD }} ${{ env.TARGET_TRIPLET}} --release
-    - name: Debug Artifacts
+
+    - name: Debug libnative Artifact
       uses: actions/upload-artifact@v4
+      if: ${{ !inputs.release }}
       with:
           name: libnative-${{ matrix.platform }}-${{ matrix.arch }}-debug
           path: native/target/${{ env.TARGET_TRIPLET }}/debug/${{ matrix.lib }}
-    - name: Release Artifacts
+    - name: Debug libeditor Artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: libeditor-${{ matrix.platform }}-${{ matrix.arch }}-debug
+          path: native/target/${{ env.TARGET_TRIPLET }}/debug/${{ matrix.editor_lib }}
+
+    - name: Release libnative Artifacts
       uses: actions/upload-artifact@v4
       if: inputs.release
       with:
@@ -104,6 +115,7 @@ jobs:
             aarch64: true
             extension: '.dmg'
             lib: libnative.dylib
+            editor_lib: "libeditor.dylib"
             template_dir: '$HOME/Library/Application\ Support/Godot/export_templates'
             godot_artefact: 'macOS.universal'
           - profile: 'Windows'
@@ -115,6 +127,7 @@ jobs:
             aarch64: true
             extension: '.exe'
             lib: native.dll
+            editor_lib: "libeditor.so"
             template_dir: '$HOME/.local/share/godot/export_templates'
             godot_artefact: 'linux.x86_64'
           - profile: 'Linux'
@@ -123,6 +136,7 @@ jobs:
             vendor: 'unknown'
             os: ubuntu-24.04
             lib: libnative.so
+            editor_lib: "libeditor.so"
             template_dir: '$HOME/.local/share/godot/export_templates'
             godot_artefact: 'linux.x86_64'
             x86_64: true
@@ -162,38 +176,42 @@ jobs:
           cd ${{ matrix.template_dir }}/${{ matrix.version }}.stable
           curl -LO https://github.com/godotengine/godot/releases/download/${{ matrix.version }}-stable/Godot_v${{ matrix.version }}-stable_export_templates.tpz
           unzip -j Godot_v${{ matrix.version }}-stable_export_templates.tpz
-      - name: download host libs
-        if: ${{ matrix.platform != 'linux' && startsWith(matrix.os, 'ubuntu') }}
-        uses: actions/download-artifact@v5
+      - name: download editor lib
+        uses: actions/download-artifact@v8
         with:
-          name: libnative-linux-x86_64-debug
-          path: native/target/x86_64-unknown-linux-gnu/debug/
-  
+          name: libeditor-${{ startsWith(matrix.os, 'ubuntu') && 'linux' || matrix.platform }}-${{ startsWith(matrix.os, 'ubuntu') && 'x86_64' || 'aarch64' }}-debug
+          path: native/target/${{ startsWith(matrix.os, 'ubuntu') && 'x86_64-unknown-linux-gnu' || 'aarch64-apple-darwin' }}/debug/
+          merge-multiple: true
+
       - name: download x86_64 debug libs
-        if: matrix.x86_64
-        uses: actions/download-artifact@v5
+        if: ${{ matrix.x86_64 && !inputs.release }}
+        uses: actions/download-artifact@v8
         with:
           name: libnative-${{ matrix.platform }}-x86_64-debug
           path: native/target/x86_64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/debug/
+          merge-multiple: true
       - name: download x86_64 release libs
-        if: ${{ matrix.x86_64 && inputs.release }}
-        uses: actions/download-artifact@v5
+        if: ${{ matrix.x86_64 && inputs.release }}
+        uses: actions/download-artifact@v8
         with:
           name: libnative-${{ matrix.platform }}-x86_64-release
           path: native/target/x86_64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/release/
+          merge-multiple: true
   
       - name: download aarch64 debug libs
-        if: matrix.aarch64
-        uses: actions/download-artifact@v5
+        if: ${{ matrix.aarch64 && !inputs.release }}
+        uses: actions/download-artifact@v8
         with:
           name: libnative-${{ matrix.platform }}-aarch64-debug
           path: native/target/aarch64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/debug/
+          merge-multiple: true
       - name: download aarch64 release libs
         if: ${{ matrix.aarch64 && inputs.release }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: libnative-${{ matrix.platform }}-aarch64-release
           path: native/target/aarch64-${{ matrix.vendor }}-${{ matrix.platform }}${{ matrix.env }}/release/
+          merge-multiple: true
 
       - name: create universal libnative
         if: matrix.platform == 'darwin'
@@ -210,8 +228,10 @@ jobs:
           let aarch64_debug = $"($aarch64_path)/debug/${{ matrix.lib }}"
           let aarch64_release = $"($aarch64_path)/release/${{ matrix.lib }}"
 
-          mkdir $"native/target/universal-($platform_dir)/debug/"
-          lipo -create $x86_debug $aarch64_debug -output $"native/target/universal-($platform_dir)/debug/${{ matrix.lib }}"
+          if not $release {
+            mkdir $"native/target/universal-($platform_dir)/debug/"
+            lipo -create $x86_debug $aarch64_debug -output $"native/target/universal-($platform_dir)/debug/${{ matrix.lib }}"
+          }
 
           if $release {
             mkdir $"native/target/universal-($platform_dir)/release/"
@@ -234,10 +254,7 @@ jobs:
           let profile = if $release { "release" } else { "debug" }
 
           rm -r $"native/target/x86_64-($platform_dir)/($profile)/"
-
-          if $release {
-            rm -r $"native/target/aarch64-($platform_dir)/($profile)/"
-          }
+          rm -r $"native/target/aarch64-($platform_dir)/($profile)/"
 
       - name: export-debug
         shell: nu {0}

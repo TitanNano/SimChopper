@@ -10,16 +10,21 @@ use std::{
     process::{Command, Stdio},
 };
 
-use godot::builtin::{GString, PackedStringArray, VariantType};
-use godot::classes::{EditorInterface, ProjectSettings, RefCounted, SceneTree};
 use godot::obj::{Base, Gd, Singleton};
-use godot::prelude::{godot_api, GodotClass};
+use godot::prelude::{GodotClass, godot_api};
 use godot::register::info::PropertyHint;
 use godot::task;
+use godot::{
+    builtin::{GString, PackedStringArray, VariantType},
+    global::godot_error,
+};
+use godot::{
+    classes::{EditorInterface, ProjectSettings, RefCounted, SceneTree},
+    global::godot_print,
+};
 
-use crate::editor::new_non_zero;
-use crate::editor::ui::{ForgroundProcess, ProgressDialog};
-use crate::util::logger;
+use crate::new_non_zero;
+use crate::ui::{ForgroundProcess, ProgressDialog};
 
 #[derive(GodotClass)]
 #[class(base = RefCounted, no_init)]
@@ -85,7 +90,7 @@ impl AoBaker {
             editor_settings.get_setting("filesystem/import/blender/blender_path");
 
         if blender_path_variant.is_nil() {
-            logger::error!("Unable to get blender path!");
+            godot_error!("Unable to get blender path!");
             return;
         }
 
@@ -114,18 +119,14 @@ impl AoBaker {
 
                 std::fs::read_dir(system_path.to_string())
                     .inspect_err(|err| {
-                        logger::error!(
-                            "unable to read directory: {}.\nError: {}",
-                            system_path,
-                            err
-                        );
+                        godot_error!("Unable to read directory: {}.\nError: {}", system_path, err);
                     })
                     .ok()
             })
             .flatten()
             .filter_map(|entry| {
                 entry
-                    .inspect_err(|err| logger::error!("Failed to enumerate directory entry: {err}"))
+                    .inspect_err(|err| godot_error!("Failed to enumerate directory entry: {err}"))
                     .ok()
             })
             .filter(|entry| {
@@ -168,14 +169,14 @@ impl AoBaker {
             .stdout(Stdio::piped())
             .stdin(Stdio::null());
 
-        logger::debug!("invoking blender: {:?}", blender_command);
+        godot_print!("invoking blender: {:?}", blender_command);
 
         let blender = blender_command.spawn();
 
         let mut blender = match blender {
             Ok(child) => child,
             Err(err) => {
-                logger::error!("Failed to spawn blender process: {}", err);
+                godot_error!("Failed to spawn blender process: {}", err);
                 return;
             }
         };
@@ -191,14 +192,14 @@ impl AoBaker {
                 // We are not done yet.
                 Ok(None) => (),
 
-                // we are done and it was a success
+                // We are done and it was a success
                 Ok(Some(status)) if status.success() => {
                     break;
                 }
 
-                // we are done but blender failed.
+                // We are done but blender failed.
                 Ok(Some(status)) => {
-                    logger::error!(
+                    godot_error!(
                         "Blender exited with status {}",
                         status.code().unwrap_or_default()
                     );
@@ -207,7 +208,7 @@ impl AoBaker {
 
                 // getting the status didn't work
                 Err(err) => {
-                    logger::error!("Failed to check blender exit status: {err}");
+                    godot_error!("Failed to check blender exit status: {err}");
                     break;
                 }
             }
@@ -216,7 +217,7 @@ impl AoBaker {
             let line_error = stdreader.read_line(&mut read_buffer);
 
             if let Err(err) = line_error {
-                logger::error!("failed to read from blender stdout: {err}");
+                godot_error!("failed to read from blender stdout: {err}");
                 continue;
             }
 
@@ -224,14 +225,14 @@ impl AoBaker {
                 let label = read_buffer.split('|').nth(1).unwrap_or_default();
 
                 dialog.bind_mut().push_task_step(label);
-                logger::info!("Blender: {read_buffer}");
+                godot_print!("Blender: {read_buffer}");
             }
 
             if read_buffer.starts_with("File|") {
                 let label = read_buffer.split('|').nth(1).unwrap_or_default();
 
                 dialog.bind_mut().push_task(label);
-                logger::info!("Blender: {read_buffer}");
+                godot_print!("Blender: {read_buffer}");
             }
 
             let _: () = next_frame.to_future().await;

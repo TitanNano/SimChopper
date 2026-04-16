@@ -7,20 +7,20 @@
 [ext_resource type="Script" uid="uid://ksr8mwgn8xoq" path="res://src/Objects/World/Backdrop.gd" id="6"]
 [ext_resource type="CameraAttributesPhysical" uid="uid://ckjhc3lehild4" path="res://resources/Environments/camera_attributes_physical.tres" id="7_yho3v"]
 [ext_resource type="Environment" uid="uid://bl607wqoa882d" path="res://resources/Environments/WorldEnv.tres" id="8"]
-[ext_resource type="Script" uid="uid://jljpgypnojsp" path="res://native/src/scripts/objects/camera.rs" id="8_qw8ew"]
+[ext_resource type="Script" uid="uid://jljpgypnojsp" path="res://native/game/src/scripts/objects/camera.rs" id="8_qw8ew"]
 [ext_resource type="VoxelGIData" uid="uid://cu5hs3tfbj2xd" path="res://resources/Config/voxel_gi_params.tres" id="9_nkrdn"]
 [ext_resource type="Script" uid="uid://bblluinwmhapb" path="res://src/Objects/Camera/CameraInterpolation.gd" id="10"]
 [ext_resource type="Script" uid="uid://dbmgsvtd552t6" path="res://src/Objects/Terrain/Terrain.gd" id="11"]
 [ext_resource type="Material" uid="uid://d3jryprnnxb6x" path="res://resources/Materials/terrain_material.tres" id="12"]
-[ext_resource type="Script" uid="uid://c0a6eytloytey" path="res://native/src/scripts/world/solar_setup.rs" id="12_88vys"]
+[ext_resource type="Script" uid="uid://c0a6eytloytey" path="res://native/game/src/scripts/world/solar_setup.rs" id="12_88vys"]
 [ext_resource type="InputDevice" uid="uid://bky2vkjjwnd0p" path="res://resources/Config/primary_input_device.tres" id="12_hd7nr"]
 [ext_resource type="Material" uid="uid://bmp5rvu5slnnt" path="res://resources/Materials/ocean_material.tres" id="13"]
 [ext_resource type="Script" uid="uid://d15feraixcdwm" path="res://src/Objects/World/Networks.gd" id="14"]
 [ext_resource type="WorldConstants" uid="uid://dbxp5cngs1a5g" path="res://resources/Config/world_constants.tres" id="15"]
-[ext_resource type="Script" uid="uid://bn2ww2ekrihcg" path="res://native/src/scripts/world/buildings.rs" id="15_23gpq"]
+[ext_resource type="Script" uid="uid://bn2ww2ekrihcg" path="res://native/game/src/scripts/world/buildings.rs" id="15_23gpq"]
 [ext_resource type="PackedScene" uid="uid://cmv7rt4gqew38" path="res://resources/Objects/Helis/schweizer_300.tscn" id="16_e6k8r"]
 [ext_resource type="RoadNavigationConfig" uid="uid://dvccb8vdrejqp" path="res://resources/Config/road_navigation.tres" id="16_eq860"]
-[ext_resource type="Script" uid="uid://djjvfkec3e3ph" path="res://native/src/scripts/world/gi_probes.rs" id="19_e3ctf"]
+[ext_resource type="Script" uid="uid://djjvfkec3e3ph" path="res://native/game/src/scripts/world/gi_probes.rs" id="19_e3ctf"]
 [ext_resource type="AnimationLibrary" uid="uid://bc7h3e5qkdula" path="res://resources/Animations/title_screen_ui.tres" id="21_hlc2k"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nkrdn"]
@@ -97,7 +97,7 @@ gi_probes = NodePath("GiProbes")
 environment = ExtResource("8")
 camera_attributes = ExtResource("7_yho3v")
 
-[node name="SolarSetup" type="Node3D" parent="SubViewportContainer/SubViewport/World/Environment" unique_id=850312298 node_paths=PackedStringArray("sun", "moon")]
+[node name="SolarSetup" type="Node3D" parent="SubViewportContainer/SubViewport/World/Environment" unique_id=1882445554 node_paths=PackedStringArray("sun", "moon")]
 transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0)
 rotation_order = 0
 script = ExtResource("12_88vys")
@@ -105,6 +105,7 @@ sun = NodePath("Sun")
 moon = NodePath("Moon")
 day_length = 10
 voxel_gi_data = ExtResource("9_nkrdn")
+metadata/_custom_type_script = "uid://c0a6eytloytey"
 
 [node name="Sun" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport/World/Environment/SolarSetup" unique_id=898696932]
 transform = Transform3D(1, -3.48787e-16, 3.48787e-16, -3.48787e-16, -1, 8.74228e-08, 3.48787e-16, -8.74228e-08, -1, 2.08165e-12, -5.50338e-09, 0.1)
@@ -132,13 +133,15 @@ directional_shadow_blend_splits = true
 directional_shadow_fade_start = 0.6
 directional_shadow_max_distance = 200.0
 
-[node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport/World" unique_id=2064854527 node_paths=PackedStringArray("solar_setup")]
+[node name="Camera" type="Camera3D" parent="SubViewportContainer/SubViewport/World" unique_id=2011441420 node_paths=PackedStringArray("solar_setup", "focus_target")]
 transform = Transform3D(1, 0, 0, 0, 0.8910063, 0.45399037, 0, -0.45399037, 0.8910063, -45.4393, 4.499999, 25.9155)
 attributes = ExtResource("7_yho3v")
 doppler_tracking = 2
 current = true
 script = ExtResource("8_qw8ew")
 solar_setup = NodePath("../Environment/SolarSetup")
+focus_target = NodePath("../Schweizer_300")
+metadata/_custom_type_script = "uid://jljpgypnojsp"
 
 [node name="Schweizer_300" parent="SubViewportContainer/SubViewport/World" unique_id=1998635440 node_paths=PackedStringArray("child_camera", "child_main_camera", "child_debug_camera") groups=["player"] instance=ExtResource("16_e6k8r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.4393, -9.81614e-07, 17.9155)
@@ -175,14 +178,15 @@ road_navigation = ExtResource("16_eq860")
 
 [node name="Road" type="Node3D" parent="SubViewportContainer/SubViewport/World/Networks" unique_id=392084148 groups=["road-network"]]
 
-[node name="Buildings" type="Node" parent="SubViewportContainer/SubViewport/World" unique_id=730073247]
+[node name="Buildings" type="Node" parent="SubViewportContainer/SubViewport/World" unique_id=127425830]
 script = ExtResource("15_23gpq")
 world_constants = ExtResource("15")
+metadata/_custom_type_script = "uid://bn2ww2ekrihcg"
 
 [node name="Backdrop" type="Node" parent="SubViewportContainer/SubViewport/World" unique_id=1333752962]
 script = ExtResource("6")
 
-[node name="GiProbes" type="Node3D" parent="SubViewportContainer/SubViewport/World" unique_id=67311610]
+[node name="GiProbes" type="Node3D" parent="SubViewportContainer/SubViewport/World" unique_id=468319335]
 script = ExtResource("19_e3ctf")
 world_constants = ExtResource("15")
 camera_attributes = ExtResource("7_yho3v")

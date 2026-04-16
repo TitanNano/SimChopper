@@ -4,7 +4,7 @@ compatibility_minimum = 4.5
 reloadable = true
 
 [build]
-source = "res://native/"
+source = "res://native/game/"
 
 [libraries]
 macos.debug.arm64="res://native/target/aarch64-apple-darwin/debug/libnative.dylib"

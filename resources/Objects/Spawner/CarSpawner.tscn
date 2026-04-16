@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://blyermwgncstx"]
 
-[ext_resource type="Script" uid="uid://bc552pej2vb8b" path="res://native/src/scripts/spawner/car_spawner.rs" id="1_c5pws"]
+[ext_resource type="Script" uid="uid://bc552pej2vb8b" path="res://native/game/src/scripts/spawner/car_spawner.rs" id="1_c5pws"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_falwk"]
 top_radius = 10.0

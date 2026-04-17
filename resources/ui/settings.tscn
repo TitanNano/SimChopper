@@ -1,0 +1,222 @@
+[gd_scene format=3 uid="uid://bioq71ppnncw5"]
+
+[ext_resource type="Theme" uid="uid://dw1b3gtetxdgl" path="res://resources/ui_themes/settings_menu_theme.tres" id="1_rv0ww"]
+[ext_resource type="Material" uid="uid://cyopsm3h2lthd" path="res://resources/Materials/ui_blur_material.tres" id="1_rys2v"]
+[ext_resource type="Script" uid="uid://c5e50xbnlkiks" path="res://native/src/scripts/ui/tab_controller.rs" id="2_aim2s"]
+[ext_resource type="InputDevice" uid="uid://bky2vkjjwnd0p" path="res://resources/Config/primary_input_device.tres" id="3_3jfrj"]
+[ext_resource type="Texture2D" uid="uid://b301f4mt0pg0k" path="res://resources/Textures/control/ui_tab_prev.tres" id="4_aim2s"]
+[ext_resource type="Texture2D" uid="uid://m7n7og30pq2k" path="res://resources/Textures/control/ui_tab_next.tres" id="5_3jfrj"]
+[ext_resource type="PackedScene" uid="uid://bivg14j2kt501" path="res://resources/ui/settings_option_list.tscn" id="5_5e4gs"]
+[ext_resource type="PackedScene" uid="uid://6wucddao00pd" path="res://resources/ui/settings_option_toggle.tscn" id="6_rv0ww"]
+[ext_resource type="PackedScene" uid="uid://cs8hk84y2lecw" path="res://resources/ui/settings_option_range.tscn" id="7_rv0ww"]
+[ext_resource type="PackedScene" uid="uid://bsls8nq8sr7q" path="res://resources/ui/settings_option_input.tscn" id="10_0k1u1"]
+[ext_resource type="Texture2D" uid="uid://dmno2ptclyybd" path="res://resources/Textures/control/forward.tres" id="11_44bim"]
+[ext_resource type="Texture2D" uid="uid://kpm378digbw7" path="res://resources/Textures/control/backward.tres" id="12_1dh6r"]
+[ext_resource type="Texture2D" uid="uid://ce8ue88wl2nvl" path="res://resources/Textures/control/turn_left.tres" id="13_im2bc"]
+[ext_resource type="Texture2D" uid="uid://6fdcfbrvwq81" path="res://resources/Textures/control/turn_right.tres" id="14_gtb17"]
+[ext_resource type="Texture2D" uid="uid://bdv56k4trtp8w" path="res://resources/Textures/control/strafe_left.tres" id="15_3qjbt"]
+[ext_resource type="Texture2D" uid="uid://bdc70ql0a6wde" path="res://resources/Textures/control/strafe_right.tres" id="16_8frbw"]
+[ext_resource type="Texture2D" uid="uid://di0orkkqokp2l" path="res://resources/Textures/control/rise.tres" id="17_8frbw"]
+[ext_resource type="Texture2D" uid="uid://ucsgbn6ufftg" path="res://resources/Textures/control/land.tres" id="18_rvtar"]
+[ext_resource type="Texture2D" uid="uid://cw7r73l1j0j4m" path="res://resources/Textures/control/fire_primary.tres" id="19_xv08n"]
+
+[node name="Root" type="VBoxContainer" unique_id=760692856 node_paths=PackedStringArray("nodes_tab_control", "nodes_tabs_container")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_rv0ww")
+theme_type_variation = &"RootLayout"
+script = ExtResource("2_aim2s")
+input_device = ExtResource("3_3jfrj")
+nodes_tab_control = NodePath("TabBar/TabBarLayout/TabControl")
+nodes_tabs_container = NodePath("TabContainer")
+
+[node name="TabBar" type="PanelContainer" parent="." unique_id=653839119]
+material = ExtResource("1_rys2v")
+layout_mode = 2
+theme_type_variation = &"SettingsTabBar"
+
+[node name="TabBarLayout" type="HBoxContainer" parent="TabBar" unique_id=1527806700]
+layout_mode = 2
+
+[node name="ControlIconPrev" type="TextureRect" parent="TabBar/TabBarLayout" unique_id=2036855831]
+layout_mode = 2
+texture = ExtResource("4_aim2s")
+expand_mode = 2
+
+[node name="TabControl" type="TabBar" parent="TabBar/TabBarLayout" unique_id=1274291699]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+current_tab = 0
+tab_alignment = 1
+clip_tabs = false
+close_with_middle_mouse = false
+switch_on_drag_hover = false
+tab_count = 3
+tab_0/title = "Video"
+tab_1/title = "Sound"
+tab_2/title = "Controls"
+
+[node name="ControlIconNext" type="TextureRect" parent="TabBar/TabBarLayout" unique_id=252960043]
+layout_mode = 2
+texture = ExtResource("5_3jfrj")
+expand_mode = 2
+
+[node name="TabContainer" type="Control" parent="." unique_id=1898272863]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VideoTab" type="PanelContainer" parent="TabContainer" unique_id=848077711]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"SettingsTabContainer"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/VideoTab" unique_id=398757456]
+layout_mode = 2
+theme_type_variation = &"SettingsSplit"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/VideoTab/HBoxContainer" unique_id=789120246]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsOptionList"
+
+[node name="Resolution" parent="TabContainer/VideoTab/HBoxContainer/VBoxContainer" unique_id=475406479 instance=ExtResource("5_5e4gs")]
+layout_mode = 2
+label = "Resolution"
+values = Array[String](["1920x1080"])
+
+[node name="Fullscreen" parent="TabContainer/VideoTab/HBoxContainer/VBoxContainer" unique_id=1464865732 instance=ExtResource("6_rv0ww")]
+layout_mode = 2
+label = "Fullscreen"
+value = true
+
+[node name="VSync" parent="TabContainer/VideoTab/HBoxContainer/VBoxContainer" unique_id=1702919599 instance=ExtResource("6_rv0ww")]
+layout_mode = 2
+label = "V-Sync"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/VideoTab/HBoxContainer" unique_id=81097026]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsDescription"
+text = "The option description goes here."
+
+[node name="SoundTab" type="PanelContainer" parent="TabContainer" unique_id=1395524084]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"SettingsTabContainer"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/SoundTab" unique_id=479791197]
+layout_mode = 2
+theme_type_variation = &"SettingsSplit"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/SoundTab/HBoxContainer" unique_id=1134410152]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsOptionList"
+
+[node name="Master" parent="TabContainer/SoundTab/HBoxContainer/VBoxContainer" unique_id=494687550 instance=ExtResource("7_rv0ww")]
+layout_mode = 2
+label = "Master"
+value = 100.0
+
+[node name="Environment" parent="TabContainer/SoundTab/HBoxContainer/VBoxContainer" unique_id=1433328046 instance=ExtResource("7_rv0ww")]
+layout_mode = 2
+label = "Environment"
+value = 100.0
+
+[node name="Music" parent="TabContainer/SoundTab/HBoxContainer/VBoxContainer" unique_id=1850795348 instance=ExtResource("7_rv0ww")]
+layout_mode = 2
+label = "Music"
+value = 100.0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/SoundTab/HBoxContainer" unique_id=709038937]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsDescription"
+text = "The option description goes here."
+
+[node name="ControlsTab" type="PanelContainer" parent="TabContainer" unique_id=1763255928]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"SettingsTabContainer"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/ControlsTab" unique_id=678384332]
+layout_mode = 2
+theme_type_variation = &"SettingsSplit"
+
+[node name="VBoxContainerLeft" type="VBoxContainer" parent="TabContainer/ControlsTab/HBoxContainer" unique_id=1441648826]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsOptionList"
+
+[node name="MoveForward" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=510698977 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Move Forward"
+texture = ExtResource("11_44bim")
+
+[node name="MoveBackward" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=1211399512 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Move Backward"
+texture = ExtResource("12_1dh6r")
+
+[node name="TurnLeft" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=353676701 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Turn Left"
+texture = ExtResource("13_im2bc")
+
+[node name="TurnRight" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=946461237 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Turn Right"
+texture = ExtResource("14_gtb17")
+
+[node name="StrafeLeft" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=1446559392 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Strafe Left"
+texture = ExtResource("15_3qjbt")
+
+[node name="StrafeRight" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=1604071926 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Strafe Right"
+texture = ExtResource("16_8frbw")
+
+[node name="Rise" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=866588137 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Rise"
+texture = ExtResource("17_8frbw")
+
+[node name="Land" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=696704535 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Land"
+texture = ExtResource("18_rvtar")
+
+[node name="VBoxContainerRight" type="VBoxContainer" parent="TabContainer/ControlsTab/HBoxContainer" unique_id=1104573068]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsOptionList"
+
+[node name="FirePrimary" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerRight" unique_id=1495686467 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Fire Primary"
+texture = ExtResource("19_xv08n")

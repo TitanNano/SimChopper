@@ -6,10 +6,12 @@
  */
 
 mod input_device;
+mod input_prompt_texture;
 mod items;
 mod water_decal_tracker;
 mod world_constants;
 
 pub(crate) use input_device::InputDevice;
+pub(crate) use input_prompt_texture::InputPromptTexture;
 pub use water_decal_tracker::WaterDecalTracker;
 pub use world_constants::*;

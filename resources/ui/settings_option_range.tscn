@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://cs8hk84y2lecw"]
+
+[ext_resource type="PackedScene" uid="uid://dyskwp1x1hl4i" path="res://resources/ui/settings_option.tscn" id="1_ntsf4"]
+[ext_resource type="Script" uid="uid://cf5coen440mfv" path="res://native/src/scripts/ui/settings_option_range.rs" id="2_ntsf4"]
+
+[node name="SettingsOptionRange" unique_id=475406479 node_paths=PackedStringArray("nodes_label", "nodes_value") instance=ExtResource("1_ntsf4")]
+script = ExtResource("2_ntsf4")
+nodes_label = NodePath("HBoxContainer/Label")
+nodes_value = NodePath("HBoxContainer/PanelContainer/HSlider")
+label = ""
+description = ""
+value = 0.0
+min = 0.0
+max = 100.0
+step = 0.0
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer" parent_id_path=PackedInt32Array(1874205364) index="2" unique_id=2054884024]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RangeSliderBox"
+
+[node name="HSlider" type="HSlider" parent="HBoxContainer/PanelContainer" index="0" unique_id=1083830632]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 0.0

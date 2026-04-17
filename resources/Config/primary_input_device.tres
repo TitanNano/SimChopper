@@ -1,3 +1,4 @@
 [gd_resource type="InputDevice" format=3 uid="uid://bky2vkjjwnd0p"]
 
 [resource]
+editor_device_type = "controller_generic"

@@ -1,13 +1,18 @@
-use godot::builtin::{Callable, StringName};
+use std::borrow::Cow;
+
+use godot::builtin::{Callable, GString, StringName};
+use godot::classes::class_macros::sys::VariantType;
 use godot::classes::input::MouseMode;
 use godot::classes::{
     match_class, Engine, IResource, Input, InputEvent, InputEventJoypadButton,
     InputEventJoypadMotion, Resource,
 };
+use godot::init::is_editor_hint;
 use godot::meta::conv::ByValue;
+use godot::meta::shape::EnumeratorShape;
 use godot::meta::{FromGodot, GodotConvert, ToGodot};
 use godot::obj::{Base, Gd, Singleton, WithUserSignals};
-use godot::prelude::{godot_api, ConvertError, GodotClass};
+use godot::prelude::{godot_api, ConvertError, Export, GodotClass};
 use godot::register::property::SimpleVar;
 
 macro_rules! input_axis {
@@ -54,20 +59,157 @@ impl InputAxis {
     }
 }
 
-#[derive(Default)]
-enum DeviceType {
+#[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
+pub(crate) enum DeviceType {
     #[default]
     KeyboardMouse,
-    Controller,
+    Controller(ControllerType),
 }
 
+const DEVICE_TYPE_VARIANTS: &[EnumeratorShape] = &[
+    EnumeratorShape::new_string("keyboard_mouse"),
+    EnumeratorShape::new_string("controller_play_station"),
+    EnumeratorShape::new_string("controller_xbox"),
+    EnumeratorShape::new_string("controller_steam"),
+    EnumeratorShape::new_string("controller_steam_deck"),
+    EnumeratorShape::new_string("controller_switch"),
+    EnumeratorShape::new_string("controller_switch_2"),
+    EnumeratorShape::new_string("controller_wii"),
+    EnumeratorShape::new_string("controller_wii_u"),
+    EnumeratorShape::new_string("controller_gamecube"),
+    EnumeratorShape::new_string("controller_generic"),
+];
+
+impl GodotConvert for DeviceType {
+    type Via = GString;
+
+    fn godot_shape() -> godot::meta::shape::GodotShape {
+        godot::meta::shape::GodotShape::Enum {
+            variant_type: VariantType::STRING,
+            enumerators: Cow::Borrowed(DEVICE_TYPE_VARIANTS),
+            godot_name: None,
+            is_bitfield: false,
+        }
+    }
+}
+
+impl ToGodot for DeviceType {
+    type Pass = ByValue;
+
+    fn to_godot(&self) -> godot::meta::ToArg<'_, Self::Via, Self::Pass> {
+        let str = match self {
+            DeviceType::KeyboardMouse => "keyboard_mouse",
+            DeviceType::Controller(ControllerType::PlayStation) => "controller_play_station",
+            DeviceType::Controller(ControllerType::Xbox) => "controller_xbox",
+            DeviceType::Controller(ControllerType::Steam) => "controller_steam",
+            DeviceType::Controller(ControllerType::SteamDeck) => "controller_steam_deck",
+            DeviceType::Controller(ControllerType::NintendoSwitch) => "controller_switch",
+            DeviceType::Controller(ControllerType::NintendoSwitch2) => "controller_switch_2",
+            DeviceType::Controller(ControllerType::NintendoWii) => "controller_wii",
+            DeviceType::Controller(ControllerType::NintendoWiiU) => "controller_wii_u",
+            DeviceType::Controller(ControllerType::NintendoGamecube) => "controller_gamecube",
+            DeviceType::Controller(ControllerType::Generic) => "controller_generic",
+        };
+
+        GString::from(str)
+    }
+}
+
+impl FromGodot for DeviceType {
+    fn try_from_godot(via: Self::Via) -> Result<Self, ConvertError> {
+        match &*via.to_string() {
+            "keyboard_mouse" => Ok(DeviceType::KeyboardMouse),
+            "controller_play_station" => Ok(DeviceType::Controller(ControllerType::PlayStation)),
+            "controller_xbox" => Ok(DeviceType::Controller(ControllerType::Xbox)),
+            "controller_steam" => Ok(DeviceType::Controller(ControllerType::Steam)),
+            "controller_steam_deck" => Ok(DeviceType::Controller(ControllerType::SteamDeck)),
+            "controller_switch" => Ok(DeviceType::Controller(ControllerType::NintendoSwitch)),
+            "controller_switch_2" => Ok(DeviceType::Controller(ControllerType::NintendoSwitch2)),
+            "controller_wii" => Ok(DeviceType::Controller(ControllerType::NintendoWii)),
+            "controller_wii_u" => Ok(DeviceType::Controller(ControllerType::NintendoWiiU)),
+            "controller_gamecube" => Ok(DeviceType::Controller(ControllerType::NintendoGamecube)),
+            "controller_generic" => Ok(DeviceType::Controller(ControllerType::Generic)),
+            _ => Err(ConvertError::new("unknown input device type")),
+        }
+    }
+}
+
+impl SimpleVar for DeviceType {}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub(crate) enum ControllerType {
+    PlayStation,
+    Xbox,
+    Steam,
+    SteamDeck,
+    NintendoSwitch,
+    NintendoSwitch2,
+    NintendoWii,
+    NintendoWiiU,
+    NintendoGamecube,
+    Generic,
+}
+
+impl ControllerType {
+    /// Controller name mapping based on the SDL game controller db.
+    ///
+    /// <https://github.com/mdqinc/SDL_GameControllerDB/blob/master/gamecontrollerdb.txt>
+    fn from_device_id(device_id: i32) -> Self {
+        let name = Input::singleton().get_joy_name(device_id).to_string();
+
+        if name.contains("PS4 Controller") || name.contains("PS3 Controller") {
+            Self::PlayStation
+        } else if name.contains("Xbox") {
+            Self::Xbox
+        } else if name.contains("Steam Controller") {
+            Self::Steam
+        } else if name.contains("Steam Deck") {
+            Self::SteamDeck
+        } else if name.contains("Nintendo Switch 2") {
+            Self::NintendoSwitch2
+        } else if name.contains("Nintendo Switch") {
+            Self::NintendoSwitch
+        } else if name.contains("Nintendo Wii U") {
+            Self::NintendoWiiU
+        } else if name.contains("Nintendo Wii") {
+            Self::NintendoWii
+        } else if name.contains("Nintendo Gamecube") {
+            Self::NintendoGamecube
+        } else {
+            Self::Generic
+        }
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            ControllerType::PlayStation => "play_station",
+            ControllerType::Xbox => "xbox",
+            ControllerType::Steam => "steam",
+            ControllerType::SteamDeck => "steam_deck",
+            ControllerType::NintendoSwitch => "nintendo_switch",
+            ControllerType::NintendoSwitch2 => "nintendo_switch_2",
+            ControllerType::NintendoWii => "nintendo_wii",
+            ControllerType::NintendoWiiU => "nintendo_wii_u",
+            ControllerType::NintendoGamecube => "nintendo_gamecube",
+            ControllerType::Generic => "generic",
+        }
+    }
+}
+
+impl Export for DeviceType {}
+
 #[derive(GodotClass)]
-#[class( base = Resource)]
+#[class( base = Resource, tool)]
+#[expect(clippy::struct_excessive_bools)]
 pub(crate) struct InputDevice {
     #[export]
-    device_id: i32,
+    pub device_id: i32,
 
     device_type: DeviceType,
+
+    #[export]
+    #[var(set)]
+    editor_device_type: DeviceType,
     mouse_mode: MouseMode,
 
     seperate_climp_axis: bool,
@@ -79,6 +221,8 @@ pub(crate) struct InputDevice {
 
     fire_primary_state: bool,
     fire_secondary_state: bool,
+    ui_tab_prev_state: bool,
+    ui_tab_next_state: bool,
 
     base: Base<Resource>,
 }
@@ -89,6 +233,7 @@ impl IResource for InputDevice {
         Self {
             device_id: 0,
             device_type: DeviceType::default(),
+            editor_device_type: DeviceType::KeyboardMouse,
             mouse_mode: MouseMode::VISIBLE,
             seperate_climp_axis: true,
             climb: InputAxis::default(),
@@ -98,17 +243,31 @@ impl IResource for InputDevice {
             base,
             fire_primary_state: false,
             fire_secondary_state: false,
+            ui_tab_prev_state: false,
+            ui_tab_next_state: false,
         }
     }
 }
 
 #[godot_api]
 impl InputDevice {
+    /// [`DeviceType`] of the input device has changed.
+    ///
+    /// Either due to input on a different device with the same ID (Keyboard to Controller switch) or because the editor override changed.
+    #[signal]
+    pub fn device_type_changed();
+
     #[signal]
     fn fire_primary(pressed: bool);
 
     #[signal]
     fn fire_secondary(pressed: bool);
+
+    #[signal]
+    pub fn ui_tab_prev(pressed: bool);
+
+    #[signal]
+    pub fn ui_tab_next(pressed: bool);
 
     #[func]
     fn climb_strength(&self) -> f32 {
@@ -153,15 +312,23 @@ impl InputDevice {
     #[func]
     #[expect(clippy::needless_pass_by_value)]
     pub fn capture(&mut self, event: Gd<InputEvent>) {
-        if event.get_device() != self.device_id {
+        let device_id = event.get_device();
+
+        if device_id != self.device_id {
             return;
         }
 
+        let current_device_type = self.device_type;
+
         self.device_type = match_class! { event.clone(),
-            _ @ InputEventJoypadButton => DeviceType::Controller,
-            _ @ InputEventJoypadMotion => DeviceType::Controller,
+            _ @ InputEventJoypadButton => DeviceType::Controller(ControllerType::from_device_id(device_id)),
+            _ @ InputEventJoypadMotion => DeviceType::Controller(ControllerType::from_device_id(device_id)),
             _ => DeviceType::KeyboardMouse,
         };
+
+        if current_device_type != self.device_type {
+            self.signals().device_type_changed().emit();
+        }
 
         input_axis!(event, self.climb, AxisAction::Land, AxisAction::Rise);
         input_axis!(event, self.movement, AxisAction::Forward, AxisAction::Back);
@@ -180,11 +347,13 @@ impl InputDevice {
 
         input_button!(event, ButtonAction::FirePrimary, self => (fire_primary, fire_primary_state));
         input_button!(event, ButtonAction::FireSecondary, self => (fire_secondary, fire_secondary_state));
+        input_button!(event, ButtonAction::UiTabPrev, self => (ui_tab_prev, ui_tab_prev_state));
+        input_button!(event, ButtonAction::UiTabNext, self => (ui_tab_next, ui_tab_next_state));
 
         if !Engine::singleton().is_embedded_in_editor() {
             match self.device_type {
                 DeviceType::KeyboardMouse => Input::singleton().set_mouse_mode(self.mouse_mode),
-                DeviceType::Controller => Input::singleton().set_mouse_mode(MouseMode::HIDDEN),
+                DeviceType::Controller(_) => Input::singleton().set_mouse_mode(MouseMode::HIDDEN),
             }
         }
     }
@@ -201,6 +370,9 @@ impl InputDevice {
                 .fire_secondary()
                 .to_untyped()
                 .connect(&handler),
+
+            ButtonAction::UiTabPrev => self.signals().ui_tab_prev().to_untyped().connect(&handler),
+            ButtonAction::UiTabNext => self.signals().ui_tab_next().to_untyped().connect(&handler),
         }
     }
 
@@ -218,12 +390,41 @@ impl InputDevice {
                 .fire_secondary()
                 .to_untyped()
                 .disconnect(&handler),
+            ButtonAction::UiTabPrev => self
+                .signals()
+                .ui_tab_prev()
+                .to_untyped()
+                .disconnect(&handler),
+            ButtonAction::UiTabNext => self
+                .signals()
+                .ui_tab_next()
+                .to_untyped()
+                .disconnect(&handler),
         }
     }
 
     #[func]
     pub fn set_mouse_mode(&mut self, mode: MouseMode) {
         self.mouse_mode = mode;
+    }
+
+    pub fn device_type(&self) -> DeviceType {
+        if is_editor_hint() {
+            self.editor_device_type
+        } else {
+            self.device_type
+        }
+    }
+
+    #[func]
+    fn set_editor_device_type(&mut self, device_type: DeviceType) {
+        let previous_device_type = self.editor_device_type;
+
+        self.editor_device_type = device_type;
+
+        if device_type != previous_device_type {
+            self.signals().device_type_changed().emit();
+        }
     }
 }
 
@@ -292,9 +493,10 @@ impl FromGodot for AxisAction {
 
 #[derive(Clone, Copy, Debug)]
 enum ButtonAction {
-    // Buttons
     FirePrimary,
     FireSecondary,
+    UiTabPrev,
+    UiTabNext,
 }
 
 impl ButtonAction {
@@ -302,6 +504,8 @@ impl ButtonAction {
         match self {
             Self::FirePrimary => "fire_primary",
             Self::FireSecondary => "fire_secondary",
+            Self::UiTabPrev => "ui_tab_prev",
+            Self::UiTabNext => "ui_tab_next",
         }
     }
 }
@@ -319,6 +523,8 @@ impl FromGodot for ButtonAction {
         let parsed = match via.to_string().as_str() {
             "fire_primary" => Self::FirePrimary,
             "fire_secondary" => Self::FireSecondary,
+            "ui_tab_prev" => Self::UiTabPrev,
+            "ui_tab_next" => Self::UiTabNext,
             _ => return Err(ConvertError::new("unknown action type")),
         };
 

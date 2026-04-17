@@ -9,6 +9,8 @@
 [ext_resource type="Material" uid="uid://d22y3mrstykx1" path="res://resources/Materials/schweizer_300_green_paint.tres" id="4_scex8"]
 [ext_resource type="Material" uid="uid://m6cr6gd6bycq" path="res://resources/Materials/schweizer_300_orange_paint.tres" id="5_gbrg3"]
 [ext_resource type="Material" uid="uid://pugv3tibcyst" path="res://resources/Materials/schweizer_300_windows.tres" id="6_4ijke"]
+[ext_resource type="Material" uid="uid://cyopsm3h2lthd" path="res://resources/Materials/ui_blur_material.tres" id="6_cv2q5"]
+[ext_resource type="PackedScene" uid="uid://bioq71ppnncw5" path="res://resources/ui/settings.tscn" id="6_kb751"]
 [ext_resource type="PackedScene" uid="uid://cnqfo57vlyy3w" path="res://resources/Meshes/Helis/schweizer_300/rotor.gltf" id="7_xv2f0"]
 [ext_resource type="PackedScene" uid="uid://bbcfwjl2304l5" path="res://resources/Meshes/Helis/schweizer_300/tail_rotor.gltf" id="8_ecj1i"]
 [ext_resource type="Theme" uid="uid://rumvfyg8qyrj" path="res://resources/ui_themes/title_menu_theme.tres" id="10_scex8"]
@@ -57,11 +59,6 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0)
 }
 tracks/0/use_blend = true
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wq8ws"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
-border_width_right = 1
-border_color = Color(0.54901963, 0.6666667, 0.87058824, 0.4627451)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h6837"]
 bg_color = Color(0, 0, 0, 1)
@@ -184,10 +181,58 @@ tracks/1/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 1)]
 }
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("GridContainer:position:x")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/3/type = "bezier"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("GridContainer:position:y")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="Animation" id="Animation_cv2q5"]
+resource_name = "title_menu_out"
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("GridContainer:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(2, 0),
+"points": PackedFloat32Array(0, 0, 0, 0.3, 0, -256, -0.3, 0, 0.3, 0),
+"times": PackedFloat32Array(0, 1)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("GridContainer:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(2, 0),
+"points": PackedFloat32Array(0, 0, 0, 0.25, 0, 0, 0, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 1)
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_1w7u6"]
 _data = {
-&"RESET": SubResource("Animation_ecj1i")
+&"RESET": SubResource("Animation_ecj1i"),
+&"title_menu_out": SubResource("Animation_cv2q5")
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_m8ej5"]
@@ -199,8 +244,8 @@ _data = {
 [node name="Root" type="Node3D" unique_id=2066082292 node_paths=PackedStringArray("scene_transitions", "start_game", "quit_game", "ui_sounds")]
 script = ExtResource("1_4ijke")
 scene_transitions = NodePath("SceneTransitionPlayer")
-start_game = NodePath("GridContainer/PanelContainer/Panel/VBoxContainer/New Game")
-quit_game = NodePath("GridContainer/PanelContainer/Panel/VBoxContainer/Quit")
+start_game = NodePath("GridContainer/BorderContainer/VBoxContainer/New Game")
+quit_game = NodePath("GridContainer/BorderContainer/VBoxContainer/Quit")
 main_scene = "uid://cvh54xiw8586b"
 ui_sounds = NodePath("UISoundPlayer")
 animations_ui_select = SubResource("Animation_1w7u6")
@@ -216,31 +261,24 @@ grow_vertical = 2
 theme = ExtResource("10_scex8")
 columns = 5
 
-[node name="PanelContainer" type="PanelContainer" parent="GridContainer" unique_id=281565182]
+[node name="BorderContainer" type="PanelContainer" parent="GridContainer" unique_id=281565182]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_wq8ws")
+theme_type_variation = &"BorderContainer"
 
-[node name="Panel" type="Panel" parent="GridContainer/PanelContainer" unique_id=2085032994]
+[node name="PanelBackground" type="Panel" parent="GridContainer/BorderContainer" unique_id=2085032994]
+material = ExtResource("6_cv2q5")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("10_scex8")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer/PanelContainer/Panel" unique_id=1992182300]
-layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_top = -157.0
-offset_bottom = 157.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer/BorderContainer" unique_id=1992182300]
+layout_mode = 2
 size_flags_vertical = 4
 
-[node name="Continue" type="Button" parent="GridContainer/PanelContainer/Panel/VBoxContainer" unique_id=1762317769]
+[node name="Continue" type="Button" parent="GridContainer/BorderContainer/VBoxContainer" unique_id=1762317769]
 layout_mode = 2
 focus_neighbor_bottom = NodePath("../New Game")
 focus_next = NodePath("../New Game")
@@ -249,13 +287,13 @@ disabled = true
 button_mask = 0
 text = "Continue"
 
-[node name="New Game" type="Button" parent="GridContainer/PanelContainer/Panel/VBoxContainer" unique_id=346531914]
+[node name="New Game" type="Button" parent="GridContainer/BorderContainer/VBoxContainer" unique_id=346531914]
 layout_mode = 2
-focus_neighbor_bottom = NodePath("../Quit")
-focus_next = NodePath("../Quit")
+focus_neighbor_bottom = NodePath("../Settings")
+focus_next = NodePath("../Settings")
 text = "New Game"
 
-[node name="Load Game" type="Button" parent="GridContainer/PanelContainer/Panel/VBoxContainer" unique_id=1845106796]
+[node name="Load Game" type="Button" parent="GridContainer/BorderContainer/VBoxContainer" unique_id=1845106796]
 layout_mode = 2
 focus_neighbor_top = NodePath("../New Game")
 focus_neighbor_bottom = NodePath("../Settings")
@@ -266,29 +304,29 @@ disabled = true
 button_mask = 0
 text = "Load Game"
 
-[node name="Settings" type="Button" parent="GridContainer/PanelContainer/Panel/VBoxContainer" unique_id=1139425955]
+[node name="Settings" type="Button" parent="GridContainer/BorderContainer/VBoxContainer" unique_id=1139425955]
 layout_mode = 2
-focus_neighbor_top = NodePath("../Load Game")
+focus_neighbor_top = NodePath("../New Game")
 focus_neighbor_bottom = NodePath("../Quit")
 focus_next = NodePath("../Quit")
-focus_previous = NodePath("../Load Game")
-focus_mode = 0
-disabled = true
-button_mask = 0
+focus_previous = NodePath("../New Game")
 text = "Settings"
 
-[node name="Credits" type="Button" parent="GridContainer/PanelContainer/Panel/VBoxContainer" unique_id=1550277427]
+[node name="Credits" type="Button" parent="GridContainer/BorderContainer/VBoxContainer" unique_id=1550277427]
 layout_mode = 2
 focus_mode = 0
 disabled = true
 button_mask = 0
 text = "Credits"
 
-[node name="Quit" type="Button" parent="GridContainer/PanelContainer/Panel/VBoxContainer" unique_id=934364022]
+[node name="Quit" type="Button" parent="GridContainer/BorderContainer/VBoxContainer" unique_id=934364022]
 layout_mode = 2
-focus_neighbor_top = NodePath("../New Game")
-focus_previous = NodePath("../New Game")
+focus_neighbor_top = NodePath("../Settings")
+focus_previous = NodePath("../Settings")
 text = "Quit"
+
+[node name="SettingsScreen" parent="." unique_id=760692856 instance=ExtResource("6_kb751")]
+visible = false
 
 [node name="Black Cover" type="Panel" parent="." unique_id=230169948]
 anchors_preset = 15
@@ -298,7 +336,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_h6837")
 
-[node name="hangar_2" parent="." unique_id=1321286550 instance=ExtResource("1_lejt8")]
+[node name="hangar_2" parent="." unique_id=1035202761 instance=ExtResource("1_lejt8")]
 
 [node name="Path3D" type="Path3D" parent="hangar_2" unique_id=493704069]
 curve = SubResource("Curve3D_ip0tl")
@@ -357,24 +395,24 @@ size = Vector3(26, 11.985107, 29)
 camera_attributes = ExtResource("3_gbrg3")
 data = ExtResource("14_1w7u6")
 
-[connection signal="focus_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Continue" to="." method="on_ui_select"]
-[connection signal="mouse_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Continue" to="." method="on_ui_hover" flags=18]
-[connection signal="pressed" from="GridContainer/PanelContainer/Panel/VBoxContainer/Continue" to="." method="on_ui_activate"]
-[connection signal="focus_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/New Game" to="." method="on_ui_select"]
-[connection signal="mouse_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/New Game" to="." method="on_ui_hover" flags=18]
-[connection signal="pressed" from="GridContainer/PanelContainer/Panel/VBoxContainer/New Game" to="." method="on_ui_activate"]
-[connection signal="focus_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Load Game" to="." method="on_ui_select"]
-[connection signal="mouse_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Load Game" to="." method="on_ui_hover" flags=18]
-[connection signal="pressed" from="GridContainer/PanelContainer/Panel/VBoxContainer/Load Game" to="." method="on_ui_activate"]
-[connection signal="focus_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Settings" to="." method="on_ui_select"]
-[connection signal="mouse_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Settings" to="." method="on_ui_hover" flags=18]
-[connection signal="pressed" from="GridContainer/PanelContainer/Panel/VBoxContainer/Settings" to="." method="on_ui_activate"]
-[connection signal="focus_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Credits" to="." method="on_ui_select"]
-[connection signal="mouse_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Credits" to="." method="on_ui_hover" flags=18]
-[connection signal="pressed" from="GridContainer/PanelContainer/Panel/VBoxContainer/Credits" to="." method="on_ui_activate"]
-[connection signal="focus_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Quit" to="." method="on_ui_select"]
-[connection signal="mouse_entered" from="GridContainer/PanelContainer/Panel/VBoxContainer/Quit" to="." method="on_ui_hover" flags=18]
-[connection signal="pressed" from="GridContainer/PanelContainer/Panel/VBoxContainer/Quit" to="." method="on_ui_activate"]
+[connection signal="focus_entered" from="GridContainer/BorderContainer/VBoxContainer/Continue" to="." method="on_ui_select"]
+[connection signal="mouse_entered" from="GridContainer/BorderContainer/VBoxContainer/Continue" to="." method="on_ui_hover" flags=18]
+[connection signal="pressed" from="GridContainer/BorderContainer/VBoxContainer/Continue" to="." method="on_ui_activate"]
+[connection signal="focus_entered" from="GridContainer/BorderContainer/VBoxContainer/New Game" to="." method="on_ui_select"]
+[connection signal="mouse_entered" from="GridContainer/BorderContainer/VBoxContainer/New Game" to="." method="on_ui_hover" flags=18]
+[connection signal="pressed" from="GridContainer/BorderContainer/VBoxContainer/New Game" to="." method="on_ui_activate"]
+[connection signal="focus_entered" from="GridContainer/BorderContainer/VBoxContainer/Load Game" to="." method="on_ui_select"]
+[connection signal="mouse_entered" from="GridContainer/BorderContainer/VBoxContainer/Load Game" to="." method="on_ui_hover" flags=18]
+[connection signal="pressed" from="GridContainer/BorderContainer/VBoxContainer/Load Game" to="." method="on_ui_activate"]
+[connection signal="focus_entered" from="GridContainer/BorderContainer/VBoxContainer/Settings" to="." method="on_ui_select"]
+[connection signal="mouse_entered" from="GridContainer/BorderContainer/VBoxContainer/Settings" to="." method="on_ui_hover" flags=18]
+[connection signal="pressed" from="GridContainer/BorderContainer/VBoxContainer/Settings" to="." method="on_ui_activate"]
+[connection signal="focus_entered" from="GridContainer/BorderContainer/VBoxContainer/Credits" to="." method="on_ui_select"]
+[connection signal="mouse_entered" from="GridContainer/BorderContainer/VBoxContainer/Credits" to="." method="on_ui_hover" flags=18]
+[connection signal="pressed" from="GridContainer/BorderContainer/VBoxContainer/Credits" to="." method="on_ui_activate"]
+[connection signal="focus_entered" from="GridContainer/BorderContainer/VBoxContainer/Quit" to="." method="on_ui_select"]
+[connection signal="mouse_entered" from="GridContainer/BorderContainer/VBoxContainer/Quit" to="." method="on_ui_hover" flags=18]
+[connection signal="pressed" from="GridContainer/BorderContainer/VBoxContainer/Quit" to="." method="on_ui_activate"]
 
 [editable path="hangar_2"]
 [editable path="hangar_2/Helicopter/main"]

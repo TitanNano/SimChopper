@@ -1,5 +1,12 @@
 [gd_resource type="Theme" format=3 uid="uid://rumvfyg8qyrj"]
 
+[ext_resource type="Texture2D" uid="uid://do1no8ci35ysh" path="res://resources/Textures/ui/background.tres" id="1_skxmj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wq8ws"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_right = 1
+border_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hk5p3"]
 content_margin_left = 5.0
 content_margin_top = 5.0
@@ -20,31 +27,13 @@ content_margin_bottom = 5.0
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hk5p3"]
 bg_color = Color(0.31, 0.31, 0.31, 0.19607843)
 
-[sub_resource type="Gradient" id="Gradient_hk5p3"]
-offsets = PackedFloat32Array(0, 0.9981413)
-colors = PackedColorArray(0.5481, 0.66613007, 0.87, 0.4627451, 0.2, 0.2, 0.2, 0.43529412)
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_hk5p3"]
-noise_type = 5
-frequency = 0.0226
-fractal_octaves = 3
-fractal_lacunarity = 0.5
-fractal_gain = 1.0
-domain_warp_enabled = true
-domain_warp_type = 2
-domain_warp_amplitude = 50.0
-domain_warp_frequency = 0.06
-domain_warp_fractal_octaves = 3
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_skxmj"]
-noise = SubResource("FastNoiseLite_hk5p3")
-color_ramp = SubResource("Gradient_hk5p3")
-
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vhryd"]
-texture = SubResource("NoiseTexture2D_skxmj")
+texture = ExtResource("1_skxmj")
 axis_stretch_horizontal = 1
 
 [resource]
+BorderContainer/base_type = &"PanelContainer"
+BorderContainer/styles/panel = SubResource("StyleBoxFlat_wq8ws")
 Button/colors/font_disabled_color = Color(0.796243, 0.796243, 0.796243, 0.45490196)
 Button/constants/h_separation = 0
 Button/font_sizes/font_size = 28

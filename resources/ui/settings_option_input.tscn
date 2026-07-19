@@ -16,7 +16,7 @@ text = ""
 [node name="PanelContainer" type="PanelContainer" parent="HBoxContainer" parent_id_path=PackedInt32Array(1874205364) index="2" unique_id=184170336]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RangeSliderBox"
+theme_type_variation = &"KeyBindBox"
 
 [node name="TextureRect" type="TextureRect" parent="HBoxContainer/PanelContainer" index="0" unique_id=1939482685]
 layout_mode = 2

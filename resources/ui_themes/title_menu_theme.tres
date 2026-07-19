@@ -1,11 +1,9 @@
 [gd_resource type="Theme" format=3 uid="uid://rumvfyg8qyrj"]
 
-[ext_resource type="Texture2D" uid="uid://do1no8ci35ysh" path="res://resources/Textures/ui/background.tres" id="1_skxmj"]
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wq8ws"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
+bg_color = Color(0, 0, 0, 0)
 border_width_right = 1
-border_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+border_color = Color(0.5921569, 0.5921569, 0.5921569, 0.2627451)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hk5p3"]
 content_margin_left = 5.0
@@ -27,9 +25,16 @@ content_margin_bottom = 5.0
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hk5p3"]
 bg_color = Color(0.31, 0.31, 0.31, 0.19607843)
 
+[sub_resource type="Gradient" id="Gradient_hk5p3"]
+colors = PackedColorArray(0.75686276, 0.75686276, 0.75686276, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_skxmj"]
+gradient = SubResource("Gradient_hk5p3")
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vhryd"]
-texture = ExtResource("1_skxmj")
+texture = SubResource("GradientTexture1D_skxmj")
 axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
 [resource]
 BorderContainer/base_type = &"PanelContainer"

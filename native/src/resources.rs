@@ -5,13 +5,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+mod game_settings;
 mod input_device;
 mod input_prompt_texture;
 mod items;
+mod toml_loader;
 mod water_decal_tracker;
 mod world_constants;
 
+pub(crate) use game_settings::GameSettings;
 pub(crate) use input_device::InputDevice;
 pub(crate) use input_prompt_texture::InputPromptTexture;
+pub(crate) use toml_loader::{TomlResourceLoader, TomlResourceSaver};
 pub use water_decal_tracker::WaterDecalTracker;
 pub use world_constants::*;

@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use godot::builtin::{Callable, GString, StringName};
 use godot::classes::class_macros::sys::VariantType;
 use godot::classes::input::MouseMode;
+use godot::classes::notify::ObjectNotification;
 use godot::classes::{
     match_class, Engine, IResource, Input, InputEvent, InputEventJoypadButton,
     InputEventJoypadMotion, Resource,
@@ -14,6 +15,8 @@ use godot::meta::{FromGodot, GodotConvert, ToGodot};
 use godot::obj::{Base, Gd, Singleton, WithUserSignals};
 use godot::prelude::{godot_api, ConvertError, Export, GodotClass};
 use godot::register::property::SimpleVar;
+
+use crate::util::logger;
 
 macro_rules! input_axis {
     ($event:ident, $field:expr, $neg:expr, $pos:expr) => {
@@ -95,6 +98,7 @@ impl GodotConvert for DeviceType {
 
 impl ToGodot for DeviceType {
     type Pass = ByValue;
+    type Threads = <Self::Via as ToGodot>::Threads;
 
     fn to_godot(&self) -> godot::meta::ToArg<'_, Self::Via, Self::Pass> {
         let str = match self {
@@ -247,6 +251,16 @@ impl IResource for InputDevice {
             ui_tab_next_state: false,
         }
     }
+
+    fn on_notification(&mut self, notification: ObjectNotification) {
+        match notification {
+            ObjectNotification::POSTINITIALIZE => logger::debug!("input device post init!"),
+            ObjectNotification::EXTENSION_RELOADED => {
+                logger::debug!("input device hot-reload complete!");
+            }
+            _ => (),
+        }
+    }
 }
 
 #[godot_api]
@@ -285,7 +299,7 @@ impl InputDevice {
     }
 
     #[func]
-    fn strafe_strength(&self) -> f32 {
+    pub fn strafe_strength(&self) -> f32 {
         let strafe_strength = self.strafe.get();
 
         if self.seperate_climp_axis {
@@ -300,7 +314,7 @@ impl InputDevice {
     }
 
     #[func]
-    fn movement_strength(&self) -> f32 {
+    pub fn movement_strength(&self) -> f32 {
         self.movement.get()
     }
 
@@ -467,6 +481,7 @@ impl GodotConvert for AxisAction {
 impl SimpleVar for AxisAction {}
 impl ToGodot for AxisAction {
     type Pass = ByValue;
+    type Threads = <Self::Via as ToGodot>::Threads;
 
     fn to_godot(&self) -> godot::meta::ToArg<'_, Self::Via, Self::Pass> {
         StringName::from(self.as_str())

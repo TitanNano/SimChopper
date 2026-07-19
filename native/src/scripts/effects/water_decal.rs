@@ -9,7 +9,7 @@ use godot::builtin::{Callable, Color, NodePath};
 use godot::classes::Decal;
 use godot::meta::ToGodot;
 use godot::obj::Gd;
-use godot_rust_script::{godot_script_impl, CastToScript, Context, GodotScript, OnEditor, RsRef};
+use godot_rust_script::{godot_script_impl, CastToScript, Context, GodotScript, OnEditor, Rs};
 
 use crate::resources::WaterDecalTracker;
 use crate::util;
@@ -52,7 +52,7 @@ impl WaterDecal {
                 1.0,
             );
 
-            let mut script: RsRef<Self> = base.clone().into_script();
+            let mut script: Rs<Self> = base.clone().into_script();
 
             tween.tween_callback(&Callable::from_fn("water_decal_tween_out", move |_| {
                 script.clean_up();

@@ -201,6 +201,7 @@ impl<const UPPER: u32, const LOWER: u32> FromGodot for LInt<LOWER, UPPER> {
 
 impl<const UPPER: u32, const LOWER: u32> ToGodot for LInt<LOWER, UPPER> {
     type Pass = ByValue;
+    type Threads = <Self::Via as ToGodot>::Threads;
 
     fn to_godot(&self) -> Self::Via {
         self.into_u32()

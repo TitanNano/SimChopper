@@ -14,7 +14,7 @@ use godot::classes::{
 };
 use godot::meta::ToGodot;
 use godot::obj::{Gd, Singleton as _};
-use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
+use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, Rs};
 
 use crate::debug_3d;
 use crate::project_settings::CustomProjectSettings;
@@ -95,7 +95,7 @@ struct Car {
 
     /// Optional [`Debugger3D`] to inspect the internal state of the car.
     #[export]
-    pub debugger: Option<RsRef<Debugger3D>>,
+    pub debugger: Option<Rs<Debugger3D>>,
 
     base: Gd<<Self as GodotScript>::Base>,
 }

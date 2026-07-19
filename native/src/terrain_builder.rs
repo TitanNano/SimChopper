@@ -15,8 +15,10 @@ use std::ops::{Deref, Not};
 use std::time::Instant;
 
 use godot::classes::mesh::PrimitiveType;
+use godot::classes::resource::DeepDuplicateMode;
 use godot::classes::{ArrayMesh, Material, SurfaceTool};
 use godot::meta::GodotType;
+use godot::obj::Unique;
 use godot::{prelude::*, task};
 use itertools::Itertools;
 use kanal::{ReceiveError, Receiver};
@@ -519,7 +521,7 @@ fn generate_tile_surfaces(
 
     tile_surface.apply_slope(
         tile_data.terrain.slope,
-        rotation,
+        *rotation,
         context.tile_height.into(),
     );
 
@@ -744,7 +746,7 @@ fn generate_chunk_vertices(context: &WorkerThreadContext, chunk: ChunkConfig) ->
 /// Generate an [`ArrayMesh`] from a list of surface vertecies.
 fn generate_chunk_mesh(context: &WorkerThreadContext, chunk: ChunkSurfaces) -> TerrainChunk {
     let mut generator = SurfaceTool::new_gd();
-    let mut mesh = ArrayMesh::new_gd();
+    let mut mesh = Unique::<Gd<ArrayMesh>>::new_gd();
     let mut vertex_count = 0;
 
     for (surface_type, surface) in chunk.surfaces {
@@ -796,35 +798,59 @@ fn generate_chunk_mesh(context: &WorkerThreadContext, chunk: ChunkSurfaces) -> T
         generator.generate_normals();
         generator.generate_tangents();
 
-        let surface_arrays = generator.commit_to_arrays();
-        let new_index = mesh.get_surface_count();
+        mesh = generator
+            .commit_ex()
+            .existing(mesh)
+            .done()
+            .expect("surface generator did not return updated mesh!");
 
-        mesh.add_surface_from_arrays(PrimitiveType::TRIANGLES, &surface_arrays);
+        mesh.apply_gd(|mesh| {
+            let new_index = mesh.get_surface_count() - 1;
 
-        let surface_name = match surface_type {
-            TileSurfaceType::Ground => TerrainBuilder::GROUND_SURFACE,
-            TileSurfaceType::Water => TerrainBuilder::WATER_SURFACE,
-        };
+            assert!(new_index >= 0);
 
-        mesh.surface_set_name(new_index, surface_name);
+            let surface_name = match surface_type {
+                TileSurfaceType::Ground => TerrainBuilder::GROUND_SURFACE,
+                TileSurfaceType::Water => TerrainBuilder::WATER_SURFACE,
+            };
 
-        let surface_material_variant = context.materials.get(surface_type.to_string());
+            mesh.surface_set_name(new_index, surface_name);
 
-        let surface_material: Option<Gd<Material>> =
-            surface_material_variant.map(|material| material.to());
+            let surface_material_variant = context.materials.get(surface_type.to_string());
 
-        if let Some(material) = surface_material {
-            mesh.surface_set_material(new_index, &material);
-        } else {
-            logger::error!("no material for surface type {}", surface_type);
-        }
+            let surface_material: Option<Gd<Material>> =
+                surface_material_variant.map(|material| material.to());
+
+            if let Some(material) = surface_material {
+                mesh.surface_set_material(
+                    new_index,
+                    Unique::try_from_ref_counted(
+                        material
+                            .duplicate_resource_ex()
+                            .deep(DeepDuplicateMode::ALL)
+                            .done(),
+                    )
+                    .unwrap(),
+                );
+            } else {
+                logger::error!("no material for surface type {}", surface_type);
+            }
+        });
     }
 
     logger::info!("generated {} vertices for terain", vertex_count);
 
     TerrainChunk {
-        mesh: Shared(mesh),
+        mesh: Shared(mesh.share()),
         config: chunk.config,
+    }
+}
+
+impl<T: GodotType> GodotConvert for Shared<T> {
+    type Via = T;
+
+    fn godot_shape() -> godot::meta::shape::GodotShape {
+        T::godot_shape()
     }
 }
 

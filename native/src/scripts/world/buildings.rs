@@ -16,7 +16,7 @@ use godot::obj::{Gd, NewAlloc, Singleton as _};
 use godot::task;
 use godot::task::TaskHandle;
 use godot_rust_script::{
-    godot_script_impl, CastToScript, Context, GodotScript, OnEditor, RsRef, ScriptSignal,
+    godot_script_impl, CastToScript, Context, GodotScript, OnEditor, ScriptSignal,
 };
 
 use crate::objects::scene_object_registry;
@@ -71,7 +71,7 @@ impl Buildings {
         let (resolve, godot_future) = async_support::godot_future();
 
         let handle = ctx.reentrant_scope(self, |mut base: Gd<Node>| {
-            let mut script_self_ref: RsRef<Self> = base.to_script();
+            let script_self_ref = base.to_script::<Self>();
             let tree = base.get_tree();
 
             task::spawn(async move {
@@ -148,7 +148,7 @@ impl Buildings {
                             &city_coords_feature,
                         );
 
-                        CastToScript::<Buildings>::to_script(&base).emit_spawn_point_encountered(
+                        base.to_script::<Self>().emit_spawn_point_encountered(
                             Array::from(&[building_origin.0, building_origin.1]),
                             2,
                             spawn_tile.altitude,

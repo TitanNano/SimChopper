@@ -99,7 +99,7 @@ impl TileSurface {
     }
 
     #[expect(clippy::too_many_lines)]
-    pub fn apply_slope(&mut self, slope: TerrainSlope, rotation: &TerrainRotation, height: f32) {
+    pub fn apply_slope(&mut self, slope: TerrainSlope, rotation: TerrainRotation, height: f32) {
         match slope {
             TerrainSlope::None => (),
             TerrainSlope::North => {

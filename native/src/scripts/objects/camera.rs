@@ -10,7 +10,7 @@ use std::f32;
 use godot::builtin::math::{ApproxEq, FloatExt};
 use godot::classes::{Camera3D, CameraAttributesPhysical, Node3D};
 use godot::obj::Gd;
-use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
+use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, Rs};
 use itertools::Itertools;
 
 use crate::scripts::world::solar_setup::{ISolarSetup, SolarSetup};
@@ -20,7 +20,7 @@ use crate::util::logger;
 #[script(base = Camera3D)]
 struct Camera {
     #[export]
-    pub solar_setup: OnEditor<RsRef<SolarSetup>>,
+    pub solar_setup: OnEditor<Rs<SolarSetup>>,
 
     #[export]
     pub focus_target: Option<Gd<Node3D>>,

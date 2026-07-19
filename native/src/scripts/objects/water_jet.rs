@@ -16,7 +16,7 @@ use godot::classes::{
 use godot::meta::ToGodot;
 use godot::obj::{Gd, Inherits};
 use godot::prelude::{GodotClass, NodePath};
-use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, RsRef};
+use godot_rust_script::{godot_script_impl, GodotScript, OnEditor, Rs};
 
 use crate::ext::node_3d::Node3DExt;
 use crate::resources::WaterDecalTracker;
@@ -38,7 +38,7 @@ struct WaterJet {
     pub decal: OnEditor<Gd<Decal>>,
 
     #[export]
-    pub debugger: Option<RsRef<Debugger3D>>,
+    pub debugger: Option<Rs<Debugger3D>>,
 
     #[export]
     pub decal_tracker: OnEditor<Gd<WaterDecalTracker>>,

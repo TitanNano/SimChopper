@@ -10,7 +10,6 @@
 [ext_resource type="Material" uid="uid://m6cr6gd6bycq" path="res://resources/Materials/schweizer_300_orange_paint.tres" id="5_gbrg3"]
 [ext_resource type="Material" uid="uid://pugv3tibcyst" path="res://resources/Materials/schweizer_300_windows.tres" id="6_4ijke"]
 [ext_resource type="Material" uid="uid://cyopsm3h2lthd" path="res://resources/Materials/ui_blur_material.tres" id="6_cv2q5"]
-[ext_resource type="PackedScene" uid="uid://bioq71ppnncw5" path="res://resources/ui/settings.tscn" id="6_kb751"]
 [ext_resource type="PackedScene" uid="uid://cnqfo57vlyy3w" path="res://resources/Meshes/Helis/schweizer_300/rotor.gltf" id="7_xv2f0"]
 [ext_resource type="PackedScene" uid="uid://bbcfwjl2304l5" path="res://resources/Meshes/Helis/schweizer_300/tail_rotor.gltf" id="8_ecj1i"]
 [ext_resource type="Theme" uid="uid://rumvfyg8qyrj" path="res://resources/ui_themes/title_menu_theme.tres" id="10_scex8"]
@@ -241,15 +240,17 @@ _data = {
 &"select": SubResource("Animation_1w7u6")
 }
 
-[node name="Root" type="Node3D" unique_id=2066082292 node_paths=PackedStringArray("scene_transitions", "start_game", "quit_game", "ui_sounds")]
+[node name="Root" type="Node3D" unique_id=2066082292 node_paths=PackedStringArray("nodes_scene_transitions", "nodes_start_game", "nodes_quit_game", "nodes_settings", "nodes_ui_sounds")]
 script = ExtResource("1_4ijke")
-scene_transitions = NodePath("SceneTransitionPlayer")
-start_game = NodePath("GridContainer/BorderContainer/VBoxContainer/New Game")
-quit_game = NodePath("GridContainer/BorderContainer/VBoxContainer/Quit")
 main_scene = "uid://cvh54xiw8586b"
-ui_sounds = NodePath("UISoundPlayer")
+settings_scene = "uid://bioq71ppnncw5"
 animations_ui_select = SubResource("Animation_1w7u6")
 animations_ui_activate = SubResource("Animation_m8ej5")
+nodes_scene_transitions = NodePath("SceneTransitionPlayer")
+nodes_start_game = NodePath("GridContainer/BorderContainer/VBoxContainer/New Game")
+nodes_quit_game = NodePath("GridContainer/BorderContainer/VBoxContainer/Quit")
+nodes_settings = NodePath("GridContainer/BorderContainer/VBoxContainer/Settings")
+nodes_ui_sounds = NodePath("UISoundPlayer")
 input_device = ExtResource("4_5mv2j")
 
 [node name="GridContainer" type="GridContainer" parent="." unique_id=25898047]
@@ -324,9 +325,6 @@ layout_mode = 2
 focus_neighbor_top = NodePath("../Settings")
 focus_previous = NodePath("../Settings")
 text = "Quit"
-
-[node name="SettingsScreen" parent="." unique_id=760692856 instance=ExtResource("6_kb751")]
-visible = false
 
 [node name="Black Cover" type="Panel" parent="." unique_id=230169948]
 anchors_preset = 15

@@ -2,7 +2,7 @@
 
 [sub_resource type="Gradient" id="Gradient_hk5p3"]
 offsets = PackedFloat32Array(0.10539216, 0.43382353, 0.6838235, 0.8455882)
-colors = PackedColorArray(0.49354511, 0.49354565, 0.4935453, 1, 0.2159017, 0.21590173, 0.21590167, 1, 0.26776323, 0.4559735, 0.51163524, 1, 0.15884632, 0.295547, 0.33188412, 1)
+colors = PackedColorArray(0.6190317, 0.4529869, 0.33808485, 1, 0.24398571, 0.20719498, 0.19205788, 1, 0.63052285, 0.3254623, 0.23461041, 1, 0.38635558, 0.23145154, 0.055926025, 1)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_hk5p3"]
 noise_type = 5
@@ -17,5 +17,7 @@ domain_warp_frequency = 0.06
 domain_warp_fractal_octaves = 2
 
 [resource]
+width = 1024
+height = 1024
 noise = SubResource("FastNoiseLite_hk5p3")
 color_ramp = SubResource("Gradient_hk5p3")

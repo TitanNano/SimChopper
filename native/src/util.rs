@@ -8,6 +8,7 @@
 pub mod async_support;
 pub mod logger;
 mod numbers;
+mod on_ready;
 
 #[cfg(debug_assertions)]
 use godot::builtin::{
@@ -17,15 +18,19 @@ use godot::builtin::{
     Signal, StringName, Transform2D, Transform3D, VarArray, VarDictionary, Variant, VariantType,
     Vector2, Vector2i, Vector3i, Vector4, Vector4i,
 };
-use godot::builtin::{Basis, Vector3};
 #[cfg(debug_assertions)]
 use godot::classes::Object;
-use godot::classes::{SceneTree, SceneTreeTimer};
-use godot::obj::Gd;
+use godot::classes::{Engine, SceneTree, SceneTreeTimer};
 #[cfg(debug_assertions)]
 use godot::obj::NewAlloc;
+use godot::obj::{Gd, Singleton};
+use godot::{
+    builtin::{Basis, Vector3},
+    classes::object::ConnectFlags,
+};
 
 pub use numbers::*;
+pub(crate) use on_ready::*;
 
 /// Create a new in game one-shot timer in seconds.
 #[inline]
@@ -153,4 +158,17 @@ macro_rules! debug_3d {
     (inner $debugger: ident, $variable: ident) => {
         $debugger.debug_data().set(stringify!($variable), $variable);
     };
+}
+
+pub(crate) fn run_on_main(cb: impl FnMut() + Sync + Send + 'static) {
+    let tree = Engine::singleton()
+        .get_main_loop()
+        .expect("SceneTree must be available")
+        .cast::<SceneTree>();
+
+    tree.signals()
+        .process_frame()
+        .builder()
+        .flags(ConnectFlags::ONE_SHOT)
+        .connect_sync(cb);
 }

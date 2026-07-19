@@ -1,6 +1,10 @@
+mod settings_footer;
 mod settings_option_input;
 mod settings_option_list;
 mod settings_option_range;
 mod settings_option_toggle;
+mod settings_sound_tab;
+mod settings_tab_bar;
+mod settings_video_tab;
 mod tab_controller;
 mod title_menu;

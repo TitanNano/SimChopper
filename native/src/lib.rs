@@ -17,8 +17,12 @@ mod terrain_builder;
 mod util;
 mod world;
 
+use godot::classes::{ResourceLoader, ResourceSaver};
 use godot::init::InitStage;
+use godot::obj::{NewGd, Singleton};
 use godot::prelude::{gdextension, ExtensionLibrary};
+
+use crate::resources::{TomlResourceLoader, TomlResourceSaver};
 
 struct NativeLib;
 
@@ -27,6 +31,8 @@ unsafe impl ExtensionLibrary for NativeLib {
     fn on_stage_init(level: InitStage) {
         if level == InitStage::Scene {
             godot_rust_script::init!(scripts);
+            ResourceLoader::singleton().add_resource_format_loader(&TomlResourceLoader::new_gd());
+            ResourceSaver::singleton().add_resource_format_saver(&TomlResourceSaver::new_gd());
         }
     }
 

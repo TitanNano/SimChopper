@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-use std::ops::{Deref, DerefMut, Neg};
+use std::ops::Neg;
 
 use godot::builtin::math::ApproxEq;
 use godot::builtin::{Aabb, Array, GString, Transform3D, Vector3, Vector3Axis};
@@ -19,36 +19,7 @@ use godot_rust_script::{godot_script_impl, GodotScript, OnEditor};
 use num::ToPrimitive;
 
 use crate::script_callable;
-use crate::util::{logger, Uf32};
-
-#[derive(Debug)]
-struct OnReady<T>(Option<T>);
-
-impl<T> OnReady<T> {
-    fn init(&mut self, value: T) {
-        self.0 = Some(value);
-    }
-}
-
-impl<T> Default for OnReady<T> {
-    fn default() -> Self {
-        Self(None)
-    }
-}
-
-impl<T> Deref for OnReady<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        self.0.as_ref().unwrap()
-    }
-}
-
-impl<T> DerefMut for OnReady<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.0.as_mut().unwrap()
-    }
-}
+use crate::util::{logger, OnReady, Uf32};
 
 #[derive(GodotScript, Debug)]
 #[script(base = Node, tool)]

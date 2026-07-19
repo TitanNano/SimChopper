@@ -1,0 +1,141 @@
+[gd_scene format=3 uid="uid://c4d7s28j14rqe"]
+
+[ext_resource type="Script" uid="uid://dq1kusf1to0uj" path="res://native/src/scripts/objects/debug_camera.rs" id="1_gcown"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_cxhge"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_gcown"]
+sky_material = SubResource("ProceduralSkyMaterial_cxhge")
+
+[sub_resource type="Environment" id="Environment_8ntum"]
+background_mode = 2
+sky = SubResource("Sky_gcown")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_ywb28"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_cxhge"]
+viewport_path = NodePath("CSGCombiner3D/SubViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gcown"]
+resource_local_to_scene = true
+albedo_texture = SubResource("ViewportTexture_cxhge")
+roughness = 0.2
+texture_filter = 1
+
+[sub_resource type="GDScript" id="GDScript_8ntum"]
+script/source = "@tool
+extends CSGBox3D
+
+@export
+var camera: Camera3D
+
+@export 
+var target_camera: Camera3D
+
+@export
+var viewport: SubViewport
+
+@export
+var active := false
+
+func _process(delta: float):
+	const MAX_DIST := 10
+	const BASE_RES := 512
+	
+	if !active:
+		return
+	
+	
+	var distance := (target_camera.global_position - self.global_position).z
+	var vector := self.global_position.direction_to(target_camera.global_position) * -1.0
+	var normal := vector.bounce(self.global_transform.basis * Vector3.FORWARD)	
+	var angle := atan2((self.size.y / 2), (target_camera.global_position - self.global_position).z)
+	var scale := 1.0 - (clampf(distance, 0, MAX_DIST - 0.05) / MAX_DIST) ** 0.3
+	
+	var vw := roundf(BASE_RES * scale)
+	var vh := roundf(BASE_RES * scale * (self.size.y / self.size.x))
+	
+	self.camera.look_at(self.global_position + normal)
+	self.camera.fov = rad_to_deg(angle)
+	self.viewport.size.x = vw
+	self.viewport.size.y = vh
+"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cxhge"]
+albedo_color = Color(0.5490892, 0.48525912, 0.21304625, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cxhge"]
+material = SubResource("StandardMaterial3D_cxhge")
+size = Vector3(0.3, 0.3, 0.3)
+
+[sub_resource type="TorusMesh" id="TorusMesh_gcown"]
+inner_radius = 0.1
+outer_radius = 0.3
+
+[node name="Root" type="Node3D" unique_id=1772013786]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1627556860]
+environment = SubResource("Environment_8ntum")
+camera_attributes = SubResource("CameraAttributesPractical_ywb28")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=944171481]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="." unique_id=597744374]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Frame" type="CSGBox3D" parent="CSGCombiner3D" unique_id=96699332]
+size = Vector3(0.5, 1, 0.1)
+
+[node name="MirrorCutout" type="CSGBox3D" parent="CSGCombiner3D" unique_id=1678141376]
+operation = 2
+size = Vector3(0.4, 0.9, 0.4)
+
+[node name="Mirror" type="CSGBox3D" parent="CSGCombiner3D" unique_id=1160543274 node_paths=PackedStringArray("camera", "target_camera", "viewport")]
+size = Vector3(0.4, 0.9, 0.05)
+material = SubResource("StandardMaterial3D_gcown")
+script = SubResource("GDScript_8ntum")
+camera = NodePath("../SubViewport/Node3D/Camera3D")
+target_camera = NodePath("../../Camera3D")
+viewport = NodePath("../SubViewport")
+active = true
+
+[node name="SubViewport" type="SubViewport" parent="CSGCombiner3D" unique_id=1931516083]
+handle_input_locally = false
+anisotropic_filtering_level = 1
+size = Vector2i(93, 210)
+
+[node name="Node3D" type="Node3D" parent="CSGCombiner3D/SubViewport" unique_id=1119596184]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CSGCombiner3D/SubViewport/Node3D" unique_id=1139552162]
+transform = Transform3D(-0.9999116, 0.0012545821, -0.013246859, 0, 0.995545, 0.09428597, 0.013306139, 0.09427762, -0.995457, 0, 0, 0)
+keep_aspect = 0
+current = true
+fov = 5.032634
+far = 100.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CSGCombiner3D" unique_id=536429140]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=651353578]
+transform = Transform3D(0.9770455, -0.07669025, 0.19874743, 0, 0.9329534, 0.35999674, -0.21303035, -0.35173327, 0.91153795, -0.068, 0.984, 5.11)
+current = true
+fov = 45.0
+script = ExtResource("1_gcown")
+input_device = null
+move_speed = null
+
+[node name="Env" type="Node3D" parent="." unique_id=476963217]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Env" unique_id=2078655861]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48685136, 4.5944366)
+mesh = SubResource("BoxMesh_cxhge")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Env" unique_id=1510248205]
+transform = Transform3D(1, 0, 0, 0, 0.7159974, 0.69810295, 0, -0.69810295, 0.7159974, 0, 0.13, 1.994)
+mesh = SubResource("TorusMesh_gcown")

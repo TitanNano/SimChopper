@@ -9,5 +9,6 @@ mod agents;
 mod building;
 mod camera;
 mod canon_upgrade;
+mod debug_camera;
 mod debugger_3_d;
 mod water_jet;

@@ -148,7 +148,7 @@ impl Buildings {
                             &city_coords_feature,
                         );
 
-                        CastToScript::<Buildings>::to_script(&base).emit_spawn_point_encountered(
+                        base.to_script::<Self>().emit_spawn_point_encountered(
                             Array::from(&[building_origin.0, building_origin.1]),
                             2,
                             spawn_tile.altitude,

@@ -9,7 +9,7 @@ use godot::builtin::{math::ApproxEq, Transform3D, Vector3};
 use godot::classes::{MeshInstance3D, Node, Node3D, PackedScene, Texture2D, Time};
 use godot::obj::{Gd, Inherits, Singleton as _};
 use godot::tools::load;
-use godot_rust_script::{CastToScript, RsRef};
+use godot_rust_script::{CastToScript, Rs};
 use num::ToPrimitive;
 use rand::Rng;
 
@@ -22,7 +22,7 @@ use super::{BuildingFeature, BuildingNotification};
 #[derive(Debug)]
 pub(super) struct FireFeature {
     packed_fire_scene: Gd<PackedScene>,
-    fire_scene: Option<RsRef<FireSpawner>>,
+    fire_scene: Option<Rs<FireSpawner>>,
     last_fire: u64,
     fire_strength: f32,
     last_fire_strength: f32,
@@ -67,7 +67,7 @@ impl FireFeature {
         !self.is_dead() && self.fire_strength - self.last_fire_strength >= 0.0
     }
 
-    pub fn update_fire_strength(&mut self, fire: &mut RsRef<FireSpawner>) {
+    pub fn update_fire_strength(&mut self, fire: &mut Rs<FireSpawner>) {
         if self.fire_strength.approx_eq(&self.last_fire_strength) {
             return;
         }
@@ -137,7 +137,7 @@ impl<N: Inherits<Node>> BuildingFeature<N> for FireFeature {
             * aabb.size)
             .abs();
 
-        let mut script: RsRef<FireSpawner> = scene_instance.to_script();
+        let mut script: Rs<FireSpawner> = scene_instance.to_script();
 
         script.set_emission_points(Some(self.emission_points.clone()));
         script.set_emission_point_normals(Some(self.emission_point_normals.clone()));

@@ -519,7 +519,7 @@ fn generate_tile_surfaces(
 
     tile_surface.apply_slope(
         tile_data.terrain.slope,
-        rotation,
+        *rotation,
         context.tile_height.into(),
     );
 

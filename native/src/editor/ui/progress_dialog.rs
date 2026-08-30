@@ -130,7 +130,7 @@ impl ProgressDialog {
             // No host window found, use main window.
             EditorInterface::singleton()
                 .popup_dialog_centered_ex(&*base)
-                .minsize(ms.cast_int())
+                .minsize(ms.to_vector2i())
                 .done();
         }
     }

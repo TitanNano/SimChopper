@@ -98,7 +98,6 @@ impl GodotConvert for DeviceType {
 
 impl ToGodot for DeviceType {
     type Pass = ByValue;
-    type Threads = <Self::Via as ToGodot>::Threads;
 
     fn to_godot(&self) -> godot::meta::ToArg<'_, Self::Via, Self::Pass> {
         let str = match self {
@@ -481,7 +480,6 @@ impl GodotConvert for AxisAction {
 impl SimpleVar for AxisAction {}
 impl ToGodot for AxisAction {
     type Pass = ByValue;
-    type Threads = <Self::Via as ToGodot>::Threads;
 
     fn to_godot(&self) -> godot::meta::ToArg<'_, Self::Via, Self::Pass> {
         StringName::from(self.as_str())

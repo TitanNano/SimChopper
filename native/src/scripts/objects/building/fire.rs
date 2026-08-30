@@ -137,7 +137,7 @@ impl<N: Inherits<Node>> BuildingFeature<N> for FireFeature {
             * aabb.size)
             .abs();
 
-        let mut script: Rs<FireSpawner> = scene_instance.to_script();
+        let mut script = scene_instance.to_script::<FireSpawner>();
 
         script.set_emission_points(Some(self.emission_points.clone()));
         script.set_emission_point_normals(Some(self.emission_point_normals.clone()));

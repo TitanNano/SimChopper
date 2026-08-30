@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = { version = "0.5.5", features = ["experimental-threads", "api-4-5", "register-docs"] }
+godot = { version = "0.5.0", features = ["experimental-threads", "api-4-5", "register-docs", "serde"] }
 godot-rust-script = { git = "https://github.com/titannano/godot-rust-script", rev = "e63d2e01cf1c02a46091463b5675576630b65659" }
 lerp = "0.4.0"
 backtrace = "0.3.64"

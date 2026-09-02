@@ -234,6 +234,6 @@ distance_fade_enabled = true
 omni_range = 15.0
 omni_attenuation = 0.5
 
-[node name="Light Occluder" parent="." index="21" unique_id=2039494598 groups=["light_occluder"]]
+[node name="Light Occluder" parent="." index="21" unique_id=235945911 groups=["light_occluder"]]
 visible = false
 surface_material_override/0 = ExtResource("3_jr424")

@@ -14,7 +14,7 @@ use godot::classes::{
     CameraAttributes, CameraAttributesPractical, MeshInstance3D, Node3D, VoxelGi, VoxelGiData,
 };
 use godot::obj::{Gd, NewAlloc, NewGd};
-use godot_rust_script::{godot_script_impl, CastToScript, GodotScript, OnEditor, Rs, ScriptSignal};
+use godot_rust_script::{godot_script_impl, CastToScript, GodotScript, OnEditor, ScriptSignal};
 
 use crate::{
     resources::WorldConstants,
@@ -116,7 +116,7 @@ impl GiProbes {
 
             let world_root = base.get_parent_node_3d().unwrap();
             let scene_tree = base.get_tree();
-            let mut script: Rs<Self> = base.to_script();
+            let mut script = base.to_script::<Self>();
 
             let probes = probe_coordinates
                 .map(|xy| {

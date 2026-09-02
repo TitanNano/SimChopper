@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bsls8nq8sr7q"]
+
+[ext_resource type="PackedScene" uid="uid://dyskwp1x1hl4i" path="res://resources/ui/settings_option.tscn" id="1_4j1qn"]
+[ext_resource type="Script" uid="uid://dgo04vq0hj0ju" path="res://native/src/scripts/ui/settings_option_input.rs" id="2_4j1qn"]
+
+[node name="SettingsOptionInput" unique_id=475406479 node_paths=PackedStringArray("nodes_label", "nodes_value") instance=ExtResource("1_4j1qn")]
+script = ExtResource("2_4j1qn")
+nodes_label = NodePath("HBoxContainer/Label")
+nodes_value = NodePath("HBoxContainer/PanelContainer/TextureRect")
+label = ""
+texture = null
+
+[node name="Label" parent="HBoxContainer" parent_id_path=PackedInt32Array(1874205364) index="0" unique_id=894782315]
+text = ""
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer" parent_id_path=PackedInt32Array(1874205364) index="2" unique_id=184170336]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"KeyBindBox"
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer/PanelContainer" index="0" unique_id=1939482685]
+layout_mode = 2
+size_flags_horizontal = 8
+expand_mode = 3

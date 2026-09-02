@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://bivg14j2kt501"]
+
+[ext_resource type="PackedScene" uid="uid://dyskwp1x1hl4i" path="res://resources/ui/settings_option.tscn" id="1_utvo5"]
+[ext_resource type="Script" uid="uid://b35a3dqq1aw5s" path="res://native/src/scripts/ui/settings_option_list.rs" id="2_kfpgn"]
+
+[node name="SettingsOptionList" unique_id=475406479 node_paths=PackedStringArray("nodes_label", "nodes_value") instance=ExtResource("1_utvo5")]
+script = ExtResource("2_kfpgn")
+nodes_label = NodePath("HBoxContainer/Label")
+nodes_value = NodePath("HBoxContainer/Value")
+label = ""
+description = ""
+values = Array[String]([])
+selected_index = 0
+
+[node name="Value" type="OptionButton" parent="HBoxContainer" parent_id_path=PackedInt32Array(1874205364) index="2" unique_id=390909681]
+layout_mode = 2
+size_flags_horizontal = 3
+accessibility_labeled_by_nodes = Array[NodePath]([NodePath("../Label")])
+selected = 0
+allow_reselect = true
+item_count = 1
+popup/item_0/text = "1920x1080"
+popup/item_0/id = 0

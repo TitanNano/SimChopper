@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dyskwp1x1hl4i"]
+
+[node name="SettingsOption" type="PanelContainer" unique_id=475406479]
+custom_minimum_size = Vector2(500, 0)
+theme_type_variation = &"SettingsOption"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1874205364]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer" unique_id=894782315]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Label"
+
+[node name="VSeparator" type="VSeparator" parent="HBoxContainer" unique_id=415780805]
+layout_mode = 2

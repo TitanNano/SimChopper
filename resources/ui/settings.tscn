@@ -1,0 +1,555 @@
+[gd_scene format=3 uid="uid://bioq71ppnncw5"]
+
+[ext_resource type="Theme" uid="uid://dw1b3gtetxdgl" path="res://resources/ui_themes/settings_menu_theme.tres" id="1_rv0ww"]
+[ext_resource type="Material" uid="uid://cyopsm3h2lthd" path="res://resources/Materials/ui_blur_material.tres" id="1_rys2v"]
+[ext_resource type="Script" uid="uid://c5e50xbnlkiks" path="res://native/src/scripts/ui/tab_controller.rs" id="2_aim2s"]
+[ext_resource type="InputDevice" uid="uid://bky2vkjjwnd0p" path="res://resources/Config/primary_input_device.tres" id="3_3jfrj"]
+[ext_resource type="Texture2D" uid="uid://b301f4mt0pg0k" path="res://resources/Textures/control/actions/ui_tab_prev.tres" id="4_aim2s"]
+[ext_resource type="Texture2D" uid="uid://m7n7og30pq2k" path="res://resources/Textures/control/actions/ui_tab_next.tres" id="5_3jfrj"]
+[ext_resource type="PackedScene" uid="uid://bivg14j2kt501" path="res://resources/ui/settings_option_list.tscn" id="5_5e4gs"]
+[ext_resource type="Script" uid="uid://dv5y7u4tq2ep8" path="res://native/src/scripts/ui/settings_tab_bar.rs" id="5_caf5k"]
+[ext_resource type="PackedScene" uid="uid://6wucddao00pd" path="res://resources/ui/settings_option_toggle.tscn" id="6_rv0ww"]
+[ext_resource type="Script" uid="uid://djectio3deffb" path="res://native/src/scripts/ui/settings_video_tab.rs" id="7_dx68r"]
+[ext_resource type="PackedScene" uid="uid://cs8hk84y2lecw" path="res://resources/ui/settings_option_range.tscn" id="7_rv0ww"]
+[ext_resource type="PackedScene" uid="uid://bsls8nq8sr7q" path="res://resources/ui/settings_option_input.tscn" id="10_0k1u1"]
+[ext_resource type="Script" uid="uid://0xeykgj85b76" path="res://native/src/scripts/ui/settings_sound_tab.rs" id="10_e1xug"]
+[ext_resource type="Texture2D" uid="uid://i8jsfqxxib0p" path="res://resources/Textures/control/actions/ui_reset.tres" id="10_upnh1"]
+[ext_resource type="Texture2D" uid="uid://dmno2ptclyybd" path="res://resources/Textures/control/actions/forward.tres" id="11_44bim"]
+[ext_resource type="Texture2D" uid="uid://kpm378digbw7" path="res://resources/Textures/control/actions/backward.tres" id="12_1dh6r"]
+[ext_resource type="Texture2D" uid="uid://dk2viso5nqih" path="res://resources/Textures/control/actions/ui_apply.tres" id="12_dx68r"]
+[ext_resource type="Texture2D" uid="uid://cdkhyslrevupb" path="res://resources/Textures/control/actions/ui_cancel.tres" id="12_fs4m5"]
+[ext_resource type="Texture2D" uid="uid://ce8ue88wl2nvl" path="res://resources/Textures/control/actions/turn_left.tres" id="13_im2bc"]
+[ext_resource type="Texture2D" uid="uid://6fdcfbrvwq81" path="res://resources/Textures/control/actions/turn_right.tres" id="14_gtb17"]
+[ext_resource type="Texture2D" uid="uid://bdv56k4trtp8w" path="res://resources/Textures/control/actions/strafe_left.tres" id="15_3qjbt"]
+[ext_resource type="Texture2D" uid="uid://bdc70ql0a6wde" path="res://resources/Textures/control/actions/strafe_right.tres" id="16_8frbw"]
+[ext_resource type="Texture2D" uid="uid://di0orkkqokp2l" path="res://resources/Textures/control/actions/rise.tres" id="17_8frbw"]
+[ext_resource type="Texture2D" uid="uid://ucsgbn6ufftg" path="res://resources/Textures/control/actions/land.tres" id="18_rvtar"]
+[ext_resource type="Texture2D" uid="uid://cw7r73l1j0j4m" path="res://resources/Textures/control/actions/fire_primary.tres" id="19_xv08n"]
+[ext_resource type="Script" uid="uid://dyh6wa3o8aij8" path="res://native/src/scripts/ui/settings_footer.rs" id="23_ghp0l"]
+
+[sub_resource type="InputEventAction" id="InputEventAction_fs4m5"]
+action = &"ui_reset"
+
+[sub_resource type="Shortcut" id="Shortcut_dx68r"]
+events = [SubResource("InputEventAction_fs4m5")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_dx68r"]
+action = &"ui_apply"
+
+[sub_resource type="Shortcut" id="Shortcut_e1xug"]
+events = [SubResource("InputEventAction_dx68r")]
+
+[sub_resource type="InputEventAction" id="InputEventAction_e1xug"]
+action = &"ui_cancel"
+
+[sub_resource type="Shortcut" id="Shortcut_caf5k"]
+events = [SubResource("InputEventAction_e1xug")]
+
+[sub_resource type="Animation" id="Animation_caf5k"]
+length = 0.001
+step = 0.016666668
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TabBar:animation_offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Footer:animation_offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TabContainer:modulate:r")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/3/type = "bezier"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("TabContainer:modulate:g")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/4/type = "bezier"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("TabContainer:modulate:b")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/5/type = "bezier"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("TabContainer:modulate:a")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="Animation" id="Animation_e1xug"]
+resource_name = "enter"
+length = 0.4
+step = 0.016666668
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TabBar:animation_offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, 0, 0, 0.064, -1, 0, -0.066, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.4)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Footer:animation_offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, 0, 0, 0.066, -1, 0, -0.064, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.4)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TabContainer:modulate:r")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, -0.1, 0, 0.1, 0, 1, -0.1, 0, 0.1, 0),
+"times": PackedFloat32Array(0, 0.4)
+}
+tracks/3/type = "bezier"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("TabContainer:modulate:g")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, -0.1, 0, 0.1, 0, 1, -0.1, 0, 0.1, 0),
+"times": PackedFloat32Array(0, 0.4)
+}
+tracks/4/type = "bezier"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("TabContainer:modulate:b")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, -0.1, 0, 0.1, 0, 1, -0.1, 0, 0.1, 0),
+"times": PackedFloat32Array(0, 0.4)
+}
+tracks/5/type = "bezier"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("TabContainer:modulate:a")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, 0, 0, 0.064, 1, 1, -0.066, 0, 0, 0),
+"times": PackedFloat32Array(0, 0.4)
+}
+
+[sub_resource type="Animation" id="Animation_ghp0l"]
+resource_name = "exit"
+length = 0.4
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TabBar:animation_offset")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, 0, 0, 0.064, 0, 1, -0.066, -1, 0, 0),
+"times": PackedFloat32Array(0, 0.39999998)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Footer:animation_offset")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(0, 0, 0, 0.064, 0, 1, -0.066, -1, 0, 0),
+"times": PackedFloat32Array(0, 0.39999998)
+}
+tracks/2/type = "bezier"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TabContainer:modulate:r")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, 0, 0, 0.1, 0, 1, 0, 0, 0.1, 0),
+"times": PackedFloat32Array(0, 0.39999998)
+}
+tracks/3/type = "bezier"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("TabContainer:modulate:g")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, 0, 0, 0.1, 0, 1, 0, 0, 0.1, 0),
+"times": PackedFloat32Array(0, 0.39999998)
+}
+tracks/4/type = "bezier"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("TabContainer:modulate:b")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, 0, 0, 0.1, 0, 1, 0, 0, 0.1, 0),
+"times": PackedFloat32Array(0, 0.39999998)
+}
+tracks/5/type = "bezier"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("TabContainer:modulate:a")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(1, 0, 0, 0.064, 0, 0, -0.066, 1, 0, 0),
+"times": PackedFloat32Array(0, 0.35833332)
+}
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0.39999998),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"finalize_close"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ghp0l"]
+_data = {
+&"RESET": SubResource("Animation_caf5k"),
+&"enter": SubResource("Animation_e1xug"),
+&"exit": SubResource("Animation_ghp0l")
+}
+
+[node name="Root" type="VBoxContainer" unique_id=760692856 node_paths=PackedStringArray("nodes_tab_control", "nodes_tabs_container", "nodes_accept", "nodes_reset", "nodes_cancel", "nodes_animation_player")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_rv0ww")
+theme_type_variation = &"RootLayout"
+script = ExtResource("2_aim2s")
+input_device = ExtResource("3_3jfrj")
+nodes_tab_control = NodePath("TabBar/TabBarLayout/TabControl")
+nodes_tabs_container = NodePath("TabContainer")
+nodes_accept = NodePath("Footer/HBoxContainer/Apply")
+nodes_reset = NodePath("Footer/HBoxContainer/Reset")
+nodes_cancel = NodePath("Footer/HBoxContainer/Cancel")
+nodes_animation_player = NodePath("AnimationPlayer")
+
+[node name="TabBar" type="PanelContainer" parent="." unique_id=653839119]
+material = ExtResource("1_rys2v")
+layout_mode = 2
+theme_type_variation = &"SettingsTabBar"
+script = ExtResource("5_caf5k")
+animation_offset = 0.0
+
+[node name="TabBarLayout" type="HBoxContainer" parent="TabBar" unique_id=1527806700]
+layout_mode = 2
+
+[node name="ControlIconPrev" type="TextureRect" parent="TabBar/TabBarLayout" unique_id=2036855831]
+layout_mode = 2
+texture = ExtResource("4_aim2s")
+expand_mode = 2
+
+[node name="TabControl" type="TabBar" parent="TabBar/TabBarLayout" unique_id=1274291699]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+current_tab = 0
+tab_alignment = 1
+clip_tabs = false
+close_with_middle_mouse = false
+switch_on_drag_hover = false
+tab_count = 3
+tab_0/title = "Video"
+tab_1/title = "Sound"
+tab_2/title = "Controls"
+
+[node name="ControlIconNext" type="TextureRect" parent="TabBar/TabBarLayout" unique_id=252960043]
+layout_mode = 2
+texture = ExtResource("5_3jfrj")
+expand_mode = 2
+
+[node name="TabContainer" type="Control" parent="." unique_id=1898272863]
+clip_children = 1
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VideoTab" type="PanelContainer" parent="TabContainer" unique_id=848077711 node_paths=PackedStringArray("focus_start", "resolution", "fullscreen")]
+material = ExtResource("1_rys2v")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"SettingsTabContainer"
+script = ExtResource("7_dx68r")
+focus_start = NodePath("HBoxContainer/VBoxContainer/Resolution")
+resolution = NodePath("HBoxContainer/VBoxContainer/Resolution")
+fullscreen = NodePath("HBoxContainer/VBoxContainer/Fullscreen")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/VideoTab" unique_id=398757456]
+layout_mode = 2
+theme_type_variation = &"SettingsSplit"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/VideoTab/HBoxContainer" unique_id=789120246]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsOptionList"
+
+[node name="Resolution" parent="TabContainer/VideoTab/HBoxContainer/VBoxContainer" unique_id=475406479 instance=ExtResource("5_5e4gs")]
+layout_mode = 2
+label = "Resolution"
+values = Array[String](["1920x1080"])
+
+[node name="Fullscreen" parent="TabContainer/VideoTab/HBoxContainer/VBoxContainer" unique_id=1464865732 instance=ExtResource("6_rv0ww")]
+layout_mode = 2
+label = "Fullscreen"
+value = true
+
+[node name="VSync" parent="TabContainer/VideoTab/HBoxContainer/VBoxContainer" unique_id=1702919599 instance=ExtResource("6_rv0ww")]
+layout_mode = 2
+label = "V-Sync"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/VideoTab/HBoxContainer" unique_id=81097026]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsDescription"
+text = "The option description goes here."
+
+[node name="SoundTab" type="PanelContainer" parent="TabContainer" unique_id=1395524084 node_paths=PackedStringArray("master_bus", "env_bus", "music_bus", "focus_start")]
+visible = false
+material = ExtResource("1_rys2v")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"SettingsTabContainer"
+script = ExtResource("10_e1xug")
+master_bus = NodePath("HBoxContainer/VBoxContainer/Master")
+env_bus = NodePath("HBoxContainer/VBoxContainer/Environment")
+music_bus = NodePath("HBoxContainer/VBoxContainer/Music")
+focus_start = NodePath("HBoxContainer/VBoxContainer/Master")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/SoundTab" unique_id=479791197]
+layout_mode = 2
+theme_type_variation = &"SettingsSplit"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/SoundTab/HBoxContainer" unique_id=1134410152]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsOptionList"
+
+[node name="Master" parent="TabContainer/SoundTab/HBoxContainer/VBoxContainer" unique_id=494687550 instance=ExtResource("7_rv0ww")]
+layout_mode = 2
+label = "Master"
+value = 100.0
+step = 1.0
+
+[node name="Environment" parent="TabContainer/SoundTab/HBoxContainer/VBoxContainer" unique_id=1433328046 instance=ExtResource("7_rv0ww")]
+layout_mode = 2
+label = "Environment"
+value = 100.0
+step = 1.0
+
+[node name="Music" parent="TabContainer/SoundTab/HBoxContainer/VBoxContainer" unique_id=1850795348 instance=ExtResource("7_rv0ww")]
+layout_mode = 2
+label = "Music"
+value = 100.0
+step = 1.0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/SoundTab/HBoxContainer" unique_id=709038937]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsDescription"
+text = "The option description goes here."
+
+[node name="ControlsTab" type="PanelContainer" parent="TabContainer" unique_id=1763255928]
+material = ExtResource("1_rys2v")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"SettingsTabContainer"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/ControlsTab" unique_id=678384332]
+layout_mode = 2
+theme_type_variation = &"SettingsSplit"
+
+[node name="VBoxContainerLeft" type="VBoxContainer" parent="TabContainer/ControlsTab/HBoxContainer" unique_id=1441648826]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsOptionList"
+
+[node name="MoveForward" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=510698977 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Move Forward"
+texture = ExtResource("11_44bim")
+
+[node name="MoveBackward" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=1211399512 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Move Backward"
+texture = ExtResource("12_1dh6r")
+
+[node name="TurnLeft" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=353676701 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Turn Left"
+texture = ExtResource("13_im2bc")
+
+[node name="TurnRight" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=946461237 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Turn Right"
+texture = ExtResource("14_gtb17")
+
+[node name="StrafeLeft" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=1446559392 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Strafe Left"
+texture = ExtResource("15_3qjbt")
+
+[node name="StrafeRight" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerLeft" unique_id=1604071926 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Strafe Right"
+texture = ExtResource("16_8frbw")
+
+[node name="VBoxContainerRight" type="VBoxContainer" parent="TabContainer/ControlsTab/HBoxContainer" unique_id=1104573068]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SettingsOptionList"
+
+[node name="Rise" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerRight" unique_id=866588137 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Rise"
+texture = ExtResource("17_8frbw")
+
+[node name="Land" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerRight" unique_id=696704535 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Land"
+texture = ExtResource("18_rvtar")
+
+[node name="FirePrimary" parent="TabContainer/ControlsTab/HBoxContainer/VBoxContainerRight" unique_id=1495686467 instance=ExtResource("10_0k1u1")]
+layout_mode = 2
+label = "Fire Primary"
+texture = ExtResource("19_xv08n")
+
+[node name="Footer" type="PanelContainer" parent="." unique_id=1664705594]
+material = ExtResource("1_rys2v")
+layout_mode = 2
+theme_type_variation = &"SettingsFooter"
+script = ExtResource("23_ghp0l")
+animation_offset = 0.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Footer" unique_id=575406343]
+layout_mode = 2
+alignment = 2
+
+[node name="Reset" type="Button" parent="Footer/HBoxContainer" unique_id=755848797 node_paths=PackedStringArray("shortcut_context")]
+layout_mode = 2
+size_flags_horizontal = 8
+focus_mode = 0
+shortcut_context = NodePath("../../..")
+theme_type_variation = &"FlatButton"
+shortcut = SubResource("Shortcut_dx68r")
+shortcut_in_tooltip = false
+text = "Reset"
+icon = ExtResource("10_upnh1")
+flat = true
+
+[node name="Apply" type="Button" parent="Footer/HBoxContainer" unique_id=1140458030 node_paths=PackedStringArray("shortcut_context")]
+layout_mode = 2
+size_flags_horizontal = 8
+focus_mode = 0
+shortcut_context = NodePath("../../..")
+theme_type_variation = &"FlatButton"
+shortcut = SubResource("Shortcut_e1xug")
+shortcut_in_tooltip = false
+text = "Apply"
+icon = ExtResource("12_dx68r")
+flat = true
+
+[node name="Cancel" type="Button" parent="Footer/HBoxContainer" unique_id=261888583 node_paths=PackedStringArray("shortcut_context")]
+layout_mode = 2
+size_flags_horizontal = 8
+focus_mode = 0
+shortcut_context = NodePath("../../..")
+theme_type_variation = &"FlatButton"
+shortcut = SubResource("Shortcut_caf5k")
+shortcut_in_tooltip = false
+text = "Cancel
+"
+icon = ExtResource("12_fs4m5")
+flat = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1460947898]
+libraries/ = SubResource("AnimationLibrary_ghp0l")
+autoplay = &"enter"

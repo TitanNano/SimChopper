@@ -1,0 +1,207 @@
+[gd_resource type="Theme" format=3 uid="uid://dw1b3gtetxdgl"]
+
+[sub_resource type="DPITexture" id="DPITexture_l1efq"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"16\"><rect width=\"30\" height=\"14\" x=\"1\" y=\"1\" fill=\"#fff\" fill-opacity=\".75\" rx=\"7\"/><circle cx=\"24\" cy=\"8\" r=\"5\" fill=\"#1a1a1a\"/></svg>
+"
+base_scale = 2.0
+
+[sub_resource type="DPITexture" id="DPITexture_tyf3o"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"16\"><rect width=\"30\" height=\"14\" x=\"1\" y=\"1\" fill=\"#fff\" fill-opacity=\".37\" rx=\"7\"/><circle cx=\"24\" cy=\"8\" r=\"5\" fill=\"#1a1a1a\" fill-opacity=\".5\"/></svg>
+"
+base_scale = 2.0
+
+[sub_resource type="DPITexture" id="DPITexture_rv0ww"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"16\"><g fill-opacity=\".5\"><rect width=\"30\" height=\"14\" x=\"1\" y=\"1\" fill=\"#1a1a1a\" rx=\"7\"/><circle cx=\"8\" cy=\"8\" r=\"5\" fill=\"#fff\"/></g></svg>
+"
+base_scale = 2.0
+
+[sub_resource type="DPITexture" id="DPITexture_aim2s"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"16\"><g fill-opacity=\".25\"><rect width=\"30\" height=\"14\" x=\"1\" y=\"1\" fill=\"#1a1a1a\" rx=\"7\"/><circle cx=\"8\" cy=\"8\" r=\"5\" fill=\"#fff\"/></g></svg>
+"
+base_scale = 2.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_aim2s"]
+content_margin_left = 16.0
+content_margin_right = 16.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f8f7k"]
+content_margin_left = 4.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+
+[sub_resource type="DPITexture" id="DPITexture_3jfrj"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><circle cx=\"8\" cy=\"8\" r=\"7\" fill=\"#fefefe\"/></svg>
+"
+base_scale = 2.0
+
+[sub_resource type="DPITexture" id="DPITexture_0k1u1"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><circle cx=\"8\" cy=\"8\" r=\"7\" fill=\"#fefefe\"/></svg>
+"
+base_scale = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rv0ww"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(1, 1, 1, 0.6745098)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+corner_detail = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0k1u1"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+corner_detail = 6
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_40g8j"]
+content_margin_left = 24.0
+content_margin_top = 4.0
+content_margin_right = 24.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tyf3o"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+
+[sub_resource type="DPITexture" id="DPITexture_5e4gs"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\"><path fill=\"none\" stroke=\"#b2b2b2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-opacity=\".85\" stroke-width=\"2\" d=\"m2 4 4 4 4-4\"/></svg>
+"
+base_scale = 3.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rv0ww"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_44bim"]
+content_margin_left = 24.0
+content_margin_right = 24.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aim2s"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+bg_color = Color(1, 1, 1, 0.16862746)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_40g8j"]
+bg_color = Color(0.62763536, 0.62763536, 0.62763536, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3jfrj"]
+bg_color = Color(1, 1, 1, 0.16862746)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l1efq"]
+content_margin_left = 24.0
+content_margin_right = 24.0
+bg_color = Color(0.627451, 0.627451, 0.627451, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3d3gr"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+bg_color = Color(0.50980395, 0.50980395, 0.50980395, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5e4gs"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+bg_color = Color(1, 1, 1, 0.23529412)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rys2v"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+bg_color = Color(0.234, 0.43420005, 0.78, 0.4627451)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l1efq"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_0k1u1"]
+content_margin_left = 0.0
+content_margin_top = 4.0
+content_margin_right = 0.0
+content_margin_bottom = 4.0
+color = Color(1, 1, 1, 1)
+grow_begin = 0.0
+grow_end = 0.0
+thickness = 2
+vertical = true
+
+[resource]
+CheckButton/icons/checked = SubResource("DPITexture_l1efq")
+CheckButton/icons/checked_disabled = SubResource("DPITexture_tyf3o")
+CheckButton/icons/unchecked = SubResource("DPITexture_rv0ww")
+CheckButton/icons/unchecked_disabled = SubResource("DPITexture_aim2s")
+CheckButton/styles/normal = SubResource("StyleBoxEmpty_aim2s")
+FlatButton/colors/font_color = Color(0.7058867, 0.7058868, 0.7058867, 1)
+FlatButton/colors/font_hover_color = Color(0.8453288, 0.8453288, 0.84532875, 1)
+FlatButton/colors/font_pressed_color = Color(1, 1, 1, 1)
+FlatButton/constants/icon_max_width = 32
+FlatButton/font_sizes/font_size = 16
+FlatButton/styles/hover = SubResource("StyleBoxEmpty_f8f7k")
+FlatButton/styles/normal = SubResource("StyleBoxEmpty_f8f7k")
+FlatButton/styles/pressed = SubResource("StyleBoxEmpty_f8f7k")
+HSlider/constants/center_grabber = 1
+HSlider/icons/grabber = SubResource("DPITexture_3jfrj")
+HSlider/icons/grabber_highlight = SubResource("DPITexture_0k1u1")
+HSlider/styles/grabber_area = SubResource("StyleBoxFlat_rv0ww")
+HSlider/styles/slider = SubResource("StyleBoxFlat_0k1u1")
+KeyBindBox/base_type = &"PanelContainer"
+KeyBindBox/styles/panel = SubResource("StyleBoxEmpty_40g8j")
+Label/font_sizes/font_size = 24
+Label/styles/normal = SubResource("StyleBoxEmpty_tyf3o")
+OptionButton/constants/arrow_margin = 16
+OptionButton/font_sizes/font_size = 24
+OptionButton/icons/arrow = SubResource("DPITexture_5e4gs")
+OptionButton/styles/normal = SubResource("StyleBoxEmpty_rv0ww")
+RangeSliderBox/base_type = &"PanelContainer"
+RangeSliderBox/styles/panel = SubResource("StyleBoxEmpty_44bim")
+RootLayout/base_type = &"VBoxContainer"
+RootLayout/constants/separation = 0
+SettingsDescription/base_type = &"RichTextLabel"
+SettingsDescription/font_sizes/normal_font_size = 32
+SettingsDescription/styles/normal = SubResource("StyleBoxFlat_aim2s")
+SettingsFooter/base_type = &"PanelContainer"
+SettingsFooter/styles/panel = SubResource("StyleBoxFlat_40g8j")
+SettingsOption/base_type = &"PanelContainer"
+SettingsOption/styles/panel = SubResource("StyleBoxFlat_3jfrj")
+SettingsOptionList/base_type = &"VBoxContainer"
+SettingsOptionList/constants/separation = 0
+SettingsSplit/base_type = &"HBoxContainer"
+SettingsSplit/constants/separation = 24
+SettingsTabBar/base_type = &"PanelContainer"
+SettingsTabBar/styles/panel = SubResource("StyleBoxFlat_l1efq")
+SettingsTabContainer/base_type = &"PanelContainer"
+SettingsTabContainer/styles/panel = SubResource("StyleBoxFlat_3d3gr")
+TabBar/colors/font_unselected_color = Color(0.8431839, 0.8431839, 0.84318376, 1)
+TabBar/colors/icon_unselected_color = Color(1, 1, 1, 1)
+TabBar/font_sizes/font_size = 24
+TabBar/styles/tab_hovered = SubResource("StyleBoxFlat_5e4gs")
+TabBar/styles/tab_selected = SubResource("StyleBoxFlat_rys2v")
+TabBar/styles/tab_unselected = SubResource("StyleBoxEmpty_l1efq")
+VSeparator/constants/separation = 2
+VSeparator/styles/separator = SubResource("StyleBoxLine_0k1u1")

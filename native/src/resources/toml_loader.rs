@@ -32,12 +32,6 @@ impl IResourceFormatLoader for TomlResourceLoader {
     }
 
     fn recognize_path(&self, path: GString, _type: StringName) -> bool {
-        logger::debug!(
-            "checking resource path {} for toml support! Ext: {}",
-            path,
-            path.get_extension()
-        );
-
         path.get_extension() == "toml"
     }
 
